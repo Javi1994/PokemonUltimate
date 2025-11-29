@@ -51,17 +51,44 @@ public class MoveInstance {
 ```
 
 ## 4. Move Effects (The Building Blocks)
-*Namespace: `PokemonGame.Core.Effects`*
+*Namespace: `PokemonUltimate.Core.Effects`*
 
-Effects are small, reusable logic blocks. They implement a method to generate **Actions**.
+Effects are small, reusable logic blocks. They are currently **data definitions** that describe what a move does. The execution logic (`GenerateActions`) will be added when the combat system is implemented.
 
+### Current Implementation (Data Definitions)
 ```csharp
 public interface IMoveEffect {
-    // Returns the Actions this effect causes.
-    // Context includes UserSlot, TargetSlot, Field, etc.
-    IEnumerable<BattleAction> GenerateActions(CombatContext ctx);
+    // Type-safe identifier for this effect
+    EffectType EffectType { get; }
+    
+    // Human-readable description
+    string Description { get; }
+    
+    // TODO: Will be added when combat system is ready
+    // IEnumerable<BattleAction> GenerateActions(CombatContext ctx);
 }
 
+public enum EffectType {
+    Damage, FixedDamage, Status, StatChange, 
+    Recoil, Drain, Heal, Flinch, MultiHit
+}
+```
+
+### Implemented Effect Classes
+| Effect | Parameters | Example |
+|--------|------------|---------|
+| `DamageEffect` | Multiplier, CanCrit, CritStages | Tackle, Razor Leaf |
+| `FixedDamageEffect` | Amount, UseLevelAsDamage | Dragon Rage, Seismic Toss |
+| `StatusEffect` | Status, ChancePercent, TargetSelf | Thunder Wave, Ember |
+| `StatChangeEffect` | Stat, Stages, ChancePercent, TargetSelf | Growl, Swords Dance |
+| `RecoilEffect` | RecoilPercent | Double-Edge |
+| `DrainEffect` | DrainPercent | Giga Drain |
+| `HealEffect` | HealPercent | Recover |
+| `FlinchEffect` | ChancePercent | Air Slash |
+| `MultiHitEffect` | MinHits, MaxHits | Fury Attack |
+
+### Future Implementation (Execution Logic)
+```csharp
 public class CombatContext {
     public BattleSlot User { get; private set; }
     public BattleSlot Target { get; private set; }
@@ -131,33 +158,41 @@ We use **SerializeReference** (Odin Inspector or standard Unity 2021+) to show t
     -   In Inspector, you click "+" and choose "DamageEffect", "StatusEffect", etc.
 
 ## 7. Testability (The "Ember" Test)
-We can test a move without running the game.
+We can test a move without running the game. Current tests verify **composition** (what effects are attached), while future tests will verify **execution** (what actions are generated).
 
+### Current: Composition Tests
 ```csharp
 [Test]
-public void Test_Ember_Generates_Damage_And_Burn() {
-    // 1. Setup
-    var ember = new MoveData {
-        Name = "Ember",
-        Power = 40,
-        Effects = { new DamageEffect(), new StatusEffect(Status.Burn, 0.1f) }
-    };
-    
-    // Create Dummy Slots for testing
-    var field = new BattleField(); 
-    // (Assuming BattleField has a helper to create dummy slots or we mock them)
-    var userSlot = new BattleSlot(0, new BattleSide(1, true));
-    userSlot.Pokemon = new PokemonInstance(charmanderData, 5);
-    
-    var targetSlot = new BattleSlot(0, new BattleSide(1, false));
-    targetSlot.Pokemon = new PokemonInstance(bulbasaurData, 5);
+public void Test_Ember_Has_Damage_And_Burn_Effects() {
+    // Use catalog or create manually
+    var ember = MoveCatalog.Ember;
+    // Or: new MoveData { Effects = { new DamageEffect(), new StatusEffect(PersistentStatus.Burn, 10) } }
 
-    // 2. Execute
+    Assert.Multiple(() => {
+        // Verify effect composition
+        Assert.That(ember.HasEffect<DamageEffect>(), Is.True);
+        Assert.That(ember.HasEffect<StatusEffect>(), Is.True);
+        
+        // Verify effect parameters
+        var status = ember.GetEffect<StatusEffect>();
+        Assert.That(status.EffectType, Is.EqualTo(EffectType.Status));
+        Assert.That(status.Status, Is.EqualTo(PersistentStatus.Burn));
+        Assert.That(status.ChancePercent, Is.EqualTo(10));
+    });
+}
+```
+
+### Future: Execution Tests (When Combat System is Ready)
+```csharp
+[Test]
+public void Test_Ember_Generates_Damage_And_Burn_Actions() {
+    var ember = MoveCatalog.Ember;
     var context = new CombatContext(userSlot, targetSlot, field);
+    
     var actions = new List<BattleAction>();
-    foreach(var eff in ember.Effects) actions.AddRange(eff.GenerateActions(context));
+    foreach(var eff in ember.Effects) 
+        actions.AddRange(eff.GenerateActions(context));
 
-    // 3. Assert
     Assert.IsTrue(actions.Any(a => a is DamageAction));
     Assert.IsTrue(actions.Any(a => a is StatusRollAction));
 }

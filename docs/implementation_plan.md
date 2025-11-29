@@ -31,11 +31,12 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 4.  ✅ **Tests**: 16 tests for registry + 10 tests for model
 
 ### 1.3 Move Data ✅ COMPLETE (Basic)
-1.  ✅ **Blueprint**: `MoveData` (Name, Type, Category, Power, Accuracy, PP, Priority, TargetScope)
-2.  ✅ **Enums**: `PokemonType` (18), `MoveCategory` (3), `TargetScope` (10)
+1.  ✅ **Blueprint**: `MoveData` (Name, Type, Category, Power, Accuracy, PP, Priority, TargetScope, Effects)
+2.  ✅ **Enums**: `PokemonType` (18), `MoveCategory` (3), `TargetScope` (10), `Stat` (8), `PersistentStatus` (7), `VolatileStatus` (11), `EffectType` (9)
 3.  ✅ **Registry**: `IMoveRegistry`, `MoveRegistry` (with Type/Category filters)
 4.  ✅ **Catalog**: `MoveCatalog` (20 Moves: Normal, Fire, Water, Grass, Electric, Ground, Psychic)
-5.  ✅ **Tests**: 9 registry + 9 filter + 12 model tests
+5.  ✅ **Effects**: `IMoveEffect` interface + 9 concrete effects (DamageEffect, FixedDamageEffect, StatusEffect, StatChangeEffect, RecoilEffect, DrainEffect, HealEffect, FlinchEffect, MultiHitEffect)
+6.  ✅ **Tests**: 9 registry + 9 filter + 12 model + 25 effect + 12 composition + 12 catalog effects tests
 
 ### 1.4 Instance & Factory ⏳ PENDING
 1.  ⏳ **Expand**: Add BaseStats, Types, MovePool to `PokemonSpeciesData`

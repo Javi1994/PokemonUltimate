@@ -56,7 +56,7 @@ public static class PokemonCatalog
 ```csharp
 public static class MoveCatalog
 {
-    // Direct access to Move data
+    // Direct access to Move data (with composed Effects)
     public static readonly MoveData Thunderbolt = new MoveData
     {
         Name = "Thunderbolt",
@@ -66,7 +66,12 @@ public static class MoveCatalog
         Accuracy = 100,
         MaxPP = 15,
         Priority = 0,
-        TargetScope = TargetScope.SingleEnemy
+        TargetScope = TargetScope.SingleEnemy,
+        Effects = 
+        { 
+            new DamageEffect(),
+            new StatusEffect(PersistentStatus.Paralysis, 10)
+        }
     };
     
     // Enumerate all defined Moves
@@ -207,11 +212,50 @@ public void Test_RegisterAll_Pokemon_Are_Retrievable()
 }
 ```
 
-## 8. Future Enhancements
+## 8. Move Effects (Implemented)
+
+Moves now include composed Effects that define their behavior:
+
+```csharp
+// Example: Fire move with burn chance
+public static readonly MoveData Flamethrower = new MoveData
+{
+    Name = "Flamethrower",
+    Type = PokemonType.Fire,
+    Power = 90,
+    Effects = 
+    { 
+        new DamageEffect(),
+        new StatusEffect(PersistentStatus.Burn, 10)
+    }
+};
+
+// Check if move has specific effect
+if (move.HasEffect<StatusEffect>())
+{
+    var status = move.GetEffect<StatusEffect>();
+    Console.WriteLine($"Can apply {status.Status} with {status.ChancePercent}% chance");
+}
+```
+
+### Available Effect Types
+| EffectType | Class | Description |
+|------------|-------|-------------|
+| `Damage` | `DamageEffect` | Standard damage calculation |
+| `FixedDamage` | `FixedDamageEffect` | Fixed HP damage (Dragon Rage) |
+| `Status` | `StatusEffect` | Apply persistent status |
+| `StatChange` | `StatChangeEffect` | Modify stat stages |
+| `Recoil` | `RecoilEffect` | User takes recoil damage |
+| `Drain` | `DrainEffect` | User heals from damage |
+| `Heal` | `HealEffect` | Direct HP recovery |
+| `Flinch` | `FlinchEffect` | May cause flinch |
+| `MultiHit` | `MultiHitEffect` | Hits 2-5 times |
+
+## 9. Future Enhancements
 
 ### Planned
 - Add BaseStats, Types, Abilities to Pokemon in catalog
-- Add Effects list to Moves in catalog
+- Add `GenerateActions()` method to effects when combat system is ready
 - Consider grouping by generation or region
 
 ### Considered (Not Planned)

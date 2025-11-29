@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Interfaces;
 
@@ -38,8 +40,28 @@ namespace PokemonUltimate.Core.Data
         // IIdentifiable implementation - Name serves as the unique ID
         public string Id => Name;
 
-        // Effects will be added later when implementing the combat system
-        // public List<IMoveEffect> Effects { get; set; } = new List<IMoveEffect>();
+        // Composed effects that define what the move does (Composition Pattern)
+        public List<IMoveEffect> Effects { get; set; } = new List<IMoveEffect>();
+        
+        // Helper to check if move has a specific effect type
+        public bool HasEffect<T>() where T : IMoveEffect
+        {
+            foreach (var effect in Effects)
+            {
+                if (effect is T) return true;
+            }
+            return false;
+        }
+        
+        // Helper to get a specific effect type (or null if not found)
+        public T GetEffect<T>() where T : class, IMoveEffect
+        {
+            foreach (var effect in Effects)
+            {
+                if (effect is T typedEffect) return typedEffect;
+            }
+            return null;
+        }
     }
 }
 

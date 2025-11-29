@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using PokemonUltimate.Core.Data;
+using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Interfaces;
 
@@ -21,7 +22,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 35,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new DamageEffect() }
         };
 
         public static readonly MoveData Scratch = new MoveData
@@ -34,7 +36,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 35,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new DamageEffect() }
         };
 
         public static readonly MoveData QuickAttack = new MoveData
@@ -47,7 +50,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 30,
             Priority = 1,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new DamageEffect() }
         };
 
         public static readonly MoveData HyperBeam = new MoveData
@@ -60,7 +64,9 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 90,
             MaxPP = 5,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new DamageEffect() }
+            // Note: Recharge effect will be added later
         };
 
         public static readonly MoveData Growl = new MoveData
@@ -73,7 +79,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 40,
             Priority = 0,
-            TargetScope = TargetScope.AllEnemies
+            TargetScope = TargetScope.AllEnemies,
+            Effects = { new StatChangeEffect(Stat.Attack, -1, targetSelf: false) }
         };
 
         #endregion
@@ -90,7 +97,12 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 25,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = 
+            { 
+                new DamageEffect(),
+                new StatusEffect(PersistentStatus.Burn, 10)
+            }
         };
 
         public static readonly MoveData Flamethrower = new MoveData
@@ -103,7 +115,12 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 15,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = 
+            { 
+                new DamageEffect(),
+                new StatusEffect(PersistentStatus.Burn, 10)
+            }
         };
 
         public static readonly MoveData FireBlast = new MoveData
@@ -116,7 +133,12 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 85,
             MaxPP = 5,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = 
+            { 
+                new DamageEffect(),
+                new StatusEffect(PersistentStatus.Burn, 10)
+            }
         };
 
         #endregion
@@ -133,7 +155,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 25,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new DamageEffect() }
         };
 
         public static readonly MoveData Surf = new MoveData
@@ -146,7 +169,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 15,
             Priority = 0,
-            TargetScope = TargetScope.AllEnemies
+            TargetScope = TargetScope.AllEnemies,
+            Effects = { new DamageEffect() }
         };
 
         public static readonly MoveData HydroPump = new MoveData
@@ -159,7 +183,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 80,
             MaxPP = 5,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new DamageEffect() }
         };
 
         #endregion
@@ -176,7 +201,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 25,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new DamageEffect() }
         };
 
         public static readonly MoveData RazorLeaf = new MoveData
@@ -189,7 +215,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 95,
             MaxPP = 25,
             Priority = 0,
-            TargetScope = TargetScope.AllEnemies
+            TargetScope = TargetScope.AllEnemies,
+            Effects = { new DamageEffect { CritStages = 1 } } // High crit ratio
         };
 
         public static readonly MoveData SolarBeam = new MoveData
@@ -202,7 +229,9 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 10,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new DamageEffect() }
+            // Note: Charge effect will be added later
         };
 
         #endregion
@@ -219,7 +248,12 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 30,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = 
+            { 
+                new DamageEffect(),
+                new StatusEffect(PersistentStatus.Paralysis, 10)
+            }
         };
 
         public static readonly MoveData Thunderbolt = new MoveData
@@ -232,7 +266,12 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 15,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = 
+            { 
+                new DamageEffect(),
+                new StatusEffect(PersistentStatus.Paralysis, 10)
+            }
         };
 
         public static readonly MoveData Thunder = new MoveData
@@ -245,7 +284,12 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 70,
             MaxPP = 10,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = 
+            { 
+                new DamageEffect(),
+                new StatusEffect(PersistentStatus.Paralysis, 30)
+            }
         };
 
         public static readonly MoveData ThunderWave = new MoveData
@@ -258,7 +302,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 90,
             MaxPP = 20,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = { new StatusEffect(PersistentStatus.Paralysis, 100) }
         };
 
         #endregion
@@ -275,7 +320,8 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 10,
             Priority = 0,
-            TargetScope = TargetScope.AllOthers
+            TargetScope = TargetScope.AllOthers,
+            Effects = { new DamageEffect() }
         };
 
         #endregion
@@ -292,7 +338,12 @@ namespace PokemonUltimate.Core.Catalogs
             Accuracy = 100,
             MaxPP = 10,
             Priority = 0,
-            TargetScope = TargetScope.SingleEnemy
+            TargetScope = TargetScope.SingleEnemy,
+            Effects = 
+            { 
+                new DamageEffect(),
+                new StatChangeEffect(Stat.SpDefense, -1, targetSelf: false, chancePercent: 10)
+            }
         };
 
         #endregion

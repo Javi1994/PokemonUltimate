@@ -19,11 +19,20 @@
     - [x] `IMoveRegistry` interface
     - [x] `MoveRegistry` (with Type/Category filters)
     - [ ] `MoveInstance` (PP tracking per Pokemon)
-    - [ ] `IMoveEffect` system (composable effects)
+- [x] **Move Effects (Composable)**
+    - [x] `IMoveEffect` interface (EffectType + Description)
+    - [x] `EffectType` enum (Damage, Status, StatChange, etc.)
+    - [x] 9 effect classes: DamageEffect, FixedDamageEffect, StatusEffect, StatChangeEffect, RecoilEffect, DrainEffect, HealEffect, FlinchEffect, MultiHitEffect
+    - [x] Effects integrated into `MoveCatalog` entries
+    - [ ] `GenerateActions()` method (pending combat system)
 - [x] **Enums**
     - [x] `PokemonType` (18 types)
     - [x] `MoveCategory` (Physical, Special, Status)
     - [x] `TargetScope` (Self, SingleEnemy, AllEnemies, etc.)
+    - [x] `Stat` (HP, Attack, Defense, SpAttack, SpDefense, Speed, Accuracy, Evasion)
+    - [x] `PersistentStatus` (Burn, Paralysis, Sleep, Poison, BadlyPoisoned, Freeze)
+    - [x] `VolatileStatus` (Confusion, Flinch, LeechSeed, etc.)
+    - [x] `EffectType` (Damage, FixedDamage, Status, StatChange, Recoil, Drain, Heal, Flinch, MultiHit)
 - [x] **Catalogs**
     - [x] `PokemonCatalog` (15 Pokemon defined)
     - [x] `MoveCatalog` (20 Moves defined)
@@ -51,6 +60,9 @@
 - [x] Move Filter tests (9 tests)
 - [x] Pokemon/Move Data model tests (22 tests)
 - [x] Catalog tests (28 tests)
+- [x] Move Effect tests (25 tests)
+- [x] Effect Composition tests (12 tests)
+- [x] Catalog Effects tests (12 tests)
 
 ---
 
