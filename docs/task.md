@@ -33,10 +33,15 @@
     - [x] `PersistentStatus` (Burn, Paralysis, Sleep, Poison, BadlyPoisoned, Freeze)
     - [x] `VolatileStatus` (Confusion, Flinch, LeechSeed, etc.)
     - [x] `EffectType` (Damage, FixedDamage, Status, StatChange, Recoil, Drain, Heal, Flinch, MultiHit)
-- [x] **Catalogs**
-    - [x] `PokemonCatalog` (15 Pokemon defined)
-    - [x] `MoveCatalog` (20 Moves defined)
+- [x] **Catalogs (Modular with Partial Classes)**
+    - [x] `PokemonCatalog` - organized by generation
+        - [x] `PokemonCatalog.cs` (orchestrator)
+        - [x] `PokemonCatalog.Gen1.cs` (15 Pokemon)
+    - [x] `MoveCatalog` - organized by type
+        - [x] `MoveCatalog.cs` (orchestrator)
+        - [x] `MoveCatalog.[Type].cs` (20 Moves across 7 types)
     - [x] `RegisterAll()` for bulk registration
+    - [x] Lazy initialization for `All` enumeration
 
 ### Combat Engine (Step 2-5) ⏳ PENDING
 - [ ] **Action Queue Architecture**

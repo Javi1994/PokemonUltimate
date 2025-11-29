@@ -57,7 +57,15 @@
     -   Systems should be loosely coupled.
     -   Use Interfaces to define boundaries.
 
-11. **Documentation Comments**:
+11. **Small Catalogs (Content Organization)**:
+    -   **NEVER** create a single giant file with all Pokemon or all Moves.
+    -   Use **partial classes** to split catalogs into small, focused files.
+    -   **Pokemon**: Organize by generation (`PokemonCatalog.Gen1.cs`, `PokemonCatalog.Gen2.cs`).
+    -   **Moves**: Organize by type (`MoveCatalog.Fire.cs`, `MoveCatalog.Electric.cs`).
+    -   **Rule of Thumb**: Each file should have **~50-150 lines max**. If it grows larger, split it.
+    -   **Benefits**: Easier maintenance, better collaboration, faster navigation, cleaner diffs.
+
+12. **Documentation Comments**:
     -   Every class and interface **MUST** have a simple, direct comment at the top explaining its purpose.
     -   Keep it short. Example: `// Defines the blueprint for a Pokemon species (immutable data).`
 
@@ -96,7 +104,7 @@
 -   **Pokemon Data** (`pokemon_data_detailed.md`): Blueprints (Species) vs Instances, Factory pattern.
 -   **Move System** (`move_system_detailed.md`): Composable effects (`IMoveEffect`), no content-specific classes.
 -   **Data Loading** (`data_loading_system.md`): Registry pattern (`IDataRegistry`), auto-population.
--   **Catalogs** (`catalogs_system.md`): Static data definitions (`PokemonCatalog`, `MoveCatalog`), bulk registration.
+-   **Catalogs** (`catalogs_system.md`): Modular static data using partial classes, organized by generation/type.
 
 ### Combat Flow
 -   **Action Queue** (`combat_system_spec.md`): Sequential processing of `BattleAction`s (Logic + Visual).

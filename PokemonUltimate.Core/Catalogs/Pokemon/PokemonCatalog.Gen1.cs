@@ -1,18 +1,14 @@
-using System.Collections.Generic;
 using PokemonUltimate.Core.Data;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Interfaces;
 
 namespace PokemonUltimate.Core.Catalogs
 {
     /// <summary>
-    /// Static catalog of all Pokemon in the game.
-    /// Provides direct access to Pokemon data and bulk registration to registries.
-    /// Stats are official Gen 1 values.
+    /// Generation 1 Pokemon (Kanto region, #001-151).
     /// </summary>
-    public static class PokemonCatalog
+    public static partial class PokemonCatalog
     {
-        #region Generation 1 Starters - Grass Line
+        #region Starters - Grass Line
 
         public static readonly PokemonSpeciesData Bulbasaur = new PokemonSpeciesData
         {
@@ -20,7 +16,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 1,
             PrimaryType = PokemonType.Grass,
             SecondaryType = PokemonType.Poison,
-            BaseStats = new BaseStats(45, 49, 49, 65, 65, 45) // BST: 318
+            BaseStats = new BaseStats(45, 49, 49, 65, 65, 45)
         };
 
         public static readonly PokemonSpeciesData Ivysaur = new PokemonSpeciesData
@@ -29,7 +25,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 2,
             PrimaryType = PokemonType.Grass,
             SecondaryType = PokemonType.Poison,
-            BaseStats = new BaseStats(60, 62, 63, 80, 80, 60) // BST: 405
+            BaseStats = new BaseStats(60, 62, 63, 80, 80, 60)
         };
 
         public static readonly PokemonSpeciesData Venusaur = new PokemonSpeciesData
@@ -38,12 +34,12 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 3,
             PrimaryType = PokemonType.Grass,
             SecondaryType = PokemonType.Poison,
-            BaseStats = new BaseStats(80, 82, 83, 100, 100, 80) // BST: 525
+            BaseStats = new BaseStats(80, 82, 83, 100, 100, 80)
         };
 
         #endregion
 
-        #region Generation 1 Starters - Fire Line
+        #region Starters - Fire Line
 
         public static readonly PokemonSpeciesData Charmander = new PokemonSpeciesData
         {
@@ -51,7 +47,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 4,
             PrimaryType = PokemonType.Fire,
             SecondaryType = null,
-            BaseStats = new BaseStats(39, 52, 43, 60, 50, 65) // BST: 309
+            BaseStats = new BaseStats(39, 52, 43, 60, 50, 65)
         };
 
         public static readonly PokemonSpeciesData Charmeleon = new PokemonSpeciesData
@@ -60,7 +56,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 5,
             PrimaryType = PokemonType.Fire,
             SecondaryType = null,
-            BaseStats = new BaseStats(58, 64, 58, 80, 65, 80) // BST: 405
+            BaseStats = new BaseStats(58, 64, 58, 80, 65, 80)
         };
 
         public static readonly PokemonSpeciesData Charizard = new PokemonSpeciesData
@@ -69,12 +65,12 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 6,
             PrimaryType = PokemonType.Fire,
             SecondaryType = PokemonType.Flying,
-            BaseStats = new BaseStats(78, 84, 78, 109, 85, 100) // BST: 534
+            BaseStats = new BaseStats(78, 84, 78, 109, 85, 100)
         };
 
         #endregion
 
-        #region Generation 1 Starters - Water Line
+        #region Starters - Water Line
 
         public static readonly PokemonSpeciesData Squirtle = new PokemonSpeciesData
         {
@@ -82,7 +78,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 7,
             PrimaryType = PokemonType.Water,
             SecondaryType = null,
-            BaseStats = new BaseStats(44, 48, 65, 50, 64, 43) // BST: 314
+            BaseStats = new BaseStats(44, 48, 65, 50, 64, 43)
         };
 
         public static readonly PokemonSpeciesData Wartortle = new PokemonSpeciesData
@@ -91,7 +87,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 8,
             PrimaryType = PokemonType.Water,
             SecondaryType = null,
-            BaseStats = new BaseStats(59, 63, 80, 65, 80, 58) // BST: 405
+            BaseStats = new BaseStats(59, 63, 80, 65, 80, 58)
         };
 
         public static readonly PokemonSpeciesData Blastoise = new PokemonSpeciesData
@@ -100,12 +96,12 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 9,
             PrimaryType = PokemonType.Water,
             SecondaryType = null,
-            BaseStats = new BaseStats(79, 83, 100, 85, 105, 78) // BST: 530
+            BaseStats = new BaseStats(79, 83, 100, 85, 105, 78)
         };
 
         #endregion
 
-        #region Electric Pokemon
+        #region Electric
 
         public static readonly PokemonSpeciesData Pikachu = new PokemonSpeciesData
         {
@@ -113,7 +109,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 25,
             PrimaryType = PokemonType.Electric,
             SecondaryType = null,
-            BaseStats = new BaseStats(35, 55, 40, 50, 50, 90) // BST: 320
+            BaseStats = new BaseStats(35, 55, 40, 50, 50, 90)
         };
 
         public static readonly PokemonSpeciesData Raichu = new PokemonSpeciesData
@@ -122,12 +118,12 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 26,
             PrimaryType = PokemonType.Electric,
             SecondaryType = null,
-            BaseStats = new BaseStats(60, 90, 55, 90, 80, 110) // BST: 485
+            BaseStats = new BaseStats(60, 90, 55, 90, 80, 110)
         };
 
         #endregion
 
-        #region Normal Pokemon
+        #region Normal
 
         public static readonly PokemonSpeciesData Eevee = new PokemonSpeciesData
         {
@@ -135,7 +131,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 133,
             PrimaryType = PokemonType.Normal,
             SecondaryType = null,
-            BaseStats = new BaseStats(55, 55, 50, 45, 65, 55) // BST: 325
+            BaseStats = new BaseStats(55, 55, 50, 45, 65, 55)
         };
 
         public static readonly PokemonSpeciesData Snorlax = new PokemonSpeciesData
@@ -144,7 +140,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 143,
             PrimaryType = PokemonType.Normal,
             SecondaryType = null,
-            BaseStats = new BaseStats(160, 110, 65, 65, 110, 30) // BST: 540
+            BaseStats = new BaseStats(160, 110, 65, 65, 110, 30)
         };
 
         #endregion
@@ -157,7 +153,7 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 150,
             PrimaryType = PokemonType.Psychic,
             SecondaryType = null,
-            BaseStats = new BaseStats(106, 110, 90, 154, 90, 130) // BST: 680
+            BaseStats = new BaseStats(106, 110, 90, 154, 90, 130)
         };
 
         public static readonly PokemonSpeciesData Mew = new PokemonSpeciesData
@@ -166,60 +162,37 @@ namespace PokemonUltimate.Core.Catalogs
             PokedexNumber = 151,
             PrimaryType = PokemonType.Psychic,
             SecondaryType = null,
-            BaseStats = new BaseStats(100, 100, 100, 100, 100, 100) // BST: 600
+            BaseStats = new BaseStats(100, 100, 100, 100, 100, 100)
         };
 
         #endregion
 
-        #region All Pokemon & Registration
+        #region Registration
 
-        /// <summary>
-        /// All Pokemon defined in this catalog.
-        /// </summary>
-        public static IEnumerable<PokemonSpeciesData> All
+        static partial void RegisterGen1()
         {
-            get
-            {
-                // Grass Starters
-                yield return Bulbasaur;
-                yield return Ivysaur;
-                yield return Venusaur;
-                // Fire Starters
-                yield return Charmander;
-                yield return Charmeleon;
-                yield return Charizard;
-                // Water Starters
-                yield return Squirtle;
-                yield return Wartortle;
-                yield return Blastoise;
-                // Electric
-                yield return Pikachu;
-                yield return Raichu;
-                // Normal
-                yield return Eevee;
-                yield return Snorlax;
-                // Legendary
-                yield return Mewtwo;
-                yield return Mew;
-            }
+            // Starters
+            _all.Add(Bulbasaur);
+            _all.Add(Ivysaur);
+            _all.Add(Venusaur);
+            _all.Add(Charmander);
+            _all.Add(Charmeleon);
+            _all.Add(Charizard);
+            _all.Add(Squirtle);
+            _all.Add(Wartortle);
+            _all.Add(Blastoise);
+            // Electric
+            _all.Add(Pikachu);
+            _all.Add(Raichu);
+            // Normal
+            _all.Add(Eevee);
+            _all.Add(Snorlax);
+            // Legendary
+            _all.Add(Mewtwo);
+            _all.Add(Mew);
         }
-
-        /// <summary>
-        /// Register all Pokemon from this catalog into a registry.
-        /// </summary>
-        public static void RegisterAll(IPokemonRegistry registry)
-        {
-            foreach (var pokemon in All)
-            {
-                registry.Register(pokemon);
-            }
-        }
-
-        /// <summary>
-        /// Count of all Pokemon in catalog.
-        /// </summary>
-        public static int Count => 15;
 
         #endregion
     }
 }
+

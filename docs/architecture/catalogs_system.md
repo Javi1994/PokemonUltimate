@@ -14,6 +14,7 @@ This bridges the gap between static data definitions and the runtime Registry sy
 - **No Magic Strings**: Type-safe references instead of `registry.Get("Pikachu")`
 - **Testability**: Tests can use specific Pokemon without setting up full registries
 - **Bulk Registration**: One call to populate an entire registry
+- **Modular**: Organized by generation/type using partial classes
 
 ### Catalog vs Registry
 | Aspect | Catalog | Registry |
@@ -24,79 +25,93 @@ This bridges the gap between static data definitions and the runtime Registry sy
 | Mutability | Immutable | Can add at runtime |
 | Use Case | Known data, compile-time | Dynamic lookup, runtime |
 
-## 3. Structure
+## 3. File Structure
 
-### `PokemonCatalog`
-*Namespace: `PokemonUltimate.Core.Catalogs`*
+### Pokemon Catalog (by Generation)
+```
+Catalogs/Pokemon/
+├── PokemonCatalog.cs           # Orquestador: All, Count, RegisterAll
+├── PokemonCatalog.Gen1.cs      # Generation 1 (#001-151)
+├── PokemonCatalog.Gen2.cs      # Generation 2 (#152-251) [future]
+└── PokemonCatalog.Custom.cs    # Custom Pokemon [future]
+```
 
+### Move Catalog (by Type)
+```
+Catalogs/Moves/
+├── MoveCatalog.cs              # Orquestador: All, Count, RegisterAll
+├── MoveCatalog.Normal.cs       # Normal-type moves
+├── MoveCatalog.Fire.cs         # Fire-type moves
+├── MoveCatalog.Water.cs        # Water-type moves
+├── MoveCatalog.Grass.cs        # Grass-type moves
+├── MoveCatalog.Electric.cs     # Electric-type moves
+├── MoveCatalog.Ground.cs       # Ground-type moves
+└── MoveCatalog.Psychic.cs      # Psychic-type moves
+```
+
+## 4. Architecture
+
+### PokemonCatalog (Orchestrator)
 ```csharp
-public static class PokemonCatalog
+public static partial class PokemonCatalog
 {
-    // Direct access to Pokemon data
+    private static List<PokemonSpeciesData> _all;
+    
+    public static IEnumerable<PokemonSpeciesData> All
+    {
+        get
+        {
+            if (_all == null) InitializeAll();
+            return _all;
+        }
+    }
+    
+    public static int Count => _all?.Count ?? 0;
+    
+    public static void RegisterAll(IPokemonRegistry registry);
+    
+    private static void InitializeAll()
+    {
+        _all = new List<PokemonSpeciesData>();
+        RegisterGen1();  // Implemented in PokemonCatalog.Gen1.cs
+        // RegisterGen2(); // Add when needed
+    }
+    
+    static partial void RegisterGen1();
+}
+```
+
+### PokemonCatalog.Gen1 (Partial)
+```csharp
+public static partial class PokemonCatalog
+{
     public static readonly PokemonSpeciesData Pikachu = new PokemonSpeciesData
     {
         Name = "Pikachu",
-        PokedexNumber = 25
+        PokedexNumber = 25,
+        PrimaryType = PokemonType.Electric,
+        BaseStats = new BaseStats(35, 55, 40, 50, 50, 90)
     };
     
-    // Enumerate all defined Pokemon
-    public static IEnumerable<PokemonSpeciesData> All { get; }
-    
-    // Bulk register into a registry
-    public static void RegisterAll(IPokemonRegistry registry);
-    
-    // Count of defined Pokemon
-    public static int Count { get; }
-}
-```
-
-### `MoveCatalog`
-*Namespace: `PokemonUltimate.Core.Catalogs`*
-
-```csharp
-public static class MoveCatalog
-{
-    // Direct access to Move data (with composed Effects)
-    public static readonly MoveData Thunderbolt = new MoveData
+    static partial void RegisterGen1()
     {
-        Name = "Thunderbolt",
-        Type = PokemonType.Electric,
-        Category = MoveCategory.Special,
-        Power = 90,
-        Accuracy = 100,
-        MaxPP = 15,
-        Priority = 0,
-        TargetScope = TargetScope.SingleEnemy,
-        Effects = 
-        { 
-            new DamageEffect(),
-            new StatusEffect(PersistentStatus.Paralysis, 10)
-        }
-    };
-    
-    // Enumerate all defined Moves
-    public static IEnumerable<MoveData> All { get; }
-    
-    // Bulk register into a registry
-    public static void RegisterAll(IMoveRegistry registry);
-    
-    // Count of defined Moves
-    public static int Count { get; }
+        _all.Add(Pikachu);
+        // ... add all Gen1 Pokemon
+    }
 }
 ```
 
-## 4. Current Content
+## 5. Current Content
 
-### PokemonCatalog (15 Pokemon)
-| Pokemon | Pokedex # | Category |
-|---------|-----------|----------|
-| Bulbasaur, Ivysaur, Venusaur | 1, 2, 3 | Grass Starter Line |
-| Charmander, Charmeleon, Charizard | 4, 5, 6 | Fire Starter Line |
-| Squirtle, Wartortle, Blastoise | 7, 8, 9 | Water Starter Line |
-| Pikachu, Raichu | 25, 26 | Electric |
-| Eevee | 133 | Normal |
-| Snorlax | 143 | Normal |
-| Mewtwo, Mew | 150, 151 | Legendary/Mythical |
+### PokemonCatalog (15 Pokemon - Gen 1)
+| Pokemon | Pokedex # | Types | BST |
+|---------|-----------|-------|-----|
+| Bulbasaur, Ivysaur, Venusaur | 1-3 | Grass/Poison | 318→525 |
+| Charmander, Charmeleon, Charizard | 4-6 | Fire→Fire/Flying | 309→534 |
+| Squirtle, Wartortle, Blastoise | 7-9 | Water | 314→530 |
+| Pikachu, Raichu | 25-26 | Electric | 320→485 |
+| Eevee, Snorlax | 133, 143 | Normal | 325, 540 |
+| Mewtwo, Mew | 150-151 | Psychic | 680, 600 |
 
 ### MoveCatalog (20 Moves)
 | Type | Moves |
@@ -109,115 +124,111 @@ public static class MoveCatalog
 | Ground | Earthquake |
 | Psychic | Psychic |
 
-## 5. Usage Patterns
+## 6. Adding New Content
+
+### Adding Generation 2 Pokemon
+
+1. **Create file** `PokemonCatalog.Gen2.cs`:
+```csharp
+public static partial class PokemonCatalog
+{
+    public static readonly PokemonSpeciesData Chikorita = new PokemonSpeciesData
+    {
+        Name = "Chikorita",
+        PokedexNumber = 152,
+        PrimaryType = PokemonType.Grass,
+        BaseStats = new BaseStats(45, 49, 65, 49, 65, 45)
+    };
+    
+    static partial void RegisterGen2()
+    {
+        _all.Add(Chikorita);
+        // ... add all Gen2 Pokemon
+    }
+}
+```
+
+2. **Update orchestrator** `PokemonCatalog.cs`:
+```csharp
+private static void InitializeAll()
+{
+    _all = new List<PokemonSpeciesData>();
+    RegisterGen1();
+    RegisterGen2();  // ← Add this line
+}
+
+static partial void RegisterGen2();  // ← Add declaration
+```
+
+### Adding Ice Moves
+
+1. **Create file** `MoveCatalog.Ice.cs`:
+```csharp
+public static partial class MoveCatalog
+{
+    public static readonly MoveData IceBeam = new MoveData
+    {
+        Name = "Ice Beam",
+        Type = PokemonType.Ice,
+        Category = MoveCategory.Special,
+        Power = 90,
+        Accuracy = 100,
+        Effects = { new DamageEffect(), new StatusEffect(PersistentStatus.Freeze, 10) }
+    };
+    
+    static partial void RegisterIce()
+    {
+        _all.Add(IceBeam);
+    }
+}
+```
+
+2. **Update orchestrator** `MoveCatalog.cs`:
+```csharp
+private static void InitializeAll()
+{
+    // ... existing types
+    RegisterIce();  // ← Add this line
+}
+
+static partial void RegisterIce();  // ← Add declaration
+```
+
+## 7. Usage Patterns
 
 ### Pattern 1: Direct Access
 ```csharp
-// In tests or when you know exactly what you need
 var pikachu = PokemonCatalog.Pikachu;
 var thunderbolt = MoveCatalog.Thunderbolt;
 
-Assert.That(pikachu.PokedexNumber, Is.EqualTo(25));
-Assert.That(thunderbolt.Power, Is.EqualTo(90));
+Assert.That(pikachu.BaseStats.Speed, Is.EqualTo(90));
 ```
 
 ### Pattern 2: Registry Population
 ```csharp
-// At game startup
 var pokemonRegistry = new PokemonRegistry();
 var moveRegistry = new MoveRegistry();
 
 PokemonCatalog.RegisterAll(pokemonRegistry);
 MoveCatalog.RegisterAll(moveRegistry);
 
-// Now use registry for dynamic lookups
 var pokemon = pokemonRegistry.GetByPokedexNumber(25);
-var fireMoves = moveRegistry.GetByType(PokemonType.Fire);
 ```
 
-### Pattern 3: Iteration
+### Pattern 3: Filtering
 ```csharp
-// List all available Pokemon
-foreach (var pokemon in PokemonCatalog.All)
-{
-    Console.WriteLine($"#{pokemon.PokedexNumber}: {pokemon.Name}");
-}
+// All Fire-type Pokemon
+var fireTypes = PokemonCatalog.All.Where(p => p.HasType(PokemonType.Fire));
 
-// Filter moves by category
+// All Status moves
 var statusMoves = MoveCatalog.All.Where(m => m.Category == MoveCategory.Status);
 ```
 
-## 6. Adding New Content
+## 8. Move Effects
 
-### Adding a Pokemon
-```csharp
-// 1. Add the static field in PokemonCatalog
-public static readonly PokemonSpeciesData Gengar = new PokemonSpeciesData
-{
-    Name = "Gengar",
-    PokedexNumber = 94
-};
-
-// 2. Add to the All property's yield returns
-yield return Gengar;
-
-// 3. Update Count
-public static int Count => 16; // was 15
-```
-
-### Adding a Move
-```csharp
-// 1. Add the static field in MoveCatalog
-public static readonly MoveData ShadowBall = new MoveData
-{
-    Name = "Shadow Ball",
-    Type = PokemonType.Ghost,
-    Category = MoveCategory.Special,
-    Power = 80,
-    Accuracy = 100,
-    MaxPP = 15,
-    Priority = 0,
-    TargetScope = TargetScope.SingleEnemy
-};
-
-// 2. Add to the All property's yield returns
-yield return ShadowBall;
-
-// 3. Update Count
-public static int Count => 21; // was 20
-```
-
-## 7. Testing Strategy
-
-### Catalog Tests Should Verify:
-1. **Direct Access**: Fields return correct data
-2. **All Enumeration**: Returns correct count
-3. **Uniqueness**: All names/numbers are unique
-4. **RegisterAll**: Populates registry correctly
-5. **Consistency**: Catalog data matches registry data after registration
-
-### Example Test
-```csharp
-[Test]
-public void Test_RegisterAll_Pokemon_Are_Retrievable()
-{
-    var registry = new PokemonRegistry();
-    PokemonCatalog.RegisterAll(registry);
-    
-    Assert.Multiple(() =>
-    {
-        Assert.That(registry.GetByName("Pikachu"), Is.SameAs(PokemonCatalog.Pikachu));
-        Assert.That(registry.GetByPokedexNumber(25), Is.SameAs(PokemonCatalog.Pikachu));
-    });
-}
-```
-
-## 8. Move Effects (Implemented)
-
-Moves now include composed Effects that define their behavior:
+Moves include composed Effects that define their behavior:
 
 ```csharp
-// Example: Fire move with burn chance
 public static readonly MoveData Flamethrower = new MoveData
 {
     Name = "Flamethrower",
@@ -229,20 +240,13 @@ public static readonly MoveData Flamethrower = new MoveData
         new StatusEffect(PersistentStatus.Burn, 10)
     }
 };
-
-// Check if move has specific effect
-if (move.HasEffect<StatusEffect>())
-{
-    var status = move.GetEffect<StatusEffect>();
-    Console.WriteLine($"Can apply {status.Status} with {status.ChancePercent}% chance");
-}
 ```
 
 ### Available Effect Types
 | EffectType | Class | Description |
 |------------|-------|-------------|
 | `Damage` | `DamageEffect` | Standard damage calculation |
-| `FixedDamage` | `FixedDamageEffect` | Fixed HP damage (Dragon Rage) |
+| `FixedDamage` | `FixedDamageEffect` | Fixed HP damage |
 | `Status` | `StatusEffect` | Apply persistent status |
 | `StatChange` | `StatChangeEffect` | Modify stat stages |
 | `Recoil` | `RecoilEffect` | User takes recoil damage |
@@ -251,15 +255,33 @@ if (move.HasEffect<StatusEffect>())
 | `Flinch` | `FlinchEffect` | May cause flinch |
 | `MultiHit` | `MultiHitEffect` | Hits 2-5 times |
 
-## 9. Future Enhancements
+## 9. Testing Strategy
 
-### Planned
-- Add BaseStats, Types, Abilities to Pokemon in catalog
-- Add `GenerateActions()` method to effects when combat system is ready
-- Consider grouping by generation or region
+Tests are organized to match the catalog structure:
 
-### Considered (Not Planned)
-- **JSON/YAML Loading**: Would lose compile-time safety and IDE support
-- **ScriptableObjects**: Only needed when Unity integration happens
-- **Database**: Overkill for static game data
+```
+Tests/Catalogs/
+├── Pokemon/
+│   ├── PokemonCatalogTests.cs       # General: All, RegisterAll, validations
+│   └── PokemonCatalogGen1Tests.cs   # Gen1-specific tests
+└── Moves/
+    ├── MoveCatalogTests.cs          # General tests
+    ├── MoveCatalogNormalTests.cs    # Normal moves tests
+    ├── MoveCatalogFireTests.cs      # Fire moves tests
+    └── ...
+```
 
+### What Tests Should Verify:
+1. **General**: All enumeration, Count, RegisterAll, uniqueness
+2. **Generation/Type specific**: Correct data for each Pokemon/Move
+3. **Effects**: Correct effects attached to moves
+
+## 10. Benefits of This Architecture
+
+| Aspect | Benefit |
+|--------|---------|
+| **Scalability** | 1000 Pokemon = ~7 generation files, not 1 huge file |
+| **Maintainability** | Each file is ~100-200 lines max |
+| **Collaboration** | Different developers can work on different generations |
+| **Testing** | Tests match source structure |
+| **Discovery** | IDE shows all Pokemon/Moves via autocomplete |
