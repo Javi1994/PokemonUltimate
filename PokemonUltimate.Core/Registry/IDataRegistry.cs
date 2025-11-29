@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using PokemonUltimate.Core.Models;
 
-namespace PokemonUltimate.Core.Interfaces
+namespace PokemonUltimate.Core.Registry
 {
-    // Contract for any system that stores and retrieves data by ID.
+    /// <summary>
+    /// Contract for any system that stores and retrieves data by ID.
+    /// </summary>
     public interface IDataRegistry<T> where T : IIdentifiable
     {
         T Get(string id);
@@ -11,3 +14,4 @@ namespace PokemonUltimate.Core.Interfaces
         void Register(T item);
     }
 }
+

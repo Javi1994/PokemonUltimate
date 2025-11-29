@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Data;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Models;
 
 namespace PokemonUltimate.Core.Builders
 {

@@ -5,20 +5,29 @@ To ensure the game is **Testable** and **Modular**, the code never loads files d
 This allows us to swap the "Real Unity Database" for a "Fake Test Database" instantly.
 
 ## 2. The Registry Interfaces
-*Namespace: `PokemonGame.Core.Interfaces`*
+*Namespace: `PokemonUltimate.Core.Registry`*
 
 We define a generic contract for accessing data.
 
 ```csharp
-public interface IDataRegistry<T> {
-    T Get(string id);
+public interface IDataRegistry<T> where T : IIdentifiable {
+    void Register(T item);
+    T GetByName(string name);
     IEnumerable<T> GetAll();
-    bool Exists(string id);
+    bool Exists(string name);
+    int Count { get; }
 }
 
-// Specific Registries (to keep dependencies clean)
-public interface IPokemonRegistry : IDataRegistry<PokemonSpeciesData> { }
-public interface IMoveRegistry : IDataRegistry<MoveData> { }
+// Specific Registries (extended functionality)
+public interface IPokemonRegistry : IDataRegistry<PokemonSpeciesData> {
+    PokemonSpeciesData GetByPokedexNumber(int number);
+    bool ExistsByPokedexNumber(int number);
+}
+
+public interface IMoveRegistry : IDataRegistry<MoveData> {
+    IEnumerable<MoveData> GetByType(PokemonType type);
+    IEnumerable<MoveData> GetByCategory(MoveCategory category);
+}
 ```
 
 ## 3. Unity Implementation: `GameDatabaseSO`
@@ -100,30 +109,51 @@ public static class GameServices {
 4.  It calls `GameServices.Register(database, database)`.
 5.  It loads the Main Menu.
 
-## 6. Testability (The "Mock Registry")
-For Unit Tests, we don't use Unity or the Database. We use a Mock.
+## 6. Testability (Registry + Catalogs)
+For Unit Tests, we don't use Unity or the Database. We use the built-in `GameDataRegistry` and `Catalogs`.
 
+### Option A: Direct Catalog Access (Preferred for Tests)
 ```csharp
-public class MockPokemonRegistry : IPokemonRegistry {
-    private List<PokemonSpeciesData> _fakeData = new List<PokemonSpeciesData>();
-
-    public void Add(PokemonSpeciesData data) => _fakeData.Add(data);
-
-    public PokemonSpeciesData Get(string id) => _fakeData.First(p => p.Id == id);
+[Test]
+public void Test_Pokemon_Stats() {
+    // Direct access - no setup needed
+    var pikachu = PokemonCatalog.Pikachu;
+    
+    Assert.That(pikachu.BaseStats.Speed, Is.EqualTo(90));
+    Assert.That(pikachu.HasType(PokemonType.Electric), Is.True);
 }
+```
 
+### Option B: Registry with Catalog Data
+```csharp
 [Test]
 public void Test_Combat_Start() {
-    // Setup Fake Data
-    var registry = new MockPokemonRegistry();
-    registry.Add(new PokemonSpeciesData { Id = "pikachu", BaseStats = ... });
+    // Setup Registry with catalog data
+    var registry = new PokemonRegistry();
+    PokemonCatalog.RegisterAll(registry);
     
-    // Inject
-    GameServices.Register(registry, null);
+    // Use registry for dynamic lookup
+    var pikachu = registry.GetByPokedexNumber(25);
     
-    // Run Test
-    var pokemon = PokemonFactory.Create(registry.Get("pikachu"), 5);
-    Assert.IsNotNull(pokemon);
+    // Future: PokemonFactory.Create(pikachu, level: 5)
+    Assert.That(pikachu.Name, Is.EqualTo("Pikachu"));
+}
+```
+
+### Option C: Custom Test Data
+```csharp
+[Test]
+public void Test_With_Custom_Pokemon() {
+    // Create custom test data using builder
+    var testMon = Pokemon.Define("TestMon", 999)
+        .Type(PokemonType.Normal)
+        .Stats(100, 100, 100, 100, 100, 100)
+        .Build();
+    
+    var registry = new PokemonRegistry();
+    registry.Register(testMon);
+    
+    Assert.That(registry.Exists("TestMon"), Is.True);
 }
 ```
 

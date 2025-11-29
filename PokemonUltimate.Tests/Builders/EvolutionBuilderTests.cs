@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using PokemonUltimate.Core.Builders;
 using PokemonUltimate.Core.Catalogs;
-using PokemonUltimate.Core.Data;
+using PokemonUltimate.Core.Models;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution.Conditions;
 

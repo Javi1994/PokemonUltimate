@@ -52,6 +52,8 @@
         - [x] `MoveCatalog.[Type].cs` (20 Moves across 7 types)
     - [x] `RegisterAll()` for bulk registration
     - [x] Lazy initialization for `All` enumeration
+- [x] **Documentation**
+    - [x] `project_structure.md` - Solution organization and folder conventions
 
 ### Combat Engine (Step 2-5) ⏳ PENDING
 - [ ] **Action Queue Architecture**

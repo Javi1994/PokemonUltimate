@@ -100,6 +100,9 @@
 ## 5. Core Systems Reference
 *Quick reference to the main combat systems. See individual specs for details.*
 
+### Project Organization
+-   **Project Structure** (`project_structure.md`): Solution layout, namespaces, folder conventions, dependency flow.
+
 ### Data & Loading
 -   **Pokemon Data** (`pokemon_data_detailed.md`): Blueprints (Species) vs Instances, Factory pattern.
 -   **Move System** (`move_system_detailed.md`): Composable effects (`IMoveEffect`), no content-specific classes.

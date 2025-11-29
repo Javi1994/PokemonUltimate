@@ -1,4 +1,4 @@
-namespace PokemonUltimate.Core.Data
+namespace PokemonUltimate.Core.Models
 {
     /// <summary>
     /// Base stats for a Pokemon species. These are the foundation for calculating

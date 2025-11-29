@@ -1,9 +1,15 @@
-using PokemonUltimate.Core.Data;
+using NUnit.Framework;
+using PokemonUltimate.Core.Models;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Effects;
+using System.Collections.Generic;
 
-namespace PokemonUltimate.Tests.Data
+namespace PokemonUltimate.Tests.Models
 {
-    // Tests for MoveData model: property values, defaults, and edge cases
+    /// <summary>
+    /// Tests for MoveData model: property values, defaults, effects helpers, and edge cases
+    /// </summary>
+    [TestFixture]
     public class MoveDataTests
     {
         #region Property Tests
@@ -165,6 +171,103 @@ namespace PokemonUltimate.Tests.Data
             };
 
             Assert.That(stealthRock.TargetScope, Is.EqualTo(TargetScope.Field));
+        }
+
+        #endregion
+
+        #region Effect Helper Tests
+
+        [Test]
+        public void Test_HasEffect_Returns_True_When_Effect_Exists()
+        {
+            var move = new MoveData
+            {
+                Name = "Flamethrower",
+                Effects = new List<IMoveEffect>
+                {
+                    new DamageEffect(),
+                    new StatusEffect(PersistentStatus.Burn, 10)
+                }
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(move.HasEffect<DamageEffect>(), Is.True);
+                Assert.That(move.HasEffect<StatusEffect>(), Is.True);
+            });
+        }
+
+        [Test]
+        public void Test_HasEffect_Returns_False_When_Effect_Not_Exists()
+        {
+            var move = new MoveData
+            {
+                Name = "Tackle",
+                Effects = new List<IMoveEffect> { new DamageEffect() }
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(move.HasEffect<StatusEffect>(), Is.False);
+                Assert.That(move.HasEffect<HealEffect>(), Is.False);
+                Assert.That(move.HasEffect<RecoilEffect>(), Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_HasEffect_Returns_False_When_No_Effects()
+        {
+            var move = new MoveData { Name = "Empty Move" };
+
+            Assert.That(move.HasEffect<DamageEffect>(), Is.False);
+        }
+
+        [Test]
+        public void Test_GetEffect_Returns_Effect_When_Exists()
+        {
+            var damageEffect = new DamageEffect { CritStages = 2 };
+            var move = new MoveData
+            {
+                Name = "Slash",
+                Effects = new List<IMoveEffect> { damageEffect }
+            };
+
+            var result = move.GetEffect<DamageEffect>();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Is.EqualTo(damageEffect));
+                Assert.That(result.CritStages, Is.EqualTo(2));
+            });
+        }
+
+        [Test]
+        public void Test_GetEffect_Returns_Null_When_Not_Exists()
+        {
+            var move = new MoveData
+            {
+                Name = "Tackle",
+                Effects = new List<IMoveEffect> { new DamageEffect() }
+            };
+
+            Assert.That(move.GetEffect<StatusEffect>(), Is.Null);
+        }
+
+        [Test]
+        public void Test_GetEffect_Returns_First_Match()
+        {
+            var effect1 = new StatChangeEffect(Stat.Attack, 1);
+            var effect2 = new StatChangeEffect(Stat.Defense, -1);
+            var move = new MoveData
+            {
+                Name = "Growth",
+                Effects = new List<IMoveEffect> { effect1, effect2 }
+            };
+
+            var result = move.GetEffect<StatChangeEffect>();
+
+            Assert.That(result, Is.EqualTo(effect1));
         }
 
         #endregion

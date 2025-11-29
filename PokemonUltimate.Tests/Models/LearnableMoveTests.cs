@@ -1,9 +1,9 @@
 using NUnit.Framework;
 using PokemonUltimate.Core.Catalogs;
-using PokemonUltimate.Core.Data;
+using PokemonUltimate.Core.Models;
 using PokemonUltimate.Core.Enums;
 
-namespace PokemonUltimate.Tests.Data
+namespace PokemonUltimate.Tests.Models
 {
     [TestFixture]
     public class LearnableMoveTests

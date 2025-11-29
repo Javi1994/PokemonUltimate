@@ -12,7 +12,9 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 1.  ✅ Create Solution `PokemonUltimate.sln`.
 2.  ✅ Create Class Library `PokemonUltimate.Core` (The Engine) - netstandard2.1 for Unity compatibility.
 3.  ✅ Create NUnit Project `PokemonUltimate.Tests` (The Verifier) - net8.0.
-4.  ⏳ Create Unity Project `PokemonUltimate.Unity` (The Viewer) - *Leave empty for now*.
+4.  ✅ Create Console App `PokemonUltimate.Console` (Smoke Test) - net8.0.
+5.  ✅ Document project structure (`docs/architecture/project_structure.md`).
+6.  ⏳ Create Unity Project `PokemonUltimate.Unity` (The Viewer) - *Leave empty for now*.
 
 ---
 

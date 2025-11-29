@@ -1,10 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using PokemonUltimate.Core.Data;
+using NUnit.Framework;
+using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Registry;
 
-namespace PokemonUltimate.Tests.Data
+namespace PokemonUltimate.Tests.Registry
 {
-    // Tests for basic PokemonRegistry operations: Register, Retrieve by Name, Exists, GetAll
+    /// <summary>
+    /// Tests for basic PokemonRegistry operations: Register, Retrieve by Name, Exists, GetAll
+    /// </summary>
+    [TestFixture]
     public class PokemonRegistryTests
     {
         private PokemonRegistry _registry;

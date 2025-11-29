@@ -1,9 +1,11 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Interfaces;
+using PokemonUltimate.Core.Models;
 
-namespace PokemonUltimate.Core.Data
+namespace PokemonUltimate.Core.Registry
 {
-    // Specialized registry for Pokemon that supports lookup by Name or Pokedex Number.
+    /// <summary>
+    /// Specialized registry for Pokemon that supports lookup by Name or Pokedex Number.
+    /// </summary>
     public class PokemonRegistry : GameDataRegistry<PokemonSpeciesData>, IPokemonRegistry
     {
         private readonly Dictionary<int, PokemonSpeciesData> _byPokedexNumber = new Dictionary<int, PokemonSpeciesData>();
@@ -17,13 +19,17 @@ namespace PokemonUltimate.Core.Data
             }
         }
 
-        // Retrieve by Name (delegates to base Get since Name is the ID)
+        /// <summary>
+        /// Retrieve by Name (delegates to base Get since Name is the ID)
+        /// </summary>
         public PokemonSpeciesData GetByName(string name)
         {
             return Get(name);
         }
 
-        // Retrieve by Pokedex Number
+        /// <summary>
+        /// Retrieve by Pokedex Number
+        /// </summary>
         public PokemonSpeciesData GetByPokedexNumber(int number)
         {
             if (_byPokedexNumber.TryGetValue(number, out var item))
@@ -33,10 +39,13 @@ namespace PokemonUltimate.Core.Data
             throw new KeyNotFoundException($"Pokemon with Pokedex Number {number} not found.");
         }
 
-        // Check if exists by Pokedex Number
+        /// <summary>
+        /// Check if exists by Pokedex Number
+        /// </summary>
         public bool ExistsByPokedexNumber(int number)
         {
             return _byPokedexNumber.ContainsKey(number);
         }
     }
 }
+

@@ -1,6 +1,6 @@
-using PokemonUltimate.Core.Data;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution.Conditions;
+using PokemonUltimate.Core.Models;
 
 namespace PokemonUltimate.Core.Builders
 {

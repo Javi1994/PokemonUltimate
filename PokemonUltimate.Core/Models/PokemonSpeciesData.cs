@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution;
-using PokemonUltimate.Core.Interfaces;
 
-namespace PokemonUltimate.Core.Data
+namespace PokemonUltimate.Core.Models
 {
     /// <summary>
     /// Blueprint for a Pokemon species (immutable data).
@@ -110,3 +109,4 @@ namespace PokemonUltimate.Core.Data
         #endregion
     }
 }
+

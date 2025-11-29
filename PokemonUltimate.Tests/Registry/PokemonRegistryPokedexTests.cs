@@ -1,9 +1,14 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Data;
+using NUnit.Framework;
+using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Registry;
 
-namespace PokemonUltimate.Tests.Data
+namespace PokemonUltimate.Tests.Registry
 {
-    // Tests for PokemonRegistry Pokedex Number operations: GetByPokedexNumber, ExistsByPokedexNumber
+    /// <summary>
+    /// Tests for PokemonRegistry Pokedex Number operations: GetByPokedexNumber, ExistsByPokedexNumber
+    /// </summary>
+    [TestFixture]
     public class PokemonRegistryPokedexTests
     {
         private PokemonRegistry _registry;

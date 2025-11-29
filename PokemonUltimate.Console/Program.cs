@@ -1,6 +1,6 @@
 ﻿using PokemonUltimate.Core.Catalogs;
-using PokemonUltimate.Core.Data;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Registry;
 
 namespace PokemonUltimate.Console;
 

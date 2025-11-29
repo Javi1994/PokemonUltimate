@@ -1,10 +1,12 @@
-using PokemonUltimate.Core.Data;
+using NUnit.Framework;
+using PokemonUltimate.Core.Models;
 
-namespace PokemonUltimate.Tests.Data
+namespace PokemonUltimate.Tests.Models
 {
     /// <summary>
     /// Tests for BaseStats class: constructors, properties, and Total calculation.
     /// </summary>
+    [TestFixture]
     public class BaseStatsTests
     {
         #region Constructor Tests

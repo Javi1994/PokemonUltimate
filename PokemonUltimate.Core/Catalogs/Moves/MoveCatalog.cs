@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Data;
-using PokemonUltimate.Core.Interfaces;
+using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Registry;
 
 namespace PokemonUltimate.Core.Catalogs
 {

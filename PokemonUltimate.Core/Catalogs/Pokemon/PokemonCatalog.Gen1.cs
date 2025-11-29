@@ -1,7 +1,6 @@
 using PokemonUltimate.Core.Builders;
-using PokemonUltimate.Core.Catalogs;
-using PokemonUltimate.Core.Data;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Models;
 
 namespace PokemonUltimate.Core.Catalogs
 {

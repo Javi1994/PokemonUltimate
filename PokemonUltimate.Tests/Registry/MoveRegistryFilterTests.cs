@@ -1,9 +1,15 @@
-using PokemonUltimate.Core.Data;
+using System.Linq;
+using NUnit.Framework;
+using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Registry;
 using PokemonUltimate.Core.Enums;
 
-namespace PokemonUltimate.Tests.Data
+namespace PokemonUltimate.Tests.Registry
 {
-    // Tests for MoveRegistry filtering operations: GetByType, GetByCategory
+    /// <summary>
+    /// Tests for MoveRegistry filtering operations: GetByType, GetByCategory
+    /// </summary>
+    [TestFixture]
     public class MoveRegistryFilterTests
     {
         private MoveRegistry _registry;

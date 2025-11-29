@@ -1,6 +1,6 @@
 using PokemonUltimate.Core.Enums;
 
-namespace PokemonUltimate.Core.Data
+namespace PokemonUltimate.Core.Models
 {
     /// <summary>
     /// Represents a move that a Pokemon species can learn.

@@ -1,10 +1,17 @@
+using System;
 using System.Collections.Generic;
-using PokemonUltimate.Core.Data;
+using System.Linq;
+using NUnit.Framework;
+using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Registry;
 using PokemonUltimate.Core.Enums;
 
-namespace PokemonUltimate.Tests.Data
+namespace PokemonUltimate.Tests.Registry
 {
-    // Tests for basic MoveRegistry operations: Register, Retrieve by Name, Exists, GetAll
+    /// <summary>
+    /// Tests for basic MoveRegistry operations: Register, Retrieve by Name, Exists, GetAll
+    /// </summary>
+    [TestFixture]
     public class MoveRegistryTests
     {
         private MoveRegistry _registry;

@@ -1,9 +1,11 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Interfaces;
+using PokemonUltimate.Core.Models;
 
-namespace PokemonUltimate.Core.Data
+namespace PokemonUltimate.Core.Registry
 {
-    // Generic storage for game data, accessible by ID.
+    /// <summary>
+    /// Generic storage for game data, accessible by ID.
+    /// </summary>
     public class GameDataRegistry<T> : IDataRegistry<T> where T : class, IIdentifiable
     {
         private readonly Dictionary<string, T> _items = new Dictionary<string, T>();
@@ -33,3 +35,4 @@ namespace PokemonUltimate.Core.Data
         }
     }
 }
+

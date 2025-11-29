@@ -1,11 +1,15 @@
-using PokemonUltimate.Core.Data;
+using NUnit.Framework;
+using PokemonUltimate.Core.Models;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Catalogs;
+using System.Linq;
 
-namespace PokemonUltimate.Tests.Data
+namespace PokemonUltimate.Tests.Models
 {
     /// <summary>
     /// Tests for PokemonSpeciesData model: property values, defaults, types, stats, and IIdentifiable implementation.
     /// </summary>
+    [TestFixture]
     public class PokemonSpeciesDataTests
     {
         #region Basic Property Tests
@@ -305,6 +309,210 @@ namespace PokemonUltimate.Tests.Data
 
         #endregion
 
+        #region Learnset Helper Methods Tests
+
+        [Test]
+        public void Test_GetStartingMoves_Returns_Start_Method_Moves()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "TestMon",
+                Learnset = new System.Collections.Generic.List<LearnableMove>
+                {
+                    new LearnableMove(MoveCatalog.Tackle, LearnMethod.Start),
+                    new LearnableMove(MoveCatalog.Growl, LearnMethod.Start),
+                    new LearnableMove(MoveCatalog.Ember, LearnMethod.LevelUp, 10)
+                }
+            };
+
+            var startMoves = pokemon.GetStartingMoves().ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(startMoves, Has.Count.EqualTo(2));
+                Assert.That(startMoves.All(m => m.Method == LearnMethod.Start), Is.True);
+            });
+        }
+
+        [Test]
+        public void Test_GetStartingMoves_Returns_Empty_When_None()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "TestMon",
+                Learnset = new System.Collections.Generic.List<LearnableMove>
+                {
+                    new LearnableMove(MoveCatalog.Ember, LearnMethod.LevelUp, 10)
+                }
+            };
+
+            Assert.That(pokemon.GetStartingMoves(), Is.Empty);
+        }
+
+        [Test]
+        public void Test_GetMovesAtLevel_Returns_Correct_Moves()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "TestMon",
+                Learnset = new System.Collections.Generic.List<LearnableMove>
+                {
+                    new LearnableMove(MoveCatalog.Tackle, LearnMethod.Start),
+                    new LearnableMove(MoveCatalog.Ember, LearnMethod.LevelUp, 10),
+                    new LearnableMove(MoveCatalog.Flamethrower, LearnMethod.LevelUp, 25),
+                    new LearnableMove(MoveCatalog.FireBlast, LearnMethod.LevelUp, 25)
+                }
+            };
+
+            var level25Moves = pokemon.GetMovesAtLevel(25).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(level25Moves, Has.Count.EqualTo(2));
+                Assert.That(level25Moves.All(m => m.Level == 25), Is.True);
+            });
+        }
+
+        [Test]
+        public void Test_GetMovesAtLevel_Returns_Empty_When_None()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "TestMon",
+                Learnset = new System.Collections.Generic.List<LearnableMove>
+                {
+                    new LearnableMove(MoveCatalog.Ember, LearnMethod.LevelUp, 10)
+                }
+            };
+
+            Assert.That(pokemon.GetMovesAtLevel(5), Is.Empty);
+        }
+
+        [Test]
+        public void Test_GetMovesUpToLevel_Returns_Start_And_LevelUp_Moves()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "TestMon",
+                Learnset = new System.Collections.Generic.List<LearnableMove>
+                {
+                    new LearnableMove(MoveCatalog.Tackle, LearnMethod.Start),
+                    new LearnableMove(MoveCatalog.Growl, LearnMethod.Start),
+                    new LearnableMove(MoveCatalog.Ember, LearnMethod.LevelUp, 10),
+                    new LearnableMove(MoveCatalog.Flamethrower, LearnMethod.LevelUp, 25),
+                    new LearnableMove(MoveCatalog.Earthquake, LearnMethod.TM)
+                }
+            };
+
+            var upTo15 = pokemon.GetMovesUpToLevel(15).ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(upTo15, Has.Count.EqualTo(3)); // 2 Start + 1 LevelUp at 10
+                Assert.That(upTo15.Any(m => m.Move == MoveCatalog.Tackle), Is.True);
+                Assert.That(upTo15.Any(m => m.Move == MoveCatalog.Ember), Is.True);
+                Assert.That(upTo15.Any(m => m.Move == MoveCatalog.Flamethrower), Is.False); // Level 25
+                Assert.That(upTo15.Any(m => m.Move == MoveCatalog.Earthquake), Is.False); // TM
+            });
+        }
+
+        [Test]
+        public void Test_CanLearn_Returns_True_For_Learnable_Move()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "TestMon",
+                Learnset = new System.Collections.Generic.List<LearnableMove>
+                {
+                    new LearnableMove(MoveCatalog.Tackle, LearnMethod.Start),
+                    new LearnableMove(MoveCatalog.Flamethrower, LearnMethod.TM)
+                }
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.CanLearn(MoveCatalog.Tackle), Is.True);
+                Assert.That(pokemon.CanLearn(MoveCatalog.Flamethrower), Is.True);
+            });
+        }
+
+        [Test]
+        public void Test_CanLearn_Returns_False_For_Non_Learnable_Move()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "TestMon",
+                Learnset = new System.Collections.Generic.List<LearnableMove>
+                {
+                    new LearnableMove(MoveCatalog.Tackle, LearnMethod.Start)
+                }
+            };
+
+            Assert.That(pokemon.CanLearn(MoveCatalog.Earthquake), Is.False);
+        }
+
+        [Test]
+        public void Test_CanLearn_Returns_False_When_Empty_Learnset()
+        {
+            var pokemon = new PokemonSpeciesData { Name = "TestMon" };
+
+            Assert.That(pokemon.CanLearn(MoveCatalog.Tackle), Is.False);
+        }
+
+        #endregion
+
+        #region Evolution Tests
+
+        [Test]
+        public void Test_CanEvolve_Returns_True_When_Has_Evolutions()
+        {
+            var target = new PokemonSpeciesData { Name = "Evolution" };
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "Base",
+                Evolutions = new System.Collections.Generic.List<Core.Evolution.Evolution>
+                {
+                    new Core.Evolution.Evolution { Target = target }
+                }
+            };
+
+            Assert.That(pokemon.CanEvolve, Is.True);
+        }
+
+        [Test]
+        public void Test_CanEvolve_Returns_False_When_No_Evolutions()
+        {
+            var pokemon = new PokemonSpeciesData { Name = "FinalForm" };
+
+            Assert.That(pokemon.CanEvolve, Is.False);
+        }
+
+        [Test]
+        public void Test_Evolutions_Default_Is_Empty_List()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.Evolutions, Is.Not.Null);
+                Assert.That(pokemon.Evolutions, Is.Empty);
+            });
+        }
+
+        [Test]
+        public void Test_Learnset_Default_Is_Empty_List()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.Learnset, Is.Not.Null);
+                Assert.That(pokemon.Learnset, Is.Empty);
+            });
+        }
+
+        #endregion
+
         #region Helpers
 
         private static BaseStats CreateStatsWithTotal(int targetTotal)
@@ -318,3 +526,4 @@ namespace PokemonUltimate.Tests.Data
         #endregion
     }
 }
+

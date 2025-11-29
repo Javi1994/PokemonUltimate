@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using PokemonUltimate.Core.Data;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution;
+using PokemonUltimate.Core.Models;
 
 namespace PokemonUltimate.Core.Builders
 {
