@@ -1,6 +1,6 @@
-using PokemonUltimate.Core.Models;
-using PokemonUltimate.Core.Effects;
+using PokemonUltimate.Core.Builders;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Models;
 
 namespace PokemonUltimate.Core.Catalogs
 {
@@ -9,23 +9,14 @@ namespace PokemonUltimate.Core.Catalogs
     /// </summary>
     public static partial class MoveCatalog
     {
-        public static readonly MoveData Psychic = new MoveData
-        {
-            Name = "Psychic",
-            Description = "The target is hit by a strong telekinetic force. May also lower the target's Sp. Def.",
-            Type = PokemonType.Psychic,
-            Category = MoveCategory.Special,
-            Power = 90,
-            Accuracy = 100,
-            MaxPP = 10,
-            Priority = 0,
-            TargetScope = TargetScope.SingleEnemy,
-            Effects = 
-            { 
-                new DamageEffect(),
-                new StatChangeEffect(Stat.SpDefense, -1, targetSelf: false, chancePercent: 10)
-            }
-        };
+        public static readonly MoveData Psychic = Move.Define("Psychic")
+            .Description("The target is hit by a strong telekinetic force. May also lower the target's Sp. Def.")
+            .Type(PokemonType.Psychic)
+            .Special(90, 100, 10)
+            .WithEffects(e => e
+                .Damage()
+                .LowerSpDefense(1, 10))
+            .Build();
 
         static partial void RegisterPsychic()
         {
@@ -33,4 +24,3 @@ namespace PokemonUltimate.Core.Catalogs
         }
     }
 }
-

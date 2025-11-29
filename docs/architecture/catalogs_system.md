@@ -204,17 +204,19 @@ static partial void RegisterGen2();  // ← Add declaration
 
 1. **Create file** `MoveCatalog.Ice.cs`:
 ```csharp
+using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Models;
+
 public static partial class MoveCatalog
 {
-    public static readonly MoveData IceBeam = new MoveData
-    {
-        Name = "Ice Beam",
-        Type = PokemonType.Ice,
-        Category = MoveCategory.Special,
-        Power = 90,
-        Accuracy = 100,
-        Effects = { new DamageEffect(), new StatusEffect(PersistentStatus.Freeze, 10) }
-    };
+    public static readonly MoveData IceBeam = Move.Define("Ice Beam")
+        .Type(PokemonType.Ice)
+        .Special(90, 100, 10)
+        .WithEffects(e => e
+            .Damage()
+            .MayFreeze(10))
+        .Build();
     
     static partial void RegisterIce()
     {
@@ -283,23 +285,80 @@ var level9Moves = charmander.GetMovesAtLevel(9); // [Ember]
 bool canLearn = charmander.CanLearn(MoveCatalog.Flamethrower); // true
 ```
 
-## 8. Move Effects
+## 8. Move Builder System ✅ NEW
 
-Moves include composed Effects that define their behavior:
+Moves are now defined using a **Fluent Builder Pattern** for improved readability:
 
+### Example: Defining Moves
 ```csharp
-public static readonly MoveData Flamethrower = new MoveData
-{
-    Name = "Flamethrower",
-    Type = PokemonType.Fire,
-    Power = 90,
-    Effects = 
-    { 
-        new DamageEffect(),
-        new StatusEffect(PersistentStatus.Burn, 10)
-    }
-};
+public static readonly MoveData Flamethrower = Move.Define("Flamethrower")
+    .Description("The target is scorched with an intense blast of fire.")
+    .Type(PokemonType.Fire)
+    .Special(90, 100, 15)  // power, accuracy, pp
+    .WithEffects(e => e
+        .Damage()
+        .MayBurn(10))
+    .Build();
+
+public static readonly MoveData SwordsDance = Move.Define("Swords Dance")
+    .Type(PokemonType.Normal)
+    .Status(0, 20)  // accuracy (0 = never miss), pp
+    .TargetSelf()
+    .WithEffects(e => e.RaiseAttack(2))
+    .Build();
 ```
+
+### MoveBuilder Methods
+| Method | Description |
+|--------|-------------|
+| `Move.Define(name)` | Start definition |
+| `.Description(text)` | Optional description |
+| `.Type(type)` | Element type |
+| `.Physical(power, acc, pp)` | Physical attack |
+| `.Special(power, acc, pp)` | Special attack |
+| `.Status(acc, pp)` | Status move (power = 0) |
+| `.Priority(n)` | Priority (-7 to +5, default 0) |
+| `.Target(scope)` | Target scope |
+| `.TargetSelf()` | Shorthand: Self scope |
+| `.TargetAllEnemies()` | Shorthand: AllEnemies scope |
+| `.WithEffects(e => ...)` | Add effects |
+| `.Build()` | Finalize |
+
+### EffectBuilder Methods
+
+**Damage:**
+| Method | Description |
+|--------|-------------|
+| `.Damage()` | Standard damage |
+| `.DamageHighCrit(stages)` | High crit ratio |
+| `.FixedDamage(amount)` | Fixed damage (Dragon Rage) |
+| `.LevelDamage()` | Damage = level (Seismic Toss) |
+
+**Status:**
+| Method | Description |
+|--------|-------------|
+| `.MayBurn(chance)` | May inflict burn |
+| `.MayParalyze(chance)` | May inflict paralysis |
+| `.MayPoison(chance)` | May inflict poison |
+| `.MayBadlyPoison(chance)` | May inflict toxic |
+| `.MaySleep(chance)` | May inflict sleep |
+| `.MayFreeze(chance)` | May inflict freeze |
+
+**Stat Changes:**
+| Method | Description |
+|--------|-------------|
+| `.RaiseAttack/Defense/SpAttack/SpDefense/Speed/Evasion(stages, chance)` | Buff self |
+| `.LowerAttack/Defense/SpAttack/SpDefense/Speed/Accuracy(stages, chance)` | Debuff target |
+
+**Other:**
+| Method | Description |
+|--------|-------------|
+| `.Recoil(percent)` | User takes recoil |
+| `.Drain(percent)` | Heal from damage |
+| `.Heal(percent)` | Heal % of max HP |
+| `.MayFlinch(chance)` | May flinch target |
+| `.MultiHit(min, max)` | Hit 2-5 times |
+| `.HitsNTimes(n)` | Hit exactly N times |
 
 ### Available Effect Types
 | EffectType | Class | Description |
@@ -330,9 +389,11 @@ Tests/Catalogs/
     └── ...
 
 Tests/Builders/
-├── PokemonBuilderTests.cs       # Builder fluent API tests
+├── PokemonBuilderTests.cs       # Pokemon builder fluent API tests
 ├── LearnsetBuilderTests.cs      # Learnset builder tests
-└── EvolutionBuilderTests.cs     # Evolution builder tests
+├── EvolutionBuilderTests.cs     # Evolution builder tests
+├── MoveBuilderTests.cs          # Move builder fluent API tests
+└── EffectBuilderTests.cs        # Effect builder tests
 
 Tests/Evolution/
 ├── EvolutionConditionTests.cs   # Condition classes tests

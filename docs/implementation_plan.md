@@ -38,13 +38,14 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 9.  ✅ **Builder**: `PokemonBuilder`, `LearnsetBuilder`, `EvolutionBuilder` (fluent API with gender methods)
 10. ✅ **Tests**: 100+ tests covering registry, model, stats, catalog, builders, evolution, gender, nature
 
-### 1.3 Move Data ✅ COMPLETE (Basic)
+### 1.3 Move Data ✅ COMPLETE
 1.  ✅ **Blueprint**: `MoveData` (Name, Type, Category, Power, Accuracy, PP, Priority, TargetScope, Effects)
 2.  ✅ **Enums**: `PokemonType` (18), `MoveCategory` (3), `TargetScope` (10), `Stat` (8), `PersistentStatus` (7), `VolatileStatus` (11), `EffectType` (24)
 3.  ✅ **Registry**: `IMoveRegistry`, `MoveRegistry` (with Type/Category filters)
 4.  ✅ **Catalog**: `MoveCatalog` (20 Moves: Normal, Fire, Water, Grass, Electric, Ground, Psychic)
 5.  ✅ **Effects**: `IMoveEffect` interface + 9 concrete effects (DamageEffect, FixedDamageEffect, StatusEffect, StatChangeEffect, RecoilEffect, DrainEffect, HealEffect, FlinchEffect, MultiHitEffect)
-6.  ✅ **Tests**: 70+ tests covering registry, filter, model, effect, composition, catalog effects
+6.  ✅ **Builder**: `MoveBuilder` + `EffectBuilder` (fluent API for composing moves and effects)
+7.  ✅ **Tests**: 100+ tests covering registry, filter, model, effect, composition, catalog effects, builders
 
 ### 1.4 Instance & Factory ⏳ PENDING
 1.  ⏳ **Instance**: `PokemonInstance` (Level, CurrentHP, Stats, Moves, Status)

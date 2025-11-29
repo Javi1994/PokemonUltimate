@@ -49,6 +49,8 @@
     - [x] `PokemonBuilder` - fluent Pokemon definition
     - [x] `LearnsetBuilder` - learnset configuration
     - [x] `EvolutionBuilder` - evolution conditions
+    - [x] `MoveBuilder` - fluent Move definition
+    - [x] `EffectBuilder` - effect composition
 - [x] **Catalogs (Modular with Partial Classes)**
     - [x] `PokemonCatalog` - organized by generation
         - [x] `PokemonCatalog.cs` (orchestrator)
@@ -86,8 +88,12 @@
 - [x] Move Effect tests (25 tests)
 - [x] Effect Composition tests (12 tests)
 - [x] Catalog Effects tests (12 tests)
-- [x] Builder tests (45+ tests)
+- [x] Pokemon Builder tests (25+ tests)
+- [x] Move Builder tests (20 tests)
+- [x] Effect Builder tests (35+ tests)
+- [x] Learnset/Evolution Builder tests (20+ tests)
 - [x] Evolution & Condition tests (18 tests)
+- [x] Nature/Gender tests (18 tests)
 
 ---
 

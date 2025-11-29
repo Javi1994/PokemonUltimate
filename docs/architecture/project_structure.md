@@ -119,7 +119,9 @@ PokemonUltimate.Core/
 ├── Builders/                        # 🏗️ Fluent Builders
 │   ├── PokemonBuilder.cs            # Pokemon.Define(...).Build()
 │   ├── LearnsetBuilder.cs           # .StartsWith(), .AtLevel()
-│   └── EvolutionBuilder.cs          # .AtLevel(), .WithItem()
+│   ├── EvolutionBuilder.cs          # .AtLevel(), .WithItem()
+│   ├── MoveBuilder.cs               # Move.Define(...).Build()
+│   └── EffectBuilder.cs             # .Damage(), .MayBurn()
 │
 └── Catalogs/                        # 📚 Static Game Data
     ├── Pokemon/
@@ -169,7 +171,9 @@ PokemonUltimate.Tests/
 ├── Builders/                        # Tests for builders
 │   ├── PokemonBuilderTests.cs
 │   ├── LearnsetBuilderTests.cs
-│   └── EvolutionBuilderTests.cs
+│   ├── EvolutionBuilderTests.cs
+│   ├── MoveBuilderTests.cs
+│   └── EffectBuilderTests.cs
 │
 └── Catalogs/                        # Tests for catalogs
     ├── Pokemon/

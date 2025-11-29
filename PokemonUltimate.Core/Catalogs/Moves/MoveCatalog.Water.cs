@@ -1,6 +1,6 @@
-using PokemonUltimate.Core.Models;
-using PokemonUltimate.Core.Effects;
+using PokemonUltimate.Core.Builders;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Models;
 
 namespace PokemonUltimate.Core.Catalogs
 {
@@ -9,47 +9,27 @@ namespace PokemonUltimate.Core.Catalogs
     /// </summary>
     public static partial class MoveCatalog
     {
-        public static readonly MoveData WaterGun = new MoveData
-        {
-            Name = "Water Gun",
-            Description = "The target is blasted with a forceful shot of water.",
-            Type = PokemonType.Water,
-            Category = MoveCategory.Special,
-            Power = 40,
-            Accuracy = 100,
-            MaxPP = 25,
-            Priority = 0,
-            TargetScope = TargetScope.SingleEnemy,
-            Effects = { new DamageEffect() }
-        };
+        public static readonly MoveData WaterGun = Move.Define("Water Gun")
+            .Description("The target is blasted with a forceful shot of water.")
+            .Type(PokemonType.Water)
+            .Special(40, 100, 25)
+            .WithEffects(e => e.Damage())
+            .Build();
 
-        public static readonly MoveData Surf = new MoveData
-        {
-            Name = "Surf",
-            Description = "The user attacks everything around it by swamping its surroundings with a giant wave.",
-            Type = PokemonType.Water,
-            Category = MoveCategory.Special,
-            Power = 90,
-            Accuracy = 100,
-            MaxPP = 15,
-            Priority = 0,
-            TargetScope = TargetScope.AllEnemies,
-            Effects = { new DamageEffect() }
-        };
+        public static readonly MoveData Surf = Move.Define("Surf")
+            .Description("The user attacks everything around it by swamping its surroundings with a giant wave.")
+            .Type(PokemonType.Water)
+            .Special(90, 100, 15)
+            .TargetAllEnemies()
+            .WithEffects(e => e.Damage())
+            .Build();
 
-        public static readonly MoveData HydroPump = new MoveData
-        {
-            Name = "Hydro Pump",
-            Description = "The target is blasted by a huge volume of water launched under great pressure.",
-            Type = PokemonType.Water,
-            Category = MoveCategory.Special,
-            Power = 110,
-            Accuracy = 80,
-            MaxPP = 5,
-            Priority = 0,
-            TargetScope = TargetScope.SingleEnemy,
-            Effects = { new DamageEffect() }
-        };
+        public static readonly MoveData HydroPump = Move.Define("Hydro Pump")
+            .Description("The target is blasted by a huge volume of water launched under great pressure.")
+            .Type(PokemonType.Water)
+            .Special(110, 80, 5)
+            .WithEffects(e => e.Damage())
+            .Build();
 
         static partial void RegisterWater()
         {
@@ -59,4 +39,3 @@ namespace PokemonUltimate.Core.Catalogs
         }
     }
 }
-

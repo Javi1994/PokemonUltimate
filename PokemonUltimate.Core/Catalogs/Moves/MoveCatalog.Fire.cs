@@ -1,6 +1,6 @@
-using PokemonUltimate.Core.Models;
-using PokemonUltimate.Core.Effects;
+using PokemonUltimate.Core.Builders;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Models;
 
 namespace PokemonUltimate.Core.Catalogs
 {
@@ -9,59 +9,32 @@ namespace PokemonUltimate.Core.Catalogs
     /// </summary>
     public static partial class MoveCatalog
     {
-        public static readonly MoveData Ember = new MoveData
-        {
-            Name = "Ember",
-            Description = "The target is attacked with small flames. May also leave the target with a burn.",
-            Type = PokemonType.Fire,
-            Category = MoveCategory.Special,
-            Power = 40,
-            Accuracy = 100,
-            MaxPP = 25,
-            Priority = 0,
-            TargetScope = TargetScope.SingleEnemy,
-            Effects = 
-            { 
-                new DamageEffect(),
-                new StatusEffect(PersistentStatus.Burn, 10)
-            }
-        };
+        public static readonly MoveData Ember = Move.Define("Ember")
+            .Description("The target is attacked with small flames. May also leave the target with a burn.")
+            .Type(PokemonType.Fire)
+            .Special(40, 100, 25)
+            .WithEffects(e => e
+                .Damage()
+                .MayBurn(10))
+            .Build();
 
-        public static readonly MoveData Flamethrower = new MoveData
-        {
-            Name = "Flamethrower",
-            Description = "The target is scorched with an intense blast of fire. May also leave the target with a burn.",
-            Type = PokemonType.Fire,
-            Category = MoveCategory.Special,
-            Power = 90,
-            Accuracy = 100,
-            MaxPP = 15,
-            Priority = 0,
-            TargetScope = TargetScope.SingleEnemy,
-            Effects = 
-            { 
-                new DamageEffect(),
-                new StatusEffect(PersistentStatus.Burn, 10)
-            }
-        };
+        public static readonly MoveData Flamethrower = Move.Define("Flamethrower")
+            .Description("The target is scorched with an intense blast of fire. May also leave the target with a burn.")
+            .Type(PokemonType.Fire)
+            .Special(90, 100, 15)
+            .WithEffects(e => e
+                .Damage()
+                .MayBurn(10))
+            .Build();
 
-        public static readonly MoveData FireBlast = new MoveData
-        {
-            Name = "Fire Blast",
-            Description = "The target is attacked with an intense blast of all-consuming fire. May also burn.",
-            Type = PokemonType.Fire,
-            Category = MoveCategory.Special,
-            Power = 110,
-            Accuracy = 85,
-            MaxPP = 5,
-            Priority = 0,
-            TargetScope = TargetScope.SingleEnemy,
-            Effects = 
-            { 
-                new DamageEffect(),
-                new StatusEffect(PersistentStatus.Burn, 10)
-            }
-        };
+        public static readonly MoveData FireBlast = Move.Define("Fire Blast")
+            .Description("The target is attacked with an intense blast of all-consuming fire. May also burn.")
+            .Type(PokemonType.Fire)
+            .Special(110, 85, 5)
+            .WithEffects(e => e
+                .Damage()
+                .MayBurn(10))
+            .Build();
 
         static partial void RegisterFire()
         {
@@ -71,4 +44,3 @@ namespace PokemonUltimate.Core.Catalogs
         }
     }
 }
-

@@ -21,6 +21,12 @@ namespace PokemonUltimate.Core.Enums
         // Targets everyone except user (Explosion)
         AllOthers,
         
+        // Targets all adjacent Pokemon including allies (Earthquake in doubles)
+        AllAdjacent,
+        
+        // Targets all adjacent enemies only (Razor Leaf, Heat Wave)
+        AllAdjacentEnemies,
+        
         // Can target anyone (Telekinesis)
         Any,
         
