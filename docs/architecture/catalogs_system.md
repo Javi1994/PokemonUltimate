@@ -30,7 +30,7 @@ This bridges the gap between static data definitions and the runtime Registry sy
 ### Pokemon Catalog (by Generation)
 ```
 Catalogs/Pokemon/
-├── PokemonCatalog.cs           # Orquestador: All, Count, RegisterAll
+├── PokemonCatalog.cs           # Orchestrator: All, Count, RegisterAll
 ├── PokemonCatalog.Gen1.cs      # Generation 1 (#001-151)
 ├── PokemonCatalog.Gen2.cs      # Generation 2 (#152-251) [future]
 └── PokemonCatalog.Custom.cs    # Custom Pokemon [future]
@@ -39,7 +39,7 @@ Catalogs/Pokemon/
 ### Move Catalog (by Type)
 ```
 Catalogs/Moves/
-├── MoveCatalog.cs              # Orquestador: All, Count, RegisterAll
+├── MoveCatalog.cs              # Orchestrator: All, Count, RegisterAll
 ├── MoveCatalog.Normal.cs       # Normal-type moves
 ├── MoveCatalog.Fire.cs         # Fire-type moves
 ├── MoveCatalog.Water.cs        # Water-type moves
@@ -49,69 +49,98 @@ Catalogs/Moves/
 └── MoveCatalog.Psychic.cs      # Psychic-type moves
 ```
 
-## 4. Architecture
+## 4. Pokemon Builder System ✅ NEW
 
-### PokemonCatalog (Orchestrator)
+Pokemon are now defined using a **Fluent Builder Pattern** for improved readability:
+
+### Example: Defining a Pokemon
 ```csharp
-public static partial class PokemonCatalog
-{
-    private static List<PokemonSpeciesData> _all;
-    
-    public static IEnumerable<PokemonSpeciesData> All
-    {
-        get
-        {
-            if (_all == null) InitializeAll();
-            return _all;
-        }
-    }
-    
-    public static int Count => _all?.Count ?? 0;
-    
-    public static void RegisterAll(IPokemonRegistry registry);
-    
-    private static void InitializeAll()
-    {
-        _all = new List<PokemonSpeciesData>();
-        RegisterGen1();  // Implemented in PokemonCatalog.Gen1.cs
-        // RegisterGen2(); // Add when needed
-    }
-    
-    static partial void RegisterGen1();
-}
+// Final evolutions first (so they can be referenced)
+public static readonly PokemonSpeciesData Charizard = Pokemon.Define("Charizard", 6)
+    .Types(PokemonType.Fire, PokemonType.Flying)
+    .Stats(78, 84, 78, 109, 85, 100)
+    .Moves(m => m
+        .StartsWith(MoveCatalog.Scratch, MoveCatalog.Ember)
+        .AtLevel(46, MoveCatalog.Flamethrower)
+        .ByTM(MoveCatalog.FireBlast, MoveCatalog.Earthquake))
+    .Build();
+
+// Evolution target is already defined, so we can reference it
+public static readonly PokemonSpeciesData Charmander = Pokemon.Define("Charmander", 4)
+    .Type(PokemonType.Fire)
+    .Stats(39, 52, 43, 60, 50, 65)
+    .Moves(m => m
+        .StartsWith(MoveCatalog.Scratch, MoveCatalog.Growl)
+        .AtLevel(9, MoveCatalog.Ember))
+    .EvolvesTo(Charmeleon, e => e.AtLevel(16))  // Type-safe reference!
+    .Build();
 ```
 
-### PokemonCatalog.Gen1 (Partial)
+### Builder Methods
+| Method | Description |
+|--------|-------------|
+| `Pokemon.Define(name, dex)` | Start definition |
+| `.Type(type)` | Set mono-type |
+| `.Types(primary, secondary)` | Set dual-type |
+| `.Stats(hp, atk, def, spa, spd, spe)` | Set base stats |
+| `.Moves(m => ...)` | Configure learnset |
+| `.EvolvesTo(target, e => ...)` | Add evolution |
+| `.Build()` | Finalize |
+
+### Learnset Builder
+| Method | Description |
+|--------|-------------|
+| `.StartsWith(moves...)` | Level 1 moves |
+| `.AtLevel(level, moves...)` | Level-up moves |
+| `.ByTM(moves...)` | TM/HM moves |
+| `.ByEgg(moves...)` | Egg moves |
+| `.OnEvolution(moves...)` | Evolution moves |
+| `.ByTutor(moves...)` | Tutor moves |
+
+### Evolution Builder
+| Method | Description |
+|--------|-------------|
+| `.AtLevel(level)` | Level requirement |
+| `.WithItem(itemName)` | Use item (stone, etc.) |
+| `.WithFriendship(min = 220)` | High friendship |
+| `.During(time)` | Time of day |
+| `.ByTrade()` | Trade evolution |
+| `.KnowsMove(move)` | Must know move |
+
+### Important: Definition Order
+**Define Pokemon in reverse evolution order** so targets exist when referenced:
+
 ```csharp
-public static partial class PokemonCatalog
-{
-    public static readonly PokemonSpeciesData Pikachu = new PokemonSpeciesData
-    {
-        Name = "Pikachu",
-        PokedexNumber = 25,
-        PrimaryType = PokemonType.Electric,
-        BaseStats = new BaseStats(35, 55, 40, 50, 50, 90)
-    };
-    
-    static partial void RegisterGen1()
-    {
-        _all.Add(Pikachu);
-        // ... add all Gen1 Pokemon
-    }
-}
+// ✅ Correct: Final form first
+public static readonly PokemonSpeciesData Venusaur = ...;  // No evolution
+public static readonly PokemonSpeciesData Ivysaur = ...;   // → Venusaur
+public static readonly PokemonSpeciesData Bulbasaur = ...; // → Ivysaur
+
+// ❌ Wrong: Would fail because Ivysaur doesn't exist yet
+public static readonly PokemonSpeciesData Bulbasaur = ...
+    .EvolvesTo(Ivysaur, ...)  // Error: Ivysaur is null
 ```
 
 ## 5. Current Content
 
 ### PokemonCatalog (15 Pokemon - Gen 1)
-| Pokemon | Pokedex # | Types | BST |
-|---------|-----------|-------|-----|
-| Bulbasaur, Ivysaur, Venusaur | 1-3 | Grass/Poison | 318→525 |
-| Charmander, Charmeleon, Charizard | 4-6 | Fire→Fire/Flying | 309→534 |
-| Squirtle, Wartortle, Blastoise | 7-9 | Water | 314→530 |
-| Pikachu, Raichu | 25-26 | Electric | 320→485 |
-| Eevee, Snorlax | 133, 143 | Normal | 325, 540 |
-| Mewtwo, Mew | 150-151 | Psychic | 680, 600 |
+| Pokemon | Pokedex # | Types | BST | Evolves To |
+|---------|-----------|-------|-----|------------|
+| Bulbasaur | 1 | Grass/Poison | 318 | Ivysaur @16 |
+| Ivysaur | 2 | Grass/Poison | 405 | Venusaur @32 |
+| Venusaur | 3 | Grass/Poison | 525 | - |
+| Charmander | 4 | Fire | 309 | Charmeleon @16 |
+| Charmeleon | 5 | Fire | 405 | Charizard @36 |
+| Charizard | 6 | Fire/Flying | 534 | - |
+| Squirtle | 7 | Water | 314 | Wartortle @16 |
+| Wartortle | 8 | Water | 405 | Blastoise @36 |
+| Blastoise | 9 | Water | 530 | - |
+| Pikachu | 25 | Electric | 320 | Raichu (Thunder Stone) |
+| Raichu | 26 | Electric | 485 | - |
+| Eevee | 133 | Normal | 325 | (multiple) |
+| Snorlax | 143 | Normal | 540 | - |
+| Mewtwo | 150 | Psychic | 680 | - |
+| Mew | 151 | Psychic | 600 | - |
 
 ### MoveCatalog (20 Moves)
 | Type | Moves |
@@ -132,18 +161,29 @@ public static partial class PokemonCatalog
 ```csharp
 public static partial class PokemonCatalog
 {
-    public static readonly PokemonSpeciesData Chikorita = new PokemonSpeciesData
-    {
-        Name = "Chikorita",
-        PokedexNumber = 152,
-        PrimaryType = PokemonType.Grass,
-        BaseStats = new BaseStats(45, 49, 65, 49, 65, 45)
-    };
+    // Define in reverse evolution order!
+    public static readonly PokemonSpeciesData Meganium = Pokemon.Define("Meganium", 154)
+        .Types(PokemonType.Grass, PokemonType.Grass)
+        .Stats(80, 82, 100, 83, 100, 80)
+        .Build();
+    
+    public static readonly PokemonSpeciesData Bayleef = Pokemon.Define("Bayleef", 153)
+        .Type(PokemonType.Grass)
+        .Stats(60, 62, 80, 63, 80, 60)
+        .EvolvesTo(Meganium, e => e.AtLevel(32))
+        .Build();
+    
+    public static readonly PokemonSpeciesData Chikorita = Pokemon.Define("Chikorita", 152)
+        .Type(PokemonType.Grass)
+        .Stats(45, 49, 65, 49, 65, 45)
+        .EvolvesTo(Bayleef, e => e.AtLevel(16))
+        .Build();
     
     static partial void RegisterGen2()
     {
         _all.Add(Chikorita);
-        // ... add all Gen2 Pokemon
+        _all.Add(Bayleef);
+        _all.Add(Meganium);
     }
 }
 ```
@@ -202,6 +242,8 @@ var pikachu = PokemonCatalog.Pikachu;
 var thunderbolt = MoveCatalog.Thunderbolt;
 
 Assert.That(pikachu.BaseStats.Speed, Is.EqualTo(90));
+Assert.That(pikachu.CanEvolve, Is.True);
+Assert.That(pikachu.Evolutions[0].Target, Is.EqualTo(PokemonCatalog.Raichu));
 ```
 
 ### Pattern 2: Registry Population
@@ -220,8 +262,25 @@ var pokemon = pokemonRegistry.GetByPokedexNumber(25);
 // All Fire-type Pokemon
 var fireTypes = PokemonCatalog.All.Where(p => p.HasType(PokemonType.Fire));
 
+// All Pokemon that can evolve
+var evolving = PokemonCatalog.All.Where(p => p.CanEvolve);
+
 // All Status moves
 var statusMoves = MoveCatalog.All.Where(m => m.Category == MoveCategory.Status);
+```
+
+### Pattern 4: Learnset Queries
+```csharp
+var charmander = PokemonCatalog.Charmander;
+
+// Get starting moves
+var startMoves = charmander.GetStartingMoves(); // [Scratch, Growl]
+
+// Get moves at level 9
+var level9Moves = charmander.GetMovesAtLevel(9); // [Ember]
+
+// Check if can learn a move
+bool canLearn = charmander.CanLearn(MoveCatalog.Flamethrower); // true
 ```
 
 ## 8. Move Effects
@@ -263,18 +322,29 @@ Tests are organized to match the catalog structure:
 Tests/Catalogs/
 ├── Pokemon/
 │   ├── PokemonCatalogTests.cs       # General: All, RegisterAll, validations
-│   └── PokemonCatalogGen1Tests.cs   # Gen1-specific tests
+│   └── PokemonCatalogGen1Tests.cs   # Gen1-specific tests (with learnset/evolution)
 └── Moves/
     ├── MoveCatalogTests.cs          # General tests
     ├── MoveCatalogNormalTests.cs    # Normal moves tests
     ├── MoveCatalogFireTests.cs      # Fire moves tests
     └── ...
+
+Tests/Builders/
+├── PokemonBuilderTests.cs       # Builder fluent API tests
+├── LearnsetBuilderTests.cs      # Learnset builder tests
+└── EvolutionBuilderTests.cs     # Evolution builder tests
+
+Tests/Evolution/
+├── EvolutionConditionTests.cs   # Condition classes tests
+└── EvolutionTests.cs            # Evolution class tests
 ```
 
 ### What Tests Should Verify:
 1. **General**: All enumeration, Count, RegisterAll, uniqueness
 2. **Generation/Type specific**: Correct data for each Pokemon/Move
 3. **Effects**: Correct effects attached to moves
+4. **Learnsets**: Moves are correctly defined with proper methods/levels
+5. **Evolutions**: Evolution chains are correctly linked
 
 ## 10. Benefits of This Architecture
 
@@ -285,3 +355,5 @@ Tests/Catalogs/
 | **Collaboration** | Different developers can work on different generations |
 | **Testing** | Tests match source structure |
 | **Discovery** | IDE shows all Pokemon/Moves via autocomplete |
+| **Type Safety** | Evolution targets are compile-time references |
+| **Readability** | Builder pattern makes data definitions clear |

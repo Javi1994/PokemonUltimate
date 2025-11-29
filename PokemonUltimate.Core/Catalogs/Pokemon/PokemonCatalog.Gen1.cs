@@ -1,3 +1,5 @@
+using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Core.Catalogs;
 using PokemonUltimate.Core.Data;
 using PokemonUltimate.Core.Enums;
 
@@ -5,179 +7,174 @@ namespace PokemonUltimate.Core.Catalogs
 {
     /// <summary>
     /// Generation 1 Pokemon (Kanto region, #001-151).
+    /// Defined in reverse evolution order so evolutions can reference targets.
     /// </summary>
     public static partial class PokemonCatalog
     {
-        #region Starters - Grass Line
+        // ===== GRASS STARTER LINE (Venusaur → Ivysaur → Bulbasaur) =====
 
-        public static readonly PokemonSpeciesData Bulbasaur = new PokemonSpeciesData
-        {
-            Name = "Bulbasaur",
-            PokedexNumber = 1,
-            PrimaryType = PokemonType.Grass,
-            SecondaryType = PokemonType.Poison,
-            BaseStats = new BaseStats(45, 49, 49, 65, 65, 45)
-        };
+        public static readonly PokemonSpeciesData Venusaur = Pokemon.Define("Venusaur", 3)
+            .Types(PokemonType.Grass, PokemonType.Poison)
+            .Stats(80, 82, 83, 100, 100, 80)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.VineWhip, MoveCatalog.Growl)
+                .AtLevel(32, MoveCatalog.RazorLeaf)
+                .AtLevel(65, MoveCatalog.SolarBeam))
+            .Build();
 
-        public static readonly PokemonSpeciesData Ivysaur = new PokemonSpeciesData
-        {
-            Name = "Ivysaur",
-            PokedexNumber = 2,
-            PrimaryType = PokemonType.Grass,
-            SecondaryType = PokemonType.Poison,
-            BaseStats = new BaseStats(60, 62, 63, 80, 80, 60)
-        };
+        public static readonly PokemonSpeciesData Ivysaur = Pokemon.Define("Ivysaur", 2)
+            .Types(PokemonType.Grass, PokemonType.Poison)
+            .Stats(60, 62, 63, 80, 80, 60)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.VineWhip, MoveCatalog.Growl)
+                .AtLevel(22, MoveCatalog.RazorLeaf))
+            .EvolvesTo(Venusaur, e => e.AtLevel(32))
+            .Build();
 
-        public static readonly PokemonSpeciesData Venusaur = new PokemonSpeciesData
-        {
-            Name = "Venusaur",
-            PokedexNumber = 3,
-            PrimaryType = PokemonType.Grass,
-            SecondaryType = PokemonType.Poison,
-            BaseStats = new BaseStats(80, 82, 83, 100, 100, 80)
-        };
+        public static readonly PokemonSpeciesData Bulbasaur = Pokemon.Define("Bulbasaur", 1)
+            .Types(PokemonType.Grass, PokemonType.Poison)
+            .Stats(45, 49, 49, 65, 65, 45)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Tackle, MoveCatalog.Growl)
+                .AtLevel(9, MoveCatalog.VineWhip)
+                .AtLevel(27, MoveCatalog.RazorLeaf))
+            .EvolvesTo(Ivysaur, e => e.AtLevel(16))
+            .Build();
 
-        #endregion
+        // ===== FIRE STARTER LINE (Charizard → Charmeleon → Charmander) =====
 
-        #region Starters - Fire Line
+        public static readonly PokemonSpeciesData Charizard = Pokemon.Define("Charizard", 6)
+            .Types(PokemonType.Fire, PokemonType.Flying)
+            .Stats(78, 84, 78, 109, 85, 100)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Scratch, MoveCatalog.Ember)
+                .AtLevel(46, MoveCatalog.Flamethrower)
+                .ByTM(MoveCatalog.FireBlast, MoveCatalog.Earthquake))
+            .Build();
 
-        public static readonly PokemonSpeciesData Charmander = new PokemonSpeciesData
-        {
-            Name = "Charmander",
-            PokedexNumber = 4,
-            PrimaryType = PokemonType.Fire,
-            SecondaryType = null,
-            BaseStats = new BaseStats(39, 52, 43, 60, 50, 65)
-        };
+        public static readonly PokemonSpeciesData Charmeleon = Pokemon.Define("Charmeleon", 5)
+            .Type(PokemonType.Fire)
+            .Stats(58, 64, 58, 80, 65, 80)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Scratch, MoveCatalog.Growl)
+                .AtLevel(17, MoveCatalog.Ember)
+                .AtLevel(39, MoveCatalog.Flamethrower))
+            .EvolvesTo(Charizard, e => e.AtLevel(36))
+            .Build();
 
-        public static readonly PokemonSpeciesData Charmeleon = new PokemonSpeciesData
-        {
-            Name = "Charmeleon",
-            PokedexNumber = 5,
-            PrimaryType = PokemonType.Fire,
-            SecondaryType = null,
-            BaseStats = new BaseStats(58, 64, 58, 80, 65, 80)
-        };
+        public static readonly PokemonSpeciesData Charmander = Pokemon.Define("Charmander", 4)
+            .Type(PokemonType.Fire)
+            .Stats(39, 52, 43, 60, 50, 65)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Scratch, MoveCatalog.Growl)
+                .AtLevel(9, MoveCatalog.Ember)
+                .AtLevel(38, MoveCatalog.Flamethrower))
+            .EvolvesTo(Charmeleon, e => e.AtLevel(16))
+            .Build();
 
-        public static readonly PokemonSpeciesData Charizard = new PokemonSpeciesData
-        {
-            Name = "Charizard",
-            PokedexNumber = 6,
-            PrimaryType = PokemonType.Fire,
-            SecondaryType = PokemonType.Flying,
-            BaseStats = new BaseStats(78, 84, 78, 109, 85, 100)
-        };
+        // ===== WATER STARTER LINE (Blastoise → Wartortle → Squirtle) =====
 
-        #endregion
+        public static readonly PokemonSpeciesData Blastoise = Pokemon.Define("Blastoise", 9)
+            .Type(PokemonType.Water)
+            .Stats(79, 83, 100, 85, 105, 78)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Tackle, MoveCatalog.WaterGun)
+                .AtLevel(42, MoveCatalog.Surf)
+                .AtLevel(52, MoveCatalog.HydroPump))
+            .Build();
 
-        #region Starters - Water Line
+        public static readonly PokemonSpeciesData Wartortle = Pokemon.Define("Wartortle", 8)
+            .Type(PokemonType.Water)
+            .Stats(59, 63, 80, 65, 80, 58)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Tackle, MoveCatalog.WaterGun)
+                .AtLevel(28, MoveCatalog.Surf))
+            .EvolvesTo(Blastoise, e => e.AtLevel(36))
+            .Build();
 
-        public static readonly PokemonSpeciesData Squirtle = new PokemonSpeciesData
-        {
-            Name = "Squirtle",
-            PokedexNumber = 7,
-            PrimaryType = PokemonType.Water,
-            SecondaryType = null,
-            BaseStats = new BaseStats(44, 48, 65, 50, 64, 43)
-        };
+        public static readonly PokemonSpeciesData Squirtle = Pokemon.Define("Squirtle", 7)
+            .Type(PokemonType.Water)
+            .Stats(44, 48, 65, 50, 64, 43)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Tackle, MoveCatalog.Growl)
+                .AtLevel(8, MoveCatalog.WaterGun)
+                .AtLevel(25, MoveCatalog.Surf))
+            .EvolvesTo(Wartortle, e => e.AtLevel(16))
+            .Build();
 
-        public static readonly PokemonSpeciesData Wartortle = new PokemonSpeciesData
-        {
-            Name = "Wartortle",
-            PokedexNumber = 8,
-            PrimaryType = PokemonType.Water,
-            SecondaryType = null,
-            BaseStats = new BaseStats(59, 63, 80, 65, 80, 58)
-        };
+        // ===== ELECTRIC LINE (Raichu → Pikachu) =====
 
-        public static readonly PokemonSpeciesData Blastoise = new PokemonSpeciesData
-        {
-            Name = "Blastoise",
-            PokedexNumber = 9,
-            PrimaryType = PokemonType.Water,
-            SecondaryType = null,
-            BaseStats = new BaseStats(79, 83, 100, 85, 105, 78)
-        };
+        public static readonly PokemonSpeciesData Raichu = Pokemon.Define("Raichu", 26)
+            .Type(PokemonType.Electric)
+            .Stats(60, 90, 55, 90, 80, 110)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.ThunderShock, MoveCatalog.QuickAttack)
+                .ByTM(MoveCatalog.Thunderbolt, MoveCatalog.Thunder))
+            .Build();
 
-        #endregion
+        public static readonly PokemonSpeciesData Pikachu = Pokemon.Define("Pikachu", 25)
+            .Type(PokemonType.Electric)
+            .Stats(35, 55, 40, 50, 50, 90)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.ThunderShock, MoveCatalog.Growl)
+                .AtLevel(11, MoveCatalog.QuickAttack)
+                .AtLevel(26, MoveCatalog.Thunderbolt)
+                .ByTM(MoveCatalog.Thunder))
+            .EvolvesTo(Raichu, e => e.WithItem("Thunder Stone"))
+            .Build();
 
-        #region Electric
+        // ===== NORMAL POKEMON =====
 
-        public static readonly PokemonSpeciesData Pikachu = new PokemonSpeciesData
-        {
-            Name = "Pikachu",
-            PokedexNumber = 25,
-            PrimaryType = PokemonType.Electric,
-            SecondaryType = null,
-            BaseStats = new BaseStats(35, 55, 40, 50, 50, 90)
-        };
+        public static readonly PokemonSpeciesData Eevee = Pokemon.Define("Eevee", 133)
+            .Type(PokemonType.Normal)
+            .Stats(55, 55, 50, 45, 65, 55)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Tackle, MoveCatalog.Growl)
+                .AtLevel(15, MoveCatalog.QuickAttack))
+            .Build();
+            // Note: Eevee evolutions would reference Vaporeon, Jolteon, etc.
+            // which aren't defined yet. We'll add them when we have those Pokemon.
 
-        public static readonly PokemonSpeciesData Raichu = new PokemonSpeciesData
-        {
-            Name = "Raichu",
-            PokedexNumber = 26,
-            PrimaryType = PokemonType.Electric,
-            SecondaryType = null,
-            BaseStats = new BaseStats(60, 90, 55, 90, 80, 110)
-        };
+        public static readonly PokemonSpeciesData Snorlax = Pokemon.Define("Snorlax", 143)
+            .Type(PokemonType.Normal)
+            .Stats(160, 110, 65, 65, 110, 30)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Tackle, MoveCatalog.Growl)
+                .AtLevel(35, MoveCatalog.HyperBeam)
+                .ByTM(MoveCatalog.Earthquake, MoveCatalog.Psychic))
+            .Build();
 
-        #endregion
+        // ===== LEGENDARY/MYTHICAL =====
 
-        #region Normal
+        public static readonly PokemonSpeciesData Mewtwo = Pokemon.Define("Mewtwo", 150)
+            .Type(PokemonType.Psychic)
+            .Stats(106, 110, 90, 154, 90, 130)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Psychic)
+                .ByTM(MoveCatalog.Thunderbolt, MoveCatalog.FireBlast, MoveCatalog.HydroPump))
+            .Build();
 
-        public static readonly PokemonSpeciesData Eevee = new PokemonSpeciesData
-        {
-            Name = "Eevee",
-            PokedexNumber = 133,
-            PrimaryType = PokemonType.Normal,
-            SecondaryType = null,
-            BaseStats = new BaseStats(55, 55, 50, 45, 65, 55)
-        };
+        public static readonly PokemonSpeciesData Mew = Pokemon.Define("Mew", 151)
+            .Type(PokemonType.Psychic)
+            .Stats(100, 100, 100, 100, 100, 100)
+            .Moves(m => m
+                .StartsWith(MoveCatalog.Psychic)
+                .ByTM(MoveCatalog.Thunderbolt, MoveCatalog.Flamethrower, MoveCatalog.Surf))
+            .Build();
 
-        public static readonly PokemonSpeciesData Snorlax = new PokemonSpeciesData
-        {
-            Name = "Snorlax",
-            PokedexNumber = 143,
-            PrimaryType = PokemonType.Normal,
-            SecondaryType = null,
-            BaseStats = new BaseStats(160, 110, 65, 65, 110, 30)
-        };
-
-        #endregion
-
-        #region Legendary/Mythical
-
-        public static readonly PokemonSpeciesData Mewtwo = new PokemonSpeciesData
-        {
-            Name = "Mewtwo",
-            PokedexNumber = 150,
-            PrimaryType = PokemonType.Psychic,
-            SecondaryType = null,
-            BaseStats = new BaseStats(106, 110, 90, 154, 90, 130)
-        };
-
-        public static readonly PokemonSpeciesData Mew = new PokemonSpeciesData
-        {
-            Name = "Mew",
-            PokedexNumber = 151,
-            PrimaryType = PokemonType.Psychic,
-            SecondaryType = null,
-            BaseStats = new BaseStats(100, 100, 100, 100, 100, 100)
-        };
-
-        #endregion
-
-        #region Registration
+        // ===== REGISTRATION =====
 
         static partial void RegisterGen1()
         {
-            // Starters
+            // Grass line
             _all.Add(Bulbasaur);
             _all.Add(Ivysaur);
             _all.Add(Venusaur);
+            // Fire line
             _all.Add(Charmander);
             _all.Add(Charmeleon);
             _all.Add(Charizard);
+            // Water line
             _all.Add(Squirtle);
             _all.Add(Wartortle);
             _all.Add(Blastoise);
@@ -191,8 +188,5 @@ namespace PokemonUltimate.Core.Catalogs
             _all.Add(Mewtwo);
             _all.Add(Mew);
         }
-
-        #endregion
     }
 }
-

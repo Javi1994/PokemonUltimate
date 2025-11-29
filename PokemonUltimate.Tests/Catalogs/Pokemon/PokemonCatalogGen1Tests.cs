@@ -1,5 +1,8 @@
+using NUnit.Framework;
 using PokemonUltimate.Core.Catalogs;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Evolution.Conditions;
+using System.Linq;
 
 namespace PokemonUltimate.Tests.Catalogs.Pokemon
 {
@@ -7,6 +10,7 @@ namespace PokemonUltimate.Tests.Catalogs.Pokemon
     /// Tests specific to Generation 1 Pokemon in PokemonCatalog.
     /// Verifies correct data for each Pokemon defined in PokemonCatalog.Gen1.cs.
     /// </summary>
+    [TestFixture]
     public class PokemonCatalogGen1Tests
     {
         #region Starter Lines - Grass
@@ -28,10 +32,30 @@ namespace PokemonUltimate.Tests.Catalogs.Pokemon
         }
 
         [Test]
+        public void Test_Bulbasaur_EvolvesTo_Ivysaur()
+        {
+            var pokemon = PokemonCatalog.Bulbasaur;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.CanEvolve, Is.True);
+                Assert.That(pokemon.Evolutions, Has.Count.EqualTo(1));
+                Assert.That(pokemon.Evolutions[0].Target, Is.EqualTo(PokemonCatalog.Ivysaur));
+                Assert.That(pokemon.Evolutions[0].GetCondition<LevelCondition>().MinLevel, Is.EqualTo(16));
+            });
+        }
+
+        [Test]
         public void Test_Venusaur_Is_Stronger_Than_Bulbasaur()
         {
             Assert.That(PokemonCatalog.Venusaur.BaseStats.Total, 
                 Is.GreaterThan(PokemonCatalog.Bulbasaur.BaseStats.Total));
+        }
+
+        [Test]
+        public void Test_Venusaur_Cannot_Evolve()
+        {
+            Assert.That(PokemonCatalog.Venusaur.CanEvolve, Is.False);
         }
 
         #endregion
@@ -50,6 +74,38 @@ namespace PokemonUltimate.Tests.Catalogs.Pokemon
                 Assert.That(pokemon.PrimaryType, Is.EqualTo(PokemonType.Fire));
                 Assert.That(pokemon.SecondaryType, Is.Null);
                 Assert.That(pokemon.IsDualType, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_Charmander_Learnset()
+        {
+            var pokemon = PokemonCatalog.Charmander;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.Learnset, Is.Not.Empty);
+                Assert.That(pokemon.GetStartingMoves().Count(), Is.EqualTo(2));
+                Assert.That(pokemon.CanLearn(MoveCatalog.Scratch), Is.True);
+                Assert.That(pokemon.CanLearn(MoveCatalog.Ember), Is.True);
+                Assert.That(pokemon.CanLearn(MoveCatalog.Flamethrower), Is.True);
+            });
+        }
+
+        [Test]
+        public void Test_Charmander_Evolution_Line()
+        {
+            Assert.Multiple(() =>
+            {
+                // Charmander → Charmeleon at level 16
+                Assert.That(PokemonCatalog.Charmander.CanEvolve, Is.True);
+                Assert.That(PokemonCatalog.Charmander.Evolutions[0].Target, Is.EqualTo(PokemonCatalog.Charmeleon));
+                Assert.That(PokemonCatalog.Charmander.Evolutions[0].GetCondition<LevelCondition>().MinLevel, Is.EqualTo(16));
+
+                // Charmeleon → Charizard at level 36
+                Assert.That(PokemonCatalog.Charmeleon.CanEvolve, Is.True);
+                Assert.That(PokemonCatalog.Charmeleon.Evolutions[0].Target, Is.EqualTo(PokemonCatalog.Charizard));
+                Assert.That(PokemonCatalog.Charmeleon.Evolutions[0].GetCondition<LevelCondition>().MinLevel, Is.EqualTo(36));
             });
         }
 
@@ -84,6 +140,17 @@ namespace PokemonUltimate.Tests.Catalogs.Pokemon
                 Assert.That(pokemon.PokedexNumber, Is.EqualTo(7));
                 Assert.That(pokemon.PrimaryType, Is.EqualTo(PokemonType.Water));
                 Assert.That(pokemon.SecondaryType, Is.Null);
+            });
+        }
+
+        [Test]
+        public void Test_Squirtle_Evolution_Line()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(PokemonCatalog.Squirtle.Evolutions[0].Target, Is.EqualTo(PokemonCatalog.Wartortle));
+                Assert.That(PokemonCatalog.Wartortle.Evolutions[0].Target, Is.EqualTo(PokemonCatalog.Blastoise));
+                Assert.That(PokemonCatalog.Blastoise.CanEvolve, Is.False);
             });
         }
 
@@ -127,6 +194,33 @@ namespace PokemonUltimate.Tests.Catalogs.Pokemon
                 Assert.That(pokemon.BaseStats.HP, Is.EqualTo(35));
                 Assert.That(pokemon.BaseStats.Speed, Is.EqualTo(90));
                 Assert.That(pokemon.BaseStats.Total, Is.EqualTo(320));
+            });
+        }
+
+        [Test]
+        public void Test_Pikachu_Learnset()
+        {
+            var pokemon = PokemonCatalog.Pikachu;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.CanLearn(MoveCatalog.ThunderShock), Is.True);
+                Assert.That(pokemon.CanLearn(MoveCatalog.Thunderbolt), Is.True);
+                Assert.That(pokemon.CanLearn(MoveCatalog.Thunder), Is.True);
+            });
+        }
+
+        [Test]
+        public void Test_Pikachu_Evolves_With_Thunder_Stone()
+        {
+            var pokemon = PokemonCatalog.Pikachu;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.CanEvolve, Is.True);
+                Assert.That(pokemon.Evolutions[0].Target, Is.EqualTo(PokemonCatalog.Raichu));
+                Assert.That(pokemon.Evolutions[0].HasCondition<ItemCondition>(), Is.True);
+                Assert.That(pokemon.Evolutions[0].GetCondition<ItemCondition>().ItemName, Is.EqualTo("Thunder Stone"));
             });
         }
 
@@ -184,6 +278,7 @@ namespace PokemonUltimate.Tests.Catalogs.Pokemon
                 Assert.That(pokemon.SecondaryType, Is.Null);
                 Assert.That(pokemon.BaseStats.Total, Is.EqualTo(680)); // Legendary BST
                 Assert.That(pokemon.BaseStats.SpAttack, Is.EqualTo(154)); // Highest SpAtk
+                Assert.That(pokemon.CanEvolve, Is.False);
             });
         }
 
@@ -202,10 +297,10 @@ namespace PokemonUltimate.Tests.Catalogs.Pokemon
                 Assert.That(pokemon.BaseStats.HP, Is.EqualTo(100));
                 Assert.That(pokemon.BaseStats.Attack, Is.EqualTo(100));
                 Assert.That(pokemon.BaseStats.Defense, Is.EqualTo(100));
+                Assert.That(pokemon.CanEvolve, Is.False);
             });
         }
 
         #endregion
     }
 }
-

@@ -8,8 +8,11 @@
     - [x] `IDataRegistry<T>` interface
     - [x] `GameDataRegistry<T>` implementation
 - [x] **Pokemon Data**
-    - [x] `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats)
+    - [x] `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats, Learnset, Evolutions)
     - [x] `BaseStats` class (HP, Attack, Defense, SpAttack, SpDefense, Speed, Total)
+    - [x] `LearnableMove` class (Move reference, LearnMethod, Level)
+    - [x] `Evolution` class (Target, Conditions)
+    - [x] `IEvolutionCondition` interface + 6 condition classes
     - [x] `IPokemonRegistry` interface
     - [x] `PokemonRegistry` (with Pokedex lookup)
     - [ ] `PokemonInstance` (mutable runtime state)
@@ -32,11 +35,18 @@
     - [x] `Stat` (HP, Attack, Defense, SpAttack, SpDefense, Speed, Accuracy, Evasion)
     - [x] `PersistentStatus` (Burn, Paralysis, Sleep, Poison, BadlyPoisoned, Freeze)
     - [x] `VolatileStatus` (Confusion, Flinch, LeechSeed, etc.)
-    - [x] `EffectType` (Damage, FixedDamage, Status, StatChange, Recoil, Drain, Heal, Flinch, MultiHit)
+    - [x] `EffectType` (24 types: 9 implemented + 15 planned)
+    - [x] `LearnMethod` (Start, LevelUp, Evolution, TM, Egg, Tutor)
+    - [x] `TimeOfDay` (Morning, Day, Evening, Night)
+    - [x] `EvolutionConditionType` (Level, UseItem, Trade, Friendship, etc.)
+- [x] **Builders (Fluent API)**
+    - [x] `PokemonBuilder` - fluent Pokemon definition
+    - [x] `LearnsetBuilder` - learnset configuration
+    - [x] `EvolutionBuilder` - evolution conditions
 - [x] **Catalogs (Modular with Partial Classes)**
     - [x] `PokemonCatalog` - organized by generation
         - [x] `PokemonCatalog.cs` (orchestrator)
-        - [x] `PokemonCatalog.Gen1.cs` (15 Pokemon)
+        - [x] `PokemonCatalog.Gen1.cs` (15 Pokemon with learnsets & evolutions)
     - [x] `MoveCatalog` - organized by type
         - [x] `MoveCatalog.cs` (orchestrator)
         - [x] `MoveCatalog.[Type].cs` (20 Moves across 7 types)
@@ -68,6 +78,8 @@
 - [x] Move Effect tests (25 tests)
 - [x] Effect Composition tests (12 tests)
 - [x] Catalog Effects tests (12 tests)
+- [x] Builder tests (45+ tests)
+- [x] Evolution & Condition tests (18 tests)
 
 ---
 

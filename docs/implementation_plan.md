@@ -16,7 +16,7 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 
 ---
 
-## Step 1: The Data Foundation & Registry (TDD) 🔄 IN PROGRESS
+## Step 1: The Data Foundation & Registry (TDD) ✅ COMPLETE
 **Objective**: Verify we can store, retrieve, and instantiate Pokemon and Moves.
 
 ### 1.1 Registry System ✅ COMPLETE
@@ -25,26 +25,28 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 3.  ✅ **Tests**: Register, Get, Exists, GetAll, edge cases
 
 ### 1.2 Pokemon Data ✅ COMPLETE
-1.  ✅ **Blueprint**: `PokemonSpeciesData` (Name, PokedexNumber, PrimaryType, SecondaryType, BaseStats)
+1.  ✅ **Blueprint**: `PokemonSpeciesData` (Name, PokedexNumber, PrimaryType, SecondaryType, BaseStats, Learnset, Evolutions)
 2.  ✅ **BaseStats**: Class with HP, Attack, Defense, SpAttack, SpDefense, Speed, Total
-3.  ✅ **Registry**: `IPokemonRegistry`, `PokemonRegistry` (dual lookup: Name + PokedexNumber)
-4.  ✅ **Catalog**: `PokemonCatalog` (15 Pokemon with official Gen 1 stats and types)
-5.  ✅ **Tests**: 16 registry + 24 model + 12 stats + 18 catalog tests
+3.  ✅ **Learnset**: `LearnableMove` class + `LearnMethod` enum
+4.  ✅ **Evolution**: `Evolution` class + `IEvolutionCondition` interface + 6 condition types
+5.  ✅ **Registry**: `IPokemonRegistry`, `PokemonRegistry` (dual lookup: Name + PokedexNumber)
+6.  ✅ **Catalog**: `PokemonCatalog` (15 Pokemon with official Gen 1 stats, types, learnsets, evolutions)
+7.  ✅ **Builder**: `PokemonBuilder`, `LearnsetBuilder`, `EvolutionBuilder` (fluent API)
+8.  ✅ **Tests**: 80+ tests covering registry, model, stats, catalog, builders, evolution
 
 ### 1.3 Move Data ✅ COMPLETE (Basic)
 1.  ✅ **Blueprint**: `MoveData` (Name, Type, Category, Power, Accuracy, PP, Priority, TargetScope, Effects)
-2.  ✅ **Enums**: `PokemonType` (18), `MoveCategory` (3), `TargetScope` (10), `Stat` (8), `PersistentStatus` (7), `VolatileStatus` (11), `EffectType` (9)
+2.  ✅ **Enums**: `PokemonType` (18), `MoveCategory` (3), `TargetScope` (10), `Stat` (8), `PersistentStatus` (7), `VolatileStatus` (11), `EffectType` (24)
 3.  ✅ **Registry**: `IMoveRegistry`, `MoveRegistry` (with Type/Category filters)
 4.  ✅ **Catalog**: `MoveCatalog` (20 Moves: Normal, Fire, Water, Grass, Electric, Ground, Psychic)
 5.  ✅ **Effects**: `IMoveEffect` interface + 9 concrete effects (DamageEffect, FixedDamageEffect, StatusEffect, StatChangeEffect, RecoilEffect, DrainEffect, HealEffect, FlinchEffect, MultiHitEffect)
-6.  ✅ **Tests**: 9 registry + 9 filter + 12 model + 25 effect + 12 composition + 12 catalog effects tests
+6.  ✅ **Tests**: 70+ tests covering registry, filter, model, effect, composition, catalog effects
 
 ### 1.4 Instance & Factory ⏳ PENDING
-1.  ✅ **Expand**: BaseStats and Types added to `PokemonSpeciesData`
-2.  ⏳ **Instance**: `PokemonInstance` (Level, CurrentHP, Stats, Moves, Status)
-3.  ⏳ **Factory**: `PokemonFactory.Create(species, level)` with stat calculation
-4.  ⏳ **Builder**: `PokemonBuilder` for fluent instance creation
-5.  ⏳ **Tests**: Factory creates valid instances, stats calculated correctly
+1.  ⏳ **Instance**: `PokemonInstance` (Level, CurrentHP, Stats, Moves, Status)
+2.  ⏳ **Factory**: `PokemonFactory.Create(species, level)` with stat calculation
+3.  ⏳ **MoveInstance**: PP tracking per Pokemon
+4.  ⏳ **Tests**: Factory creates valid instances, stats calculated correctly
 
 ---
 
