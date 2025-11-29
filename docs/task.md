@@ -62,6 +62,11 @@
     - [x] Lazy initialization for `All` enumeration
 - [x] **Documentation**
     - [x] `project_structure.md` - Solution organization and folder conventions
+- [x] **Console Smoke Test**
+    - [x] Runtime verification app (~70 tests)
+    - [x] Tests all systems: Catalogs, Registries, Builders, Effects, Evolutions
+    - [x] Visual Pokemon/Move listing with types and stats
+    - [x] Run: `dotnet run --project PokemonUltimate.Console`
 
 ### Combat Engine (Step 2-5) ⏳ PENDING
 - [ ] **Action Queue Architecture**

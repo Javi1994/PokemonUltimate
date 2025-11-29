@@ -49,12 +49,53 @@ PokemonUltimate/
 | Purpose | Verify Core logic works correctly |
 
 ### 3. PokemonUltimate.Console
-**Demo Application** - Simple console app for runtime verification.
+**Runtime Smoke Test** - Console application for verifying all systems work correctly at runtime.
 
 | Property | Value |
 |----------|-------|
 | Framework | `net8.0` |
-| Purpose | Smoke test the data systems |
+| Purpose | Runtime verification of all data systems |
+
+#### How to Run
+```powershell
+dotnet run --project PokemonUltimate.Console
+```
+
+#### What It Tests
+The console application performs ~70 runtime tests across all systems:
+
+| Section | What's Tested |
+|---------|---------------|
+| **Catalogs** | Count, enumeration, direct access (PokemonCatalog.Pikachu) |
+| **Registries** | RegisterAll, GetByName, GetByPokedexNumber, type/category filters |
+| **Pokemon Data** | Name, types, IsDualType, HasType, BaseStats |
+| **Learnsets** | GetStartingMoves, GetMovesAtLevel, CanLearn |
+| **Evolutions** | CanEvolve, conditions (Level, Item), target references |
+| **Gender System** | GenderRatio, HasBothGenders, IsGenderless |
+| **Nature System** | GetStatMultiplier, IsNeutral, increased/decreased stats |
+| **Move Data** | Power, accuracy, effects composition |
+| **Move Builder** | Create moves dynamically with effects |
+| **Pokemon Builder** | Create Pokemon with stats, learnsets |
+| **Effect Types** | All 9 effect classes (Damage, Status, etc.) |
+| **Target Scopes** | SingleEnemy, AllEnemies, AllOthers |
+
+#### Output Format
+```
+═══ SECTION NAME ═══
+  ✓ Test that passes
+  ✗ Test that fails [FAILED]
+    → Informational message
+
+╔═══════════════════════════════════════════════════════════════╗
+║  ✓ ALL 70 TESTS PASSED - Systems Ready for Combat!           ║
+╚═══════════════════════════════════════════════════════════════╝
+```
+
+#### When to Use
+- After making changes to Core to verify nothing broke
+- Before starting new features to confirm base systems work
+- As a quick sanity check without running the full test suite
+- To see a visual listing of all Pokemon and Moves in the catalog
 
 ---
 
