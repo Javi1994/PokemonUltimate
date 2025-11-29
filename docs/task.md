@@ -8,12 +8,12 @@
     - [x] `IDataRegistry<T>` interface
     - [x] `GameDataRegistry<T>` implementation
 - [x] **Pokemon Data**
-    - [x] `PokemonSpeciesData` (basic blueprint)
+    - [x] `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats)
+    - [x] `BaseStats` class (HP, Attack, Defense, SpAttack, SpDefense, Speed, Total)
     - [x] `IPokemonRegistry` interface
     - [x] `PokemonRegistry` (with Pokedex lookup)
     - [ ] `PokemonInstance` (mutable runtime state)
     - [ ] `PokemonFactory` (create instances from blueprints)
-    - [ ] Base Stats, Types, Evolution data in SpeciesData
 - [x] **Move Data**
     - [x] `MoveData` (blueprint with Type, Category, Power, etc.)
     - [x] `IMoveRegistry` interface

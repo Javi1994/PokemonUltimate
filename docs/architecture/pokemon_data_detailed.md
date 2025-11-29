@@ -4,37 +4,65 @@
 This document defines exactly how a Pokemon is structured in data (Static) and in memory (Dynamic).
 It follows the **Testability First** guideline by separating the Data (POCO) from the Unity Asset (ScriptableObject).
 
-## 2. Static Data (The "Species")
-*Namespace: `PokemonGame.Core.Data`*
+## 2. Static Data (The "Species") ✅ IMPLEMENTED
+*Namespace: `PokemonUltimate.Core.Data`*
 
 This represents the "Blueprint" of a Pokemon (e.g., "Charizard"). It is immutable during gameplay.
 
+### Current Implementation
 ```csharp
-public class PokemonSpeciesData {
+public class PokemonSpeciesData : IIdentifiable {
     // Identity
-    public string Id { get; set; }          // "charizard"
     public string Name { get; set; }        // "Charizard"
+    public int PokedexNumber { get; set; }  // 6
+    public string Id => Name;               // IIdentifiable
     
-    // Visuals (Paths/Keys only, no Unity types)
-    public string SpritePath { get; set; }  
-    public string CryAudioPath { get; set; }
+    // Types (Primary is required, Secondary is optional)
+    public PokemonType PrimaryType { get; set; }   // Fire
+    public PokemonType? SecondaryType { get; set; } // Flying (nullable)
+    public bool IsDualType => SecondaryType.HasValue;
+    public bool HasType(PokemonType type);  // Helper method
 
-    // Core Stats
-    public List<PokemonType> Types { get; set; } // [Fire, Flying]
-    public Dictionary<Stat, int> BaseStats { get; set; } 
-    // { HP:78, Atk:84, Def:78, SpAtk:109, SpDef:85, Spd:100 }
-
-    // Progression
-    public List<LearnableMove> MovePool { get; set; }
-    // [{Level:1, MoveId:"scratch"}, {Level:36, MoveId:"flamethrower"}]
-    
-    // Evolution (Optional for now, but good to have)
-    public string EvolutionId { get; set; }
-    public int EvolutionLevel { get; set; }
+    // Base Stats
+    public BaseStats BaseStats { get; set; } // See below
 }
 
-public enum Stat { HP, Attack, Defense, SpAttack, SpDefense, Speed }
-public enum PokemonType { Normal, Fire, Water, Grass, Electric, ... }
+public class BaseStats {
+    public int HP { get; set; }
+    public int Attack { get; set; }
+    public int Defense { get; set; }
+    public int SpAttack { get; set; }
+    public int SpDefense { get; set; }
+    public int Speed { get; set; }
+    public int Total { get; }  // Sum of all stats (BST)
+    
+    public BaseStats(int hp, int attack, int defense, int spAttack, int spDefense, int speed);
+}
+```
+
+### Example Usage
+```csharp
+var charizard = new PokemonSpeciesData {
+    Name = "Charizard",
+    PokedexNumber = 6,
+    PrimaryType = PokemonType.Fire,
+    SecondaryType = PokemonType.Flying,
+    BaseStats = new BaseStats(78, 84, 78, 109, 85, 100) // BST: 534
+};
+
+// Or use the catalog
+var pikachu = PokemonCatalog.Pikachu;
+Console.WriteLine(pikachu.BaseStats.Speed); // 90
+```
+
+### Future Additions (Not Yet Implemented)
+```csharp
+// These will be added when needed:
+public string SpritePath { get; set; }      // Visual reference
+public string CryAudioPath { get; set; }    // Audio reference
+public List<LearnableMove> MovePool { get; set; }  // Level-up moves
+public string EvolutionId { get; set; }     // Evolution target
+public int EvolutionLevel { get; set; }     // Evolution level
 ```
 
 ## 3. Dynamic Data (The "Instance")

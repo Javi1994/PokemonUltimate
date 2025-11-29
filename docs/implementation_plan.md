@@ -24,11 +24,12 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 2.  ✅ **Implementation**: `GameDataRegistry<T>` (Dictionary-based)
 3.  ✅ **Tests**: Register, Get, Exists, GetAll, edge cases
 
-### 1.2 Pokemon Data ✅ COMPLETE (Basic)
-1.  ✅ **Blueprint**: `PokemonSpeciesData` (Name, PokedexNumber)
-2.  ✅ **Registry**: `IPokemonRegistry`, `PokemonRegistry` (dual lookup: Name + PokedexNumber)
-3.  ✅ **Catalog**: `PokemonCatalog` (15 Pokemon: starters, Pikachu, legendaries)
-4.  ✅ **Tests**: 16 tests for registry + 10 tests for model
+### 1.2 Pokemon Data ✅ COMPLETE
+1.  ✅ **Blueprint**: `PokemonSpeciesData` (Name, PokedexNumber, PrimaryType, SecondaryType, BaseStats)
+2.  ✅ **BaseStats**: Class with HP, Attack, Defense, SpAttack, SpDefense, Speed, Total
+3.  ✅ **Registry**: `IPokemonRegistry`, `PokemonRegistry` (dual lookup: Name + PokedexNumber)
+4.  ✅ **Catalog**: `PokemonCatalog` (15 Pokemon with official Gen 1 stats and types)
+5.  ✅ **Tests**: 16 registry + 24 model + 12 stats + 18 catalog tests
 
 ### 1.3 Move Data ✅ COMPLETE (Basic)
 1.  ✅ **Blueprint**: `MoveData` (Name, Type, Category, Power, Accuracy, PP, Priority, TargetScope, Effects)
@@ -39,7 +40,7 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 6.  ✅ **Tests**: 9 registry + 9 filter + 12 model + 25 effect + 12 composition + 12 catalog effects tests
 
 ### 1.4 Instance & Factory ⏳ PENDING
-1.  ⏳ **Expand**: Add BaseStats, Types, MovePool to `PokemonSpeciesData`
+1.  ✅ **Expand**: BaseStats and Types added to `PokemonSpeciesData`
 2.  ⏳ **Instance**: `PokemonInstance` (Level, CurrentHP, Stats, Moves, Status)
 3.  ⏳ **Factory**: `PokemonFactory.Create(species, level)` with stat calculation
 4.  ⏳ **Builder**: `PokemonBuilder` for fluent instance creation
