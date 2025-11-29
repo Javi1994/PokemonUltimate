@@ -39,6 +39,12 @@
     - [x] `LearnMethod` (Start, LevelUp, Evolution, TM, Egg, Tutor)
     - [x] `TimeOfDay` (Morning, Day, Evening, Night)
     - [x] `EvolutionConditionType` (Level, UseItem, Trade, Friendship, etc.)
+    - [x] `Gender` (Male, Female, Genderless)
+    - [x] `Nature` (25 natures with stat modifiers)
+- [x] **Nature & Gender System**
+    - [x] `NatureData` static class (stat multipliers +10%/-10%)
+    - [x] `GenderRatio` property in PokemonSpeciesData
+    - [x] Builder methods: `GenderRatio()`, `Genderless()`, `MaleOnly()`, `FemaleOnly()`
 - [x] **Builders (Fluent API)**
     - [x] `PokemonBuilder` - fluent Pokemon definition
     - [x] `LearnsetBuilder` - learnset configuration

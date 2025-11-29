@@ -513,6 +513,85 @@ namespace PokemonUltimate.Tests.Models
 
         #endregion
 
+        #region Gender Ratio Tests
+
+        [Test]
+        public void Test_GenderRatio_Default_Is_50()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.GenderRatio, Is.EqualTo(50f));
+        }
+
+        [Test]
+        public void Test_IsGenderless_Returns_True_When_Ratio_Is_Negative()
+        {
+            var pokemon = new PokemonSpeciesData { GenderRatio = -1f };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.IsGenderless, Is.True);
+                Assert.That(pokemon.HasBothGenders, Is.False);
+                Assert.That(pokemon.IsMaleOnly, Is.False);
+                Assert.That(pokemon.IsFemaleOnly, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_IsMaleOnly_Returns_True_When_Ratio_Is_100()
+        {
+            var pokemon = new PokemonSpeciesData { GenderRatio = 100f };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.IsMaleOnly, Is.True);
+                Assert.That(pokemon.IsGenderless, Is.False);
+                Assert.That(pokemon.IsFemaleOnly, Is.False);
+                Assert.That(pokemon.HasBothGenders, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_IsFemaleOnly_Returns_True_When_Ratio_Is_0()
+        {
+            var pokemon = new PokemonSpeciesData { GenderRatio = 0f };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.IsFemaleOnly, Is.True);
+                Assert.That(pokemon.IsGenderless, Is.False);
+                Assert.That(pokemon.IsMaleOnly, Is.False);
+                Assert.That(pokemon.HasBothGenders, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_HasBothGenders_Returns_True_For_Normal_Ratio()
+        {
+            var pokemon = new PokemonSpeciesData { GenderRatio = 50f };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.HasBothGenders, Is.True);
+                Assert.That(pokemon.IsGenderless, Is.False);
+                Assert.That(pokemon.IsMaleOnly, Is.False);
+                Assert.That(pokemon.IsFemaleOnly, Is.False);
+            });
+        }
+
+        [Test]
+        [TestCase(87.5f)]  // Starter Pokemon ratio
+        [TestCase(75f)]
+        [TestCase(25f)]
+        public void Test_HasBothGenders_For_Unequal_Ratios(float ratio)
+        {
+            var pokemon = new PokemonSpeciesData { GenderRatio = ratio };
+
+            Assert.That(pokemon.HasBothGenders, Is.True);
+        }
+
+        #endregion
+
         #region Helpers
 
         private static BaseStats CreateStatsWithTotal(int targetTotal)

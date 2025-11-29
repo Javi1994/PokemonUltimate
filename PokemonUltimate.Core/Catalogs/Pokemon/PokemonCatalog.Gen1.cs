@@ -11,10 +11,12 @@ namespace PokemonUltimate.Core.Catalogs
     public static partial class PokemonCatalog
     {
         // ===== GRASS STARTER LINE (Venusaur → Ivysaur → Bulbasaur) =====
+        // Starters have 87.5% male ratio
 
         public static readonly PokemonSpeciesData Venusaur = Pokemon.Define("Venusaur", 3)
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(80, 82, 83, 100, 100, 80)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.VineWhip, MoveCatalog.Growl)
                 .AtLevel(32, MoveCatalog.RazorLeaf)
@@ -24,6 +26,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Ivysaur = Pokemon.Define("Ivysaur", 2)
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(60, 62, 63, 80, 80, 60)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.VineWhip, MoveCatalog.Growl)
                 .AtLevel(22, MoveCatalog.RazorLeaf))
@@ -33,6 +36,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Bulbasaur = Pokemon.Define("Bulbasaur", 1)
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(45, 49, 49, 65, 65, 45)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Tackle, MoveCatalog.Growl)
                 .AtLevel(9, MoveCatalog.VineWhip)
@@ -41,10 +45,12 @@ namespace PokemonUltimate.Core.Catalogs
             .Build();
 
         // ===== FIRE STARTER LINE (Charizard → Charmeleon → Charmander) =====
+        // Starters have 87.5% male ratio
 
         public static readonly PokemonSpeciesData Charizard = Pokemon.Define("Charizard", 6)
             .Types(PokemonType.Fire, PokemonType.Flying)
             .Stats(78, 84, 78, 109, 85, 100)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Scratch, MoveCatalog.Ember)
                 .AtLevel(46, MoveCatalog.Flamethrower)
@@ -54,6 +60,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Charmeleon = Pokemon.Define("Charmeleon", 5)
             .Type(PokemonType.Fire)
             .Stats(58, 64, 58, 80, 65, 80)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Scratch, MoveCatalog.Growl)
                 .AtLevel(17, MoveCatalog.Ember)
@@ -64,6 +71,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Charmander = Pokemon.Define("Charmander", 4)
             .Type(PokemonType.Fire)
             .Stats(39, 52, 43, 60, 50, 65)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Scratch, MoveCatalog.Growl)
                 .AtLevel(9, MoveCatalog.Ember)
@@ -72,10 +80,12 @@ namespace PokemonUltimate.Core.Catalogs
             .Build();
 
         // ===== WATER STARTER LINE (Blastoise → Wartortle → Squirtle) =====
+        // Starters have 87.5% male ratio
 
         public static readonly PokemonSpeciesData Blastoise = Pokemon.Define("Blastoise", 9)
             .Type(PokemonType.Water)
             .Stats(79, 83, 100, 85, 105, 78)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Tackle, MoveCatalog.WaterGun)
                 .AtLevel(42, MoveCatalog.Surf)
@@ -85,6 +95,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Wartortle = Pokemon.Define("Wartortle", 8)
             .Type(PokemonType.Water)
             .Stats(59, 63, 80, 65, 80, 58)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Tackle, MoveCatalog.WaterGun)
                 .AtLevel(28, MoveCatalog.Surf))
@@ -94,6 +105,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Squirtle = Pokemon.Define("Squirtle", 7)
             .Type(PokemonType.Water)
             .Stats(44, 48, 65, 50, 64, 43)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Tackle, MoveCatalog.Growl)
                 .AtLevel(8, MoveCatalog.WaterGun)
@@ -127,6 +139,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Eevee = Pokemon.Define("Eevee", 133)
             .Type(PokemonType.Normal)
             .Stats(55, 55, 50, 45, 65, 55)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Tackle, MoveCatalog.Growl)
                 .AtLevel(15, MoveCatalog.QuickAttack))
@@ -137,6 +150,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Snorlax = Pokemon.Define("Snorlax", 143)
             .Type(PokemonType.Normal)
             .Stats(160, 110, 65, 65, 110, 30)
+            .GenderRatio(87.5f)
             .Moves(m => m
                 .StartsWith(MoveCatalog.Tackle, MoveCatalog.Growl)
                 .AtLevel(35, MoveCatalog.HyperBeam)
@@ -144,10 +158,12 @@ namespace PokemonUltimate.Core.Catalogs
             .Build();
 
         // ===== LEGENDARY/MYTHICAL =====
+        // Legendaries are typically genderless
 
         public static readonly PokemonSpeciesData Mewtwo = Pokemon.Define("Mewtwo", 150)
             .Type(PokemonType.Psychic)
             .Stats(106, 110, 90, 154, 90, 130)
+            .Genderless()
             .Moves(m => m
                 .StartsWith(MoveCatalog.Psychic)
                 .ByTM(MoveCatalog.Thunderbolt, MoveCatalog.FireBlast, MoveCatalog.HydroPump))
@@ -156,6 +172,7 @@ namespace PokemonUltimate.Core.Catalogs
         public static readonly PokemonSpeciesData Mew = Pokemon.Define("Mew", 151)
             .Type(PokemonType.Psychic)
             .Stats(100, 100, 100, 100, 100, 100)
+            .Genderless()
             .Moves(m => m
                 .StartsWith(MoveCatalog.Psychic)
                 .ByTM(MoveCatalog.Thunderbolt, MoveCatalog.Flamethrower, MoveCatalog.Surf))

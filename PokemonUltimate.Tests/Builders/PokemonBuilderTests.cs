@@ -192,6 +192,74 @@ namespace PokemonUltimate.Tests.Builders
                 Assert.That(charmeleon.Evolutions[0].GetCondition<LevelCondition>().MinLevel, Is.EqualTo(36));
             });
         }
+
+        #region Gender Builder Tests
+
+        [Test]
+        public void GenderRatio_Should_Set_Percentage()
+        {
+            var pokemon = Pokemon.Define("Charmander", 4)
+                .GenderRatio(87.5f)
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.GenderRatio, Is.EqualTo(87.5f));
+                Assert.That(pokemon.HasBothGenders, Is.True);
+            });
+        }
+
+        [Test]
+        public void Genderless_Should_Set_Negative_Ratio()
+        {
+            var pokemon = Pokemon.Define("Magnemite", 81)
+                .Genderless()
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.GenderRatio, Is.EqualTo(-1f));
+                Assert.That(pokemon.IsGenderless, Is.True);
+            });
+        }
+
+        [Test]
+        public void MaleOnly_Should_Set_100_Ratio()
+        {
+            var pokemon = Pokemon.Define("Tauros", 128)
+                .MaleOnly()
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.GenderRatio, Is.EqualTo(100f));
+                Assert.That(pokemon.IsMaleOnly, Is.True);
+            });
+        }
+
+        [Test]
+        public void FemaleOnly_Should_Set_0_Ratio()
+        {
+            var pokemon = Pokemon.Define("Chansey", 113)
+                .FemaleOnly()
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.GenderRatio, Is.EqualTo(0f));
+                Assert.That(pokemon.IsFemaleOnly, Is.True);
+            });
+        }
+
+        [Test]
+        public void Default_GenderRatio_Is_50()
+        {
+            var pokemon = Pokemon.Define("Pikachu", 25).Build();
+
+            Assert.That(pokemon.GenderRatio, Is.EqualTo(50f));
+        }
+
+        #endregion
     }
 }
 

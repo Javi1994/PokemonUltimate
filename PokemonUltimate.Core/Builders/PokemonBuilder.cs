@@ -63,6 +63,43 @@ namespace PokemonUltimate.Core.Builders
         }
 
         /// <summary>
+        /// Set the Pokemon's gender ratio (percentage chance of being male).
+        /// Use Genderless(), MaleOnly(), or FemaleOnly() for special cases.
+        /// </summary>
+        public PokemonBuilder GenderRatio(float malePercentage)
+        {
+            _pokemon.GenderRatio = malePercentage;
+            return this;
+        }
+
+        /// <summary>
+        /// Mark this Pokemon as genderless (Magnemite, Ditto, etc.).
+        /// </summary>
+        public PokemonBuilder Genderless()
+        {
+            _pokemon.GenderRatio = -1f;
+            return this;
+        }
+
+        /// <summary>
+        /// Mark this Pokemon as male-only (Tauros, Hitmonlee, etc.).
+        /// </summary>
+        public PokemonBuilder MaleOnly()
+        {
+            _pokemon.GenderRatio = 100f;
+            return this;
+        }
+
+        /// <summary>
+        /// Mark this Pokemon as female-only (Chansey, Jynx, etc.).
+        /// </summary>
+        public PokemonBuilder FemaleOnly()
+        {
+            _pokemon.GenderRatio = 0f;
+            return this;
+        }
+
+        /// <summary>
         /// Define the Pokemon's learnset using a fluent builder.
         /// </summary>
         public PokemonBuilder Moves(Action<LearnsetBuilder> configure)

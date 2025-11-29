@@ -5,7 +5,7 @@ This document defines exactly how a Pokemon is structured in data (Static) and i
 It follows the **Testability First** guideline by separating the Data (POCO) from the Unity Asset (ScriptableObject).
 
 ## 2. Static Data (The "Species") ✅ IMPLEMENTED
-*Namespace: `PokemonUltimate.Core.Data`*
+*Namespace: `PokemonUltimate.Core.Models`*
 
 This represents the "Blueprint" of a Pokemon (e.g., "Charizard"). It is immutable during gameplay.
 
@@ -25,6 +25,13 @@ public class PokemonSpeciesData : IIdentifiable {
 
     // Base Stats
     public BaseStats BaseStats { get; set; }
+
+    // Gender Ratio
+    public float GenderRatio { get; set; }  // 0-100 = % male, -1 = genderless
+    public bool IsGenderless { get; }       // GenderRatio < 0
+    public bool IsMaleOnly { get; }         // GenderRatio >= 100
+    public bool IsFemaleOnly { get; }       // GenderRatio == 0
+    public bool HasBothGenders { get; }     // 0 < GenderRatio < 100
 
     // Learnset (moves this species can learn)
     public List<LearnableMove> Learnset { get; set; }
@@ -53,8 +60,59 @@ public class BaseStats {
 }
 ```
 
+### Gender System ✅ IMPLEMENTED
+*Namespace: `PokemonUltimate.Core.Enums`*
+
+```csharp
+public enum Gender {
+    Male,
+    Female,
+    Genderless
+}
+```
+
+**GenderRatio** in PokemonSpeciesData defines the probability:
+- `50.0f` = 50% male, 50% female (most Pokemon)
+- `87.5f` = 87.5% male (starters like Charmander)
+- `100.0f` = male only (Tauros)
+- `0.0f` = female only (Chansey)
+- `-1.0f` = genderless (Magnemite, Ditto)
+
+### Nature System ✅ IMPLEMENTED
+*Namespace: `PokemonUltimate.Core.Enums` and `PokemonUltimate.Core.Models`*
+
+Natures affect stat calculation: +10% to one stat, -10% to another.
+
+```csharp
+public enum Nature {
+    // Neutral (5): Hardy, Docile, Serious, Bashful, Quirky
+    // Attack+: Lonely, Brave, Adamant, Naughty
+    // Defense+: Bold, Relaxed, Impish, Lax
+    // Speed+: Timid, Hasty, Jolly, Naive
+    // SpAttack+: Modest, Mild, Quiet, Rash
+    // SpDefense+: Calm, Gentle, Sassy, Careful
+}
+
+public static class NatureData {
+    const float BoostMultiplier = 1.1f;
+    const float ReduceMultiplier = 0.9f;
+    
+    Stat? GetIncreasedStat(Nature nature);
+    Stat? GetDecreasedStat(Nature nature);
+    bool IsNeutral(Nature nature);
+    float GetStatMultiplier(Nature nature, Stat stat);
+}
+```
+
+**Usage in stat calculation:**
+```csharp
+int baseStat = species.BaseStats.Attack;
+float natureMultiplier = NatureData.GetStatMultiplier(nature, Stat.Attack);
+int finalStat = (int)(calculatedStat * natureMultiplier);
+```
+
 ### Learnset System ✅ IMPLEMENTED
-*Namespace: `PokemonUltimate.Core.Data`*
+*Namespace: `PokemonUltimate.Core.Models`*
 
 ```csharp
 public class LearnableMove {
@@ -74,7 +132,7 @@ public enum LearnMethod {
 ```
 
 ### Evolution System ✅ IMPLEMENTED
-*Namespace: `PokemonUltimate.Core.Evolution`*
+*Namespace: `PokemonUltimate.Core.Evolution` and `PokemonUltimate.Core.Evolution.Conditions`*
 
 ```csharp
 public class Evolution {
@@ -147,6 +205,10 @@ public static readonly PokemonSpeciesData Eevee = Pokemon.Define("Eevee", 133)
 | `.Type(type)` | Set mono-type | `.Type(PokemonType.Fire)` |
 | `.Types(primary, secondary)` | Set dual-type | `.Types(Fire, Flying)` |
 | `.Stats(hp, atk, def, spa, spd, spe)` | Set base stats | `.Stats(39, 52, 43, 60, 50, 65)` |
+| `.GenderRatio(percent)` | Set male percentage | `.GenderRatio(87.5f)` |
+| `.Genderless()` | Mark as genderless | `.Genderless()` |
+| `.MaleOnly()` | Mark as male only | `.MaleOnly()` |
+| `.FemaleOnly()` | Mark as female only | `.FemaleOnly()` |
 | `.Moves(m => ...)` | Configure learnset | See below |
 | `.EvolvesTo(target, e => ...)` | Add evolution | See below |
 | `.Build()` | Finalize | Required at end |

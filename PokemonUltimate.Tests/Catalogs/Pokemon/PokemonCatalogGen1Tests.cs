@@ -302,5 +302,75 @@ namespace PokemonUltimate.Tests.Catalogs.Pokemon
         }
 
         #endregion
+
+        #region Gender Ratio Tests
+
+        [Test]
+        public void Test_Starters_Have_87_5_Percent_Male_Ratio()
+        {
+            Assert.Multiple(() =>
+            {
+                // Grass line
+                Assert.That(PokemonCatalog.Bulbasaur.GenderRatio, Is.EqualTo(87.5f));
+                Assert.That(PokemonCatalog.Ivysaur.GenderRatio, Is.EqualTo(87.5f));
+                Assert.That(PokemonCatalog.Venusaur.GenderRatio, Is.EqualTo(87.5f));
+                
+                // Fire line
+                Assert.That(PokemonCatalog.Charmander.GenderRatio, Is.EqualTo(87.5f));
+                Assert.That(PokemonCatalog.Charmeleon.GenderRatio, Is.EqualTo(87.5f));
+                Assert.That(PokemonCatalog.Charizard.GenderRatio, Is.EqualTo(87.5f));
+                
+                // Water line
+                Assert.That(PokemonCatalog.Squirtle.GenderRatio, Is.EqualTo(87.5f));
+                Assert.That(PokemonCatalog.Wartortle.GenderRatio, Is.EqualTo(87.5f));
+                Assert.That(PokemonCatalog.Blastoise.GenderRatio, Is.EqualTo(87.5f));
+            });
+        }
+
+        [Test]
+        public void Test_Starters_Have_Both_Genders()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(PokemonCatalog.Bulbasaur.HasBothGenders, Is.True);
+                Assert.That(PokemonCatalog.Charmander.HasBothGenders, Is.True);
+                Assert.That(PokemonCatalog.Squirtle.HasBothGenders, Is.True);
+            });
+        }
+
+        [Test]
+        public void Test_Eevee_And_Snorlax_Have_87_5_Percent_Male_Ratio()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(PokemonCatalog.Eevee.GenderRatio, Is.EqualTo(87.5f));
+                Assert.That(PokemonCatalog.Snorlax.GenderRatio, Is.EqualTo(87.5f));
+            });
+        }
+
+        [Test]
+        public void Test_Pikachu_And_Raichu_Have_Default_50_Percent_Ratio()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(PokemonCatalog.Pikachu.GenderRatio, Is.EqualTo(50f));
+                Assert.That(PokemonCatalog.Raichu.GenderRatio, Is.EqualTo(50f));
+            });
+        }
+
+        [Test]
+        public void Test_Legendaries_Are_Genderless()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(PokemonCatalog.Mewtwo.IsGenderless, Is.True);
+                Assert.That(PokemonCatalog.Mewtwo.GenderRatio, Is.EqualTo(-1f));
+                
+                Assert.That(PokemonCatalog.Mew.IsGenderless, Is.True);
+                Assert.That(PokemonCatalog.Mew.GenderRatio, Is.EqualTo(-1f));
+            });
+        }
+
+        #endregion
     }
 }

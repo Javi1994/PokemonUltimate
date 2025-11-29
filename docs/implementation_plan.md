@@ -27,14 +27,16 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 3.  ✅ **Tests**: Register, Get, Exists, GetAll, edge cases
 
 ### 1.2 Pokemon Data ✅ COMPLETE
-1.  ✅ **Blueprint**: `PokemonSpeciesData` (Name, PokedexNumber, PrimaryType, SecondaryType, BaseStats, Learnset, Evolutions)
+1.  ✅ **Blueprint**: `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats, GenderRatio, Learnset, Evolutions)
 2.  ✅ **BaseStats**: Class with HP, Attack, Defense, SpAttack, SpDefense, Speed, Total
 3.  ✅ **Learnset**: `LearnableMove` class + `LearnMethod` enum
 4.  ✅ **Evolution**: `Evolution` class + `IEvolutionCondition` interface + 6 condition types
-5.  ✅ **Registry**: `IPokemonRegistry`, `PokemonRegistry` (dual lookup: Name + PokedexNumber)
-6.  ✅ **Catalog**: `PokemonCatalog` (15 Pokemon with official Gen 1 stats, types, learnsets, evolutions)
-7.  ✅ **Builder**: `PokemonBuilder`, `LearnsetBuilder`, `EvolutionBuilder` (fluent API)
-8.  ✅ **Tests**: 80+ tests covering registry, model, stats, catalog, builders, evolution
+5.  ✅ **Gender**: `Gender` enum + GenderRatio in PokemonSpeciesData + helper properties
+6.  ✅ **Nature**: `Nature` enum (25) + `NatureData` static class (stat modifiers ±10%)
+7.  ✅ **Registry**: `IPokemonRegistry`, `PokemonRegistry` (dual lookup: Name + PokedexNumber)
+8.  ✅ **Catalog**: `PokemonCatalog` (15 Pokemon with official Gen 1 stats, types, learnsets, evolutions)
+9.  ✅ **Builder**: `PokemonBuilder`, `LearnsetBuilder`, `EvolutionBuilder` (fluent API with gender methods)
+10. ✅ **Tests**: 100+ tests covering registry, model, stats, catalog, builders, evolution, gender, nature
 
 ### 1.3 Move Data ✅ COMPLETE (Basic)
 1.  ✅ **Blueprint**: `MoveData` (Name, Type, Category, Power, Accuracy, PP, Priority, TargetScope, Effects)

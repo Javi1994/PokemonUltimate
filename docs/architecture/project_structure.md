@@ -65,10 +65,11 @@ PokemonUltimate.Core/
 │
 ├── Models/                          # 📦 Data Models (POCOs)
 │   ├── IIdentifiable.cs             # Base interface for registry items
-│   ├── PokemonSpeciesData.cs        # Pokemon blueprint
+│   ├── PokemonSpeciesData.cs        # Pokemon blueprint (with GenderRatio)
 │   ├── MoveData.cs                  # Move blueprint
 │   ├── BaseStats.cs                 # HP, Attack, Defense, etc.
-│   └── LearnableMove.cs             # Move in a Pokemon's learnset
+│   ├── LearnableMove.cs             # Move in a Pokemon's learnset
+│   └── NatureData.cs                # Static: Nature stat modifiers (±10%)
 │
 ├── Registry/                        # 🗄️ Data Storage & Retrieval
 │   ├── IDataRegistry.cs             # Generic registry interface
@@ -87,7 +88,9 @@ PokemonUltimate.Core/
 │   ├── VolatileStatus.cs            # Confusion, Flinch, etc.
 │   ├── EffectType.cs                # Types of move effects
 │   ├── LearnMethod.cs               # How moves are learned
-│   └── TimeOfDay.cs                 # For evolution conditions
+│   ├── TimeOfDay.cs                 # For evolution conditions
+│   ├── Gender.cs                    # Male, Female, Genderless
+│   └── Nature.cs                    # 25 natures (stat modifiers)
 │
 ├── Effects/                         # ⚡ Move Effect System
 │   ├── IMoveEffect.cs               # Effect interface
@@ -146,6 +149,7 @@ PokemonUltimate.Tests/
 │   ├── BaseStatsTests.cs
 │   ├── LearnableMoveTests.cs
 │   ├── MoveDataTests.cs
+│   ├── NatureDataTests.cs
 │   └── PokemonSpeciesDataTests.cs
 │
 ├── Registry/                        # Tests for registries

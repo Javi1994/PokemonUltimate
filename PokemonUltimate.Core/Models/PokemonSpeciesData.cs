@@ -48,6 +48,13 @@ namespace PokemonUltimate.Core.Models
         public List<Evolution.Evolution> Evolutions { get; set; } = new List<Evolution.Evolution>();
 
         /// <summary>
+        /// Gender ratio: percentage chance of being male (0-100).
+        /// -1 means genderless (Magnemite, Ditto, etc.).
+        /// Common values: 50 (equal), 87.5 (starters), 0 (female only), 100 (male only).
+        /// </summary>
+        public float GenderRatio { get; set; } = 50f;
+
+        /// <summary>
         /// IIdentifiable implementation - Name serves as the unique ID.
         /// </summary>
         public string Id => Name;
@@ -61,6 +68,26 @@ namespace PokemonUltimate.Core.Models
         /// Returns true if this Pokemon can evolve.
         /// </summary>
         public bool CanEvolve => Evolutions.Count > 0;
+
+        /// <summary>
+        /// Returns true if this Pokemon is genderless.
+        /// </summary>
+        public bool IsGenderless => GenderRatio < 0;
+
+        /// <summary>
+        /// Returns true if this Pokemon can only be male.
+        /// </summary>
+        public bool IsMaleOnly => GenderRatio >= 100;
+
+        /// <summary>
+        /// Returns true if this Pokemon can only be female.
+        /// </summary>
+        public bool IsFemaleOnly => GenderRatio == 0;
+
+        /// <summary>
+        /// Returns true if this Pokemon can be either gender.
+        /// </summary>
+        public bool HasBothGenders => GenderRatio > 0 && GenderRatio < 100;
 
         /// <summary>
         /// Checks if this Pokemon has a specific type (primary or secondary).
