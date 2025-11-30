@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Registry
 {
     /// <summary>
-    /// Specialized registry for Pokemon that supports lookup by Name or Pokedex Number.
+    /// Specialized registry for Pokemon that supports lookup by Name, Pokedex Number, and Type.
     /// </summary>
     public class PokemonRegistry : GameDataRegistry<PokemonSpeciesData>, IPokemonRegistry
     {
@@ -46,6 +48,56 @@ namespace PokemonUltimate.Core.Registry
         {
             return _byPokedexNumber.ContainsKey(number);
         }
+
+        /// <summary>
+        /// Get all Pokemon of a specific type (primary or secondary).
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> GetByType(PokemonType type)
+        {
+            return GetAll().Where(p => p.HasType(type));
+        }
+
+        /// <summary>
+        /// Get all Pokemon within a Pokedex number range (inclusive).
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> GetByPokedexRange(int start, int end)
+        {
+            if (start > end)
+                return Enumerable.Empty<PokemonSpeciesData>();
+                
+            return GetAll().Where(p => p.PokedexNumber >= start && p.PokedexNumber <= end);
+        }
+
+        /// <summary>
+        /// Get all dual-type Pokemon.
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> GetDualType()
+        {
+            return GetAll().Where(p => p.IsDualType);
+        }
+
+        /// <summary>
+        /// Get all single-type Pokemon.
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> GetMonoType()
+        {
+            return GetAll().Where(p => !p.IsDualType);
+        }
+
+        /// <summary>
+        /// Get all Pokemon that can evolve.
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> GetEvolvable()
+        {
+            return GetAll().Where(p => p.CanEvolve);
+        }
+
+        /// <summary>
+        /// Get all final evolution forms (cannot evolve further).
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> GetFinalForms()
+        {
+            return GetAll().Where(p => !p.CanEvolve);
+        }
     }
 }
-

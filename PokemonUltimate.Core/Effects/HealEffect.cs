@@ -14,6 +14,13 @@ namespace PokemonUltimate.Core.Effects
         /// <summary>Percentage of max HP to heal (0-100).</summary>
         public int HealPercent { get; set; }
         
+        /// <summary>Alias for HealPercent for API consistency.</summary>
+        public int Percent
+        {
+            get => HealPercent;
+            set => HealPercent = value;
+        }
+        
         public HealEffect() { }
         
         public HealEffect(int healPercent)

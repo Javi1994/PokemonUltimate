@@ -14,6 +14,13 @@ namespace PokemonUltimate.Core.Effects
         /// <summary>Percentage of damage dealt that user heals (0-100).</summary>
         public int DrainPercent { get; set; }
         
+        /// <summary>Alias for DrainPercent for API consistency.</summary>
+        public int Percent
+        {
+            get => DrainPercent;
+            set => DrainPercent = value;
+        }
+        
         public DrainEffect() { }
         
         public DrainEffect(int drainPercent)

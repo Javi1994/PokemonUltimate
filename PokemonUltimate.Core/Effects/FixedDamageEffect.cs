@@ -14,8 +14,22 @@ namespace PokemonUltimate.Core.Effects
         /// <summary>The exact amount of damage to deal.</summary>
         public int Amount { get; set; }
         
+        /// <summary>Alias for Amount for API consistency.</summary>
+        public int Damage
+        {
+            get => Amount;
+            set => Amount = value;
+        }
+        
         /// <summary>If true, damage equals user's level (Seismic Toss, Night Shade).</summary>
         public bool UseLevelAsDamage { get; set; } = false;
+        
+        /// <summary>Alias for UseLevelAsDamage for API consistency.</summary>
+        public bool UsesLevel
+        {
+            get => UseLevelAsDamage;
+            set => UseLevelAsDamage = value;
+        }
         
         public FixedDamageEffect() { }
         

@@ -14,6 +14,13 @@ namespace PokemonUltimate.Core.Effects
         /// <summary>Percentage of damage dealt that user takes (0-100).</summary>
         public int RecoilPercent { get; set; }
         
+        /// <summary>Alias for RecoilPercent for API consistency.</summary>
+        public int Percent
+        {
+            get => RecoilPercent;
+            set => RecoilPercent = value;
+        }
+        
         public RecoilEffect() { }
         
         public RecoilEffect(int recoilPercent)

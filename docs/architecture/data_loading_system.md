@@ -11,22 +11,66 @@ We define a generic contract for accessing data.
 
 ```csharp
 public interface IDataRegistry<T> where T : IIdentifiable {
+    // Registration
     void Register(T item);
-    T GetByName(string name);
+    void RegisterAll(IEnumerable<T> items);
+    
+    // Retrieval
+    T Get(string id);           // Throws if not found
+    T GetById(string id);       // Returns null if not found
+    bool TryGet(string id, out T item);
     IEnumerable<T> GetAll();
-    bool Exists(string name);
+    IEnumerable<T> All { get; } // Property alias
+    
+    // Queries
+    bool Exists(string id);
+    bool Contains(string id);   // Alias for Exists
     int Count { get; }
 }
+```
 
-// Specific Registries (extended functionality)
-public interface IPokemonRegistry : IDataRegistry<PokemonSpeciesData> {
+### PokemonRegistry (Extended Functionality)
+```csharp
+public class PokemonRegistry : GameDataRegistry<PokemonSpeciesData> {
+    // By Pokedex
     PokemonSpeciesData GetByPokedexNumber(int number);
     bool ExistsByPokedexNumber(int number);
+    IEnumerable<PokemonSpeciesData> GetByPokedexRange(int start, int end);
+    
+    // By Type
+    IEnumerable<PokemonSpeciesData> GetByType(PokemonType type);
+    
+    // By Evolution Status
+    IEnumerable<PokemonSpeciesData> GetDualType();
+    IEnumerable<PokemonSpeciesData> GetMonoType();
+    IEnumerable<PokemonSpeciesData> GetEvolvable();
+    IEnumerable<PokemonSpeciesData> GetFinalForms();
 }
+```
 
-public interface IMoveRegistry : IDataRegistry<MoveData> {
+### MoveRegistry (Extended Functionality)
+```csharp
+public class MoveRegistry : GameDataRegistry<MoveData> {
+    // By Type/Category
     IEnumerable<MoveData> GetByType(PokemonType type);
     IEnumerable<MoveData> GetByCategory(MoveCategory category);
+    IEnumerable<MoveData> GetDamaging();
+    IEnumerable<MoveData> GetStatus();
+    
+    // By Power
+    IEnumerable<MoveData> GetByMinPower(int minPower);
+    IEnumerable<MoveData> GetByMaxPower(int maxPower);
+    IEnumerable<MoveData> GetByPowerRange(int min, int max);
+    
+    // By Accuracy/Priority
+    IEnumerable<MoveData> GetByMinAccuracy(int minAccuracy);
+    IEnumerable<MoveData> GetNeverMiss();
+    IEnumerable<MoveData> GetByPriority(int priority);
+    IEnumerable<MoveData> GetPriorityMoves();
+    
+    // By Flags
+    IEnumerable<MoveData> GetContactMoves();
+    IEnumerable<MoveData> GetSoundMoves();
 }
 ```
 
@@ -130,12 +174,11 @@ public void Test_Pokemon_Stats() {
 public void Test_Combat_Start() {
     // Setup Registry with catalog data
     var registry = new PokemonRegistry();
-    PokemonCatalog.RegisterAll(registry);
+    registry.RegisterAll(PokemonCatalog.All);
     
     // Use registry for dynamic lookup
     var pikachu = registry.GetByPokedexNumber(25);
     
-    // Future: PokemonFactory.Create(pikachu, level: 5)
     Assert.That(pikachu.Name, Is.EqualTo("Pikachu"));
 }
 ```
@@ -153,7 +196,31 @@ public void Test_With_Custom_Pokemon() {
     var registry = new PokemonRegistry();
     registry.Register(testMon);
     
-    Assert.That(registry.Exists("TestMon"), Is.True);
+    Assert.That(registry.Contains("TestMon"), Is.True);
+}
+```
+
+### Option D: Using Registry Query Methods
+```csharp
+[Test]
+public void Test_Registry_Queries() {
+    var pokemonRegistry = new PokemonRegistry();
+    pokemonRegistry.RegisterAll(PokemonCatalog.All);
+    
+    var moveRegistry = new MoveRegistry();
+    moveRegistry.RegisterAll(MoveCatalog.All);
+    
+    // Query Pokemon by type
+    var fireTypes = pokemonRegistry.GetByType(PokemonType.Fire);
+    Assert.That(fireTypes.Any(), Is.True);
+    
+    // Query moves by power
+    var powerfulMoves = moveRegistry.GetByMinPower(100);
+    Assert.That(powerfulMoves.All(m => m.Power >= 100), Is.True);
+    
+    // Query by Pokedex range
+    var starters = pokemonRegistry.GetByPokedexRange(1, 9);
+    Assert.That(starters.Count(), Is.EqualTo(9));
 }
 ```
 
@@ -163,16 +230,27 @@ To ensure content integrity (as per Project Guidelines), we implement **Validato
 ```csharp
 [Test]
 public void Validate_All_Moves() {
-    var registry = new GameDatabaseSO(); // Load real data
-    registry.Initialize();
+    var registry = new MoveRegistry();
+    registry.RegisterAll(MoveCatalog.All);
     
-    foreach(var move in registry.GetAllMoves()) {
+    foreach(var move in registry.All) {
         Assert.IsNotEmpty(move.Name, $"Move {move.Id} has no name");
         Assert.GreaterOrEqual(move.Power, 0, $"Move {move.Name} has negative power");
-        // Verify Effects composition
-        if (move.TargetScope == TargetScope.Self) {
-            Assert.IsTrue(move.Effects.Any(e => e.TargetSelf), $"Self-move {move.Name} has no self-targeting effects");
-        }
     }
+}
+
+[Test]
+public void Validate_All_Pokemon() {
+    var registry = new PokemonRegistry();
+    registry.RegisterAll(PokemonCatalog.All);
+    
+    // Check all Pokemon have positive stats
+    foreach(var pokemon in registry.All) {
+        Assert.That(pokemon.BaseStats.Total, Is.GreaterThan(0));
+    }
+    
+    // Check no duplicate Pokedex numbers
+    var pokedexNumbers = registry.All.Select(p => p.PokedexNumber).ToList();
+    Assert.That(pokedexNumbers.Distinct().Count(), Is.EqualTo(pokedexNumbers.Count));
 }
 ```
