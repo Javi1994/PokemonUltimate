@@ -11,6 +11,8 @@ namespace PokemonUltimate.Core.Blueprints
     /// </summary>
     public class MoveData : IIdentifiable
     {
+        #region Basic Properties
+
         /// <summary>
         /// Unique identifier - the move's name (e.g., "Thunderbolt", "Flamethrower")
         /// </summary>
@@ -37,7 +39,7 @@ namespace PokemonUltimate.Core.Blueprints
         public int Power { get; set; }
 
         /// <summary>
-        /// Base accuracy percentage (0-100, or 0 for moves that never miss)
+        /// Base accuracy percentage (1-100). Use NeverMisses flag for always-hit moves.
         /// </summary>
         public int Accuracy { get; set; }
 
@@ -60,6 +62,96 @@ namespace PokemonUltimate.Core.Blueprints
         /// IIdentifiable implementation - Name serves as the unique ID
         /// </summary>
         public string Id => Name;
+
+        #endregion
+
+        #region Move Flags
+
+        /// <summary>
+        /// True if this move makes physical contact (triggers abilities like Static, Iron Barbs).
+        /// Generally true for Physical moves, but not always (e.g., Earthquake doesn't make contact).
+        /// </summary>
+        public bool MakesContact { get; set; }
+
+        /// <summary>
+        /// True if this move is sound-based (bypasses Substitute, blocked by Soundproof).
+        /// </summary>
+        public bool IsSoundBased { get; set; }
+
+        /// <summary>
+        /// True if this move never misses (Swift, Aerial Ace, Shock Wave).
+        /// Ignores accuracy/evasion checks.
+        /// </summary>
+        public bool NeverMisses { get; set; }
+
+        /// <summary>
+        /// True if this move has an increased critical hit ratio (Slash, Stone Edge, Crabhammer).
+        /// </summary>
+        public bool HighCritRatio { get; set; }
+
+        /// <summary>
+        /// True if this move always results in a critical hit (Frost Breath, Storm Throw).
+        /// </summary>
+        public bool AlwaysCrits { get; set; }
+
+        /// <summary>
+        /// True if the user must recharge next turn (Hyper Beam, Giga Impact).
+        /// </summary>
+        public bool RequiresRecharge { get; set; }
+
+        /// <summary>
+        /// True if this is a two-turn move where user is semi-invulnerable (Fly, Dig, Dive).
+        /// </summary>
+        public bool IsTwoTurn { get; set; }
+
+        /// <summary>
+        /// True if this move is a punch-based move (boosted by Iron Fist).
+        /// </summary>
+        public bool IsPunch { get; set; }
+
+        /// <summary>
+        /// True if this move is a biting move (boosted by Strong Jaw).
+        /// </summary>
+        public bool IsBite { get; set; }
+
+        /// <summary>
+        /// True if this move is a pulse/aura move (boosted by Mega Launcher).
+        /// </summary>
+        public bool IsPulse { get; set; }
+
+        /// <summary>
+        /// True if this move is a bullet/ball move (blocked by Bulletproof).
+        /// </summary>
+        public bool IsBullet { get; set; }
+
+        /// <summary>
+        /// True if this move can be reflected by Magic Coat/Magic Bounce.
+        /// </summary>
+        public bool IsReflectable { get; set; }
+
+        /// <summary>
+        /// True if this move can be stolen by Snatch.
+        /// </summary>
+        public bool IsSnatched { get; set; }
+
+        /// <summary>
+        /// True if this move ignores the target's stat changes.
+        /// </summary>
+        public bool IgnoresTargetStatChanges { get; set; }
+
+        /// <summary>
+        /// True if this move ignores the user's stat changes (negative only).
+        /// </summary>
+        public bool IgnoresUserStatChanges { get; set; }
+
+        /// <summary>
+        /// True if this move can hit Pokemon using Protect (Feint, Shadow Force).
+        /// </summary>
+        public bool BypassesProtect { get; set; }
+
+        #endregion
+
+        #region Effects
 
         /// <summary>
         /// Composed effects that define what the move does (Composition Pattern)
@@ -89,6 +181,32 @@ namespace PokemonUltimate.Core.Blueprints
             }
             return null;
         }
+
+        #endregion
+
+        #region Computed Properties
+
+        /// <summary>
+        /// True if this is a damaging move (has power > 0 or is not Status category).
+        /// </summary>
+        public bool IsDamaging => Category != MoveCategory.Status;
+
+        /// <summary>
+        /// True if this is a status move.
+        /// </summary>
+        public bool IsStatus => Category == MoveCategory.Status;
+
+        /// <summary>
+        /// True if this is a physical move.
+        /// </summary>
+        public bool IsPhysical => Category == MoveCategory.Physical;
+
+        /// <summary>
+        /// True if this is a special move.
+        /// </summary>
+        public bool IsSpecial => Category == MoveCategory.Special;
+
+        #endregion
     }
 }
 

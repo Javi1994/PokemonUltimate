@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Core.Evolution
 {
@@ -40,6 +41,17 @@ namespace PokemonUltimate.Core.Evolution
         public T GetCondition<T>() where T : class, IEvolutionCondition
         {
             return Conditions.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Checks if a specific Pokemon instance meets all conditions for this evolution.
+        /// </summary>
+        public bool CanEvolve(PokemonInstance pokemon)
+        {
+            if (pokemon == null || Conditions.Count == 0)
+                return false;
+
+            return Conditions.All(c => c.IsMet(pokemon));
         }
     }
 }

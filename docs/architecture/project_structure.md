@@ -29,6 +29,23 @@ PokemonUltimate/
 #### Directory Structure
 ```
 PokemonUltimate.Core/
+├── Blueprints/                     → Static data models (immutable)
+│   ├── PokemonSpeciesData.cs
+│   ├── MoveData.cs
+│   ├── BaseStats.cs
+│   ├── LearnableMove.cs
+│   ├── NatureData.cs
+│   └── IIdentifiable.cs
+├── Instances/                      → Runtime instances (mutable)
+│   ├── PokemonInstance.cs          (Core: properties, constructor)
+│   ├── PokemonInstance.Battle.cs   (Battle methods, HP, status)
+│   ├── PokemonInstance.LevelUp.cs  (Level up, experience, moves)
+│   ├── PokemonInstance.Evolution.cs (Evolution system)
+│   └── MoveInstance.cs
+├── Factories/                      → Instance creation
+│   ├── PokemonInstanceBuilder.cs  (Fluent builder)
+│   ├── PokemonFactory.cs          (Quick methods)
+│   └── StatCalculator.cs          (Stat formulas)
 ├── Effects/                        → Move effects (IMoveEffect implementations)
 │   ├── DamageEffect.cs
 │   ├── StatusEffect.cs
@@ -36,6 +53,8 @@ PokemonUltimate.Core/
 ├── Enums/                          → Game enumerations
 │   ├── PokemonType.cs
 │   ├── MoveCategory.cs
+│   ├── Nature.cs
+│   ├── Gender.cs
 │   └── Stat.cs
 ├── Evolution/                      → Evolution system
 │   ├── Evolution.cs
@@ -43,16 +62,11 @@ PokemonUltimate.Core/
 │   └── Conditions/
 │       ├── LevelCondition.cs
 │       └── ItemCondition.cs
-├── Models/                         → Core data models
-│   ├── PokemonSpeciesData.cs      (Blueprint)
-│   ├── MoveData.cs                (Blueprint)
-│   ├── BaseStats.cs
-│   └── LearnableMove.cs
 └── Registry/                       → Data registry system
-    ├── IDataRegistry.cs           (Generic interface)
-    ├── IPokemonRegistry.cs        (Pokemon-specific)
-    ├── IMoveRegistry.cs           (Move-specific)
-    └── GameDataRegistry.cs        (Generic implementation)
+    ├── IDataRegistry.cs
+    ├── IPokemonRegistry.cs
+    ├── IMoveRegistry.cs
+    └── GameDataRegistry.cs
 ```
 
 ### 2. PokemonUltimate.Content
@@ -122,9 +136,11 @@ PokemonUltimate.Tests/
 All Core code uses the `PokemonUltimate.Core.*` namespace:
 
 ```csharp
-PokemonUltimate.Core.Models          // PokemonSpeciesData, MoveData
+PokemonUltimate.Core.Blueprints      // PokemonSpeciesData, MoveData, BaseStats
+PokemonUltimate.Core.Instances       // PokemonInstance, MoveInstance
+PokemonUltimate.Core.Factories       // PokemonFactory, PokemonInstanceBuilder, StatCalculator
 PokemonUltimate.Core.Effects         // DamageEffect, StatusEffect
-PokemonUltimate.Core.Enums           // PokemonType, MoveCategory
+PokemonUltimate.Core.Enums           // PokemonType, MoveCategory, Nature, Gender
 PokemonUltimate.Core.Evolution       // Evolution, IEvolutionCondition
 PokemonUltimate.Core.Registry        // IDataRegistry, PokemonRegistry
 ```
@@ -195,6 +211,16 @@ PokemonCatalog.cs           → Main catalog (All, Count, RegisterAll)
 PokemonCatalog.Gen1.cs      → Kanto Pokémon (#1-151)
 PokemonCatalog.Gen2.cs      → Johto Pokémon (#152-251) [future]
 ```
+
+#### PokemonInstance Example (Runtime Class)
+```
+PokemonInstance.cs          → Core properties, constructor (277 lines)
+PokemonInstance.Battle.cs   → Battle methods, damage, healing (199 lines)
+PokemonInstance.LevelUp.cs  → Level up, experience, move learning (293 lines)
+PokemonInstance.Evolution.cs → Evolution queries and execution (227 lines)
+```
+
+**Note**: Runtime classes can also use partial classes to organize by responsibility.
 
 ---
 

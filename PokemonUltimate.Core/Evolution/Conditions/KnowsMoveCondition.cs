@@ -1,4 +1,6 @@
+using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Core.Evolution.Conditions
 {
@@ -21,6 +23,13 @@ namespace PokemonUltimate.Core.Evolution.Conditions
         {
             RequiredMove = requiredMove;
         }
+
+        public bool IsMet(PokemonInstance pokemon)
+        {
+            if (pokemon == null || RequiredMove == null)
+                return false;
+
+            return pokemon.Moves.Any(m => m.Move == RequiredMove);
+        }
     }
 }
-

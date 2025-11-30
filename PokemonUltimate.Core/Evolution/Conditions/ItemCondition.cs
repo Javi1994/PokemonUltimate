@@ -1,7 +1,10 @@
+using PokemonUltimate.Core.Instances;
+
 namespace PokemonUltimate.Core.Evolution.Conditions
 {
     /// <summary>
     /// Evolution condition: Use a specific evolution item (stone, etc.).
+    /// This condition returns false by default - items must be used explicitly.
     /// </summary>
     public class ItemCondition : IEvolutionCondition
     {
@@ -19,6 +22,25 @@ namespace PokemonUltimate.Core.Evolution.Conditions
         {
             ItemName = itemName;
         }
+
+        /// <summary>
+        /// Item conditions are never automatically met - they require explicit item use.
+        /// Use IsMet(pokemon, itemUsed) overload for item evolution checks.
+        /// </summary>
+        public bool IsMet(PokemonInstance pokemon)
+        {
+            // Item conditions require explicit item use
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the condition is met when a specific item is used.
+        /// </summary>
+        public bool IsMet(PokemonInstance pokemon, string itemUsed)
+        {
+            return pokemon != null && 
+                   !string.IsNullOrEmpty(itemUsed) && 
+                   itemUsed.Equals(ItemName, System.StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
-

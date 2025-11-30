@@ -1,3 +1,5 @@
+using PokemonUltimate.Core.Instances;
+
 namespace PokemonUltimate.Core.Evolution
 {
     /// <summary>
@@ -16,7 +18,10 @@ namespace PokemonUltimate.Core.Evolution
         /// </summary>
         string Description { get; }
 
-        // Future: bool IsMet(PokemonInstance pokemon, EvolutionContext context);
+        /// <summary>
+        /// Checks if this condition is met by the given Pokemon instance.
+        /// </summary>
+        bool IsMet(PokemonInstance pokemon);
     }
 }
 

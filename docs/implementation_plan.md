@@ -53,38 +53,48 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 6.  ✅ **Builder**: `MoveBuilder` + `EffectBuilder` (fluent API for composing moves and effects)
 7.  ✅ **Tests**: 100+ tests covering registry, filter, model, effect, composition, catalog effects, builders
 
-### 1.4 Instance & Factory ⏳ PENDING
+### 1.4 Instance & Factory ✅ COMPLETE
 **Objective**: Transform static blueprints into mutable runtime instances.
 
-1.  ⏳ **MoveInstance** (`Core/Models/MoveInstance.cs`)
+1.  ✅ **MoveInstance** (`Core/Instances/MoveInstance.cs`)
     - Reference to `MoveData` blueprint
     - `CurrentPP`, `MaxPP` tracking
     - `HasPP`, `Use()`, `Restore()`, `RestoreFully()` methods
-    - Tests: Create, use PP, restore PP, edge cases
+    - 19 tests
 
-2.  ⏳ **StatCalculator** (`Core/Factories/StatCalculator.cs`)
-    - Gen3+ formula: `((Base * 2 + IV + EV/4) * Level / 100) + 5`
-    - HP formula: `((Base * 2 + IV + EV/4) * Level / 100) + Level + 10`
-    - Nature modifier integration (+10%/-10%)
-    - Simplified version first (no IVs/EVs, add later if needed)
-    - Tests: Calculate stats at various levels, with/without Nature
+2.  ✅ **StatCalculator** (`Core/Factories/StatCalculator.cs`)
+    - Gen3+ simplified formula (no IVs/EVs)
+    - HP formula: `((Base * 2) * Level / 100) + Level + 10`
+    - Stat formula: `(((Base * 2) * Level / 100) + 5) * NatureModifier`
+    - Stat stage multipliers, accuracy stage multipliers
+    - 31 tests
 
-3.  ⏳ **PokemonInstance** (`Core/Models/PokemonInstance.cs`)
-    - Identity: `Species`, `InstanceId` (GUID), `Nickname`
+3.  ✅ **PokemonInstance** (`Core/Instances/PokemonInstance.cs`)
+    - Identity: `Species`, `InstanceId` (GUID), `Nickname`, `DisplayName`
     - Level: `Level`, `CurrentExp`
     - Stats: `MaxHP`, `CurrentHP`, `Attack`, `Defense`, `SpAttack`, `SpDefense`, `Speed`
-    - Personal: `Gender`, `Nature`
-    - Combat: `Moves` (List<MoveInstance>, max 4), `Status`, `VolatileStatus`, `StatStages` (-6 to +6)
-    - Helpers: `IsFainted`, `HPPercentage`, `GetEffectiveStat(stat)` (with stages)
-    - Tests: State management, fainted detection, stat stages
+    - Personal: `Gender`, `Nature`, `Friendship` (0-255), `IsShiny`
+    - Combat: `Moves`, `Status`, `VolatileStatus`, `StatStages` (-6 to +6)
+    - Helpers: `IsFainted`, `HPPercentage`, `HasHighFriendship`, `HasMaxFriendship`
+    - Methods: `GetEffectiveStat`, `ModifyStatStage`, `TakeDamage`, `Heal`, `FullHeal`, etc.
+    - 55 tests
 
-4.  ⏳ **PokemonFactory** (`Core/Factories/PokemonFactory.cs`)
-    - `Create(species, level)` - random Nature/Gender
-    - `Create(species, level, nature)` - specific Nature
-    - `Create(species, level, nature, gender)` - full control
-    - Auto-assigns moves from learnset (up to 4, highest level first)
-    - Calculates all stats using StatCalculator
-    - Tests: Factory creates valid instances, moves assigned correctly, stats calculated
+4.  ✅ **PokemonInstanceBuilder** (`Core/Factories/PokemonInstanceBuilder.cs`)
+    - Fluent builder pattern for full control
+    - Nature: `WithNature()`, `WithNatureBoosting()`, `WithNeutralNature()`
+    - Gender: `WithGender()`, `Male()`, `Female()`
+    - Moves: `WithMoves()`, `WithRandomMoves()`, `WithSingleMove()`, `WithNoMoves()`
+    - HP: `AtFullHealth()`, `AtHealth()`, `AtHealthPercent()`, `AtHalfHealth()`, `Fainted()`
+    - Status: `Burned()`, `Paralyzed()`, `Poisoned()`, `Asleep()`, `Frozen()`
+    - Friendship: `WithFriendship()`, `WithHighFriendship()`, `WithMaxFriendship()`, `AsHatched()`
+    - Shiny: `Shiny()`, `NotShiny()`, `WithShinyChance()`
+    - Stats override: `WithStats()`, `WithMaxHP()`, `WithAttack()`, `WithSpeed()`
+    - 70 tests
+
+5.  ✅ **PokemonFactory** (`Core/Factories/PokemonFactory.cs`)
+    - Quick creation methods (delegate to builder)
+    - `Create(species, level)`, `Create(species, level, nature)`, `Create(species, level, nature, gender)`
+    - 29 tests
 
 ---
 

@@ -5,9 +5,12 @@ using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution.Conditions;
+using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Instances;
 using PokemonUltimate.Core.Registry;
 using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
 using PokemonCatalog = PokemonUltimate.Content.Catalogs.Pokemon.PokemonCatalog;
+using Pokemon = PokemonUltimate.Core.Factories.Pokemon;
 
 namespace PokemonUltimate.Console;
 
@@ -205,11 +208,11 @@ class Program
         PrintInfo($"Created: {complexMove.Name} with {complexMove.Effects.Count} effects");
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 10: POKEMON BUILDER
+        // SECTION 10: POKEMON BLUEPRINT BUILDER
         // ═══════════════════════════════════════════════════════
-        PrintSection("POKEMON BUILDER");
+        PrintSection("POKEMON BLUEPRINT BUILDER");
 
-        var customPokemon = Pokemon.Define("TestMon", 999)
+        var customPokemon = PokemonUltimate.Content.Builders.Pokemon.Define("TestMon", 999)
             .Types(PokemonType.Fire, PokemonType.Dragon)
             .Stats(80, 120, 70, 100, 80, 110)
             .GenderRatio(0.5f)
@@ -261,23 +264,338 @@ class Program
         PrintInfo($"Available TargetScopes: {Enum.GetNames(typeof(TargetScope)).Length}");
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 13: COMPLETE POKEMON LISTING
+        // SECTION 13: MOVE INSTANCE (PP TRACKING)
+        // ═══════════════════════════════════════════════════════
+        PrintSection("MOVE INSTANCE (PP TRACKING)");
+
+        var moveInstance = new MoveInstance(MoveCatalog.Thunderbolt);
+        Test("MoveInstance has Move reference", () => moveInstance.Move == MoveCatalog.Thunderbolt);
+        Test("MoveInstance starts at full PP", () => moveInstance.CurrentPP == moveInstance.MaxPP);
+        Test("MoveInstance.HasPP is true", () => moveInstance.HasPP);
+        
+        moveInstance.Use();
+        moveInstance.Use();
+        Test("Use() decreases PP", () => moveInstance.CurrentPP == moveInstance.MaxPP - 2);
+        
+        moveInstance.Restore(1);
+        Test("Restore() increases PP", () => moveInstance.CurrentPP == moveInstance.MaxPP - 1);
+        
+        moveInstance.RestoreFully();
+        Test("RestoreFully() restores max PP", () => moveInstance.CurrentPP == moveInstance.MaxPP);
+
+        PrintInfo($"Thunderbolt: {moveInstance.CurrentPP}/{moveInstance.MaxPP} PP");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 14: STAT CALCULATOR (WITH IVs/EVs)
+        // ═══════════════════════════════════════════════════════
+        PrintSection("STAT CALCULATOR (WITH IVs/EVs)");
+
+        // Constants
+        Test("MaxIV is 31", () => StatCalculator.MaxIV == 31);
+        Test("MaxEV is 252", () => StatCalculator.MaxEV == 252);
+        Test("DefaultIV equals MaxIV", () => StatCalculator.DefaultIV == StatCalculator.MaxIV);
+
+        // HP with max IVs/EVs: ((2*35 + 31 + 63) * 50 / 100) + 50 + 10 = 142
+        var pikachuHPMax = StatCalculator.CalculateHP(35, 50);
+        Test("HP formula with max IVs/EVs (Pikachu Lv50)", () => pikachuHPMax == 142);
+
+        // HP without IVs/EVs: ((2*35 + 0 + 0) * 50 / 100) + 50 + 10 = 95
+        var pikachuHPZero = StatCalculator.CalculateHP(35, 50, 0, 0);
+        Test("HP formula without IVs/EVs (Pikachu Lv50)", () => pikachuHPZero == 95);
+
+        // Stat calculation with nature and max IVs/EVs
+        var atkNeutral = StatCalculator.CalculateStat(100, 50, Nature.Hardy, Stat.Attack);
+        var atkBoosted = StatCalculator.CalculateStat(100, 50, Nature.Adamant, Stat.Attack);
+        var atkReduced = StatCalculator.CalculateStat(100, 50, Nature.Modest, Stat.Attack);
+        
+        Test("Neutral nature with max IVs/EVs", () => atkNeutral == 152);
+        Test("Boosting nature = +10%", () => atkBoosted == 167);
+        Test("Reducing nature = -10%", () => atkReduced == 136);
+
+        // Experience calculations
+        Test("Level 1 exp = 1", () => StatCalculator.GetExpForLevel(1) == 1);
+        Test("Level 50 exp = 125000", () => StatCalculator.GetExpForLevel(50) == 125000);
+        Test("Level 100 exp = 1000000", () => StatCalculator.GetExpForLevel(100) == 1000000);
+        Test("GetLevelForExp finds correct level", () => StatCalculator.GetLevelForExp(125000) == 50);
+
+        // Stat stages
+        Test("Stage 0 = 1.0x", () => Math.Abs(StatCalculator.GetStageMultiplier(0) - 1.0f) < 0.01f);
+        Test("Stage +2 = 2.0x", () => Math.Abs(StatCalculator.GetStageMultiplier(2) - 2.0f) < 0.01f);
+        Test("Stage -2 = 0.5x", () => Math.Abs(StatCalculator.GetStageMultiplier(-2) - 0.5f) < 0.01f);
+        Test("Stage +6 = 4.0x", () => Math.Abs(StatCalculator.GetStageMultiplier(6) - 4.0f) < 0.01f);
+
+        PrintInfo($"Base 100 Atk at Lv50 (max IVs/EVs): Neutral={atkNeutral}, Adamant={atkBoosted}, Modest={atkReduced}");
+        PrintInfo($"HP difference: With IVs/EVs={pikachuHPMax}, Without={pikachuHPZero}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 15: POKEMON INSTANCE BUILDER
+        // ═══════════════════════════════════════════════════════
+        PrintSection("POKEMON INSTANCE BUILDER");
+
+        Pokemon.SetSeed(12345); // Deterministic for testing
+
+        // Basic creation
+        var basicPikachu = Pokemon.Create(PokemonCatalog.Pikachu, 25).Build();
+        Test("Builder creates instance", () => basicPikachu != null);
+        Test("Instance has correct species", () => basicPikachu.Species == PokemonCatalog.Pikachu);
+        Test("Instance has correct level", () => basicPikachu.Level == 25);
+        Test("Instance has unique ID", () => !string.IsNullOrEmpty(basicPikachu.InstanceId));
+        Test("Instance starts at full HP", () => basicPikachu.CurrentHP == basicPikachu.MaxHP);
+
+        // Full builder chain
+        var customInstance = Pokemon.Create(PokemonCatalog.Charizard, 50)
+            .WithNature(Nature.Adamant)
+            .Female()
+            .Named("Blaze Queen")
+            .WithMoves(MoveCatalog.Flamethrower, MoveCatalog.FireBlast)
+            .WithHighFriendship()
+            .AtHalfHealth()
+            .Build();
+
+        Test("WithNature sets nature", () => customInstance.Nature == Nature.Adamant);
+        Test("Female() sets gender", () => customInstance.Gender == Gender.Female);
+        Test("Named() sets nickname", () => customInstance.Nickname == "Blaze Queen");
+        Test("DisplayName shows nickname", () => customInstance.DisplayName == "Blaze Queen");
+        Test("WithMoves() sets specific moves", () => customInstance.Moves.Count == 2);
+        Test("WithHighFriendship() sets 220", () => customInstance.Friendship == 220);
+        Test("AtHalfHealth() sets 50%", () => Math.Abs(customInstance.HPPercentage - 0.5f) < 0.01f);
+
+        PrintInfo($"Created: {customInstance.DisplayName} Lv.{customInstance.Level}");
+        PrintInfo($"Stats: HP={customInstance.MaxHP}, Atk={customInstance.Attack}, Spe={customInstance.Speed}");
+        PrintInfo($"Nature: {customInstance.Nature}, Gender: {customInstance.Gender}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 16: POKEMON FACTORY (QUICK CREATION)
+        // ═══════════════════════════════════════════════════════
+        PrintSection("POKEMON FACTORY (QUICK CREATION)");
+
+        var quickPokemon = PokemonFactory.Create(PokemonCatalog.Bulbasaur, 15);
+        Test("Factory creates instance", () => quickPokemon != null);
+        Test("Factory sets level", () => quickPokemon.Level == 15);
+        Test("Factory assigns moves from learnset", () => quickPokemon.Moves.Count > 0);
+
+        var withNature = PokemonFactory.Create(PokemonCatalog.Squirtle, 20, Nature.Bold);
+        Test("Factory accepts nature", () => withNature.Nature == Nature.Bold);
+
+        var fullControl = PokemonFactory.Create(PokemonCatalog.Mewtwo, 70, Nature.Modest, Gender.Genderless);
+        Test("Factory accepts gender", () => fullControl.Gender == Gender.Genderless);
+
+        PrintInfo($"Quick created: {quickPokemon.Species.Name} Lv.{quickPokemon.Level} with {quickPokemon.Moves.Count} moves");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 17: FRIENDSHIP & SHINY
+        // ═══════════════════════════════════════════════════════
+        PrintSection("FRIENDSHIP & SHINY");
+
+        var friendlyMon = Pokemon.Create(PokemonCatalog.Eevee, 20)
+            .WithMaxFriendship()
+            .Build();
+
+        Test("Default friendship is 70", () => basicPikachu.Friendship == 70);
+        Test("WithMaxFriendship sets 255", () => friendlyMon.Friendship == 255);
+        Test("HasMaxFriendship is true", () => friendlyMon.HasMaxFriendship);
+        Test("HasHighFriendship is true at 255", () => friendlyMon.HasHighFriendship);
+
+        friendlyMon.DecreaseFriendship(50);
+        Test("DecreaseFriendship works", () => friendlyMon.Friendship == 205);
+
+        friendlyMon.IncreaseFriendship(100);
+        Test("IncreaseFriendship caps at 255", () => friendlyMon.Friendship == 255);
+
+        var shinyMon = Pokemon.Create(PokemonCatalog.Pikachu, 25).Shiny().Build();
+        Test("Shiny() makes Pokemon shiny", () => shinyMon.IsShiny);
+
+        var normalMon = Pokemon.Create(PokemonCatalog.Pikachu, 25).NotShiny().Build();
+        Test("NotShiny() makes Pokemon not shiny", () => !normalMon.IsShiny);
+
+        PrintInfo($"Friendly Eevee: Friendship={friendlyMon.Friendship}, HighFriendship={friendlyMon.HasHighFriendship}");
+        PrintInfo($"Shiny Pikachu: IsShiny={shinyMon.IsShiny}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 18: BATTLE STATE
+        // ═══════════════════════════════════════════════════════
+        PrintSection("BATTLE STATE");
+
+        var battleMon = Pokemon.Create(PokemonCatalog.Charizard, 50)
+            .WithNeutralNature()
+            .WithMaxHP(200)
+            .Build();
+
+        Test("IsFainted is false at full HP", () => !battleMon.IsFainted);
+
+        var damageDealt = battleMon.TakeDamage(50);
+        Test("TakeDamage reduces HP", () => battleMon.CurrentHP == 150);
+        Test("TakeDamage returns actual damage", () => damageDealt == 50);
+
+        var healed = battleMon.Heal(30);
+        Test("Heal increases HP", () => battleMon.CurrentHP == 180);
+        Test("Heal returns actual heal", () => healed == 30);
+
+        var overHeal = battleMon.Heal(100);
+        Test("Heal caps at MaxHP", () => battleMon.CurrentHP == 200);
+        Test("Heal returns capped amount", () => overHeal == 20);
+
+        // Stat stages
+        battleMon.ModifyStatStage(Stat.Attack, 2);
+        Test("ModifyStatStage changes stage", () => battleMon.StatStages[Stat.Attack] == 2);
+
+        var effectiveAtk = battleMon.GetEffectiveStat(Stat.Attack);
+        Test("GetEffectiveStat applies stages", () => effectiveAtk == battleMon.Attack * 2);
+
+        battleMon.ModifyStatStage(Stat.Attack, 10); // Try to exceed +6
+        Test("Stat stages cap at +6", () => battleMon.StatStages[Stat.Attack] == 6);
+
+        // Status
+        battleMon.Status = PersistentStatus.Burn;
+        Test("HasStatus returns true", () => battleMon.HasStatus);
+
+        // Reset battle state
+        battleMon.ResetBattleState();
+        Test("ResetBattleState clears stages", () => battleMon.StatStages[Stat.Attack] == 0);
+        Test("ResetBattleState keeps persistent status", () => battleMon.Status == PersistentStatus.Burn);
+
+        // Full heal
+        battleMon.TakeDamage(100);
+        battleMon.FullHeal();
+        Test("FullHeal restores HP", () => battleMon.CurrentHP == battleMon.MaxHP);
+        Test("FullHeal clears status", () => battleMon.Status == PersistentStatus.None);
+
+        PrintInfo($"Battle tested: {battleMon.Species.Name} HP={battleMon.CurrentHP}/{battleMon.MaxHP}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 19: FAINTED STATE
+        // ═══════════════════════════════════════════════════════
+        PrintSection("FAINTED STATE");
+
+        var faintedMon = Pokemon.Create(PokemonCatalog.Pikachu, 25)
+            .Fainted()
+            .Build();
+
+        Test("Fainted() sets HP to 0", () => faintedMon.CurrentHP == 0);
+        Test("IsFainted returns true", () => faintedMon.IsFainted);
+        Test("HPPercentage is 0", () => faintedMon.HPPercentage == 0);
+
+        // Overkill damage
+        var overKillMon = Pokemon.Create(PokemonCatalog.Pikachu, 25).WithMaxHP(50).Build();
+        var overkillDamage = overKillMon.TakeDamage(999);
+        Test("Overkill caps at current HP", () => overkillDamage == 50);
+        Test("HP doesn't go negative", () => overKillMon.CurrentHP == 0);
+
+        PrintInfo($"Fainted: {faintedMon.Species.Name} HP={faintedMon.CurrentHP}, IsFainted={faintedMon.IsFainted}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 20: LEVEL UP SYSTEM
+        // ═══════════════════════════════════════════════════════
+        PrintSection("LEVEL UP SYSTEM");
+
+        var levelUpMon = Pokemon.Create(PokemonCatalog.Charmander, 10)
+            .WithNeutralNature()
+            .Build();
+        
+        Test("CanLevelUp is false without exp", () => !levelUpMon.CanLevelUp());
+        
+        levelUpMon.CurrentExp = StatCalculator.GetExpForLevel(11);
+        Test("CanLevelUp is true with exp", () => levelUpMon.CanLevelUp());
+        
+        var oldMaxHP = levelUpMon.MaxHP;
+        var levelsGained = levelUpMon.AddExperience(0); // Already has exp
+        Test("AddExperience levels up", () => levelUpMon.Level == 11);
+        Test("Stats recalculate on level up", () => levelUpMon.MaxHP > oldMaxHP);
+        
+        Test("LevelUp() forces level up", () => { levelUpMon.LevelUp(); return levelUpMon.Level == 12; });
+        Test("LevelUpTo() reaches target", () => { levelUpMon.LevelUpTo(20); return levelUpMon.Level == 20; });
+        
+        // Experience methods
+        Test("GetExpForNextLevel works", () => levelUpMon.GetExpForNextLevel() == StatCalculator.GetExpForLevel(21));
+        Test("GetExpToNextLevel works", () => levelUpMon.GetExpToNextLevel() >= 0);
+
+        PrintInfo($"Charmander leveled from 10 to {levelUpMon.Level}");
+        PrintInfo($"Current HP: {levelUpMon.CurrentHP}/{levelUpMon.MaxHP}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 21: EVOLUTION SYSTEM
+        // ═══════════════════════════════════════════════════════
+        PrintSection("EVOLUTION SYSTEM");
+
+        var evoCharmander = Pokemon.Create(PokemonCatalog.Charmander, 15)
+            .WithNeutralNature()
+            .Build();
+        
+        Test("CanEvolve is false at level 15", () => !evoCharmander.CanEvolve());
+        
+        evoCharmander.LevelUpTo(16);
+        Test("CanEvolve is true at level 16", () => evoCharmander.CanEvolve());
+        Test("GetAvailableEvolution returns Charmeleon", () => 
+            evoCharmander.GetAvailableEvolution()?.Target.Name == "Charmeleon");
+        
+        var oldHP = evoCharmander.MaxHP;
+        var evolved = evoCharmander.TryEvolve();
+        Test("TryEvolve returns new species", () => evolved?.Name == "Charmeleon");
+        Test("Species changed to Charmeleon", () => evoCharmander.Species.Name == "Charmeleon");
+        Test("Stats recalculate on evolution", () => evoCharmander.MaxHP > oldHP);
+        Test("HP maintained proportionally", () => evoCharmander.CurrentHP > 0);
+
+        PrintInfo($"Evolved: {evoCharmander.Species.Name} at Level {evoCharmander.Level}");
+        PrintInfo($"New stats: HP={evoCharmander.MaxHP}, Atk={evoCharmander.Attack}");
+
+        // Eevee has no evolutions defined yet (requires Espeon/Umbreon in catalog)
+        var evoEevee = Pokemon.Create(PokemonCatalog.Eevee, 20)
+            .WithHighFriendship()
+            .Build();
+        
+        Test("Eevee has no evolutions defined yet", () => !evoEevee.CanEvolve());
+        Test("Eevee still tracks friendship correctly", () => evoEevee.HasHighFriendship);
+
+        PrintInfo($"Eevee: Friendship={evoEevee.Friendship}, CanEvolve={evoEevee.CanEvolve()} (needs Espeon/Umbreon in catalog)");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 22: MOVE SELECTION PRESETS
+        // ═══════════════════════════════════════════════════════
+        PrintSection("MOVE SELECTION PRESETS");
+
+        var stabMon = Pokemon.Create(PokemonCatalog.Pikachu, 50)
+            .WithStabMoves()
+            .Build();
+        
+        Test("WithStabMoves creates moveset", () => stabMon.Moves.Count > 0);
+        
+        // Count STAB moves (Electric for Pikachu)
+        var stabCount = stabMon.Moves.Count(m => m.Move.Type == PokemonType.Electric);
+        PrintInfo($"STAB moves selected: {stabCount}/{stabMon.Moves.Count} are Electric");
+
+        var strongMon = Pokemon.Create(PokemonCatalog.Charizard, 50)
+            .WithStrongMoves()
+            .Build();
+        
+        Test("WithStrongMoves creates moveset", () => strongMon.Moves.Count > 0);
+        
+        var optimalMon = Pokemon.Create(PokemonCatalog.Charizard, 50)
+            .WithOptimalMoves()
+            .Build();
+        
+        Test("WithOptimalMoves creates moveset", () => optimalMon.Moves.Count > 0);
+
+        PrintInfo($"Strong moves: {string.Join(", ", strongMon.Moves.Select(m => m.Move.Name))}");
+        PrintInfo($"Optimal moves: {string.Join(", ", optimalMon.Moves.Select(m => m.Move.Name))}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 23: COMPLETE POKEMON LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL POKEMON IN CATALOG");
 
-        foreach (var pokemon in PokemonCatalog.All.OrderBy(p => p.PokedexNumber))
+        foreach (var poke in PokemonCatalog.All.OrderBy(p => p.PokedexNumber))
         {
-            var types = pokemon.IsDualType 
-                ? $"{pokemon.PrimaryType}/{pokemon.SecondaryType}" 
-                : pokemon.PrimaryType.ToString();
-            var evoInfo = pokemon.CanEvolve 
-                ? $" → {pokemon.Evolutions.First().Target.Name}" 
+            var types = poke.IsDualType 
+                ? $"{poke.PrimaryType}/{poke.SecondaryType}" 
+                : poke.PrimaryType.ToString();
+            var evoInfo = poke.CanEvolve 
+                ? $" → {poke.Evolutions.First().Target.Name}" 
                 : "";
-            PrintInfo($"#{pokemon.PokedexNumber:D3} {pokemon.Name,-12} [{types,-15}] BST:{pokemon.BaseStats.Total}{evoInfo}");
+            PrintInfo($"#{poke.PokedexNumber:D3} {poke.Name,-12} [{types,-15}] BST:{poke.BaseStats.Total}{evoInfo}");
         }
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 14: COMPLETE MOVE LISTING
+        // SECTION 21: COMPLETE MOVE LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL MOVES IN CATALOG");
 
@@ -332,7 +650,7 @@ class Program
 
     static void PrintHeader()
     {
-        System.Console.Clear();
+        try { System.Console.Clear(); } catch { /* Ignore if redirected */ }
         System.Console.ForegroundColor = ConsoleColor.Cyan;
         System.Console.WriteLine();
         System.Console.WriteLine("╔═══════════════════════════════════════════════════════════════╗");

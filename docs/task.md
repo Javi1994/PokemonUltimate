@@ -15,11 +15,14 @@
     - [x] `IEvolutionCondition` interface + 6 condition classes
     - [x] `IPokemonRegistry` interface
     - [x] `PokemonRegistry` (with Pokedex lookup)
-- [ ] **Pokemon Instances (Runtime)** ⏳ NEXT
-    - [ ] `MoveInstance` (PP tracking: CurrentPP, MaxPP, Use, Restore)
-    - [ ] `StatCalculator` (Gen3+ formula with Nature modifiers)
-    - [ ] `PokemonInstance` (Level, Stats, Moves, Status, Gender, Nature)
-    - [ ] `PokemonFactory` (Create instances from blueprints)
+- [x] **Pokemon Instances (Runtime)** ✅ COMPLETE
+    - [x] `MoveInstance` (PP tracking: CurrentPP, MaxPP, Use, Restore)
+    - [x] `StatCalculator` (Full Gen3+ formula with IVs/EVs, Experience calculations)
+    - [x] `PokemonInstance` (Level, Stats, Moves, Status, Gender, Nature, Friendship, Shiny)
+    - [x] Level Up System (AddExperience, LevelUp, TryLearnLevelUpMoves)
+    - [x] Evolution System (CanEvolve, GetAvailableEvolution, Evolve, TryEvolve)
+    - [x] `PokemonInstanceBuilder` (Fluent builder with move presets: STAB, Strong, Optimal)
+    - [x] `PokemonFactory` (Quick creation, delegates to builder)
 - [x] **Move Data (Blueprints)**
     - [x] `MoveData` (blueprint with Type, Category, Power, etc.)
     - [x] `IMoveRegistry` interface
@@ -86,7 +89,7 @@
     - [ ] `DamagePipeline` with `IDamageStep`
     - [ ] `UseMoveAction`, `DamageAction`
 
-### Testing ✅
+### Testing ✅ (615 total tests)
 - [x] Pokemon Registry tests (16 tests)
 - [x] Move Registry tests (9 tests)
 - [x] Move Filter tests (9 tests)
@@ -101,6 +104,9 @@
 - [x] Learnset/Evolution Builder tests (20+ tests)
 - [x] Evolution & Condition tests (18 tests)
 - [x] Nature/Gender tests (18 tests)
+- [x] StatCalculator tests (45 tests - IVs/EVs, Experience)
+- [x] PokemonInstance tests (89 tests - Level Up, Evolution)
+- [x] PokemonInstanceBuilder tests (80+ tests - Move presets)
 
 ---
 
@@ -109,11 +115,6 @@
     - [ ] Pokemon capture mechanics
     - [ ] Catch rate formula (Ball types, HP, Status)
     - [ ] PC/Storage system
-- [ ] **Progression**
-    - [ ] Level Up system
-    - [ ] Stat recalculation on level up
-    - [ ] Evolution triggers & logic
-    - [ ] Move learning (forget old moves)
 
 ## Phase 3: Game Loop & Run Structure 🎯 PRIORITY
 - [ ] **Run Manager**

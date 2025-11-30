@@ -1,3 +1,5 @@
+using PokemonUltimate.Core.Instances;
+
 namespace PokemonUltimate.Core.Evolution.Conditions
 {
     /// <summary>
@@ -19,6 +21,10 @@ namespace PokemonUltimate.Core.Evolution.Conditions
         {
             MinFriendship = minFriendship;
         }
+
+        public bool IsMet(PokemonInstance pokemon)
+        {
+            return pokemon != null && pokemon.Friendship >= MinFriendship;
+        }
     }
 }
-
