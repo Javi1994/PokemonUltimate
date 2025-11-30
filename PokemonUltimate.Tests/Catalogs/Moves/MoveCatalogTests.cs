@@ -1,7 +1,7 @@
-using PokemonUltimate.Core.Catalogs;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Registry;
+using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
 
 namespace PokemonUltimate.Tests.Catalogs.Moves
 {

@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Blueprints;
 
 namespace PokemonUltimate.Tests.Models
 {

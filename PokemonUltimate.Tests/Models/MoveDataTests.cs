@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using PokemonUltimate.Core.Models;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Effects;
 using System.Collections.Generic;
+using PokemonUltimate.Core.Blueprints;
 
 namespace PokemonUltimate.Tests.Models
 {

@@ -1,4 +1,4 @@
-namespace PokemonUltimate.Core.Models
+namespace PokemonUltimate.Core.Blueprints
 {
     /// <summary>
     /// Contract for any object that has a unique String ID.

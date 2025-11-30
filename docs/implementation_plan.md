@@ -11,13 +11,16 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 
 1.  ✅ Create Solution `PokemonUltimate.sln`.
 2.  ✅ Create Class Library `PokemonUltimate.Core` (The Engine) - netstandard2.1 for Unity compatibility.
-3.  ✅ Create NUnit Project `PokemonUltimate.Tests` (The Verifier) - net8.0.
-4.  ✅ Create Console App `PokemonUltimate.Console` (Smoke Test) - net8.0.
+3.  ✅ Create Class Library `PokemonUltimate.Content` (The Data) - netstandard2.1.
+    - Contains: Catalogs (Pokemon, Moves) and Builders (fluent API)
+    - Separated from Core for clean architecture (engine vs data)
+4.  ✅ Create NUnit Project `PokemonUltimate.Tests` (The Verifier) - net8.0.
+5.  ✅ Create Console App `PokemonUltimate.Console` (Smoke Test) - net8.0.
     - Runtime verification of all data systems (~70 tests)
     - Tests: Catalogs, Registries, Builders, Effects, Evolutions, Nature/Gender
     - Run with: `dotnet run --project PokemonUltimate.Console`
-5.  ✅ Document project structure (`docs/architecture/project_structure.md`).
-6.  ⏳ Create Unity Project `PokemonUltimate.Unity` (The Viewer) - *Leave empty for now*.
+6.  ✅ Document project structure (`docs/architecture/project_structure.md`).
+7.  ⏳ Create Unity Project `PokemonUltimate.Unity` (The Viewer) - *Leave empty for now*.
 
 ---
 
@@ -51,10 +54,37 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 7.  ✅ **Tests**: 100+ tests covering registry, filter, model, effect, composition, catalog effects, builders
 
 ### 1.4 Instance & Factory ⏳ PENDING
-1.  ⏳ **Instance**: `PokemonInstance` (Level, CurrentHP, Stats, Moves, Status)
-2.  ⏳ **Factory**: `PokemonFactory.Create(species, level)` with stat calculation
-3.  ⏳ **MoveInstance**: PP tracking per Pokemon
-4.  ⏳ **Tests**: Factory creates valid instances, stats calculated correctly
+**Objective**: Transform static blueprints into mutable runtime instances.
+
+1.  ⏳ **MoveInstance** (`Core/Models/MoveInstance.cs`)
+    - Reference to `MoveData` blueprint
+    - `CurrentPP`, `MaxPP` tracking
+    - `HasPP`, `Use()`, `Restore()`, `RestoreFully()` methods
+    - Tests: Create, use PP, restore PP, edge cases
+
+2.  ⏳ **StatCalculator** (`Core/Factories/StatCalculator.cs`)
+    - Gen3+ formula: `((Base * 2 + IV + EV/4) * Level / 100) + 5`
+    - HP formula: `((Base * 2 + IV + EV/4) * Level / 100) + Level + 10`
+    - Nature modifier integration (+10%/-10%)
+    - Simplified version first (no IVs/EVs, add later if needed)
+    - Tests: Calculate stats at various levels, with/without Nature
+
+3.  ⏳ **PokemonInstance** (`Core/Models/PokemonInstance.cs`)
+    - Identity: `Species`, `InstanceId` (GUID), `Nickname`
+    - Level: `Level`, `CurrentExp`
+    - Stats: `MaxHP`, `CurrentHP`, `Attack`, `Defense`, `SpAttack`, `SpDefense`, `Speed`
+    - Personal: `Gender`, `Nature`
+    - Combat: `Moves` (List<MoveInstance>, max 4), `Status`, `VolatileStatus`, `StatStages` (-6 to +6)
+    - Helpers: `IsFainted`, `HPPercentage`, `GetEffectiveStat(stat)` (with stages)
+    - Tests: State management, fainted detection, stat stages
+
+4.  ⏳ **PokemonFactory** (`Core/Factories/PokemonFactory.cs`)
+    - `Create(species, level)` - random Nature/Gender
+    - `Create(species, level, nature)` - specific Nature
+    - `Create(species, level, nature, gender)` - full control
+    - Auto-assigns moves from learnset (up to 4, highest level first)
+    - Calculates all stats using StatCalculator
+    - Tests: Factory creates valid instances, moves assigned correctly, stats calculated
 
 ---
 

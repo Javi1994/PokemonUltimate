@@ -1,6 +1,6 @@
-using PokemonUltimate.Core.Catalogs;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Registry;
+using PokemonCatalog = PokemonUltimate.Content.Catalogs.Pokemon.PokemonCatalog;
 
 namespace PokemonUltimate.Tests.Catalogs.Pokemon
 {

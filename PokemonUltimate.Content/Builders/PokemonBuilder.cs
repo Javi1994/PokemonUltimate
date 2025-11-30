@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Evolution;
-using PokemonUltimate.Core.Models;
 
-namespace PokemonUltimate.Core.Builders
+namespace PokemonUltimate.Content.Builders
 {
     /// <summary>
     /// Fluent builder for creating PokemonSpeciesData instances.
@@ -13,7 +12,7 @@ namespace PokemonUltimate.Core.Builders
     public class PokemonBuilder
     {
         private readonly PokemonSpeciesData _pokemon;
-        private readonly List<Evolution.Evolution> _evolutions = new List<Evolution.Evolution>();
+        private readonly List<Core.Evolution.Evolution> _evolutions = new List<Core.Evolution.Evolution>();
         private List<LearnableMove> _learnset = new List<LearnableMove>();
 
         private PokemonBuilder(string name, int pokedexNumber)

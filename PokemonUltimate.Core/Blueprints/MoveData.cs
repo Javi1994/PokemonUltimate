@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 
-namespace PokemonUltimate.Core.Models
+namespace PokemonUltimate.Core.Blueprints
 {
     /// <summary>
     /// Blueprint for a move (immutable data).

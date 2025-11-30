@@ -27,9 +27,11 @@ This bridges the gap between static data definitions and the runtime Registry sy
 
 ## 3. File Structure
 
+Catalogs and Builders live in the **`PokemonUltimate.Content`** project (separate from Core):
+
 ### Pokemon Catalog (by Generation)
 ```
-Catalogs/Pokemon/
+PokemonUltimate.Content/Catalogs/Pokemon/
 ├── PokemonCatalog.cs           # Orchestrator: All, Count, RegisterAll
 ├── PokemonCatalog.Gen1.cs      # Generation 1 (#001-151)
 ├── PokemonCatalog.Gen2.cs      # Generation 2 (#152-251) [future]
@@ -38,7 +40,7 @@ Catalogs/Pokemon/
 
 ### Move Catalog (by Type)
 ```
-Catalogs/Moves/
+PokemonUltimate.Content/Catalogs/Moves/
 ├── MoveCatalog.cs              # Orchestrator: All, Count, RegisterAll
 ├── MoveCatalog.Normal.cs       # Normal-type moves
 ├── MoveCatalog.Fire.cs         # Fire-type moves
@@ -47,6 +49,16 @@ Catalogs/Moves/
 ├── MoveCatalog.Electric.cs     # Electric-type moves
 ├── MoveCatalog.Ground.cs       # Ground-type moves
 └── MoveCatalog.Psychic.cs      # Psychic-type moves
+```
+
+### Builders
+```
+PokemonUltimate.Content/Builders/
+├── PokemonBuilder.cs           # Pokemon.Define("Pikachu", 25)
+├── MoveBuilder.cs              # Move.Define("Ember")
+├── EffectBuilder.cs            # e => e.Damage().MayBurn(10)
+├── LearnsetBuilder.cs          # m => m.StartsWith(...)
+└── EvolutionBuilder.cs         # e => e.AtLevel(16)
 ```
 
 ## 4. Pokemon Builder System ✅ NEW
@@ -157,33 +169,39 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 
 ### Adding Generation 2 Pokemon
 
-1. **Create file** `PokemonCatalog.Gen2.cs`:
+1. **Create file** `PokemonUltimate.Content/Catalogs/Pokemon/PokemonCatalog.Gen2.cs`:
 ```csharp
-public static partial class PokemonCatalog
+using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Models;
+
+namespace PokemonUltimate.Content.Catalogs.Pokemon
 {
-    // Define in reverse evolution order!
-    public static readonly PokemonSpeciesData Meganium = Pokemon.Define("Meganium", 154)
-        .Types(PokemonType.Grass, PokemonType.Grass)
-        .Stats(80, 82, 100, 83, 100, 80)
-        .Build();
-    
-    public static readonly PokemonSpeciesData Bayleef = Pokemon.Define("Bayleef", 153)
-        .Type(PokemonType.Grass)
-        .Stats(60, 62, 80, 63, 80, 60)
-        .EvolvesTo(Meganium, e => e.AtLevel(32))
-        .Build();
-    
-    public static readonly PokemonSpeciesData Chikorita = Pokemon.Define("Chikorita", 152)
-        .Type(PokemonType.Grass)
-        .Stats(45, 49, 65, 49, 65, 45)
-        .EvolvesTo(Bayleef, e => e.AtLevel(16))
-        .Build();
-    
-    static partial void RegisterGen2()
+    public static partial class PokemonCatalog
     {
-        _all.Add(Chikorita);
-        _all.Add(Bayleef);
-        _all.Add(Meganium);
+        // Define in reverse evolution order!
+        public static readonly PokemonSpeciesData Meganium = Builders.Pokemon.Define("Meganium", 154)
+            .Type(PokemonType.Grass)
+            .Stats(80, 82, 100, 83, 100, 80)
+            .Build();
+        
+        public static readonly PokemonSpeciesData Bayleef = Builders.Pokemon.Define("Bayleef", 153)
+            .Type(PokemonType.Grass)
+            .Stats(60, 62, 80, 63, 80, 60)
+            .EvolvesTo(Meganium, e => e.AtLevel(32))
+            .Build();
+        
+        public static readonly PokemonSpeciesData Chikorita = Builders.Pokemon.Define("Chikorita", 152)
+            .Type(PokemonType.Grass)
+            .Stats(45, 49, 65, 49, 65, 45)
+            .EvolvesTo(Bayleef, e => e.AtLevel(16))
+            .Build();
+        
+        static partial void RegisterGen2()
+        {
+            _all.Add(Chikorita);
+            _all.Add(Bayleef);
+            _all.Add(Meganium);
+        }
     }
 }
 ```
@@ -202,25 +220,28 @@ static partial void RegisterGen2();  // ← Add declaration
 
 ### Adding Ice Moves
 
-1. **Create file** `MoveCatalog.Ice.cs`:
+1. **Create file** `PokemonUltimate.Content/Catalogs/Moves/MoveCatalog.Ice.cs`:
 ```csharp
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Models;
 
-public static partial class MoveCatalog
+namespace PokemonUltimate.Content.Catalogs.Moves
 {
-    public static readonly MoveData IceBeam = Move.Define("Ice Beam")
-        .Type(PokemonType.Ice)
-        .Special(90, 100, 10)
-        .WithEffects(e => e
-            .Damage()
-            .MayFreeze(10))
-        .Build();
-    
-    static partial void RegisterIce()
+    public static partial class MoveCatalog
     {
-        _all.Add(IceBeam);
+        public static readonly MoveData IceBeam = Move.Define("Ice Beam")
+            .Type(PokemonType.Ice)
+            .Special(90, 100, 10)
+            .WithEffects(e => e
+                .Damage()
+                .MayFreeze(10))
+            .Build();
+        
+        static partial void RegisterIce()
+        {
+            _all.Add(IceBeam);
+        }
     }
 }
 ```
@@ -250,6 +271,10 @@ Assert.That(pikachu.Evolutions[0].Target, Is.EqualTo(PokemonCatalog.Raichu));
 
 ### Pattern 2: Registry Population
 ```csharp
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Content.Catalogs.Moves;
+using PokemonUltimate.Core.Registry;
+
 var pokemonRegistry = new PokemonRegistry();
 var moveRegistry = new MoveRegistry();
 

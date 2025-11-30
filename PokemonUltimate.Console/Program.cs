@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
-using PokemonUltimate.Core.Builders;
-using PokemonUltimate.Core.Catalogs;
+using PokemonUltimate.Content.Builders;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution.Conditions;
-using PokemonUltimate.Core.Models;
 using PokemonUltimate.Core.Registry;
+using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
+using PokemonCatalog = PokemonUltimate.Content.Catalogs.Pokemon.PokemonCatalog;
 
 namespace PokemonUltimate.Console;
 

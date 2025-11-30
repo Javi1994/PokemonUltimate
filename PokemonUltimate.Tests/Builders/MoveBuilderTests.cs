@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using PokemonUltimate.Core.Builders;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using System.Linq;
+using PokemonUltimate.Content.Builders;
 
 namespace PokemonUltimate.Tests.Builders
 {

@@ -7,7 +7,7 @@
     - [x] `IIdentifiable` interface
     - [x] `IDataRegistry<T>` interface
     - [x] `GameDataRegistry<T>` implementation
-- [x] **Pokemon Data**
+- [x] **Pokemon Data (Blueprints)**
     - [x] `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats, Learnset, Evolutions)
     - [x] `BaseStats` class (HP, Attack, Defense, SpAttack, SpDefense, Speed, Total)
     - [x] `LearnableMove` class (Move reference, LearnMethod, Level)
@@ -15,13 +15,15 @@
     - [x] `IEvolutionCondition` interface + 6 condition classes
     - [x] `IPokemonRegistry` interface
     - [x] `PokemonRegistry` (with Pokedex lookup)
-    - [ ] `PokemonInstance` (mutable runtime state)
-    - [ ] `PokemonFactory` (create instances from blueprints)
-- [x] **Move Data**
+- [ ] **Pokemon Instances (Runtime)** ⏳ NEXT
+    - [ ] `MoveInstance` (PP tracking: CurrentPP, MaxPP, Use, Restore)
+    - [ ] `StatCalculator` (Gen3+ formula with Nature modifiers)
+    - [ ] `PokemonInstance` (Level, Stats, Moves, Status, Gender, Nature)
+    - [ ] `PokemonFactory` (Create instances from blueprints)
+- [x] **Move Data (Blueprints)**
     - [x] `MoveData` (blueprint with Type, Category, Power, etc.)
     - [x] `IMoveRegistry` interface
     - [x] `MoveRegistry` (with Type/Category filters)
-    - [ ] `MoveInstance` (PP tracking per Pokemon)
 - [x] **Move Effects (Composable)**
     - [x] `IMoveEffect` interface (EffectType + Description)
     - [x] `EffectType` enum (Damage, Status, StatChange, etc.)
@@ -45,13 +47,13 @@
     - [x] `NatureData` static class (stat multipliers +10%/-10%)
     - [x] `GenderRatio` property in PokemonSpeciesData
     - [x] Builder methods: `GenderRatio()`, `Genderless()`, `MaleOnly()`, `FemaleOnly()`
-- [x] **Builders (Fluent API)**
+- [x] **Builders (Fluent API)** *[in PokemonUltimate.Content]*
     - [x] `PokemonBuilder` - fluent Pokemon definition
     - [x] `LearnsetBuilder` - learnset configuration
     - [x] `EvolutionBuilder` - evolution conditions
     - [x] `MoveBuilder` - fluent Move definition
     - [x] `EffectBuilder` - effect composition
-- [x] **Catalogs (Modular with Partial Classes)**
+- [x] **Catalogs (Modular with Partial Classes)** *[in PokemonUltimate.Content]*
     - [x] `PokemonCatalog` - organized by generation
         - [x] `PokemonCatalog.cs` (orchestrator)
         - [x] `PokemonCatalog.Gen1.cs` (15 Pokemon with learnsets & evolutions)

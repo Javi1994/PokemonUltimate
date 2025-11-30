@@ -1,4 +1,4 @@
-using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Blueprints;
 
 namespace PokemonUltimate.Core.Registry
 {

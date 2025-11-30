@@ -2,7 +2,7 @@ using NUnit.Framework;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution;
 using PokemonUltimate.Core.Evolution.Conditions;
-using PokemonUltimate.Core.Catalogs;
+using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
 
 namespace PokemonUltimate.Tests.Evolution
 {

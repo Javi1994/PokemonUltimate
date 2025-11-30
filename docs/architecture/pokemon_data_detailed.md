@@ -159,7 +159,7 @@ public interface IEvolutionCondition {
 ```
 
 ## 3. Pokemon Builder (Fluent API) ✅ IMPLEMENTED
-*Namespace: `PokemonUltimate.Core.Builders`*
+*Namespace: `PokemonUltimate.Content.Builders`*
 
 The builder pattern provides a clean, readable way to define Pokemon data:
 
@@ -236,78 +236,210 @@ public static readonly PokemonSpeciesData Eevee = Pokemon.Define("Eevee", 133)
 | `.KnowsMove(move)` | Must know move | `.KnowsMove(MoveCatalog.Rollout)` |
 
 ## 4. Dynamic Data (The "Instance") ⏳ PENDING
-*Namespace: `PokemonGame.Core.Models`*
+*Namespace: `PokemonUltimate.Core.Models`*
 
 This represents a specific Pokemon in a specific battle. It is mutable.
 
+### MoveInstance (PP Tracking)
 ```csharp
-public class PokemonInstance {
-    // Reference to source
-    public PokemonSpeciesData Species { get; private set; }
+public class MoveInstance {
+    // Reference to blueprint
+    public MoveData Move { get; }
     
-    // Unique ID for this specific run/battle
-    public string InstanceId { get; private set; } 
-
-    // Mutable State
-    public int Level { get; private set; }
-    public int CurrentHP { get; set; }
-    public int CurrentExp { get; set; }
+    // PP tracking
+    public int MaxPP { get; }        // From MoveData.PP
+    public int CurrentPP { get; set; }
     
-    // Calculated Stats (Base + Level + IVs/EVs)
-    public Dictionary<Stat, int> Stats { get; private set; }
+    // Helpers
+    public bool HasPP => CurrentPP > 0;
     
-    // Combat State
-    public List<MoveInstance> Moves { get; private set; } // Max 4
-    public VolatileStatus VolatileStatus { get; set; } // Flinch, Confusion (Reset after battle)
-    public PersistentStatus Status { get; set; } // Burn, Paralysis (Persists)
-    public int StatusTurnCounter { get; set; } // For Sleep duration, Toxic accumulation
+    // Methods
+    public void Use();           // CurrentPP-- (if > 0)
+    public void Restore(int amount);
+    public void RestoreFully();  // CurrentPP = MaxPP
     
-    // Stat Stages (-6 to +6)
-    public Dictionary<Stat, int> StatStages { get; private set; }
-    
-    // Abilities & Items
-    public IBattleListener Ability { get; set; } // e.g., Intimidate, Blaze
-    public IBattleListener Item { get; set; } // e.g., Leftovers, Choice Band
-
-    public PokemonInstance(PokemonSpeciesData species, int level) {
-        Species = species;
-        Level = level;
-        InstanceId = System.Guid.NewGuid().ToString();
-        // Stats are calculated by the Factory, not here, to keep this class dumb/data-only
+    public MoveInstance(MoveData move) {
+        Move = move;
+        MaxPP = move.PP;
+        CurrentPP = MaxPP;
     }
 }
 ```
 
-## 5. The Factory (The Converter) ⏳ PENDING
-*Namespace: `PokemonGame.Core.Factories`*
-
-We use a Factory to handle the complex logic of creating a Pokemon (calculating stats, rolling IVs, picking moves).
-
+### PokemonInstance (Runtime State)
 ```csharp
-public static class PokemonFactory {
-    public static PokemonInstance Create(PokemonSpeciesData species, int level) {
-        var pokemon = new PokemonInstance(species, level);
-        
-        // 1. Calculate Stats
-        // Formula: ((Base * 2 * Level) / 100) + 5
-        foreach (var stat in species.BaseStats) {
-            int val = CalculateStat(stat.Key, stat.Value, level);
-            pokemon.Stats[stat.Key] = val;
-        }
-        pokemon.CurrentHP = pokemon.Stats[Stat.HP]; // Start full HP
+public class PokemonInstance {
+    // Reference to source blueprint
+    public PokemonSpeciesData Species { get; }
+    
+    // Unique ID for this specific instance
+    public string InstanceId { get; }  // GUID
+    public string Nickname { get; set; } // Optional, defaults to Species.Name
 
-        // 2. Generate Moves from Learnset
-        var validMoves = species.GetMovesUpToLevel(level)
-            .OrderByDescending(m => m.Level)
-            .Take(4);
-            
-        foreach (var move in validMoves) {
-            pokemon.Moves.Add(new MoveInstance(move.Move));
-        }
+    // Level & Experience
+    public int Level { get; private set; }
+    public int CurrentExp { get; set; }
+    
+    // Calculated Stats (set by Factory, affected by Nature)
+    public int MaxHP { get; }
+    public int CurrentHP { get; set; }
+    public int Attack { get; }
+    public int Defense { get; }
+    public int SpAttack { get; }
+    public int SpDefense { get; }
+    public int Speed { get; }
+    
+    // Personal characteristics
+    public Gender Gender { get; }
+    public Nature Nature { get; }
+    
+    // Combat State
+    public List<MoveInstance> Moves { get; } // Max 4
+    public PersistentStatus Status { get; set; } // Burn, Paralysis (Persists between battles)
+    public VolatileStatus VolatileStatus { get; set; } // Flinch, Confusion (Reset after battle)
+    public int StatusTurnCounter { get; set; } // For Sleep duration, Toxic accumulation
+    
+    // Stat Stages (-6 to +6, reset after battle)
+    public Dictionary<Stat, int> StatStages { get; }
+    
+    // Future: Abilities & Items (IBattleListener)
+    // public IBattleListener Ability { get; set; }
+    // public IBattleListener Item { get; set; }
 
-        return pokemon;
+    // Helpers
+    public bool IsFainted => CurrentHP <= 0;
+    public float HPPercentage => MaxHP > 0 ? (float)CurrentHP / MaxHP : 0;
+    public string DisplayName => Nickname ?? Species.Name;
+    
+    // Get effective stat considering stages
+    public int GetEffectiveStat(Stat stat);
+    
+    // Reset volatile state (after battle)
+    public void ResetBattleState();
+}
+```
+
+### Stat Stages Multiplier Table
+| Stage | Multiplier |
+|-------|------------|
+| -6 | 2/8 = 0.25 |
+| -5 | 2/7 = 0.29 |
+| -4 | 2/6 = 0.33 |
+| -3 | 2/5 = 0.40 |
+| -2 | 2/4 = 0.50 |
+| -1 | 2/3 = 0.67 |
+| 0 | 2/2 = 1.00 |
+| +1 | 3/2 = 1.50 |
+| +2 | 4/2 = 2.00 |
+| +3 | 5/2 = 2.50 |
+| +4 | 6/2 = 3.00 |
+| +5 | 7/2 = 3.50 |
+| +6 | 8/2 = 4.00 |
+
+Formula: `(2 + stage) / 2` for positive, `2 / (2 + |stage|)` for negative
+
+## 5. The Factory (The Converter) ⏳ PENDING
+*Namespace: `PokemonUltimate.Core.Factories`*
+
+We use a Factory to handle the complex logic of creating a Pokemon (calculating stats, picking moves, determining gender).
+
+### StatCalculator (Stat Formulas)
+```csharp
+public static class StatCalculator {
+    // Gen3+ simplified formula (no IVs/EVs for now):
+    // Other Stats: ((Base * 2) * Level / 100) + 5
+    // HP: ((Base * 2) * Level / 100) + Level + 10
+    
+    public static int CalculateHP(int baseHP, int level) {
+        return ((baseHP * 2) * level / 100) + level + 10;
+    }
+    
+    public static int CalculateStat(int baseStat, int level, Nature nature, Stat stat) {
+        int raw = ((baseStat * 2) * level / 100) + 5;
+        float multiplier = NatureData.GetStatMultiplier(nature, stat);
+        return (int)(raw * multiplier);
+    }
+    
+    // Stat stage multiplier for battle
+    public static float GetStageMultiplier(int stage) {
+        if (stage >= 0) return (2 + stage) / 2f;
+        return 2f / (2 + Math.Abs(stage));
     }
 }
+```
+
+### PokemonFactory
+```csharp
+public static class PokemonFactory {
+    // Random Nature and Gender
+    public static PokemonInstance Create(PokemonSpeciesData species, int level);
+    
+    // Specific Nature, random Gender
+    public static PokemonInstance Create(PokemonSpeciesData species, int level, Nature nature);
+    
+    // Full control
+    public static PokemonInstance Create(PokemonSpeciesData species, int level, Nature nature, Gender gender);
+    
+    // Internal: Determine gender based on GenderRatio
+    private static Gender DetermineGender(PokemonSpeciesData species, Random rng);
+    
+    // Internal: Select up to 4 moves from learnset
+    private static List<MoveInstance> SelectMoves(PokemonSpeciesData species, int level);
+}
+```
+
+### Factory Logic
+```csharp
+public static PokemonInstance Create(PokemonSpeciesData species, int level, Nature nature, Gender gender) {
+    // 1. Calculate all stats
+    int hp = StatCalculator.CalculateHP(species.BaseStats.HP, level);
+    int atk = StatCalculator.CalculateStat(species.BaseStats.Attack, level, nature, Stat.Attack);
+    int def = StatCalculator.CalculateStat(species.BaseStats.Defense, level, nature, Stat.Defense);
+    int spa = StatCalculator.CalculateStat(species.BaseStats.SpAttack, level, nature, Stat.SpAttack);
+    int spd = StatCalculator.CalculateStat(species.BaseStats.SpDefense, level, nature, Stat.SpDefense);
+    int spe = StatCalculator.CalculateStat(species.BaseStats.Speed, level, nature, Stat.Speed);
+    
+    // 2. Select moves (highest level first, max 4)
+    var moves = SelectMoves(species, level);
+    
+    // 3. Create instance with all calculated values
+    return new PokemonInstance(species, level, hp, atk, def, spa, spd, spe, nature, gender, moves);
+}
+
+private static List<MoveInstance> SelectMoves(PokemonSpeciesData species, int level) {
+    return species.GetMovesUpToLevel(level)
+        .OrderByDescending(m => m.Level)  // Highest level first
+        .ThenBy(m => m.Move.Name)         // Alphabetical for consistency
+        .Take(4)                          // Max 4 moves
+        .Select(m => new MoveInstance(m.Move))
+        .ToList();
+}
+
+private static Gender DetermineGender(PokemonSpeciesData species, Random rng) {
+    if (species.IsGenderless) return Gender.Genderless;
+    if (species.IsMaleOnly) return Gender.Male;
+    if (species.IsFemaleOnly) return Gender.Female;
+    
+    // Roll based on GenderRatio (% male)
+    return rng.NextDouble() * 100 < species.GenderRatio ? Gender.Male : Gender.Female;
+}
+```
+
+### Usage Examples
+```csharp
+// Quick create (random nature/gender)
+var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 25);
+
+// Specific nature
+var adamantCharizard = PokemonFactory.Create(PokemonCatalog.Charizard, 50, Nature.Adamant);
+
+// Full control (for tests or special Pokemon)
+var mewtwo = PokemonFactory.Create(PokemonCatalog.Mewtwo, 70, Nature.Modest, Gender.Genderless);
+
+// Access instance data
+Console.WriteLine($"{pikachu.DisplayName} Lv.{pikachu.Level}");
+Console.WriteLine($"HP: {pikachu.CurrentHP}/{pikachu.MaxHP}");
+Console.WriteLine($"Moves: {string.Join(", ", pikachu.Moves.Select(m => m.Move.Name))}");
 ```
 
 ## 6. Unity Integration (ScriptableObjects) ⏳ FUTURE

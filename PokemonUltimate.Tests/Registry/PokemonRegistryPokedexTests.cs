@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Registry;
 
 namespace PokemonUltimate.Tests.Registry

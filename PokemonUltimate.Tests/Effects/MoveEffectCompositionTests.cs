@@ -1,4 +1,4 @@
-using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 

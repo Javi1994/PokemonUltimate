@@ -1,6 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
-using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Registry;
 using PokemonUltimate.Core.Enums;
 

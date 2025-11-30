@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Blueprints;
 
 namespace PokemonUltimate.Core.Evolution
 {

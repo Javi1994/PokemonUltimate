@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using PokemonUltimate.Core.Enums;
 
-namespace PokemonUltimate.Core.Models
+namespace PokemonUltimate.Core.Blueprints
 {
     /// <summary>
     /// Provides stat modifier information for Pokemon natures.

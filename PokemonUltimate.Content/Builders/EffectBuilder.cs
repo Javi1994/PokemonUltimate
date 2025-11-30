@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 
-namespace PokemonUltimate.Core.Builders
+namespace PokemonUltimate.Content.Builders
 {
     /// <summary>
     /// Fluent builder for composing move effects.

@@ -1,19 +1,19 @@
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution.Conditions;
-using PokemonUltimate.Core.Models;
 
-namespace PokemonUltimate.Core.Builders
+namespace PokemonUltimate.Content.Builders
 {
     /// <summary>
     /// Fluent builder for creating Evolution instances.
     /// </summary>
     public class EvolutionBuilder
     {
-        private readonly Evolution.Evolution _evolution;
+        private readonly Core.Evolution.Evolution _evolution;
 
         public EvolutionBuilder(PokemonSpeciesData target)
         {
-            _evolution = new Evolution.Evolution { Target = target };
+            _evolution = new Core.Evolution.Evolution { Target = target };
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace PokemonUltimate.Core.Builders
         /// <summary>
         /// Build the Evolution instance.
         /// </summary>
-        public Evolution.Evolution Build()
+        public Core.Evolution.Evolution Build()
         {
             return _evolution;
         }

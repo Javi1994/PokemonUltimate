@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Models;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Registry;
 
-namespace PokemonUltimate.Core.Catalogs
+namespace PokemonUltimate.Content.Catalogs.Pokemon
 {
     /// <summary>
     /// Static catalog of all Pokemon in the game.

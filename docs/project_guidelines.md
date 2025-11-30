@@ -85,6 +85,11 @@
 ## 3. Technical Architecture
 -   **Engine**: Unity (2022.3+ LTS recommended).
 -   **Language**: C#.
+-   **Project Structure**:
+    -   **Core** (`PokemonUltimate.Core`): Generic game engine (logic, models, effects). Zero concrete content.
+    -   **Content** (`PokemonUltimate.Content`): Concrete data (Pokémon, Moves, Builders). Depends on Core.
+    -   **Tests** (`PokemonUltimate.Tests`): Unit tests for Core + Content. Separated from production code.
+    -   **Dependency Flow**: `Content → Core` (Content uses Core, Core never knows about Content).
 -   **Data Layer (The Blueprint Pattern)**:
     -   **Blueprints (Immutable)**: `SpeciesData`, `MoveData`. Loaded from ScriptableObjects. Never modified at runtime.
     -   **Instances (Mutable)**: `PokemonInstance`, `MoveInstance`. Created from Blueprints. Holds state.
@@ -101,7 +106,7 @@
 *Quick reference to the main combat systems. See individual specs for details.*
 
 ### Project Organization
--   **Project Structure** (`project_structure.md`): Solution layout, namespaces, folder conventions, dependency flow.
+-   **Project Structure** (`architecture/project_structure.md`): Solution layout (Core/Content/Tests), namespaces, folder conventions, dependency flow, adding new content.
 
 ### Data & Loading
 -   **Pokemon Data** (`pokemon_data_detailed.md`): Blueprints (Species) vs Instances, Factory pattern.

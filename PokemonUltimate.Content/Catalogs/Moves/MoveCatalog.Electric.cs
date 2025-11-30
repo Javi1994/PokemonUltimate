@@ -1,8 +1,8 @@
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Models;
 
-namespace PokemonUltimate.Core.Catalogs
+namespace PokemonUltimate.Content.Catalogs.Moves
 {
     /// <summary>
     /// Electric-type moves.

@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Evolution;
 
-namespace PokemonUltimate.Core.Models
+namespace PokemonUltimate.Core.Blueprints
 {
     /// <summary>
     /// Blueprint for a Pokemon species (immutable data).

@@ -1,337 +1,283 @@
 # Project Structure
 
 ## Overview
-
-This document describes the organization of the PokemonUltimate solution, its projects, and the folder structure within each project.
+This document defines the solution architecture, project organization, namespace conventions, and dependency flow for the Pokemon Combat Game.
 
 ## Solution Structure
 
 ```
 PokemonUltimate/
-├── PokemonUltimate.sln              # Solution file
-├── docs/                            # Documentation
-│   ├── architecture/                # System specifications
-│   ├── project_guidelines.md        # Core development rules
-│   ├── implementation_plan.md       # Step-by-step roadmap
-│   └── task.md                      # Project phases & progress
-│
-├── PokemonUltimate.Core/            # 🎯 Game Engine (netstandard2.1)
-├── PokemonUltimate.Tests/           # 🧪 Unit Tests (net8.0)
-└── PokemonUltimate.Console/         # 🖥️ Demo Application (net8.0)
+├── PokemonUltimate.Core/          → Generic game engine (logic only)
+├── PokemonUltimate.Content/       → Concrete game data (Pokémon, Moves, etc.)
+├── PokemonUltimate.Tests/         → Unit tests for Core + Content
+├── PokemonUltimate.Console/       → Console application (for testing)
+└── docs/                           → Architecture documentation
 ```
 
----
-
-## Projects
+## Project Breakdown
 
 ### 1. PokemonUltimate.Core
-**The Game Engine** - Pure C# library with all game logic.
+**Target Framework**: `netstandard2.1`  
+**Purpose**: Generic, reusable game engine with **zero** concrete content
 
-| Property | Value |
-|----------|-------|
-| Framework | `netstandard2.1` |
-| C# Version | `7.3` |
-| Nullable | `disable` |
-| Purpose | Unity-compatible game logic |
+#### Responsibilities
+- ✅ Define **what** something is (e.g., `MoveData`, `PokemonSpeciesData`)
+- ✅ Define **how** systems work (e.g., `DamagePipeline`, `TurnOrderResolver`)
+- ✅ Provide **interfaces** for external systems (e.g., `IDataRegistry<T>`, `IPokemonRegistry`)
+- ❌ **NEVER** contain concrete content (no "Pikachu", no "Ember")
 
-**Why netstandard2.1?**
-- Unity 2020+ uses this framework
-- Ensures all code is compatible with Unity's Mono runtime
-- No dependencies on Unity assemblies
-
-### 2. PokemonUltimate.Tests
-**Test Suite** - NUnit tests for all Core functionality.
-
-| Property | Value |
-|----------|-------|
-| Framework | `net8.0` |
-| Test Framework | NUnit 3 |
-| Purpose | Verify Core logic works correctly |
-
-### 3. PokemonUltimate.Console
-**Runtime Smoke Test** - Console application for verifying all systems work correctly at runtime.
-
-| Property | Value |
-|----------|-------|
-| Framework | `net8.0` |
-| Purpose | Runtime verification of all data systems |
-
-#### How to Run
-```powershell
-dotnet run --project PokemonUltimate.Console
-```
-
-#### What It Tests
-The console application performs ~70 runtime tests across all systems:
-
-| Section | What's Tested |
-|---------|---------------|
-| **Catalogs** | Count, enumeration, direct access (PokemonCatalog.Pikachu) |
-| **Registries** | RegisterAll, GetByName, GetByPokedexNumber, type/category filters |
-| **Pokemon Data** | Name, types, IsDualType, HasType, BaseStats |
-| **Learnsets** | GetStartingMoves, GetMovesAtLevel, CanLearn |
-| **Evolutions** | CanEvolve, conditions (Level, Item), target references |
-| **Gender System** | GenderRatio, HasBothGenders, IsGenderless |
-| **Nature System** | GetStatMultiplier, IsNeutral, increased/decreased stats |
-| **Move Data** | Power, accuracy, effects composition |
-| **Move Builder** | Create moves dynamically with effects |
-| **Pokemon Builder** | Create Pokemon with stats, learnsets |
-| **Effect Types** | All 9 effect classes (Damage, Status, etc.) |
-| **Target Scopes** | SingleEnemy, AllEnemies, AllOthers |
-
-#### Output Format
-```
-═══ SECTION NAME ═══
-  ✓ Test that passes
-  ✗ Test that fails [FAILED]
-    → Informational message
-
-╔═══════════════════════════════════════════════════════════════╗
-║  ✓ ALL 70 TESTS PASSED - Systems Ready for Combat!           ║
-╚═══════════════════════════════════════════════════════════════╝
-```
-
-#### When to Use
-- After making changes to Core to verify nothing broke
-- Before starting new features to confirm base systems work
-- As a quick sanity check without running the full test suite
-- To see a visual listing of all Pokemon and Moves in the catalog
-
----
-
-## Core Project Structure
-
+#### Directory Structure
 ```
 PokemonUltimate.Core/
-│
-├── Models/                          # 📦 Data Models (POCOs)
-│   ├── IIdentifiable.cs             # Base interface for registry items
-│   ├── PokemonSpeciesData.cs        # Pokemon blueprint (with GenderRatio)
-│   ├── MoveData.cs                  # Move blueprint
-│   ├── BaseStats.cs                 # HP, Attack, Defense, etc.
-│   ├── LearnableMove.cs             # Move in a Pokemon's learnset
-│   └── NatureData.cs                # Static: Nature stat modifiers (±10%)
-│
-├── Registry/                        # 🗄️ Data Storage & Retrieval
-│   ├── IDataRegistry.cs             # Generic registry interface
-│   ├── GameDataRegistry.cs          # Base implementation
-│   ├── IPokemonRegistry.cs          # Pokemon-specific interface
-│   ├── PokemonRegistry.cs           # Name + Pokedex lookup
-│   ├── IMoveRegistry.cs             # Move-specific interface
-│   └── MoveRegistry.cs              # Name + Type/Category filters
-│
-├── Enums/                           # 🏷️ Type Definitions
-│   ├── PokemonType.cs               # 18 types (Fire, Water, etc.)
-│   ├── MoveCategory.cs              # Physical, Special, Status
-│   ├── TargetScope.cs               # Who can be targeted
-│   ├── Stat.cs                      # HP, Attack, Speed, etc.
-│   ├── PersistentStatus.cs          # Burn, Paralysis, etc.
-│   ├── VolatileStatus.cs            # Confusion, Flinch, etc.
-│   ├── EffectType.cs                # Types of move effects
-│   ├── LearnMethod.cs               # How moves are learned
-│   ├── TimeOfDay.cs                 # For evolution conditions
-│   ├── Gender.cs                    # Male, Female, Genderless
-│   └── Nature.cs                    # 25 natures (stat modifiers)
-│
-├── Effects/                         # ⚡ Move Effect System
-│   ├── IMoveEffect.cs               # Effect interface
-│   ├── DamageEffect.cs              # Standard damage
-│   ├── FixedDamageEffect.cs         # Fixed HP damage
-│   ├── StatusEffect.cs              # Apply status condition
-│   ├── StatChangeEffect.cs          # Modify stat stages
-│   ├── RecoilEffect.cs              # User takes damage
-│   ├── DrainEffect.cs               # Heal from damage dealt
-│   ├── HealEffect.cs                # Direct HP recovery
-│   ├── FlinchEffect.cs              # May cause flinch
-│   └── MultiHitEffect.cs            # Hits 2-5 times
-│
-├── Evolution/                       # 🔄 Evolution System
-│   ├── Evolution.cs                 # Evolution definition
-│   ├── IEvolutionCondition.cs       # Condition interface
-│   ├── EvolutionConditionType.cs    # Condition types enum
-│   └── Conditions/                  # Concrete conditions
+├── Effects/                        → Move effects (IMoveEffect implementations)
+│   ├── DamageEffect.cs
+│   ├── StatusEffect.cs
+│   └── StatChangeEffect.cs
+├── Enums/                          → Game enumerations
+│   ├── PokemonType.cs
+│   ├── MoveCategory.cs
+│   └── Stat.cs
+├── Evolution/                      → Evolution system
+│   ├── Evolution.cs
+│   ├── IEvolutionCondition.cs
+│   └── Conditions/
 │       ├── LevelCondition.cs
-│       ├── ItemCondition.cs
-│       ├── FriendshipCondition.cs
-│       ├── TimeOfDayCondition.cs
-│       ├── TradeCondition.cs
-│       └── KnowsMoveCondition.cs
-│
-├── Builders/                        # 🏗️ Fluent Builders
-│   ├── PokemonBuilder.cs            # Pokemon.Define(...).Build()
-│   ├── LearnsetBuilder.cs           # .StartsWith(), .AtLevel()
-│   ├── EvolutionBuilder.cs          # .AtLevel(), .WithItem()
-│   ├── MoveBuilder.cs               # Move.Define(...).Build()
-│   └── EffectBuilder.cs             # .Damage(), .MayBurn()
-│
-└── Catalogs/                        # 📚 Static Game Data
-    ├── Pokemon/
-    │   ├── PokemonCatalog.cs        # Orchestrator
-    │   └── PokemonCatalog.Gen1.cs   # Generation 1 Pokemon
-    └── Moves/
-        ├── MoveCatalog.cs           # Orchestrator
-        ├── MoveCatalog.Normal.cs    # Normal-type moves
-        ├── MoveCatalog.Fire.cs      # Fire-type moves
-        ├── MoveCatalog.Water.cs     # Water-type moves
-        ├── MoveCatalog.Grass.cs     # Grass-type moves
-        ├── MoveCatalog.Electric.cs  # Electric-type moves
-        ├── MoveCatalog.Ground.cs    # Ground-type moves
-        └── MoveCatalog.Psychic.cs   # Psychic-type moves
+│       └── ItemCondition.cs
+├── Models/                         → Core data models
+│   ├── PokemonSpeciesData.cs      (Blueprint)
+│   ├── MoveData.cs                (Blueprint)
+│   ├── BaseStats.cs
+│   └── LearnableMove.cs
+└── Registry/                       → Data registry system
+    ├── IDataRegistry.cs           (Generic interface)
+    ├── IPokemonRegistry.cs        (Pokemon-specific)
+    ├── IMoveRegistry.cs           (Move-specific)
+    └── GameDataRegistry.cs        (Generic implementation)
 ```
 
----
+### 2. PokemonUltimate.Content
+**Target Framework**: `netstandard2.1`  
+**Purpose**: Concrete game content (specific Pokémon and Moves)  
+**Dependencies**: `PokemonUltimate.Core`
 
-## Tests Project Structure
+#### Responsibilities
+- ✅ Define **which** Pokémon exist (e.g., Pikachu #25, Charizard #6)
+- ✅ Define **which** Moves exist (e.g., Ember, Thunderbolt)
+- ✅ Provide **builder tools** (DSL) for creating content easily
+- ❌ **NEVER** contain game logic (no damage calculation, no turn order)
 
-**Mirrors Core structure for easy navigation:**
+#### Directory Structure
+```
+PokemonUltimate.Content/
+├── Builders/                       → DSL for content creation
+│   ├── PokemonBuilder.cs          (Pokemon.Define("Pikachu", 25))
+│   ├── MoveBuilder.cs             (Move.Define("Ember"))
+│   ├── EffectBuilder.cs           (e => e.Damage().MayBurn(10))
+│   ├── LearnsetBuilder.cs         (m => m.StartsWith(...))
+│   └── EvolutionBuilder.cs        (e => e.AtLevel(16))
+└── Catalogs/                       → Static content catalogs
+    ├── Moves/                      (Organized by type)
+    │   ├── MoveCatalog.cs         (Main + initialization)
+    │   ├── MoveCatalog.Fire.cs    (Fire-type moves)
+    │   ├── MoveCatalog.Water.cs   (Water-type moves)
+    │   └── MoveCatalog.Electric.cs
+    └── Pokemon/                    (Organized by generation)
+        ├── PokemonCatalog.cs      (Main + initialization)
+        └── PokemonCatalog.Gen1.cs (Kanto Pokémon #1-151)
+```
 
+### 3. PokemonUltimate.Tests
+**Target Framework**: `net8.0`  
+**Purpose**: Unit tests for both Core and Content  
+**Dependencies**: `PokemonUltimate.Core`, `PokemonUltimate.Content`, `NUnit`
+
+#### Responsibilities
+- ✅ Test **Core logic** (TDD required)
+- ✅ Validate **Content integrity** (all Pokémon have valid stats, etc.)
+- ✅ Verify **Content composition** (Ember has DamageEffect + BurnEffect)
+
+#### Directory Structure
 ```
 PokemonUltimate.Tests/
-│
-├── Models/                          # Tests for data models
-│   ├── BaseStatsTests.cs
-│   ├── LearnableMoveTests.cs
-│   ├── MoveDataTests.cs
-│   ├── NatureDataTests.cs
-│   └── PokemonSpeciesDataTests.cs
-│
-├── Registry/                        # Tests for registries
-│   ├── MoveRegistryTests.cs
-│   ├── MoveRegistryFilterTests.cs
-│   ├── PokemonRegistryTests.cs
-│   └── PokemonRegistryPokedexTests.cs
-│
-├── Effects/                         # Tests for move effects
-│   ├── MoveEffectTests.cs
-│   └── MoveEffectCompositionTests.cs
-│
-├── Evolution/                       # Tests for evolution system
-│   ├── EvolutionTests.cs
-│   └── EvolutionConditionTests.cs
-│
-├── Builders/                        # Tests for builders
-│   ├── PokemonBuilderTests.cs
-│   ├── LearnsetBuilderTests.cs
-│   ├── EvolutionBuilderTests.cs
-│   ├── MoveBuilderTests.cs
-│   └── EffectBuilderTests.cs
-│
-└── Catalogs/                        # Tests for catalogs
-    ├── Pokemon/
-    │   ├── PokemonCatalogTests.cs
-    │   └── PokemonCatalogGen1Tests.cs
-    └── Moves/
-        ├── MoveCatalogTests.cs
-        ├── MoveCatalogNormalTests.cs
-        ├── MoveCatalogFireTests.cs
-        ├── MoveCatalogElectricTests.cs
-        └── MoveCatalogOtherTypesTests.cs
+├── Builders/                       → Builder tests
+├── Catalogs/                       → Catalog tests
+│   ├── Moves/
+│   └── Pokemon/
+├── Effects/                        → Effect tests
+├── Evolution/                      → Evolution tests
+├── Models/                         → Model tests
+└── Registry/                       → Registry tests
 ```
+
+### 4. PokemonUltimate.Console
+**Target Framework**: `net8.0`  
+**Purpose**: Console application for testing game logic without Unity  
+**Dependencies**: `PokemonUltimate.Core`, `PokemonUltimate.Content`
 
 ---
 
-## Namespace Convention
+## Namespace Conventions
 
-All namespaces follow the folder structure:
+### Core Namespaces
+All Core code uses the `PokemonUltimate.Core.*` namespace:
 
-| Folder | Namespace |
-|--------|-----------|
-| `Core/Models/` | `PokemonUltimate.Core.Models` |
-| `Core/Registry/` | `PokemonUltimate.Core.Registry` |
-| `Core/Effects/` | `PokemonUltimate.Core.Effects` |
-| `Core/Evolution/` | `PokemonUltimate.Core.Evolution` |
-| `Core/Evolution/Conditions/` | `PokemonUltimate.Core.Evolution.Conditions` |
-| `Core/Builders/` | `PokemonUltimate.Core.Builders` |
-| `Core/Catalogs/` | `PokemonUltimate.Core.Catalogs` |
-| `Core/Enums/` | `PokemonUltimate.Core.Enums` |
+```csharp
+PokemonUltimate.Core.Models          // PokemonSpeciesData, MoveData
+PokemonUltimate.Core.Effects         // DamageEffect, StatusEffect
+PokemonUltimate.Core.Enums           // PokemonType, MoveCategory
+PokemonUltimate.Core.Evolution       // Evolution, IEvolutionCondition
+PokemonUltimate.Core.Registry        // IDataRegistry, PokemonRegistry
+```
+
+### Content Namespaces
+All Content code uses the `PokemonUltimate.Content.*` namespace:
+
+```csharp
+PokemonUltimate.Content.Builders           // Pokemon, Move, Effect builders
+PokemonUltimate.Content.Catalogs.Moves     // MoveCatalog (partial classes)
+PokemonUltimate.Content.Catalogs.Pokemon   // PokemonCatalog (partial classes)
+```
+
+### Test Namespaces
+Tests mirror the structure they test:
+
+```csharp
+PokemonUltimate.Tests.Models         // Tests for Core.Models
+PokemonUltimate.Tests.Catalogs.Moves // Tests for Content.Catalogs.Moves
+```
 
 ---
 
 ## Dependency Flow
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    PokemonUltimate.Tests                     │
-│                         (net8.0)                             │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    PokemonUltimate.Core                      │
-│                     (netstandard2.1)                         │
-│                                                              │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐                │
-│  │ Models  │◄───│ Registry │◄───│ Catalogs │                │
-│  └─────────┘    └──────────┘    └──────────┘                │
-│       ▲              ▲               │                       │
-│       │              │               │                       │
-│  ┌─────────┐    ┌──────────┐         │                       │
-│  │  Enums  │    │ Builders │─────────┘                       │
-│  └─────────┘    └──────────┘                                 │
-│       ▲                                                      │
-│       │                                                      │
-│  ┌─────────┐    ┌───────────┐                               │
-│  │ Effects │    │ Evolution │                               │
-│  └─────────┘    └───────────┘                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    Console[PokemonUltimate.Console] --> Content
+    Console --> Core
+    Tests[PokemonUltimate.Tests] --> Content
+    Tests --> Core
+    Content[PokemonUltimate.Content] --> Core
+    Core[PokemonUltimate.Core]
+    
+    style Core fill:#4CAF50,color:#fff
+    style Content fill:#2196F3,color:#fff
+    style Tests fill:#FF9800,color:#fff
+    style Console fill:#9C27B0,color:#fff
 ```
 
-**Key Rules:**
-- `Models` has no dependencies (pure data)
-- `Enums` has no dependencies (pure types)
-- `Effects` depends on `Enums`
-- `Registry` depends on `Models`
-- `Catalogs` depends on `Models`, `Builders`, `Effects`
-- `Builders` depends on `Models`, `Enums`, `Evolution`
+### Dependency Rules
+1. ✅ **Content → Core**: Content depends on Core (uses Models, Enums, Builders)
+2. ✅ **Tests → Core + Content**: Tests can reference both
+3. ✅ **Console → Core + Content**: Console can use both
+4. ❌ **Core → Content**: Core must NEVER know about Content
+5. ❌ **Core → Tests**: Core must NEVER depend on Tests
 
 ---
 
 ## File Organization Guidelines
 
-### 1. One Class Per File
-Each public class/interface should have its own file with matching name.
+### Catalog Files (Partial Classes)
+Catalogs are split using `partial class` to keep files small and focused:
 
-### 2. Partial Classes for Large Content
-Use partial classes to split large catalogs:
+#### MoveCatalog Example
 ```
-PokemonCatalog.cs       # Orchestrator (All, Count, RegisterAll)
-PokemonCatalog.Gen1.cs  # Gen 1 Pokemon definitions
-PokemonCatalog.Gen2.cs  # Gen 2 Pokemon definitions (future)
+MoveCatalog.cs              → Main catalog (All, Count, RegisterAll)
+MoveCatalog.Fire.cs         → Fire-type moves (Ember, Flamethrower, Fire Blast)
+MoveCatalog.Water.cs        → Water-type moves (Water Gun, Surf, Hydro Pump)
+MoveCatalog.Electric.cs     → Electric-type moves (Thunder Shock, Thunderbolt)
 ```
 
-### 3. File Size Guidelines
-- **~50-150 lines** per file
-- If a file grows beyond 200 lines, consider splitting
+**Rule**: Each file should be **50-200 lines max**. If it grows, split it further.
 
-### 4. Test File Naming
-Test files mirror source files with `Tests` suffix:
-- `BaseStats.cs` → `BaseStatsTests.cs`
-- `PokemonCatalog.Gen1.cs` → `PokemonCatalogGen1Tests.cs`
+#### PokemonCatalog Example
+```
+PokemonCatalog.cs           → Main catalog (All, Count, RegisterAll)
+PokemonCatalog.Gen1.cs      → Kanto Pokémon (#1-151)
+PokemonCatalog.Gen2.cs      → Johto Pokémon (#152-251) [future]
+```
 
 ---
 
 ## Adding New Content
 
-### Adding a New Pokemon
-1. Open `Catalogs/Pokemon/PokemonCatalog.Gen1.cs` (or appropriate generation)
-2. Define in **reverse evolution order** (final form first)
-3. Add to `RegisterGen1()` method
-4. Add tests in `Tests/Catalogs/Pokemon/PokemonCatalogGen1Tests.cs`
-
 ### Adding a New Move
-1. Open `Catalogs/Moves/MoveCatalog.[Type].cs`
-2. Define the move with its effects
-3. Add to `Register[Type]()` method
-4. Add tests in appropriate test file
+1. Navigate to `PokemonUltimate.Content/Catalogs/Moves/`
+2. Find the appropriate type file (e.g., `MoveCatalog.Fire.cs`)
+3. Add your move using the `Move` builder:
+   ```csharp
+   public static readonly MoveData Inferno = Move.Define("Inferno")
+       .Description("The user attacks by engulfing the target in an intense fire.")
+       .Type(PokemonType.Fire)
+       .Special(100, 50, 5)
+       .WithEffects(e => e
+           .Damage()
+           .MayBurn(100))
+       .Build();
+   ```
+4. Register it in the `RegisterFire()` method:
+   ```csharp
+   static partial void RegisterFire()
+   {
+       _all.Add(Ember);
+       _all.Add(Flamethrower);
+       _all.Add(Inferno);  // ← Add here
+   }
+   ```
 
-### Adding a New Effect
-1. Create class in `Effects/` implementing `IMoveEffect`
-2. Add to `EffectType` enum
-3. Add tests in `Tests/Effects/MoveEffectTests.cs`
+### Adding a New Pokémon
+1. Navigate to `PokemonUltimate.Content/Catalogs/Pokemon/`
+2. Open the appropriate generation file (e.g., `PokemonCatalog.Gen1.cs`)
+3. Add your Pokémon using the `Pokemon` builder:
+   ```csharp
+   public static readonly PokemonSpeciesData Arcanine = Builders.Pokemon.Define("Arcanine", 59)
+       .Type(PokemonType.Fire)
+       .Stats(90, 110, 80, 100, 80, 95)
+       .Moves(m => m
+           .StartsWith(Moves.MoveCatalog.Ember)
+           .AtLevel(34, Moves.MoveCatalog.Flamethrower))
+       .Build();
+   ```
+4. Register it in `RegisterGen1()`:
+   ```csharp
+   static partial void RegisterGen1()
+   {
+       // ... other Pokémon
+       _all.Add(Arcanine);
+   }
+   ```
 
-### Adding a New Evolution Condition
-1. Create class in `Evolution/Conditions/` implementing `IEvolutionCondition`
-2. Add to `EvolutionConditionType` enum
-3. Add method to `EvolutionBuilder`
-4. Add tests in `Tests/Evolution/EvolutionConditionTests.cs`
+---
 
+## Future Expansion
+
+As the project grows, consider these additional projects:
+
+### PokemonUltimate.Battle (when implementing combat)
+**Purpose**: Battle engine, damage calculation, turn order  
+**Dependencies**: `Core`
+
+### PokemonUltimate.Unity (when integrating Unity)
+**Purpose**: MonoBehaviour, UI, animations, scenes  
+**Dependencies**: `Core`, `Content`, `Battle`
+
+### PokemonUltimate.Abstractions (optional)
+**Purpose**: Public interfaces only (for plugin support)  
+**Dependencies**: None
+
+---
+
+## Key Principles
+
+1. **Core is Generic**: Think "Chess Engine", not "Chess Game". Core should work for any turn-based RPG, not just Pokémon.
+2. **Content is Specific**: Think "Chess Pieces". Content defines Pikachu, Charizard, Thunderbolt.
+3. **Tests Mirror Structure**: If you add a file to Core, create a corresponding test file.
+4. **Dependency Inversion**: Content depends on Core, never the reverse.
+5. **Partial Classes for Scalability**: Keep files small (50-200 lines). Split when they grow.
+
+---
+
+## References
+
+- [Project Guidelines](../project_guidelines.md) - Core philosophy and coding standards
+- [Data Loading System](./data_loading_system.md) - Registry pattern details
+- [Catalogs System](./catalogs_system.md) - Partial class organization

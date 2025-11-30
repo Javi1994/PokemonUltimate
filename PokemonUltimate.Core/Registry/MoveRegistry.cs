@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Models;
 
 namespace PokemonUltimate.Core.Registry
 {

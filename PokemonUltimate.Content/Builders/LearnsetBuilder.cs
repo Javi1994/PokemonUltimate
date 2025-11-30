@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Models;
 
-namespace PokemonUltimate.Core.Builders
+namespace PokemonUltimate.Content.Builders
 {
     /// <summary>
     /// Fluent builder for creating a Pokemon's learnset.

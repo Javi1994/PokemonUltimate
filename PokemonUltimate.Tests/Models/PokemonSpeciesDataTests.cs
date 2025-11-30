@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using PokemonUltimate.Core.Models;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Catalogs;
 using System.Linq;
+using PokemonUltimate.Core.Blueprints;
+using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
 
 namespace PokemonUltimate.Tests.Models
 {
