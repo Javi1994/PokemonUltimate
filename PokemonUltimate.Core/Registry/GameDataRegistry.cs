@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 
 namespace PokemonUltimate.Core.Registry
 {
@@ -39,7 +40,7 @@ namespace PokemonUltimate.Core.Registry
             {
                 return item;
             }
-            throw new KeyNotFoundException($"Item with ID {id} not found.");
+            throw new KeyNotFoundException(ErrorMessages.Format(ErrorMessages.ItemNotFound, id));
         }
 
         /// <summary>

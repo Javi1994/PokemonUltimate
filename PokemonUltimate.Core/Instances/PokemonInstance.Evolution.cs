@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Evolution.Conditions;
 
 namespace PokemonUltimate.Core.Instances
@@ -144,12 +145,14 @@ namespace PokemonUltimate.Core.Instances
         public bool Evolve(PokemonSpeciesData targetSpecies)
         {
             if (targetSpecies == null)
-                return false;
+                throw new ArgumentNullException(nameof(targetSpecies), ErrorMessages.TargetSpeciesCannotBeNull);
 
             // Verify this is a valid evolution target (must be in evolutions list)
             var evolution = Species.Evolutions?.FirstOrDefault(e => e.Target == targetSpecies);
             if (evolution == null)
-                return false;
+                throw new ArgumentException(
+                    ErrorMessages.Format(ErrorMessages.EvolutionTargetNotValid, Species.Name, targetSpecies.Name),
+                    nameof(targetSpecies));
 
             return ExecuteEvolution(targetSpecies);
         }

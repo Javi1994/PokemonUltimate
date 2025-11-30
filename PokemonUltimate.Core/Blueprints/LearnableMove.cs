@@ -1,3 +1,5 @@
+using System;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Blueprints
@@ -27,7 +29,7 @@ namespace PokemonUltimate.Core.Blueprints
 
         public LearnableMove(MoveData move, LearnMethod method, int level = 0)
         {
-            Move = move;
+            Move = move ?? throw new ArgumentNullException(nameof(move), ErrorMessages.MoveCannotBeNull);
             Method = method;
             Level = level;
         }

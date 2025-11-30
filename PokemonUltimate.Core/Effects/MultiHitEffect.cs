@@ -1,3 +1,4 @@
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Effects
@@ -10,8 +11,8 @@ namespace PokemonUltimate.Core.Effects
     {
         public EffectType EffectType => EffectType.MultiHit;
         public string Description => MinHits == MaxHits 
-            ? $"Hits {MinHits} times." 
-            : $"Hits {MinHits}-{MaxHits} times.";
+            ? string.Format(GameMessages.HitsExactly, MinHits)
+            : string.Format(GameMessages.HitsRange, MinHits, MaxHits);
         
         /// <summary>Minimum number of hits.</summary>
         public int MinHits { get; set; }

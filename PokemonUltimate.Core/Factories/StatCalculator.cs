@@ -1,5 +1,6 @@
 using System;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Factories
@@ -130,7 +131,7 @@ namespace PokemonUltimate.Core.Factories
         public static int GetEffectiveStat(int calculatedStat, int stage)
         {
             if (calculatedStat < 0)
-                throw new ArgumentException("Stat cannot be negative", nameof(calculatedStat));
+                throw new ArgumentException(ErrorMessages.StatCannotBeNegative, nameof(calculatedStat));
 
             float multiplier = GetStageMultiplier(stage);
             return (int)(calculatedStat * multiplier);
@@ -161,7 +162,7 @@ namespace PokemonUltimate.Core.Factories
         public static int GetExpForLevel(int level)
         {
             if (level < 1 || level > 100)
-                throw new ArgumentException("Level must be between 1 and 100", nameof(level));
+                throw new ArgumentException(ErrorMessages.LevelMustBeBetween1And100, nameof(level));
 
             return level * level * level;
         }
@@ -183,7 +184,7 @@ namespace PokemonUltimate.Core.Factories
         public static int GetLevelForExp(int totalExp)
         {
             if (totalExp < 0)
-                throw new ArgumentException("Experience cannot be negative", nameof(totalExp));
+                throw new ArgumentException(ErrorMessages.ExperienceCannotBeNegative, nameof(totalExp));
 
             for (int level = 100; level >= 1; level--)
             {
@@ -201,25 +202,25 @@ namespace PokemonUltimate.Core.Factories
         private static void ValidateBaseStat(int stat, string paramName)
         {
             if (stat < 0)
-                throw new ArgumentException("Base stat cannot be negative", paramName);
+                throw new ArgumentException(ErrorMessages.BaseStatCannotBeNegative, paramName);
         }
 
         private static void ValidateLevel(int level)
         {
             if (level < 1 || level > 100)
-                throw new ArgumentException("Level must be between 1 and 100", nameof(level));
+                throw new ArgumentException(ErrorMessages.LevelMustBeBetween1And100, nameof(level));
         }
 
         private static void ValidateIV(int iv)
         {
             if (iv < 0 || iv > MaxIV)
-                throw new ArgumentException($"IV must be between 0 and {MaxIV}", nameof(iv));
+                throw new ArgumentException(ErrorMessages.Format(ErrorMessages.IVMustBeBetween, MaxIV), nameof(iv));
         }
 
         private static void ValidateEV(int ev)
         {
             if (ev < 0 || ev > MaxEV)
-                throw new ArgumentException($"EV must be between 0 and {MaxEV}", nameof(ev));
+                throw new ArgumentException(ErrorMessages.Format(ErrorMessages.EVMustBeBetween, MaxEV), nameof(ev));
         }
 
         #endregion

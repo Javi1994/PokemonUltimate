@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Factories
@@ -294,16 +295,16 @@ namespace PokemonUltimate.Core.Factories
         public static string GetEffectivenessDescription(float effectiveness)
         {
             if (effectiveness == Immune)
-                return "It has no effect...";
+                return GameMessages.NoEffect;
             if (effectiveness >= SuperEffective * SuperEffective)
-                return "It's super effective! (4x)";
+                return GameMessages.SuperEffective4x;
             if (effectiveness >= SuperEffective)
-                return "It's super effective!";
+                return GameMessages.SuperEffective;
             if (effectiveness <= NotVeryEffective * NotVeryEffective)
-                return "It's not very effective... (0.25x)";
+                return GameMessages.NotVeryEffective025x;
             if (effectiveness <= NotVeryEffective)
-                return "It's not very effective...";
-            return null; // Normal effectiveness, no message
+                return GameMessages.NotVeryEffective;
+            return GameMessages.NormalEffectiveness;
         }
 
         /// <summary>

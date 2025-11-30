@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Core.Evolution.Conditions
@@ -10,7 +12,7 @@ namespace PokemonUltimate.Core.Evolution.Conditions
     public class KnowsMoveCondition : IEvolutionCondition
     {
         public EvolutionConditionType ConditionType => EvolutionConditionType.KnowsMove;
-        public string Description => $"Knows {RequiredMove?.Name ?? "unknown move"}";
+        public string Description => $"Knows {RequiredMove.Name}";
 
         /// <summary>
         /// The move that must be known.
@@ -21,12 +23,12 @@ namespace PokemonUltimate.Core.Evolution.Conditions
 
         public KnowsMoveCondition(MoveData requiredMove)
         {
-            RequiredMove = requiredMove;
+            RequiredMove = requiredMove ?? throw new ArgumentNullException(nameof(requiredMove), ErrorMessages.MoveCannotBeNull);
         }
 
         public bool IsMet(PokemonInstance pokemon)
         {
-            if (pokemon == null || RequiredMove == null)
+            if (pokemon == null)
                 return false;
 
             return pokemon.Moves.Any(m => m.Move == RequiredMove);

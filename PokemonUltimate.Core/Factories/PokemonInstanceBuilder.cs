@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Instances;
 
@@ -58,7 +59,7 @@ namespace PokemonUltimate.Core.Factories
             _species = species ?? throw new ArgumentNullException(nameof(species));
             
             if (level < 1 || level > 100)
-                throw new ArgumentException("Level must be between 1 and 100", nameof(level));
+                throw new ArgumentException(ErrorMessages.LevelMustBeBetween1And100, nameof(level));
             
             _level = level;
         }
@@ -81,7 +82,7 @@ namespace PokemonUltimate.Core.Factories
         public static PokemonInstanceBuilder CreateWithRandomLevel(PokemonSpeciesData species, int minLevel, int maxLevel)
         {
             if (minLevel > maxLevel)
-                throw new ArgumentException("minLevel cannot be greater than maxLevel");
+                throw new ArgumentException(ErrorMessages.MinLevelCannotBeGreaterThanMaxLevel);
             
             int level = _random.Next(minLevel, maxLevel + 1);
             return new PokemonInstanceBuilder(species, level);
@@ -266,7 +267,7 @@ namespace PokemonUltimate.Core.Factories
         public PokemonInstanceBuilder WithMoveCount(int count)
         {
             if (count < 1 || count > 4)
-                throw new ArgumentException("Move count must be between 1 and 4");
+                throw new ArgumentException(ErrorMessages.MoveCountMustBeBetween1And4);
             
             _moveCount = count;
             return this;
@@ -349,7 +350,7 @@ namespace PokemonUltimate.Core.Factories
         public PokemonInstanceBuilder AtHealth(int currentHP)
         {
             if (currentHP < 0)
-                throw new ArgumentException("HP cannot be negative");
+                throw new ArgumentException(ErrorMessages.HPCannotBeNegative);
             
             _currentHP = currentHP;
             _hpPercent = null;
@@ -362,7 +363,7 @@ namespace PokemonUltimate.Core.Factories
         public PokemonInstanceBuilder AtHealthPercent(float percent)
         {
             if (percent < 0 || percent > 1)
-                throw new ArgumentException("Percent must be between 0.0 and 1.0");
+                throw new ArgumentException(ErrorMessages.PercentMustBeBetween0And1);
             
             _hpPercent = percent;
             _currentHP = null;
@@ -464,7 +465,7 @@ namespace PokemonUltimate.Core.Factories
         public PokemonInstanceBuilder WithExperience(int exp)
         {
             if (exp < 0)
-                throw new ArgumentException("Experience cannot be negative");
+                throw new ArgumentException(ErrorMessages.ExperienceCannotBeNegative);
             
             _experience = exp;
             return this;
@@ -480,7 +481,7 @@ namespace PokemonUltimate.Core.Factories
         public PokemonInstanceBuilder WithFriendship(int friendship)
         {
             if (friendship < 0 || friendship > 255)
-                throw new ArgumentException("Friendship must be between 0 and 255");
+                throw new ArgumentException(ErrorMessages.FriendshipMustBeBetween0And255);
             
             _friendship = friendship;
             return this;
@@ -678,16 +679,16 @@ namespace PokemonUltimate.Core.Factories
         private void ValidateGender(Gender gender)
         {
             if (_species.IsGenderless && gender != Gender.Genderless)
-                throw new ArgumentException($"{_species.Name} is genderless");
+                throw new ArgumentException(ErrorMessages.Format(ErrorMessages.SpeciesIsGenderless, _species.Name));
 
             if (_species.IsMaleOnly && gender != Gender.Male)
-                throw new ArgumentException($"{_species.Name} is male-only");
+                throw new ArgumentException(ErrorMessages.Format(ErrorMessages.SpeciesIsMaleOnly, _species.Name));
 
             if (_species.IsFemaleOnly && gender != Gender.Female)
-                throw new ArgumentException($"{_species.Name} is female-only");
+                throw new ArgumentException(ErrorMessages.Format(ErrorMessages.SpeciesIsFemaleOnly, _species.Name));
 
             if (!_species.IsGenderless && gender == Gender.Genderless)
-                throw new ArgumentException($"{_species.Name} cannot be genderless");
+                throw new ArgumentException(ErrorMessages.Format(ErrorMessages.SpeciesCannotBeGenderless, _species.Name));
         }
 
         private List<MoveInstance> SelectMoves()

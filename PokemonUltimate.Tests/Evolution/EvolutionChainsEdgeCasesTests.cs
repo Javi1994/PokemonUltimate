@@ -552,36 +552,30 @@ namespace PokemonUltimate.Tests.Evolution
         #region Evolve Method Validation
 
         [Test]
-        public void Evolve_ToInvalidTarget_ReturnsFalse()
+        public void Evolve_ToInvalidTarget_ThrowsException()
         {
             var pokemon = PokemonFactory.Create(_stage1Pokemon, 50);
             
-            // Try to evolve directly to Stage 3 (skipping Stage 2)
-            bool result = pokemon.Evolve(_stage3Pokemon);
-            
-            Assert.That(result, Is.False);
+            // Try to evolve directly to Stage 3 (skipping Stage 2) - should throw
+            Assert.Throws<ArgumentException>(() => pokemon.Evolve(_stage3Pokemon));
             Assert.That(pokemon.Species, Is.EqualTo(_stage1Pokemon));
         }
 
         [Test]
-        public void Evolve_ToNullTarget_ReturnsFalse()
+        public void Evolve_ToNullTarget_ThrowsException()
         {
             var pokemon = PokemonFactory.Create(_stage1Pokemon, 50);
             
-            bool result = pokemon.Evolve(null);
-            
-            Assert.That(result, Is.False);
+            Assert.Throws<ArgumentNullException>(() => pokemon.Evolve(null));
         }
 
         [Test]
-        public void Evolve_ToUnrelatedSpecies_ReturnsFalse()
+        public void Evolve_ToUnrelatedSpecies_ThrowsException()
         {
             var pokemon = PokemonFactory.Create(_stage1Pokemon, 50);
             
-            // Try to evolve to a completely unrelated Pokemon
-            bool result = pokemon.Evolve(_noEvoPokemon);
-            
-            Assert.That(result, Is.False);
+            // Try to evolve to a completely unrelated Pokemon - should throw
+            Assert.Throws<ArgumentException>(() => pokemon.Evolve(_noEvoPokemon));
             Assert.That(pokemon.Species, Is.EqualTo(_stage1Pokemon));
         }
 

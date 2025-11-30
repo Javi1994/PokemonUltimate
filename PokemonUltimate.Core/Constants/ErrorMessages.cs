@@ -1,0 +1,64 @@
+namespace PokemonUltimate.Core.Constants
+{
+    /// <summary>
+    /// Centralized error messages for validation and exceptions.
+    /// </summary>
+    public static class ErrorMessages
+    {
+        #region Numeric Validation
+
+        public const string AmountCannotBeNegative = "Amount cannot be negative";
+        public const string LevelMustBeBetween1And100 = "Level must be between 1 and 100";
+        public const string ExperienceCannotBeNegative = "Experience cannot be negative";
+        public const string BaseStatCannotBeNegative = "Base stat cannot be negative";
+        public const string HPCannotBeNegative = "HP cannot be negative";
+        public const string PercentMustBeBetween0And1 = "Percent must be between 0.0 and 1.0";
+        public const string FriendshipMustBeBetween0And255 = "Friendship must be between 0 and 255";
+        public const string MoveCountMustBeBetween1And4 = "Move count must be between 1 and 4";
+        public const string MinLevelCannotBeGreaterThanMaxLevel = "minLevel cannot be greater than maxLevel";
+        public const string StatCannotBeNegative = "Stat cannot be negative";
+        public const string IVMustBeBetween = "IV must be between 0 and {0}";
+        public const string EVMustBeBetween = "EV must be between 0 and {0}";
+
+        #endregion
+
+        #region Gender Validation
+
+        public const string SpeciesIsGenderless = "{0} is genderless";
+        public const string SpeciesIsMaleOnly = "{0} is male-only";
+        public const string SpeciesIsFemaleOnly = "{0} is female-only";
+        public const string SpeciesCannotBeGenderless = "{0} cannot be genderless";
+
+        #endregion
+
+        #region Null Validation
+
+        public const string MoveCannotBeNull = "Move cannot be null";
+        public const string SpeciesCannotBeNull = "Species cannot be null";
+        public const string PokemonCannotBeNull = "Pokemon cannot be null";
+        public const string TargetSpeciesCannotBeNull = "Target species cannot be null";
+        public const string EvolutionTargetNotValid = "{0} cannot evolve to {1}";
+
+        #endregion
+
+        #region Not Found
+
+        public const string ItemNotFound = "Item with ID {0} not found.";
+        public const string PokemonNotFoundByPokedex = "Pokemon with Pokedex Number {0} not found.";
+
+        #endregion
+
+        #region Helpers
+
+        /// <summary>
+        /// Formats a message template with arguments.
+        /// </summary>
+        public static string Format(string template, params object[] args)
+        {
+            return string.Format(template, args);
+        }
+
+        #endregion
+    }
+}
+

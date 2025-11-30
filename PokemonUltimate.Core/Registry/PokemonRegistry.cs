@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Registry
@@ -38,7 +39,7 @@ namespace PokemonUltimate.Core.Registry
             {
                 return item;
             }
-            throw new KeyNotFoundException($"Pokemon with Pokedex Number {number} not found.");
+            throw new KeyNotFoundException(ErrorMessages.Format(ErrorMessages.PokemonNotFoundByPokedex, number));
         }
 
         /// <summary>

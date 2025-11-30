@@ -1,18 +1,32 @@
 namespace PokemonUltimate.Core.Enums
 {
-    // Pokemon stats used for damage calculation and stat modifications.
+    /// <summary>
+    /// Pokemon stats used for damage calculation and stat modifications.
+    /// </summary>
     public enum Stat
     {
+        /// <summary>Hit Points - determines how much damage a Pokemon can take.</summary>
         HP,
+        
+        /// <summary>Physical Attack - used for Physical moves.</summary>
         Attack,
+        
+        /// <summary>Physical Defense - reduces damage from Physical moves.</summary>
         Defense,
+        
+        /// <summary>Special Attack - used for Special moves.</summary>
         SpAttack,
+        
+        /// <summary>Special Defense - reduces damage from Special moves.</summary>
         SpDefense,
+        
+        /// <summary>Speed - determines turn order and some move effects.</summary>
         Speed,
         
-        // Battle-only stats (not stored in base stats)
+        /// <summary>Accuracy - affects chance to hit (battle-only, not a base stat).</summary>
         Accuracy,
+        
+        /// <summary>Evasion - affects chance to dodge (battle-only, not a base stat).</summary>
         Evasion
     }
 }
-

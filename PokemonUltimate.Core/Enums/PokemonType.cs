@@ -1,6 +1,8 @@
 namespace PokemonUltimate.Core.Enums
 {
-    // The 18 Pokemon types used for type matchups and STAB calculations.
+    /// <summary>
+    /// The 18 Pokemon types used for type matchups and STAB calculations.
+    /// </summary>
     public enum PokemonType
     {
         Normal,
@@ -23,4 +25,3 @@ namespace PokemonUltimate.Core.Enums
         Fairy
     }
 }
-

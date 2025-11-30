@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Blueprints
@@ -129,6 +131,9 @@ namespace PokemonUltimate.Core.Blueprints
         /// </summary>
         public bool CanLearn(MoveData move)
         {
+            if (move == null)
+                throw new ArgumentNullException(nameof(move), ErrorMessages.MoveCannotBeNull);
+            
             return Learnset.Any(m => m.Move == move);
         }
 

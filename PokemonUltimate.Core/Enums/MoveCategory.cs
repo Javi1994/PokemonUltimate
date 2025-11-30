@@ -1,16 +1,17 @@
 namespace PokemonUltimate.Core.Enums
 {
-    // Determines which stats are used for damage calculation.
+    /// <summary>
+    /// Determines which stats are used for damage calculation.
+    /// </summary>
     public enum MoveCategory
     {
-        // Uses Attack vs Defense
+        /// <summary>Uses Attack vs Defense.</summary>
         Physical,
         
-        // Uses SpAttack vs SpDefense
+        /// <summary>Uses SpAttack vs SpDefense.</summary>
         Special,
         
-        // No damage, only applies effects (status, stat changes, etc.)
+        /// <summary>No damage, only applies effects (status, stat changes, etc.).</summary>
         Status
     }
 }
-

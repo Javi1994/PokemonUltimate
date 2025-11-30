@@ -1,43 +1,44 @@
 namespace PokemonUltimate.Core.Enums
 {
-    // Defines who a move can target during battle.
+    /// <summary>
+    /// Defines who a move can target during battle.
+    /// </summary>
     public enum TargetScope
     {
-        // Targets the user (Swords Dance, Recover)
+        /// <summary>Targets the user (Swords Dance, Recover).</summary>
         Self,
         
-        // Targets a single enemy (Tackle, Thunderbolt)
+        /// <summary>Targets a single enemy (Tackle, Thunderbolt).</summary>
         SingleEnemy,
         
-        // Targets a single ally (Helping Hand)
+        /// <summary>Targets a single ally (Helping Hand).</summary>
         SingleAlly,
         
-        // Targets all enemies (Earthquake, Surf)
+        /// <summary>Targets all enemies (Earthquake, Surf in singles).</summary>
         AllEnemies,
         
-        // Targets all allies (rare)
+        /// <summary>Targets all allies (rare).</summary>
         AllAllies,
         
-        // Targets everyone except user (Explosion)
+        /// <summary>Targets everyone except user (Explosion).</summary>
         AllOthers,
         
-        // Targets all adjacent Pokemon including allies (Earthquake in doubles)
+        /// <summary>Targets all adjacent Pokemon including allies (Earthquake in doubles).</summary>
         AllAdjacent,
         
-        // Targets all adjacent enemies only (Razor Leaf, Heat Wave)
+        /// <summary>Targets all adjacent enemies only (Razor Leaf, Heat Wave).</summary>
         AllAdjacentEnemies,
         
-        // Can target anyone (Telekinesis)
+        /// <summary>Can target anyone (Telekinesis).</summary>
         Any,
         
-        // Targets a random enemy (Outrage, Petal Dance)
+        /// <summary>Targets a random enemy (Outrage, Petal Dance).</summary>
         RandomEnemy,
         
-        // Affects the entire field (Stealth Rock, Weather)
+        /// <summary>Affects the entire field (Stealth Rock, Weather).</summary>
         Field,
         
-        // Targets user and all allies (Aromatherapy, Heal Bell)
+        /// <summary>Targets user and all allies (Aromatherapy, Heal Bell).</summary>
         UserAndAllies
     }
 }
-

@@ -447,14 +447,12 @@ namespace PokemonUltimate.Tests.Instances
         }
 
         [Test]
-        public void Evolve_Rejects_Invalid_Target()
+        public void Evolve_Rejects_Invalid_Target_With_Exception()
         {
             var pokemon = CreatePokemon(level: 16);
             var invalidTarget = new PokemonSpeciesData { Name = "Invalid" };
 
-            bool result = pokemon.Evolve(invalidTarget);
-
-            Assert.That(result, Is.False);
+            Assert.Throws<ArgumentException>(() => pokemon.Evolve(invalidTarget));
             Assert.That(pokemon.Species, Is.EqualTo(_testSpecies));
         }
 

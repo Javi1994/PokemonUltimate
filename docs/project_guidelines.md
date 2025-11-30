@@ -88,6 +88,171 @@ _These rules are absolute. All code must adhere to them._
     - Every class and interface **MUST** have a simple, direct comment at the top explaining its purpose.
     - Keep it short. Example: `// Defines the blueprint for a Pokemon species (immutable data).`
 
+13. **Centralized Constants (No Magic Strings)**:
+    - **NEVER** hardcode strings directly in code (error messages, game text).
+    - Use **Constants Classes** to centralize all strings:
+      - `ErrorMessages.cs` - Validation and exception messages.
+      - `GameMessages.cs` - In-game text (effectiveness, battle feedback).
+    - **Benefits**: Easy localization, single source of truth, consistent messaging.
+    - **Format Pattern**: Use `ErrorMessages.Format(template, args)` for parameterized messages.
+    - **Example**:
+      ```csharp
+      // BAD
+      throw new ArgumentException("Level must be between 1 and 100");
+      
+      // GOOD
+      throw new ArgumentException(ErrorMessages.LevelMustBeBetween1And100);
+      ```
+
+14. **Fail Fast (Exception Policy)**:
+    - **NEVER** use `try-catch` unless absolutely necessary (e.g., external I/O).
+    - **DO** throw exceptions immediately when something is wrong.
+    - Invalid inputs should **fail loudly**, not return `false` or `null` silently.
+    - **Rule**: If a method receives invalid data, throw an exception with a clear message.
+    - **Benefits**: Bugs are detected early, stack traces point to the actual problem.
+    - **Allowed try-catch scenarios**:
+      - External file/network operations.
+      - Console operations that may fail in certain environments.
+      - Test runners that need to catch and report failures.
+    - **Example**:
+      ```csharp
+      // BAD - Silent failure
+      public bool Evolve(PokemonSpeciesData target)
+      {
+          if (target == null) return false;
+          // ...
+      }
+      
+      // GOOD - Fail fast
+      public bool Evolve(PokemonSpeciesData target)
+      {
+          if (target == null)
+              throw new ArgumentNullException(nameof(target), ErrorMessages.TargetSpeciesCannotBeNull);
+          // ...
+      }
+      ```
+
+15. **Guard Clauses First (Early Return)**:
+    - All validations **MUST** be at the beginning of the method.
+    - Use early returns to avoid deep nesting.
+    - **Benefits**: Cleaner code, easier to read, single exit point for errors.
+    - **Example**:
+      ```csharp
+      // BAD - Nested conditions
+      public void DoSomething(Pokemon pokemon)
+      {
+          if (pokemon != null)
+          {
+              if (pokemon.Level > 0)
+              {
+                  // actual logic here
+              }
+          }
+      }
+      
+      // GOOD - Guard clauses
+      public void DoSomething(Pokemon pokemon)
+      {
+          if (pokemon == null)
+              throw new ArgumentNullException(nameof(pokemon));
+          if (pokemon.Level <= 0)
+              throw new ArgumentException("Level must be positive");
+          
+          // actual logic here (no nesting)
+      }
+      ```
+
+16. **Method Size Limits**:
+    - Methods should be **30 lines or less**.
+    - If a method exceeds this, **split it** into smaller, focused methods.
+    - Each method should do **one thing well**.
+    - **Exception**: Switch statements or lookup tables may be longer.
+
+17. **Parameter Limits (Object Pattern)**:
+    - Methods should have **4 parameters or fewer**.
+    - If more are needed, use a **parameter object** or **builder pattern**.
+    - **Example**: `PokemonInstance` constructor uses a builder, not 15 parameters.
+
+18. **Explicit Access Modifiers**:
+    - **ALWAYS** specify access modifiers (`public`, `private`, `internal`).
+    - Never rely on C# defaults.
+    - Use the **principle of least privilege**: prefer `private` over `public`.
+
+19. **Naming Conventions**:
+    - **Classes/Interfaces**: `PascalCase` (e.g., `PokemonInstance`, `IMoveEffect`)
+    - **Methods/Properties**: `PascalCase` (e.g., `GetEffectiveStat`, `MaxHP`)
+    - **Private fields**: `_camelCase` with underscore prefix (e.g., `_items`, `_level`)
+    - **Local variables**: `camelCase` (e.g., `calculatedDamage`, `targetPokemon`)
+    - **Constants**: `PascalCase` (e.g., `MaxLevel`, `DefaultFriendship`)
+    - **Interfaces**: Prefix with `I` (e.g., `IDataRegistry`, `IMoveEffect`)
+    - **Enums**: Singular `PascalCase` (e.g., `PokemonType`, not `PokemonTypes`)
+    - **Boolean properties**: Use `Is`, `Has`, `Can` prefixes (e.g., `IsFainted`, `HasStatus`, `CanEvolve`)
+
+20. **Code Organization (Regions)**:
+    - Use `#region` to organize code within classes.
+    - **Standard order**:
+      1. Constants
+      2. Fields
+      3. Properties
+      4. Constructors
+      5. Public Methods
+      6. Private Methods
+    - **Example**:
+      ```csharp
+      public class MyClass
+      {
+          #region Constants
+          public const int MaxValue = 100;
+          #endregion
+          
+          #region Fields
+          private readonly int _value;
+          #endregion
+          
+          #region Properties
+          public int Value => _value;
+          #endregion
+          
+          #region Constructor
+          public MyClass(int value) { _value = value; }
+          #endregion
+          
+          #region Public Methods
+          public void DoSomething() { }
+          #endregion
+      }
+      ```
+
+21. **Prefer Readonly and Immutability**:
+    - Use `readonly` for fields that don't change after construction.
+    - Prefer immutable data structures for blueprints/data.
+    - **Mutable state** should be clearly identified (e.g., `CurrentHP`, `Level`).
+    - Use `private set` instead of `set` when only internal mutation is needed.
+
+22. **LINQ Guidelines**:
+    - Use LINQ for **queries and transformations** (filter, map, reduce).
+    - **Prefer method syntax** over query syntax for consistency.
+    - **Avoid** LINQ in hot paths (tight loops, per-frame code).
+    - **Materialize** results with `.ToList()` or `.ToArray()` when needed multiple times.
+    - **Example**:
+      ```csharp
+      // GOOD - Clear intent
+      var fireTypes = pokemon.Where(p => p.PrimaryType == PokemonType.Fire).ToList();
+      
+      // BAD - Query syntax (less common in codebase)
+      var fireTypes = (from p in pokemon where p.PrimaryType == PokemonType.Fire select p).ToList();
+      ```
+
+23. **Interface Segregation**:
+    - Interfaces should be **small and focused**.
+    - Prefer many small interfaces over one large interface.
+    - **Example**: `IDataRegistry<T>` does data access, `IPokemonRegistry` adds Pokemon-specific queries.
+
+24. **No Dead Code**:
+    - **Remove** commented-out code immediately.
+    - **Remove** unused methods, classes, and variables.
+    - Use TODO comments only for genuine pending work, not as code graveyard.
+
 ## 2. Game Design Pillars
 
 _Key constraints defining the game's scope._
