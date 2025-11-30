@@ -1,3 +1,6 @@
+// Move names and game data referenced here are trademarks of Nintendo/Game Freak/The Pokemon Company.
+// This is a non-commercial fan project for educational purposes only. See LEGAL.md for details.
+
 using System.Collections.Generic;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Registry;
@@ -9,6 +12,9 @@ namespace PokemonUltimate.Content.Catalogs.Moves
     /// Organized by type using partial classes.
     /// Each type file (MoveCatalog.Fire.cs, etc.) adds its Moves.
     /// </summary>
+    /// <remarks>
+    /// Move names are trademarks of Nintendo/Game Freak. Non-commercial fan project.
+    /// </remarks>
     public static partial class MoveCatalog
     {
         private static List<MoveData> _all;

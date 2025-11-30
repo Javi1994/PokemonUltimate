@@ -1,0 +1,141 @@
+# PokemonUltimate - Cursor AI Rules
+
+> These rules are automatically loaded by Cursor for every conversation.
+
+## 🚀 Automatic Context Loading
+
+**ALWAYS read these files at the start of any task:**
+1. `.ai/context.md` - Current project state, phase, completed systems
+2. `docs/project_guidelines.md` - 24+ mandatory coding rules
+
+**Read on-demand based on task:**
+- New feature → `docs/architecture/[relevant].md`
+- Code quality → `docs/anti-patterns.md`
+- Examples needed → `docs/examples/good_code.md`
+
+## 📋 Development Workflow
+
+### When User Says "Implement X" or "Add X"
+1. Read `.ai/context.md` to understand current state
+2. Find relevant architecture doc in `docs/architecture/`
+3. **Write functional tests FIRST** (TDD mandatory)
+4. Implement the feature
+5. Add edge case tests
+6. Run `dotnet test` to verify
+7. Check `docs/checklists/feature_complete.md`
+8. Update `.ai/context.md` with new state
+
+### When User Says "Review X" or "Check X"
+1. Read `docs/anti-patterns.md`
+2. Verify against `docs/project_guidelines.md`
+3. List issues found
+4. Fix issues if requested
+
+### When User Says "Edge Cases" or "Test X"
+1. Read `docs/examples/good_tests.md` for patterns
+2. Apply boundary testing (min/max values)
+3. Test invalid inputs (null, negative, overflow)
+4. Add real-world verification if applicable
+5. If tests reveal missing functionality → implement it
+
+## ✅ Mandatory Rules (Always Apply)
+
+### Code Quality
+- **NO magic strings** → Use `ErrorMessages.cs` or `GameMessages.cs`
+- **NO magic numbers** → Use named constants
+- **NO try-catch** → Unless absolutely necessary (I/O, external APIs)
+- **Fail-fast** → Throw exceptions for invalid inputs
+- **Guard clauses** → Validate at method start
+
+### Architecture
+- **Core/** → Logic only, NO game data
+- **Content/** → Game data, catalogs, builders
+- **Tests/** → Mirror source structure
+- **Blueprints** → Immutable (no setters)
+- **Instances** → Mutable runtime state
+
+### Testing
+- **TDD** → Tests before implementation
+- **Naming** → `MethodName_Scenario_ExpectedResult`
+- **Two-phase** → Functional tests, then edge cases
+- **Real-world** → Verify against official game data when applicable
+
+### Documentation
+- **XML docs** → All public APIs
+- **Update context** → After major features
+
+## 🔍 Quick Reference
+
+### Exception Messages
+```csharp
+// ✅ Correct
+throw new ArgumentException(ErrorMessages.AmountCannotBeNegative, nameof(amount));
+
+// ❌ Wrong
+throw new Exception("Amount cannot be negative");
+```
+
+### Test Pattern
+```csharp
+[Test]
+public void MethodName_Scenario_ExpectedResult()
+{
+    // Arrange
+    // Act
+    // Assert
+}
+```
+
+### Validation Pattern
+```csharp
+public void Method(int value)
+{
+    if (value < 0)
+        throw new ArgumentException(ErrorMessages.ValueCannotBeNegative, nameof(value));
+    
+    // Main logic
+}
+```
+
+## 📁 Key Files Reference
+
+| Need | Read |
+|------|------|
+| Project state | `.ai/context.md` |
+| Coding rules | `docs/project_guidelines.md` |
+| What NOT to do | `docs/anti-patterns.md` |
+| Code examples | `docs/examples/good_code.md` |
+| Test examples | `docs/examples/good_tests.md` |
+| Feature checklist | `docs/checklists/feature_complete.md` |
+| Combat specs | `docs/architecture/combat_system_spec.md` |
+| Damage formula | `docs/architecture/damage_and_effect_system.md` |
+
+## 🔄 After Completing Work
+
+Always:
+1. Run `dotnet build` - Verify no warnings
+2. Run `dotnet test` - Verify all pass
+3. Update `.ai/context.md` if major changes
+4. Mention test count in response
+
+## 🎮 Project-Specific Knowledge
+
+### Type Effectiveness
+- Gen 6+ chart (Fairy included)
+- STAB = 1.5x multiplier
+- Dual-type multiplies
+
+### Stat Calculation  
+- Gen 3+ formula
+- HP formula different from other stats
+- Nature = 0.9, 1.0, or 1.1 modifier
+
+### Pokemon Data
+- Blueprints in `Content/Catalogs/Pokemon/`
+- Moves in `Content/Catalogs/Moves/`
+- Effects implement `IMoveEffect`
+
+### Current Phase
+- ✅ Phase 1: Core Data (Complete)
+- ✅ Phase 2: Instances (Complete)  
+- 🎯 Phase 3: Combat System (Next)

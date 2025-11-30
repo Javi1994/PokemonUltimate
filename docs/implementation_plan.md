@@ -1,183 +1,258 @@
-# Implementation Plan: Combat MVP (Vertical Slice)
+# Implementation Plan: Pokemon Battle Engine
+
+> **Last Updated**: November 2025 | **Tests**: 1,165 passing | **Warnings**: 0
 
 ## Goal
+
 Build a functional **Combat Simulator** (1v1) running in a Console Environment (or Test Runner) before touching Unity.
+
 **Philosophy**: Testability First. We build the engine in a pure C# Class Library (`PokemonUltimate.Core`).
 
 ---
 
+## Current Status
+
+| Phase | Status | Tests |
+|-------|--------|-------|
+| Step 0: Project Setup | ✅ Complete | - |
+| Step 1: Data Foundation | ✅ Complete | ~1,165 |
+| Step 2: Action Queue | 🎯 Next | - |
+| Step 3: Battle Field | ⏳ Pending | - |
+| Step 4: Turn Loop | ⏳ Pending | - |
+| Step 5: First Attack | ⏳ Pending | - |
+| Step 6: Integration | ⏳ Pending | - |
+
+---
+
 ## Step 0: Project Setup ✅ COMPLETE
+
 **Objective**: Create the workspace structure.
 
-1.  ✅ Create Solution `PokemonUltimate.sln`.
-2.  ✅ Create Class Library `PokemonUltimate.Core` (The Engine) - netstandard2.1 for Unity compatibility.
-3.  ✅ Create Class Library `PokemonUltimate.Content` (The Data) - netstandard2.1.
-    - Contains: Catalogs (Pokemon, Moves) and Builders (fluent API)
-    - Separated from Core for clean architecture (engine vs data)
-4.  ✅ Create NUnit Project `PokemonUltimate.Tests` (The Verifier) - net8.0.
-5.  ✅ Create Console App `PokemonUltimate.Console` (Smoke Test) - net8.0.
-    - Runtime verification of all data systems (~70 tests)
-    - Tests: Catalogs, Registries, Builders, Effects, Evolutions, Nature/Gender
-    - Run with: `dotnet run --project PokemonUltimate.Console`
-6.  ✅ Document project structure (`docs/architecture/project_structure.md`).
-7.  ⏳ Create Unity Project `PokemonUltimate.Unity` (The Viewer) - *Leave empty for now*.
+| Task | Status |
+|------|--------|
+| Solution `PokemonUltimate.sln` | ✅ |
+| Class Library `PokemonUltimate.Core` (netstandard2.1) | ✅ |
+| Class Library `PokemonUltimate.Content` (netstandard2.1) | ✅ |
+| NUnit Project `PokemonUltimate.Tests` (net8.0) | ✅ |
+| Console App `PokemonUltimate.Console` (net8.0) | ✅ |
+| Documentation structure (`docs/`) | ✅ |
+| AI infrastructure (`.ai/`, `.cursorrules`) | ✅ |
+| Unity Project | ⏳ Later |
 
 ---
 
-## Step 1: The Data Foundation & Registry (TDD) ✅ COMPLETE
-**Objective**: Verify we can store, retrieve, and instantiate Pokemon and Moves.
+## Step 1: Data Foundation ✅ COMPLETE
 
-### 1.1 Registry System ✅ COMPLETE
-1.  ✅ **Interfaces**: `IIdentifiable`, `IDataRegistry<T>`
-2.  ✅ **Implementation**: `GameDataRegistry<T>` (Dictionary-based)
-3.  ✅ **Tests**: Register, Get, Exists, GetAll, edge cases
+### 1.1 Registry System ✅
 
-### 1.2 Pokemon Data ✅ COMPLETE
-1.  ✅ **Blueprint**: `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats, GenderRatio, Learnset, Evolutions)
-2.  ✅ **BaseStats**: Class with HP, Attack, Defense, SpAttack, SpDefense, Speed, Total
-3.  ✅ **Learnset**: `LearnableMove` class + `LearnMethod` enum
-4.  ✅ **Evolution**: `Evolution` class + `IEvolutionCondition` interface + 6 condition types
-5.  ✅ **Gender**: `Gender` enum + GenderRatio in PokemonSpeciesData + helper properties
-6.  ✅ **Nature**: `Nature` enum (25) + `NatureData` static class (stat modifiers ±10%)
-7.  ✅ **Registry**: `IPokemonRegistry`, `PokemonRegistry` (dual lookup: Name + PokedexNumber)
-8.  ✅ **Catalog**: `PokemonCatalog` (15 Pokemon with official Gen 1 stats, types, learnsets, evolutions)
-9.  ✅ **Builder**: `PokemonBuilder`, `LearnsetBuilder`, `EvolutionBuilder` (fluent API with gender methods)
-10. ✅ **Tests**: 100+ tests covering registry, model, stats, catalog, builders, evolution, gender, nature
+- `IIdentifiable` interface
+- `IDataRegistry<T>` interface  
+- `GameDataRegistry<T>` with `Get`, `GetById`, `TryGet`, `Contains`, `All`, `Count`
+- `PokemonRegistry` with type/pokedex queries
+- `MoveRegistry` with type/power/category queries
 
-### 1.3 Move Data ✅ COMPLETE
-1.  ✅ **Blueprint**: `MoveData` (Name, Type, Category, Power, Accuracy, PP, Priority, TargetScope, Effects)
-2.  ✅ **Enums**: `PokemonType` (18), `MoveCategory` (3), `TargetScope` (10), `Stat` (8), `PersistentStatus` (7), `VolatileStatus` (11), `EffectType` (24)
-3.  ✅ **Registry**: `IMoveRegistry`, `MoveRegistry` (with Type/Category filters)
-4.  ✅ **Catalog**: `MoveCatalog` (20 Moves: Normal, Fire, Water, Grass, Electric, Ground, Psychic)
-5.  ✅ **Effects**: `IMoveEffect` interface + 9 concrete effects (DamageEffect, FixedDamageEffect, StatusEffect, StatChangeEffect, RecoilEffect, DrainEffect, HealEffect, FlinchEffect, MultiHitEffect)
-6.  ✅ **Builder**: `MoveBuilder` + `EffectBuilder` (fluent API for composing moves and effects)
-7.  ✅ **Tests**: 100+ tests covering registry, filter, model, effect, composition, catalog effects, builders
+### 1.2 Pokemon Blueprints ✅
 
-### 1.4 Instance & Factory ✅ COMPLETE
-**Objective**: Transform static blueprints into mutable runtime instances.
+- `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats, GenderRatio, Learnset, Evolutions)
+- `BaseStats` with validation, `GetStat()`, `HighestStat`, `LowestStat`
+- `LearnableMove` + `LearnMethod` enum
+- `Evolution` + `IEvolutionCondition` (6 condition types)
+- `Gender` enum + `GenderRatio`
+- `Nature` enum (25) + `NatureData` (stat modifiers ±10%)
+- `PokemonCatalog` (15 Gen 1 Pokemon with learnsets & evolutions)
+- `PokemonBuilder`, `LearnsetBuilder`, `EvolutionBuilder`
 
-1.  ✅ **MoveInstance** (`Core/Instances/MoveInstance.cs`)
-    - Reference to `MoveData` blueprint
-    - `CurrentPP`, `MaxPP` tracking
-    - `HasPP`, `Use()`, `Restore()`, `RestoreFully()` methods
-    - 19 tests
+### 1.3 Move Blueprints ✅
 
-2.  ✅ **StatCalculator** (`Core/Factories/StatCalculator.cs`)
-    - Gen3+ simplified formula (no IVs/EVs)
-    - HP formula: `((Base * 2) * Level / 100) + Level + 10`
-    - Stat formula: `(((Base * 2) * Level / 100) + 5) * NatureModifier`
-    - Stat stage multipliers, accuracy stage multipliers
-    - 31 tests
+- `MoveData` with 15+ flags (MakesContact, IsSoundBased, NeverMisses, etc.)
+- `PokemonType` (18), `MoveCategory` (3), `TargetScope` (10)
+- `Stat` (8), `PersistentStatus` (7), `VolatileStatus` (11), `EffectType` (24)
+- `MoveCatalog` (50+ moves across 7 types)
+- `IMoveEffect` + 9 effect classes
+- `MoveBuilder` + `EffectBuilder`
 
-3.  ✅ **PokemonInstance** (`Core/Instances/PokemonInstance.cs`)
-    - Identity: `Species`, `InstanceId` (GUID), `Nickname`, `DisplayName`
-    - Level: `Level`, `CurrentExp`
-    - Stats: `MaxHP`, `CurrentHP`, `Attack`, `Defense`, `SpAttack`, `SpDefense`, `Speed`
-    - Personal: `Gender`, `Nature`, `Friendship` (0-255), `IsShiny`
-    - Combat: `Moves`, `Status`, `VolatileStatus`, `StatStages` (-6 to +6)
-    - Helpers: `IsFainted`, `HPPercentage`, `HasHighFriendship`, `HasMaxFriendship`
-    - Methods: `GetEffectiveStat`, `ModifyStatStage`, `TakeDamage`, `Heal`, `FullHeal`, etc.
-    - 55 tests
+### 1.4 Instances ✅
 
-4.  ✅ **PokemonInstanceBuilder** (`Core/Factories/PokemonInstanceBuilder.cs`)
-    - Fluent builder pattern for full control
-    - Nature: `WithNature()`, `WithNatureBoosting()`, `WithNeutralNature()`
-    - Gender: `WithGender()`, `Male()`, `Female()`
-    - Moves: `WithMoves()`, `WithRandomMoves()`, `WithSingleMove()`, `WithNoMoves()`
-    - HP: `AtFullHealth()`, `AtHealth()`, `AtHealthPercent()`, `AtHalfHealth()`, `Fainted()`
-    - Status: `Burned()`, `Paralyzed()`, `Poisoned()`, `Asleep()`, `Frozen()`
-    - Friendship: `WithFriendship()`, `WithHighFriendship()`, `WithMaxFriendship()`, `AsHatched()`
-    - Shiny: `Shiny()`, `NotShiny()`, `WithShinyChance()`
-    - Stats override: `WithStats()`, `WithMaxHP()`, `WithAttack()`, `WithSpeed()`
-    - 70 tests
+- **MoveInstance**: PP tracking, PP Ups support (max 3)
+- **PokemonInstance** (partial classes):
+  - `PokemonInstance.cs` - Core properties
+  - `PokemonInstance.Battle.cs` - Combat state, status effects on stats
+  - `PokemonInstance.LevelUp.cs` - Experience, move learning
+  - `PokemonInstance.Evolution.cs` - Evolution conditions & execution
+- **PokemonInstanceBuilder**: Full fluent API
+- **PokemonFactory**: Quick creation
 
-5.  ✅ **PokemonFactory** (`Core/Factories/PokemonFactory.cs`)
-    - Quick creation methods (delegate to builder)
-    - `Create(species, level)`, `Create(species, level, nature)`, `Create(species, level, nature, gender)`
-    - 29 tests
+### 1.5 Calculations ✅
+
+- **StatCalculator**: Gen 3+ formulas with IVs, EVs, Nature
+  - HP: `floor((2*Base + IV + floor(EV/4)) * Level / 100) + Level + 10`
+  - Other: `floor((floor((2*Base + IV + floor(EV/4)) * Level / 100) + 5) * Nature)`
+  - Verified against real Pokemon data
+- **TypeEffectiveness**: Gen 6+ chart (18 types, Fairy included)
+  - Single/dual type effectiveness
+  - STAB calculation (1.5x)
+  - Immunity handling
+
+### 1.6 Constants ✅
+
+- `ErrorMessages.cs` - Centralized error strings
+- `GameMessages.cs` - Centralized game strings
 
 ---
 
-## Step 2: The Action Queue (TDD)
+## Step 2: Action Queue 🎯 NEXT
+
 **Objective**: Verify the "Everything is an Action" pattern.
 
-1.  **Write Test**: `Test_Queue_Processing`
-    *   Create a `MockAction` that increments a counter when `ExecuteLogic` is called.
-    *   Create `BattleQueue`.
-    *   Enqueue the action.
-    *   Call `ProcessQueue`.
-    *   **Assert**: Counter == 1.
-2.  **Implement**:
-    *   `BattleAction` (Abstract).
-    *   `BattleQueue` (Class).
-    *   `IBattleView` (Interface - Mocked in test).
+### Tests to Write First
+```csharp
+[Test]
+public void ProcessQueue_SingleAction_ExecutesAction()
+{
+    // Arrange: MockAction that increments counter
+    // Act: Enqueue and ProcessQueue
+    // Assert: Counter == 1
+}
+```
+
+### Components to Implement
+- [ ] `BattleAction` (Abstract base)
+- [ ] `BattleQueue` (Processor)
+- [ ] `IBattleView` (Interface for presentation)
 
 ---
 
-## Step 3: The Battle Field (TDD)
+## Step 3: Battle Field ⏳
+
 **Objective**: Verify we can place Pokemon in slots.
 
-1.  **Write Test**: `Test_Field_Initialization`
-    *   Create `BattleField`.
-    *   Call `Initialize(1, 1)` (1v1 battle).
-    *   Add a Pokemon to Player Slot 0.
-    *   **Assert**: `PlayerSide.GetActivePokemon().Count` is 1.
-2.  **Implement**:
-    *   `BattleField`, `BattleSide`, `BattleSlot`.
-    *   `BattleRules` (Config).
+### Tests to Write
+```csharp
+[Test]
+public void Initialize_1v1Battle_CreatesCorrectSlots()
+{
+    // Arrange: BattleField
+    // Act: Initialize(1, 1), add Pokemon
+    // Assert: PlayerSide.GetActivePokemon().Count == 1
+}
+```
+
+### Components to Implement
+- [ ] `BattleField`
+- [ ] `BattleSide`
+- [ ] `BattleSlot`
+- [ ] `BattleRules` (Config)
 
 ---
 
-## Step 4: The Turn Loop (TDD)
+## Step 4: Turn Loop ⏳
+
 **Objective**: Verify Speed determines order.
 
-1.  **Write Test**: `Test_Turn_Order_Speed`
-    *   Create "FastMon" (Speed 100) and "SlowMon" (Speed 50).
-    *   Mock `IActionProvider` to return a `WaitAction` for both.
-    *   Run `CombatEngine.RunTurn()`.
-    *   **Assert**: "FastMon" action executed before "SlowMon".
-2.  **Implement**:
-    *   `CombatEngine` (The Controller).
-    *   `TurnOrderResolver` (The Sorter).
-    *   `IActionProvider` (Interface).
+### Tests to Write
+```csharp
+[Test]
+public void RunTurn_DifferentSpeeds_FasterGoesFirst()
+{
+    // Arrange: FastMon (Speed 100), SlowMon (Speed 50)
+    // Act: RunTurn()
+    // Assert: FastMon action executed before SlowMon
+}
+```
+
+### Components to Implement
+- [ ] `CombatEngine` (Controller)
+- [ ] `TurnOrderResolver` (Speed-based sorting, priority handling)
+- [ ] `IActionProvider` (Interface)
 
 ---
 
-## Step 5: The First Attack (TDD)
-**Objective**: Verify "Tackle" deals damage.
+## Step 5: First Attack ⏳
 
-1.  **Write Test**: `Test_Move_Damage`
-    *   Create "Attacker" (Atk 100) and "Defender" (Def 100).
-    *   Create Move "Tackle" (Power 40).
-    *   Enqueue `UseMoveAction`.
-    *   **Assert**: Defender HP decreased by approx calculation.
-    *   **Assert**: `IBattleView.ShowMessage` was called with "Used Tackle".
-2.  **Implement**:
-    *   `MoveData`, `MoveInstance`.
-    *   `UseMoveAction`.
-    *   `DamageAction`.
-    *   `DamageCalculator` (Pipeline).
+**Objective**: Verify moves deal damage.
+
+### Tests to Write
+```csharp
+[Test]
+public void UseMoveAction_Tackle_DealsDamage()
+{
+    // Arrange: Attacker, Defender, Tackle
+    // Act: Execute UseMoveAction
+    // Assert: Defender HP decreased
+}
+```
+
+### Components to Implement
+- [ ] `UseMoveAction`
+- [ ] `DamageAction`
+- [ ] `DamageCalculator` (Pipeline with modifiers)
 
 ---
 
-## Step 6: Integration (The "Bot Battle")
+## Step 6: Integration ⏳
+
 **Objective**: Run a full battle without rendering.
 
-1.  **Write Test**: `Test_Full_Battle_Simulation`
-    *   Setup 1v1 Battle.
-    *   Assign `RandomAI` to both sides.
-    *   Call `RunBattle()` loop.
-    *   **Assert**: One side eventually faints (Winner is declared).
-    *   **Assert**: `BattleResult` is not null.
+### Tests to Write
+```csharp
+[Test]
+public void FullBattle_TwoRandomAI_ProducesWinner()
+{
+    // Arrange: 1v1 with RandomAI
+    // Act: RunBattle()
+    // Assert: BattleResult.Winner is not null
+}
+```
+
+### Components to Implement
+- [ ] `RandomAI` (Simple AI)
+- [ ] `BattleResult`
+- [ ] Full battle loop
 
 ---
 
-## Why this order?
-1.  **Data** is the atoms.
-2.  **Queue** is the physics engine.
-3.  **Field** is the world.
-4.  **Turn** is time.
-5.  **Attack** is interaction.
-6.  **Integration** is the game.
+## Architecture Reference
+
+```
+PokemonUltimate/
+├── Core/              # Game logic (NO data)
+│   ├── Blueprints/    # Immutable definitions
+│   ├── Instances/     # Mutable runtime state
+│   ├── Factories/     # Creation & calculation
+│   ├── Effects/       # Move effects
+│   ├── Evolution/     # Evolution system
+│   ├── Registry/      # Data access
+│   ├── Enums/         # Type definitions
+│   └── Constants/     # Centralized strings
+│
+├── Content/           # Game data
+│   ├── Catalogs/      # Pokemon & Move definitions
+│   └── Builders/      # Fluent APIs
+│
+└── Tests/             # 1,165 tests
+```
+
+---
+
+## Why This Order?
+
+1. **Data** is the atoms
+2. **Queue** is the physics engine
+3. **Field** is the world
+4. **Turn** is time
+5. **Attack** is interaction
+6. **Integration** is the game
 
 Once Step 6 passes, you have a working game engine. Only THEN do you open Unity to visualize it.
+
+---
+
+## Key Documents
+
+| Need | Read |
+|------|------|
+| Current state | `.ai/context.md` |
+| Coding rules | `docs/project_guidelines.md` |
+| Combat design | `docs/architecture/combat_system_spec.md` |
+| Damage formulas | `docs/architecture/damage_and_effect_system.md` |
+| Turn order | `docs/architecture/turn_order_system.md` |

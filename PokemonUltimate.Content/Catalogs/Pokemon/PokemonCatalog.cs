@@ -1,3 +1,6 @@
+// Pokemon names and game data referenced here are trademarks of Nintendo/Game Freak/The Pokemon Company.
+// This is a non-commercial fan project for educational purposes only. See LEGAL.md for details.
+
 using System.Collections.Generic;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Registry;
@@ -9,6 +12,9 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
     /// Organized by generation using partial classes.
     /// Each generation file (PokemonCatalog.Gen1.cs, etc.) adds its Pokemon.
     /// </summary>
+    /// <remarks>
+    /// Pokemon names are trademarks of Nintendo/Game Freak. Non-commercial fan project.
+    /// </remarks>
     public static partial class PokemonCatalog
     {
         private static List<PokemonSpeciesData> _all;
