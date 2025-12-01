@@ -1,0 +1,77 @@
+using System;
+using PokemonUltimate.Core.Enums;
+
+namespace PokemonUltimate.Combat.Damage.Steps
+{
+    /// <summary>
+    /// Calculates the base damage using the Gen 3+ formula:
+    /// BaseDamage = ((2 * Level / 5 + 2) * Power * Attack / Defense) / 50 + 2
+    /// </summary>
+    public class BaseDamageStep : IDamageStep
+    {
+        public void Process(DamageContext context)
+        {
+            var attacker = context.Attacker.Pokemon;
+            var defender = context.Defender.Pokemon;
+            var move = context.Move;
+
+            // Get relevant stats based on move category
+            int attackStat;
+            int defenseStat;
+
+            if (move.Category == MoveCategory.Physical)
+            {
+                attackStat = attacker.Attack;
+                defenseStat = defender.Defense;
+            }
+            else if (move.Category == MoveCategory.Special)
+            {
+                attackStat = attacker.SpAttack;
+                defenseStat = defender.SpDefense;
+            }
+            else
+            {
+                // Status moves don't deal damage
+                context.BaseDamage = 0;
+                return;
+            }
+
+            // Apply stat stages
+            attackStat = ApplyStatStage(attackStat, context.Attacker.GetStatStage(
+                move.Category == MoveCategory.Physical ? Stat.Attack : Stat.SpAttack));
+            
+            defenseStat = ApplyStatStage(defenseStat, context.Defender.GetStatStage(
+                move.Category == MoveCategory.Physical ? Stat.Defense : Stat.SpDefense));
+
+            // Ensure minimum values
+            attackStat = Math.Max(1, attackStat);
+            defenseStat = Math.Max(1, defenseStat);
+
+            // Gen 3+ formula: ((2 * Level / 5 + 2) * Power * Attack / Defense) / 50 + 2
+            float levelFactor = (2f * attacker.Level / 5f) + 2f;
+            float statRatio = (float)attackStat / defenseStat;
+            float baseDamage = (levelFactor * move.Power * statRatio) / 50f + 2f;
+
+            context.BaseDamage = baseDamage;
+        }
+
+        private int ApplyStatStage(int baseStat, int stage)
+        {
+            // Clamp stage to valid range
+            stage = Math.Max(-6, Math.Min(6, stage));
+
+            float multiplier;
+            if (stage >= 0)
+            {
+                multiplier = (2f + stage) / 2f;
+            }
+            else
+            {
+                multiplier = 2f / (2f - stage);
+            }
+
+            return (int)(baseStat * multiplier);
+        }
+    }
+}
+

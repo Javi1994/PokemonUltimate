@@ -7,13 +7,13 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                     |
-| ----------------- | -------------------------- |
-| **Current Phase** | Phase 3: Combat System 🚧  |
-| **Sub-Phase**     | 2.3 Turn Order ✅ Complete |
-| **Tests**         | 1,388 passing              |
-| **Warnings**      | 0                          |
-| **Last Updated**  | December 2025              |
+| Aspect            | Status                             |
+| ----------------- | ---------------------------------- |
+| **Current Phase** | Phase 3: Combat System 🚧          |
+| **Sub-Phase**     | 2.4 Damage Calculation ✅ Complete |
+| **Tests**         | 1,453 passing                      |
+| **Warnings**      | 0                                  |
+| **Last Updated**  | December 2025                      |
 
 ---
 
@@ -72,15 +72,15 @@ PokemonUltimate/
 
 See `docs/combat_implementation_plan.md` for full details.
 
-| Sub-Phase              | Status      | Description               |
-| ---------------------- | ----------- | ------------------------- |
-| 2.1 Battle Foundation  | ✅ Complete | BattleField, Slot, Side   |
-| 2.2 Action Queue       | ✅ Complete | BattleQueue, BattleAction |
-| 2.3 Turn Order         | ✅ Complete | TurnOrderResolver         |
-| 2.4 Damage Calculation | 🎯 Next     | DamagePipeline            |
-| 2.5 Combat Actions     | ⏳ Pending  | UseMoveAction, etc.       |
-| 2.6 Combat Engine      | ⏳ Pending  | CombatEngine, Arbiter     |
-| 2.7 Integration        | ⏳ Pending  | AI, full battles          |
+| Sub-Phase              | Status      | Description                 |
+| ---------------------- | ----------- | --------------------------- |
+| 2.1 Battle Foundation  | ✅ Complete | BattleField, Slot, Side     |
+| 2.2 Action Queue       | ✅ Complete | BattleQueue, BattleAction   |
+| 2.3 Turn Order         | ✅ Complete | TurnOrderResolver           |
+| 2.4 Damage Calculation | ✅ Complete | DamagePipeline              |
+| 2.5 Combat Actions     | 🎯 Next     | UseMoveAction, SwitchAction |
+| 2.6 Combat Engine      | ⏳ Pending  | CombatEngine, Arbiter       |
+| 2.7 Integration        | ⏳ Pending  | AI, full battles            |
 
 Reference docs:
 

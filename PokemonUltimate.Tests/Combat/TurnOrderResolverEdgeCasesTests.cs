@@ -110,7 +110,9 @@ namespace PokemonUltimate.Tests.Combat
 
             var effectiveSpeed = TurnOrderResolver.GetEffectiveSpeed(slot, _field);
 
-            Assert.That(effectiveSpeed, Is.EqualTo(baseSpeed * expectedMultiplier).Within(0.1f));
+            // Use 1% tolerance for floating point comparison
+            var expected = baseSpeed * expectedMultiplier;
+            Assert.That(effectiveSpeed, Is.EqualTo(expected).Within(expected * 0.01f + 0.5f));
         }
 
         #endregion

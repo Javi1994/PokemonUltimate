@@ -687,11 +687,13 @@ Most moves miss, except:
 - [x] 2.3: Speed modifiers (stat stages ±6, paralysis ×0.5)
 - [ ] 7.1: Switch priority (deferred - SwitchAction not yet implemented)
 
-### Phase 2.4: Damage Calculation
-- [ ] 4.1: Base damage formula
-- [ ] 4.2: Damage modifiers
-- [ ] 4.3: Type effectiveness
-- [ ] 3.3: Critical hits
+### Phase 2.4: Damage Calculation ✅
+- [x] 4.1: Base damage formula (BaseDamageStep with Gen 3+ formula)
+- [x] 4.2: Damage modifiers (Pipeline with STAB, Burn, Random, Crit steps)
+- [x] 4.3: Type effectiveness (TypeEffectivenessStep using existing TypeEffectiveness)
+- [x] 3.3: Critical hits (CriticalHitStep with 1.5x multiplier, base 1/24 rate)
+- [x] 3.4: Move categories (Physical/Special/Status routing)
+- [x] Status moves: Zero damage for power 0 moves
 
 ### Phase 2.5: Combat Actions
 - [ ] 3.1: Pre-move checks

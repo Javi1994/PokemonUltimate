@@ -450,17 +450,41 @@ Tests/Combat/Damage/Steps/TypeEffectivenessStepTests.cs
 
 ### Completion Checklist
 
-- [ ] `DamageContext` implemented
-- [ ] `IDamageStep` interface defined
-- [ ] `DamagePipeline` implemented
-- [ ] `BaseDamageStep` with official formula
-- [ ] `CriticalHitStep` implemented
-- [ ] `RandomFactorStep` implemented
-- [ ] `StabStep` implemented
-- [ ] `TypeEffectivenessStep` (uses existing TypeEffectiveness)
-- [ ] `BurnStep` implemented
-- [ ] Integration tests with known values
-- [ ] All tests pass
+- [x] `DamageContext` implemented (immutable inputs, mutable state)
+- [x] `IDamageStep` interface defined
+- [x] `DamagePipeline` implemented (25 functional tests)
+- [x] `BaseDamageStep` with Gen 3+ formula
+- [x] `CriticalHitStep` implemented (1.5x, 1/24 base rate)
+- [x] `RandomFactorStep` implemented (0.85-1.0)
+- [x] `StabStep` implemented (1.5x)
+- [x] `TypeEffectivenessStep` (uses existing TypeEffectiveness)
+- [x] `BurnStep` implemented (0.5x for physical)
+- [x] **Edge case tests** (25 tests)
+- [x] **Real-world verification tests** (15 tests)
+- [x] All tests pass (65 DamagePipeline tests total)
+- [x] No compiler warnings
+
+### Spec Compliance Notes
+
+**Implemented (matches spec):**
+- Pipeline pattern with 6 steps
+- Gen 3+ base damage formula
+- All damage modifiers in correct order
+- Type effectiveness including immunity
+- STAB for primary and secondary types
+- Critical hit multiplier and base rate
+- Burn penalty for physical moves only
+- Status moves deal 0 damage
+- Minimum 1 damage (unless immune or status)
+- Fixed random support for deterministic testing
+
+**Deferred to Later Phases:**
+- Multi-target penalty (0.75x)
+- Weather modifiers
+- Screen modifiers (Reflect/Light Screen)
+- Ability modifiers
+- Item modifiers (Life Orb, etc.)
+- Critical hit stage increases (Focus Energy)
 
 ---
 

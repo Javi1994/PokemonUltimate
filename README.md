@@ -1,13 +1,13 @@
 # 🎮 PokemonUltimate
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![Tests](https://img.shields.io/badge/tests-1388%20passing-brightgreen)](./PokemonUltimate.Tests/)
+[![Tests](https://img.shields.io/badge/tests-1453%20passing-brightgreen)](./PokemonUltimate.Tests/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![AI Experiment](https://img.shields.io/badge/Made%20with-AI%20🤖-blueviolet)](https://www.anthropic.com/claude)
 
 > **🤖 This entire project was built by AI as an experiment in AI-assisted game development.**
 
-A complete, production-ready Pokémon battle engine built in C# — with 1388+ tests, clean architecture, and comprehensive documentation. All generated through AI pair programming.
+A complete, production-ready Pokémon battle engine built in C# — with 1453+ tests, clean architecture, and comprehensive documentation. All generated through AI pair programming.
 
 ---
 
@@ -93,7 +93,7 @@ docs/
 | Metric | Value |
 |--------|-------|
 | **Lines of Code** | ~8,000+ |
-| **Test Cases** | 1,388 |
+| **Test Cases** | 1,453 |
 | **Test Pass Rate** | 100% |
 | **Compiler Warnings** | 0 |
 | **Architecture Docs** | 16 files |
@@ -308,5 +308,5 @@ MIT License - see [LICENSE](./LICENSE)
 ---
 
 <p align="center">
-  <strong>🤖 100% AI-Generated Code | 1388 Tests | 0 Warnings</strong>
+  <strong>🤖 100% AI-Generated Code | 1453 Tests | 0 Warnings</strong>
 </p>
