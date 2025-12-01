@@ -45,6 +45,14 @@ namespace PokemonUltimate.Tests.Combat.Actions
         }
 
         [Test]
+        public void MessageAction_CanBeBlocked_IsFalse()
+        {
+            var action = new MessageAction("Test");
+
+            Assert.That(action.CanBeBlocked, Is.False);
+        }
+
+        [Test]
         public void MessageAction_ExecuteLogic_ReturnsEmpty()
         {
             var action = new MessageAction("Test");

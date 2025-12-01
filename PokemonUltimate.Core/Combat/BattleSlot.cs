@@ -30,6 +30,11 @@ namespace PokemonUltimate.Core.Combat
         public int SlotIndex { get; }
 
         /// <summary>
+        /// The side this slot belongs to. Null if created standalone (for testing).
+        /// </summary>
+        public BattleSide Side { get; }
+
+        /// <summary>
         /// True if no Pokemon is currently in this slot.
         /// </summary>
         public bool IsEmpty => _pokemon == null;
@@ -45,16 +50,27 @@ namespace PokemonUltimate.Core.Combat
         public VolatileStatus VolatileStatus => _volatileStatus;
 
         /// <summary>
-        /// Creates a new battle slot.
+        /// Creates a new battle slot without a side reference (for testing).
         /// </summary>
         /// <param name="slotIndex">The index of this slot (0-based, cannot be negative).</param>
         /// <exception cref="ArgumentException">If slotIndex is negative.</exception>
-        public BattleSlot(int slotIndex)
+        public BattleSlot(int slotIndex) : this(slotIndex, null)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new battle slot with a side reference.
+        /// </summary>
+        /// <param name="slotIndex">The index of this slot (0-based, cannot be negative).</param>
+        /// <param name="side">The side this slot belongs to. Can be null for standalone slots.</param>
+        /// <exception cref="ArgumentException">If slotIndex is negative.</exception>
+        public BattleSlot(int slotIndex, BattleSide side)
         {
             if (slotIndex < 0)
                 throw new ArgumentException(ErrorMessages.SlotIndexCannotBeNegative, nameof(slotIndex));
 
             SlotIndex = slotIndex;
+            Side = side;
             _statStages = new Dictionary<Stat, int>
             {
                 { Stat.Attack, 0 },
@@ -172,3 +188,4 @@ namespace PokemonUltimate.Core.Combat
         }
     }
 }
+

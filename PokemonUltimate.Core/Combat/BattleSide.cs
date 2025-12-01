@@ -46,7 +46,7 @@ namespace PokemonUltimate.Core.Combat
             
             for (int i = 0; i < slotCount; i++)
             {
-                _slots.Add(new BattleSlot(i));
+                _slots.Add(new BattleSlot(i, this));
             }
         }
 

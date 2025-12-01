@@ -21,6 +21,12 @@ namespace PokemonUltimate.Core.Combat.Actions
         public virtual int Priority => 0;
 
         /// <summary>
+        /// Whether this action can be blocked by effects like Protect.
+        /// Most reaction actions return false, move actions return true.
+        /// </summary>
+        public virtual bool CanBeBlocked => false;
+
+        /// <summary>
         /// Creates a battle action.
         /// </summary>
         /// <param name="user">The slot that initiated this action. Can be null for system actions.</param>

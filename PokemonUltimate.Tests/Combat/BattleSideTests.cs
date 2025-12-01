@@ -57,6 +57,15 @@ namespace PokemonUltimate.Tests.Combat
         }
 
         [Test]
+        public void Constructor_SlotsHaveReferenceToSide()
+        {
+            var side = new BattleSide(slotCount: 2, isPlayer: true);
+
+            Assert.That(side.Slots[0].Side, Is.SameAs(side));
+            Assert.That(side.Slots[1].Side, Is.SameAs(side));
+        }
+
+        [Test]
         public void Constructor_ZeroSlots_ThrowsArgumentException()
         {
             Assert.Throws<ArgumentException>(() => new BattleSide(slotCount: 0, isPlayer: true));

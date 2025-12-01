@@ -34,6 +34,23 @@ namespace PokemonUltimate.Tests.Combat
         }
 
         [Test]
+        public void Constructor_WithSlotIndexOnly_SideIsNull()
+        {
+            var slot = new BattleSlot(0);
+
+            Assert.That(slot.Side, Is.Null);
+        }
+
+        [Test]
+        public void Constructor_WithSlotIndexAndSide_SetsSide()
+        {
+            var side = new BattleSide(1, isPlayer: true);
+            var slot = new BattleSlot(0, side);
+
+            Assert.That(slot.Side, Is.EqualTo(side));
+        }
+
+        [Test]
         public void Constructor_NegativeIndex_ThrowsArgumentException()
         {
             Assert.Throws<ArgumentException>(() => new BattleSlot(-1));

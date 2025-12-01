@@ -11,7 +11,7 @@
 | ----------------- | ---------------------------- |
 | **Current Phase** | Phase 3: Combat System 🚧    |
 | **Sub-Phase**     | 2.2 Action Queue ✅ Complete |
-| **Tests**         | 1,336 passing                |
+| **Tests**         | 1,340 passing                |
 | **Warnings**      | 0                            |
 | **Last Updated**  | December 2025                |
 
