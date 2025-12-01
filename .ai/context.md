@@ -11,7 +11,7 @@
 | ----------------- | ------------------------------ |
 | **Current Phase** | Phase 3: Combat System 🚧      |
 | **Sub-Phase**     | 2.5 Combat Actions (preparing) |
-| **Tests**         | 1,541 passing                  |
+| **Tests**         | 1,600 passing                  |
 | **Warnings**      | 0                              |
 | **Last Updated**  | December 2025                  |
 
@@ -55,8 +55,9 @@ PokemonUltimate/
 -   [x] BaseStats with validation
 -   [x] Type system (18 types)
 -   [x] Nature system (25 natures)
--   [x] AbilityData (25 Gen3 abilities)
+-   [x] AbilityData (25 Gen3 abilities + additional)
 -   [x] ItemData (23 items: held items, berries)
+-   [x] StatusEffectData (15 status effects: 6 persistent + 9 volatile)
 
 ### Phase 2: Instances
 

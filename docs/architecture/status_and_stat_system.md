@@ -9,8 +9,136 @@ This system manages all **status conditions** and **stat modifications** in batt
 
 All effects integrate with the **Action Queue** and **Event Trigger** systems.
 
+## 1.1 Current Implementation Status ✅
+
+| Component | Status | Location |
+|-----------|--------|----------|
+| `PersistentStatus` enum | ✅ Complete | `Core/Enums/PersistentStatus.cs` |
+| `VolatileStatus` enum | ✅ Complete | `Core/Enums/VolatileStatus.cs` |
+| `StatusEffectData` | ✅ Complete | `Core/Blueprints/StatusEffectData.cs` |
+| `StatusEffectBuilder` | ✅ Complete | `Core/Builders/StatusEffectBuilder.cs` |
+| `StatusCatalog` | ✅ 15 statuses | `Content/Catalogs/Status/StatusCatalog.cs` |
+| `BattleSlot.StatStages` | ✅ Complete | `Combat/BattleSlot.cs` |
+
+**Runtime processors** (damage per turn, action prevention) are pending for Phase 2.5+.
+
+## 1.2 StatusEffectData Blueprint (NEW ✅)
+
+The `StatusEffectData` class provides **declarative definitions** for all status effects:
+
+```csharp
+public sealed class StatusEffectData {
+    // Identity
+    public string Id { get; }
+    public string Name { get; }
+    public PersistentStatus PersistentStatus { get; }
+    public VolatileStatus VolatileStatus { get; }
+    
+    // Duration
+    public int MinTurns { get; }
+    public int MaxTurns { get; }
+    public bool IsIndefinite => MinTurns == 0 && MaxTurns == 0;
+    
+    // End of Turn Effects
+    public float EndOfTurnDamage { get; }      // 1/16 = 0.0625
+    public bool DamageEscalates { get; }       // Toxic
+    public bool DrainsToOpponent { get; }      // Leech Seed
+    
+    // Action Prevention
+    public float MoveFailChance { get; }       // 0.25 for Paralysis
+    public bool PreventsAction => MoveFailChance >= 1.0f;
+    public float RecoveryChancePerTurn { get; }  // 0.20 for Freeze
+    
+    // Stat Modifiers
+    public float SpeedMultiplier { get; }      // 0.5 for Paralysis
+    public float AttackMultiplier { get; }     // 0.5 for Burn (physical only)
+    
+    // Self-Damage
+    public float SelfHitChance { get; }        // 0.33 for Confusion
+    public int SelfHitPower { get; }           // 40 for Confusion
+    
+    // Type Interactions
+    public PokemonType[] ImmuneTypes { get; }
+    public PokemonType[] CuredByMoveTypes { get; }
+    
+    // Helper Methods
+    public bool IsTypeImmune(PokemonType type);
+    public int GetRandomDuration(Random random);
+    public float GetEscalatingDamage(int turnCount);
+}
+```
+
+### StatusEffectBuilder (Fluent API)
+```csharp
+public static readonly StatusEffectData Burn = Status.Define("Burn")
+    .Description("Takes damage each turn, halves physical Attack.")
+    .Persistent(PersistentStatus.Burn)
+    .Indefinite()
+    .DealsDamagePerTurn(1f / 16f)
+    .HalvesPhysicalAttack()
+    .ImmuneTypes(PokemonType.Fire)
+    .Build();
+
+public static readonly StatusEffectData BadlyPoisoned = Status.Define("Badly Poisoned")
+    .Persistent(PersistentStatus.BadlyPoisoned)
+    .Indefinite()
+    .DealsEscalatingDamage(1f / 16f, 1)  // 1/16, 2/16, 3/16...
+    .ImmuneTypes(PokemonType.Poison, PokemonType.Steel)
+    .Build();
+
+public static readonly StatusEffectData Confusion = Status.Define("Confusion")
+    .Volatile(VolatileStatus.Confusion)
+    .LastsTurns(2, 5)
+    .SelfHitChance(0.33f, 40)
+    .Build();
+```
+
+### StatusCatalog (15 Statuses Defined)
+
+**Persistent (6):**
+| Status | Damage/Turn | Stat Effect | Immunities |
+|--------|-------------|-------------|------------|
+| Burn | 1/16 HP | -50% Atk (phys) | Fire |
+| Paralysis | - | 25% fail, -50% Speed | Electric |
+| Sleep | - | Cannot act (1-3 turns) | - |
+| Poison | 1/8 HP | - | Poison, Steel |
+| BadlyPoisoned | Escalating | - | Poison, Steel |
+| Freeze | - | Cannot act, 20% thaw | Ice |
+
+**Volatile (9):**
+| Status | Duration | Effect |
+|--------|----------|--------|
+| Confusion | 2-5 turns | 33% self-hit |
+| Attract | Indefinite | 50% fail |
+| Flinch | 1 turn | Cannot act |
+| LeechSeed | Indefinite | Drains 1/8 HP |
+| Curse | Indefinite | 1/4 HP/turn |
+| Encore | 3 turns | Locks move |
+| Taunt | 3 turns | No Status moves |
+| Torment | Indefinite | No repeat moves |
+| Disable | 4 turns | Blocks one move |
+
+### Usage in Combat
+```csharp
+// Get status data from catalog
+var burnData = StatusCatalog.GetByStatus(PersistentStatus.Burn);
+
+// Check immunity before applying
+if (!burnData.IsTypeImmune(target.Species.PrimaryType)) {
+    target.Status = PersistentStatus.Burn;
+}
+
+// Calculate end-of-turn damage
+float damagePercent = burnData.EndOfTurnDamage; // 0.0625
+int damage = (int)(target.MaxHP * damagePercent);
+
+// For Toxic, escalating damage
+var toxicData = StatusCatalog.BadlyPoisoned;
+float toxicDamage = toxicData.GetEscalatingDamage(turnCount);
+```
+
 ## 2. Persistent Status (Major Conditions)
-*Namespace: `PokemonGame.Core.Models`*
+*Namespace: `PokemonUltimate.Core.Enums`*
 
 ### Data Structure
 ```csharp

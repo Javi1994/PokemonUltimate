@@ -29,13 +29,14 @@ The Combat System is divided into **7 phases**, each building on the previous. E
 | Phase | Status | Tests | Notes |
 |-------|--------|-------|-------|
 | 2.1 Battle Foundation | ✅ Complete | 133 | BattleSlot, BattleSide, BattleField |
-| 2.2 Action Queue | 🎯 Next | 0 | |
-| 2.3 Turn Order | ⏳ Pending | 0 | |
-| 2.4 Damage Calculation | ⏳ Pending | 0 | |
-| 2.5 Combat Actions | ⏳ Pending | 0 | |
+| 2.2 Action Queue | ✅ Complete | 77 | BattleAction, BattleQueue |
+| 2.3 Turn Order | ✅ Complete | 48 | TurnOrderResolver |
+| 2.4 Damage Calculation | ✅ Complete | 65 | DamagePipeline |
+| **Data Layer** | ✅ Complete | 170 | AbilityData, ItemData, StatusEffectData |
+| 2.5 Combat Actions | 🎯 Next | 0 | UseMoveAction, SwitchAction |
 | 2.6 Combat Engine | ⏳ Pending | 0 | |
 | 2.7 Integration | ⏳ Pending | 0 | |
-| **Total** | **1/7** | **133** | |
+| **Total** | **5/7** | **493** | Combat module only |
 
 ---
 

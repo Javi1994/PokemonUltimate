@@ -33,7 +33,7 @@ Catalogs and Builders live in the **`PokemonUltimate.Content`** project (separat
 ```
 PokemonUltimate.Content/Catalogs/Pokemon/
 ├── PokemonCatalog.cs           # Orchestrator: All, Count, RegisterAll
-├── PokemonCatalog.Gen1.cs      # Generation 1 (#001-151)
+├── PokemonCatalog.Gen1.cs      # Generation 1 (#001-151) - with abilities!
 ├── PokemonCatalog.Gen2.cs      # Generation 2 (#152-251) [future]
 └── PokemonCatalog.Custom.cs    # Custom Pokemon [future]
 ```
@@ -51,6 +51,28 @@ PokemonUltimate.Content/Catalogs/Moves/
 └── MoveCatalog.Psychic.cs      # Psychic-type moves
 ```
 
+### Ability Catalog (NEW ✅)
+```
+PokemonUltimate.Content/Catalogs/Abilities/
+├── AbilityCatalog.cs           # Orchestrator: All, GetByName
+├── AbilityCatalog.Gen3.cs      # Gen 3 abilities (25 abilities)
+└── AbilityCatalog.Additional.cs # Additional abilities (10 abilities)
+```
+
+### Item Catalog (NEW ✅)
+```
+PokemonUltimate.Content/Catalogs/Items/
+├── ItemCatalog.cs              # Orchestrator: All, GetByName
+├── ItemCatalog.HeldItems.cs    # Held items (15 items)
+└── ItemCatalog.Berries.cs      # Berries (8 items)
+```
+
+### Status Catalog (NEW ✅)
+```
+PokemonUltimate.Content/Catalogs/Status/
+└── StatusCatalog.cs            # All status effects (15 statuses)
+```
+
 ### Builders
 ```
 PokemonUltimate.Content/Builders/
@@ -59,28 +81,45 @@ PokemonUltimate.Content/Builders/
 ├── EffectBuilder.cs            # e => e.Damage().MayBurn(10)
 ├── LearnsetBuilder.cs          # m => m.StartsWith(...)
 └── EvolutionBuilder.cs         # e => e.AtLevel(16)
+
+PokemonUltimate.Core/Builders/
+├── AbilityBuilder.cs           # Ability.Define("Intimidate")
+├── ItemBuilder.cs              # Item.Define("Leftovers")
+└── StatusEffectBuilder.cs      # Status.Define("Burn")
 ```
 
 ## 4. Pokemon Builder System ✅ NEW
 
 Pokemon are now defined using a **Fluent Builder Pattern** for improved readability:
 
-### Example: Defining a Pokemon
+### Example: Defining a Pokemon (with Abilities ✅)
 ```csharp
 // Final evolutions first (so they can be referenced)
 public static readonly PokemonSpeciesData Charizard = Pokemon.Define("Charizard", 6)
     .Types(PokemonType.Fire, PokemonType.Flying)
     .Stats(78, 84, 78, 109, 85, 100)
+    .Ability(AbilityCatalog.Blaze)              // Primary ability
+    .HiddenAbility(AbilityCatalog.SolarPower)   // Hidden ability
     .Moves(m => m
         .StartsWith(MoveCatalog.Scratch, MoveCatalog.Ember)
         .AtLevel(46, MoveCatalog.Flamethrower)
         .ByTM(MoveCatalog.FireBlast, MoveCatalog.Earthquake))
     .Build();
 
+// Pokemon with two normal abilities
+public static readonly PokemonSpeciesData Snorlax = Pokemon.Define("Snorlax", 143)
+    .Type(PokemonType.Normal)
+    .Stats(160, 110, 65, 65, 110, 30)
+    .Abilities(AbilityCatalog.Immunity, AbilityCatalog.ThickFat)  // Two options
+    .HiddenAbility(AbilityCatalog.Gluttony)
+    .Build();
+
 // Evolution target is already defined, so we can reference it
 public static readonly PokemonSpeciesData Charmander = Pokemon.Define("Charmander", 4)
     .Type(PokemonType.Fire)
     .Stats(39, 52, 43, 60, 50, 65)
+    .Ability(AbilityCatalog.Blaze)
+    .HiddenAbility(AbilityCatalog.SolarPower)
     .Moves(m => m
         .StartsWith(MoveCatalog.Scratch, MoveCatalog.Growl)
         .AtLevel(9, MoveCatalog.Ember))
@@ -95,6 +134,9 @@ public static readonly PokemonSpeciesData Charmander = Pokemon.Define("Charmande
 | `.Type(type)` | Set mono-type |
 | `.Types(primary, secondary)` | Set dual-type |
 | `.Stats(hp, atk, def, spa, spd, spe)` | Set base stats |
+| `.Ability(ability)` | Set primary ability |
+| `.Abilities(primary, secondary)` | Set both normal abilities |
+| `.HiddenAbility(ability)` | Set hidden ability |
 | `.Moves(m => ...)` | Configure learnset |
 | `.EvolvesTo(target, e => ...)` | Add evolution |
 | `.Build()` | Finalize |
@@ -164,6 +206,31 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 | Electric | Thunder Shock, Thunderbolt, Thunder, Thunder Wave |
 | Ground | Earthquake |
 | Psychic | Psychic |
+
+### AbilityCatalog (35 Abilities) ✅ NEW
+| Category | Abilities |
+|----------|-----------|
+| Stat Modification | Intimidate, Speed Boost, Clear Body, Huge Power |
+| Status-Related | Static, Poison Point, Flame Body, Limber, Immunity |
+| Type Immunity | Levitate, Flash Fire, Water Absorb, Volt Absorb |
+| Power Boost | Blaze, Torrent, Overgrow, Swarm |
+| Damage Reduction | Thick Fat |
+| Weather | Drizzle, Drought, Sand Stream, Swift Swim, Chlorophyll |
+| Survival | Sturdy |
+| Contact Damage | Rough Skin |
+| Additional | Solar Power, Rain Dish, Lightning Rod, Adaptability, etc. |
+
+### ItemCatalog (23 Items) ✅ NEW
+| Category | Items |
+|----------|-------|
+| Held Items | Leftovers, Choice Band, Choice Specs, Choice Scarf, Life Orb, Focus Sash, Expert Belt, Muscle Band, Wise Glasses, Assault Vest, Rocky Helmet, Eviolite, Black Sludge, Toxic Orb, Flame Orb |
+| Berries | Oran Berry, Sitrus Berry, Cheri Berry, Chesto Berry, Pecha Berry, Rawst Berry, Aspear Berry, Lum Berry |
+
+### StatusCatalog (15 Statuses) ✅ NEW
+| Type | Statuses |
+|------|----------|
+| Persistent | Burn, Paralysis, Sleep, Poison, BadlyPoisoned, Freeze |
+| Volatile | Confusion, Attract, Flinch, LeechSeed, Curse, Encore, Taunt, Torment, Disable |
 
 ## 6. Adding New Content
 

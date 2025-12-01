@@ -93,7 +93,7 @@ docs/
 | Metric | Value |
 |--------|-------|
 | **Lines of Code** | ~8,000+ |
-| **Test Cases** | 1,541 |
+| **Test Cases** | 1,600 |
 | **Test Pass Rate** | 100% |
 | **Compiler Warnings** | 0 |
 | **Architecture Docs** | 16 files |

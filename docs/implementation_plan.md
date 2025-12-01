@@ -1,12 +1,12 @@
 # Implementation Plan: Pokemon Battle Engine
 
-> **Last Updated**: November 2025 | **Tests**: 1,165 passing | **Warnings**: 0
+> **Last Updated**: December 2025 | **Tests**: 1,600 passing | **Warnings**: 0
 
 ## Goal
 
-Build a functional **Combat Simulator** (1v1) running in a Console Environment (or Test Runner) before touching Unity.
+Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Console Environment (or Test Runner) before touching Unity.
 
-**Philosophy**: Testability First. We build the engine in a pure C# Class Library (`PokemonUltimate.Core`).
+**Philosophy**: Testability First. We build the engine in a pure C# Class Library (`PokemonUltimate.Core`, `PokemonUltimate.Combat`).
 
 ---
 
@@ -15,12 +15,13 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 | Phase | Status | Tests |
 |-------|--------|-------|
 | Step 0: Project Setup | ✅ Complete | - |
-| Step 1: Data Foundation | ✅ Complete | ~1,165 |
-| Step 2: Action Queue | 🎯 Next | - |
-| Step 3: Battle Field | ⏳ Pending | - |
-| Step 4: Turn Loop | ⏳ Pending | - |
-| Step 5: First Attack | ⏳ Pending | - |
-| Step 6: Integration | ⏳ Pending | - |
+| Step 1: Data Foundation | ✅ Complete | ~800 |
+| Step 2: Combat Foundation | ✅ Complete | ~300 |
+| Step 3: Damage Pipeline | ✅ Complete | ~200 |
+| Step 4: Data Enhancement | ✅ Complete | ~300 |
+| Step 5: Combat Actions | 🎯 Next | - |
+| Step 6: Combat Engine | ⏳ Pending | - |
+| Step 7: Integration | ⏳ Pending | - |
 
 ---
 
@@ -100,114 +101,95 @@ Build a functional **Combat Simulator** (1v1) running in a Console Environment (
 
 ---
 
-## Step 2: Action Queue 🎯 NEXT
+## Step 2: Combat Foundation ✅ COMPLETE
 
-**Objective**: Verify the "Everything is an Action" pattern.
+### 2.1 Action Queue ✅
+- `BattleAction` - Abstract base with `ExecuteLogic()` and `ExecuteVisual()`
+- `MessageAction` - Simple message display
+- `BattleQueue` - Action processor with reaction handling
+- `IBattleView` - Interface for presentation
+- `NullBattleView` - No-op implementation for testing
 
-### Tests to Write First
-```csharp
-[Test]
-public void ProcessQueue_SingleAction_ExecutesAction()
-{
-    // Arrange: MockAction that increments counter
-    // Act: Enqueue and ProcessQueue
-    // Assert: Counter == 1
-}
-```
+### 2.2 Battle Field ✅
+- `BattleField` - Contains both sides
+- `BattleSide` - Player or Enemy side with slots and bench
+- `BattleSlot` - Active Pokemon position with stat stages
+- `BattleRules` - Configuration (1v1, 2v2, etc.)
 
-### Components to Implement
-- [ ] `BattleAction` (Abstract base)
-- [ ] `BattleQueue` (Processor)
-- [ ] `IBattleView` (Interface for presentation)
-
----
-
-## Step 3: Battle Field ⏳
-
-**Objective**: Verify we can place Pokemon in slots.
-
-### Tests to Write
-```csharp
-[Test]
-public void Initialize_1v1Battle_CreatesCorrectSlots()
-{
-    // Arrange: BattleField
-    // Act: Initialize(1, 1), add Pokemon
-    // Assert: PlayerSide.GetActivePokemon().Count == 1
-}
-```
-
-### Components to Implement
-- [ ] `BattleField`
-- [ ] `BattleSide`
-- [ ] `BattleSlot`
-- [ ] `BattleRules` (Config)
+### 2.3 Turn Order ✅
+- `TurnOrderResolver` - Speed-based sorting with priority handling
+- Stat stage modifiers
+- Paralysis speed penalty
 
 ---
 
-## Step 4: Turn Loop ⏳
+## Step 3: Damage Pipeline ✅ COMPLETE
 
-**Objective**: Verify Speed determines order.
-
-### Tests to Write
-```csharp
-[Test]
-public void RunTurn_DifferentSpeeds_FasterGoesFirst()
-{
-    // Arrange: FastMon (Speed 100), SlowMon (Speed 50)
-    // Act: RunTurn()
-    // Assert: FastMon action executed before SlowMon
-}
-```
-
-### Components to Implement
-- [ ] `CombatEngine` (Controller)
-- [ ] `TurnOrderResolver` (Speed-based sorting, priority handling)
-- [ ] `IActionProvider` (Interface)
+- `DamageContext` - Calculation context
+- `IDamageStep` - Pipeline step interface
+- `DamagePipeline` - Orchestrates calculation
+- **Steps**: BaseDamage, CriticalHit, RandomFactor, STAB, TypeEffectiveness, Burn
 
 ---
 
-## Step 5: First Attack ⏳
+## Step 4: Data Enhancement ✅ COMPLETE (NEW)
 
-**Objective**: Verify moves deal damage.
+### 4.1 Abilities ✅
+- `AbilityData` blueprint with triggers and effects
+- `AbilityBuilder` fluent API
+- `AbilityCatalog` (35 abilities: Gen3 + additional)
+- Species have Ability1, Ability2, HiddenAbility
+- Instance has assigned Ability
 
-### Tests to Write
-```csharp
-[Test]
-public void UseMoveAction_Tackle_DealsDamage()
-{
-    // Arrange: Attacker, Defender, Tackle
-    // Act: Execute UseMoveAction
-    // Assert: Defender HP decreased
-}
-```
+### 4.2 Items ✅
+- `ItemData` blueprint with categories and effects
+- `ItemBuilder` fluent API
+- `ItemCatalog` (23 items: held items + berries)
+- Instance has HeldItem
 
-### Components to Implement
-- [ ] `UseMoveAction`
-- [ ] `DamageAction`
-- [ ] `DamageCalculator` (Pipeline with modifiers)
+### 4.3 Status Effects ✅
+- `StatusEffectData` blueprint with full mechanics
+- `StatusEffectBuilder` fluent API
+- `StatusCatalog` (15 statuses: 6 persistent + 9 volatile)
+- Damage per turn, stat modifiers, duration, immunities
 
 ---
 
-## Step 6: Integration ⏳
+## Step 5: Combat Actions 🎯 NEXT
+
+**Objective**: Implement core battle actions.
+
+### Components to Implement
+- [ ] `UseMoveAction` - Execute a move
+- [ ] `SwitchAction` - Switch Pokemon
+- [ ] `DamageAction` - Apply damage
+- [ ] `HealAction` - Restore HP
+- [ ] `StatChangeAction` - Modify stat stages
+- [ ] `ApplyStatusAction` - Apply status conditions
+
+---
+
+## Step 6: Combat Engine ⏳
+
+**Objective**: Full turn loop and battle flow.
+
+### Components to Implement
+- [ ] `CombatEngine` - Main controller
+- [ ] `CombatArbiter` - Rules enforcement
+- [ ] Turn phases (Selection, Execution, End)
+- [ ] Victory/Defeat detection
+
+---
+
+## Step 7: Integration ⏳
 
 **Objective**: Run a full battle without rendering.
 
-### Tests to Write
-```csharp
-[Test]
-public void FullBattle_TwoRandomAI_ProducesWinner()
-{
-    // Arrange: 1v1 with RandomAI
-    // Act: RunBattle()
-    // Assert: BattleResult.Winner is not null
-}
-```
-
 ### Components to Implement
-- [ ] `RandomAI` (Simple AI)
+- [ ] `RandomAI` - Simple AI
 - [ ] `BattleResult`
 - [ ] Full battle loop
+- [ ] Console demo
 
 ---
 
@@ -216,34 +198,45 @@ public void FullBattle_TwoRandomAI_ProducesWinner()
 ```
 PokemonUltimate/
 ├── Core/              # Game logic (NO data)
-│   ├── Blueprints/    # Immutable definitions
+│   ├── Blueprints/    # Immutable definitions (Pokemon, Move, Ability, Item, Status)
 │   ├── Instances/     # Mutable runtime state
 │   ├── Factories/     # Creation & calculation
+│   ├── Builders/      # Core builders (Ability, Item, Status)
 │   ├── Effects/       # Move effects
 │   ├── Evolution/     # Evolution system
 │   ├── Registry/      # Data access
 │   ├── Enums/         # Type definitions
 │   └── Constants/     # Centralized strings
 │
-├── Content/           # Game data
-│   ├── Catalogs/      # Pokemon & Move definitions
-│   └── Builders/      # Fluent APIs
+├── Combat/            # Battle system (NEW)
+│   ├── Actions/       # BattleAction, MessageAction
+│   ├── Damage/        # DamagePipeline, IDamageStep
+│   ├── BattleField, BattleSide, BattleSlot
+│   ├── BattleQueue, TurnOrderResolver
+│   └── IBattleView, NullBattleView
 │
-└── Tests/             # 1,165 tests
+├── Content/           # Game data
+│   ├── Catalogs/      # Pokemon, Move, Ability, Item, Status
+│   └── Builders/      # Pokemon, Move builders
+│
+└── Tests/             # 1,600 tests
 ```
 
 ---
 
 ## Why This Order?
 
-1. **Data** is the atoms
-2. **Queue** is the physics engine
-3. **Field** is the world
-4. **Turn** is time
-5. **Attack** is interaction
-6. **Integration** is the game
+1. **Data** is the atoms (Pokemon, Moves, Types)
+2. **Enhancement** adds complexity (Abilities, Items, Status)
+3. **Queue** is the physics engine (Action processing)
+4. **Field** is the world (BattleField, Slots)
+5. **Turn Order** is time (Speed, Priority)
+6. **Damage** is interaction (Pipeline)
+7. **Actions** are events (UseMoveAction, etc.)
+8. **Engine** is the game loop
+9. **Integration** is the full game
 
-Once Step 6 passes, you have a working game engine. Only THEN do you open Unity to visualize it.
+Once Step 7 passes, you have a working game engine. Only THEN do you open Unity to visualize it.
 
 ---
 
@@ -253,7 +246,11 @@ Once Step 6 passes, you have a working game engine. Only THEN do you open Unity 
 |------|------|
 | Current state | `.ai/context.md` |
 | Coding rules | `docs/project_guidelines.md` |
+| **Combat phases** | `docs/combat_implementation_plan.md` |
+| **Use cases** | `docs/combat_use_cases.md` |
 | **Unity setup** | `docs/unity_integration.md` |
 | Combat design | `docs/architecture/combat_system_spec.md` |
+| Abilities/Items | `docs/architecture/abilities_items_system.md` |
+| Status effects | `docs/architecture/status_and_stat_system.md` |
 | Damage formulas | `docs/architecture/damage_and_effect_system.md` |
 | Turn order | `docs/architecture/turn_order_system.md` |
