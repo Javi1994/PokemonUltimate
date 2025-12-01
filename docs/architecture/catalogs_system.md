@@ -261,6 +261,28 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 | Psychic | Psychic 1.3x | Blocks Priority |
 | Misty | - | Dragon 0.5x, prevents all status |
 
+### HazardCatalog (4 Hazards) ✅ NEW
+| Hazard | Layers | Effect |
+|--------|--------|--------|
+| Stealth Rock | 1 | Type-based damage (Rock effectiveness) |
+| Spikes | 1-3 | 12.5% / 16.7% / 25% HP |
+| Toxic Spikes | 1-2 | Poison / Badly Poisoned |
+| Sticky Web | 1 | -1 Speed |
+
+### SideConditionCatalog (10 Conditions) ✅ NEW
+| Category | Conditions |
+|----------|------------|
+| Screens | Reflect, Light Screen, Aurora Veil |
+| Speed/Status | Tailwind, Safeguard, Mist, Lucky Chant |
+| Protection | Wide Guard, Quick Guard, Mat Block |
+
+### FieldEffectCatalog (8 Effects) ✅ NEW
+| Category | Effects |
+|----------|---------|
+| Rooms | Trick Room, Magic Room, Wonder Room |
+| Field | Gravity, Ion Deluge, Fairy Lock |
+| Sports | Mud Sport, Water Sport |
+
 ## 6. Adding New Content
 
 ### Adding Generation 2 Pokemon

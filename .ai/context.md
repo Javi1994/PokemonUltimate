@@ -11,7 +11,7 @@
 | ----------------- | -------------------------- |
 | **Current Phase** | Phase 3: Combat System 🚧  |
 | **Sub-Phase**     | 2.5 Combat Actions (ready) |
-| **Tests**         | 1,721 passing              |
+| **Tests**         | 1,789 passing              |
 | **Warnings**      | 0                          |
 | **Last Updated**  | December 2025              |
 
@@ -60,6 +60,9 @@ PokemonUltimate/
 -   [x] StatusEffectData (15 status effects: 6 persistent + 9 volatile)
 -   [x] WeatherData (9 weather conditions: 5 standard + 3 primal + fog)
 -   [x] TerrainData (4 terrains: Grassy, Electric, Psychic, Misty)
+-   [x] HazardData (4 hazards: Stealth Rock, Spikes, Toxic Spikes, Sticky Web)
+-   [x] SideConditionData (10 conditions: screens, Tailwind, protections)
+-   [x] FieldEffectData (8 effects: rooms, Gravity, sports)
 
 ### Phase 2: Instances
 
