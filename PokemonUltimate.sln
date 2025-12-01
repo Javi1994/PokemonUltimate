@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.Core", "PokemonUltimate.Core\PokemonUltimate.Core.csproj", "{7C4824C3-DB54-4BED-B131-FE54110E098C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.Tests", "PokemonUltimate.Tests\PokemonUltimate.Tests.csproj", "{4E83F907-1854-44E2-9161-41A49587C4AC}"
@@ -8,6 +8,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.Console", "PokemonUltimate.Console\PokemonUltimate.Console.csproj", "{8112A868-C8B6-46AC-9A69-814D068DF868}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.Content", "PokemonUltimate.Content\PokemonUltimate.Content.csproj", "{F350C6AD-F884-4333-81C2-B410C98CA067}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.Combat", "PokemonUltimate.Combat\PokemonUltimate.Combat.csproj", "{6377B692-25D5-4A08-81DF-4C054F7E93C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,5 +33,9 @@ Global
 		{F350C6AD-F884-4333-81C2-B410C98CA067}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F350C6AD-F884-4333-81C2-B410C98CA067}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F350C6AD-F884-4333-81C2-B410C98CA067}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6377B692-25D5-4A08-81DF-4C054F7E93C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6377B692-25D5-4A08-81DF-4C054F7E93C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6377B692-25D5-4A08-81DF-4C054F7E93C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6377B692-25D5-4A08-81DF-4C054F7E93C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

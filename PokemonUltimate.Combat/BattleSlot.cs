@@ -4,7 +4,7 @@ using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.Core.Combat
+namespace PokemonUltimate.Combat
 {
     /// <summary>
     /// Represents a slot on the battlefield that can hold an active Pokemon.

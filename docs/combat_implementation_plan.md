@@ -49,12 +49,12 @@ The Combat System is divided into **7 phases**, each building on the previous. E
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `BattleSlot` | `Core/Combat/BattleSlot.cs` | Container for active Pokemon + battle state |
-| `BattleSide` | `Core/Combat/BattleSide.cs` | One side of the field (player/enemy) |
-| `BattleField` | `Core/Combat/BattleField.cs` | Complete battlefield (2 sides) |
-| `BattleRules` | `Core/Combat/BattleRules.cs` | Configuration (1v1, 2v2, etc.) |
-| `IBattleView` | `Core/Combat/IBattleView.cs` | Interface for visual presentation |
-| `BattleAction` | `Core/Combat/Actions/BattleAction.cs` | Abstract base for all actions |
+| `BattleSlot` | `Combat/BattleSlot.cs` | Container for active Pokemon + battle state |
+| `BattleSide` | `Combat/BattleSide.cs` | One side of the field (player/enemy) |
+| `BattleField` | `Combat/BattleField.cs` | Complete battlefield (2 sides) |
+| `BattleRules` | `Combat/BattleRules.cs` | Configuration (1v1, 2v2, etc.) |
+| `IBattleView` | `Combat/IBattleView.cs` | Interface for visual presentation |
+| `BattleAction` | `Combat/Actions/BattleAction.cs` | Abstract base for all actions |
 
 ### BattleSlot Specification
 
@@ -195,9 +195,9 @@ Tests/Combat/BattleFieldTests.cs
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `BattleQueue` | `Core/Combat/BattleQueue.cs` | Action processor |
-| `MessageAction` | `Core/Combat/Actions/MessageAction.cs` | Simple message (for testing) |
-| `NullBattleView` | `Core/Combat/NullBattleView.cs` | No-op view for tests |
+| `BattleQueue` | `Combat/BattleQueue.cs` | Action processor |
+| `MessageAction` | `Combat/Actions/MessageAction.cs` | Simple message (for testing) |
+| `NullBattleView` | `Combat/NullBattleView.cs` | No-op view for tests |
 
 ### BattleQueue Specification
 
@@ -287,8 +287,8 @@ Tests/Combat/Actions/MessageActionTests.cs
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `TurnOrderResolver` | `Core/Combat/TurnOrderResolver.cs` | Sorts actions |
-| `IActionProvider` | `Core/Combat/IActionProvider.cs` | Interface for action selection |
+| `TurnOrderResolver` | `Combat/TurnOrderResolver.cs` | Sorts actions |
+| `IActionProvider` | `Combat/IActionProvider.cs` | Interface for action selection |
 
 ### TurnOrderResolver Specification
 
@@ -362,9 +362,9 @@ Tests/Combat/TurnOrderResolverTests.cs
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `DamageContext` | `Core/Combat/Damage/DamageContext.cs` | Calculation state |
-| `IDamageStep` | `Core/Combat/Damage/IDamageStep.cs` | Pipeline step interface |
-| `DamagePipeline` | `Core/Combat/Damage/DamagePipeline.cs` | Executes steps |
+| `DamageContext` | `Combat/Damage/DamageContext.cs` | Calculation state |
+| `IDamageStep` | `Combat/Damage/IDamageStep.cs` | Pipeline step interface |
+| `DamagePipeline` | `Combat/Damage/DamagePipeline.cs` | Executes steps |
 
 ### Pipeline Steps
 
@@ -455,13 +455,13 @@ Tests/Combat/Damage/Steps/TypeEffectivenessStepTests.cs
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `DamageAction` | `Core/Combat/Actions/DamageAction.cs` | Apply damage to target |
-| `UseMoveAction` | `Core/Combat/Actions/UseMoveAction.cs` | Full move execution |
-| `FaintAction` | `Core/Combat/Actions/FaintAction.cs` | Handle KO |
-| `ApplyStatusAction` | `Core/Combat/Actions/ApplyStatusAction.cs` | Apply status condition |
-| `StatChangeAction` | `Core/Combat/Actions/StatChangeAction.cs` | Modify stat stages |
-| `HealAction` | `Core/Combat/Actions/HealAction.cs` | Restore HP |
-| `SwitchAction` | `Core/Combat/Actions/SwitchAction.cs` | Switch Pokemon |
+| `DamageAction` | `Combat/Actions/DamageAction.cs` | Apply damage to target |
+| `UseMoveAction` | `Combat/Actions/UseMoveAction.cs` | Full move execution |
+| `FaintAction` | `Combat/Actions/FaintAction.cs` | Handle KO |
+| `ApplyStatusAction` | `Combat/Actions/ApplyStatusAction.cs` | Apply status condition |
+| `StatChangeAction` | `Combat/Actions/StatChangeAction.cs` | Modify stat stages |
+| `HealAction` | `Combat/Actions/HealAction.cs` | Restore HP |
+| `SwitchAction` | `Combat/Actions/SwitchAction.cs` | Switch Pokemon |
 
 ### UseMoveAction Flow
 
@@ -535,10 +535,10 @@ Tests/Combat/Actions/SwitchActionTests.cs
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `CombatEngine` | `Core/Combat/CombatEngine.cs` | Main controller |
-| `BattleArbiter` | `Core/Combat/BattleArbiter.cs` | Victory/defeat detection |
-| `BattleOutcome` | `Core/Combat/BattleOutcome.cs` | Battle result enum |
-| `BattleResult` | `Core/Combat/BattleResult.cs` | Detailed result data |
+| `CombatEngine` | `Combat/CombatEngine.cs` | Main controller |
+| `BattleArbiter` | `Combat/BattleArbiter.cs` | Victory/defeat detection |
+| `BattleOutcome` | `Combat/BattleOutcome.cs` | Battle result enum |
+| `BattleResult` | `Combat/BattleResult.cs` | Detailed result data |
 
 ### CombatEngine Specification
 
@@ -621,8 +621,8 @@ Tests/Combat/BattleArbiterTests.cs
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `RandomAI` | `Core/Combat/AI/RandomAI.cs` | Random move selection |
-| `AlwaysAttackAI` | `Core/Combat/AI/AlwaysAttackAI.cs` | Always uses first move |
+| `RandomAI` | `Combat/AI/RandomAI.cs` | Random move selection |
+| `AlwaysAttackAI` | `Combat/AI/AlwaysAttackAI.cs` | Always uses first move |
 
 ### Integration Tests
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using PokemonUltimate.Combat;
+using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Combat;
-using PokemonUltimate.Core.Combat.Actions;
 using PokemonUltimate.Core.Factories;
 
 namespace PokemonUltimate.Tests.Combat

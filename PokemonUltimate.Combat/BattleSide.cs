@@ -4,7 +4,7 @@ using System.Linq;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.Core.Combat
+namespace PokemonUltimate.Combat
 {
     /// <summary>
     /// Represents one side of the battlefield (player or enemy).
@@ -43,7 +43,7 @@ namespace PokemonUltimate.Core.Combat
 
             IsPlayer = isPlayer;
             _slots = new List<BattleSlot>(slotCount);
-            
+
             for (int i = 0; i < slotCount; i++)
             {
                 _slots.Add(new BattleSlot(i, this));

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using PokemonUltimate.Core.Combat;
-using PokemonUltimate.Core.Combat.Actions;
+using PokemonUltimate.Combat;
+using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 
@@ -123,7 +123,7 @@ namespace PokemonUltimate.Tests.Combat
         public void Clear_CalledMultipleTimes_DoesNotThrow()
         {
             _queue.Enqueue(new MessageAction("Test"));
-            
+
             Assert.DoesNotThrow(() =>
             {
                 _queue.Clear();
@@ -165,7 +165,7 @@ namespace PokemonUltimate.Tests.Combat
         public async Task ProcessQueue_ActionReturnsEmptyReactions_ContinuesNormally()
         {
             var executionOrder = new List<int>();
-            
+
             _queue.Enqueue(new ActionWithEmptyReactions(1, executionOrder));
             _queue.Enqueue(new OrderTrackingAction(2, executionOrder));
 
@@ -216,7 +216,7 @@ namespace PokemonUltimate.Tests.Combat
         public async Task InsertAtFront_EmptyCollection_DoesNothing()
         {
             _queue.Enqueue(new MessageAction("One"));
-            
+
             _queue.InsertAtFront(new List<BattleAction>());
 
             Assert.That(_queue.Count, Is.EqualTo(1));
@@ -245,7 +245,7 @@ namespace PokemonUltimate.Tests.Combat
         public async Task ProcessQueue_AfterProcessing_CanBeReused()
         {
             var executionOrder = new List<int>();
-            
+
             _queue.Enqueue(new OrderTrackingAction(1, executionOrder));
             await _queue.ProcessQueue(_field, _view);
 
@@ -301,7 +301,7 @@ namespace PokemonUltimate.Tests.Combat
             // This tests that if an action somehow triggers external enqueue during processing,
             // the queue handles it gracefully
             var executionOrder = new List<int>();
-            
+
             _queue.Enqueue(new OrderTrackingAction(1, executionOrder));
             _queue.Enqueue(new OrderTrackingAction(2, executionOrder));
             _queue.Enqueue(new OrderTrackingAction(3, executionOrder));

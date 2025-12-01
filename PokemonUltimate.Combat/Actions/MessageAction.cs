@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Core.Constants;
 
-namespace PokemonUltimate.Core.Combat.Actions
+namespace PokemonUltimate.Combat.Actions
 {
     /// <summary>
     /// A simple action that displays a message.

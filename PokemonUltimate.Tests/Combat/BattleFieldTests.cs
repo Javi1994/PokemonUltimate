@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using PokemonUltimate.Core.Combat;
+using PokemonUltimate.Combat;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 using PokemonUltimate.Content.Catalogs.Pokemon;

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Core.Combat.Actions;
+using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Core.Constants;
 
-namespace PokemonUltimate.Core.Combat
+namespace PokemonUltimate.Combat
 {
     /// <summary>
     /// Manages the sequential processing of battle actions.
@@ -14,7 +14,7 @@ namespace PokemonUltimate.Core.Combat
     public class BattleQueue
     {
         private const int MaxIterations = 1000;
-        
+
         private readonly LinkedList<BattleAction> _queue;
 
         /// <summary>

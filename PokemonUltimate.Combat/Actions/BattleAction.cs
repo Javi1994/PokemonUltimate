@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PokemonUltimate.Core.Combat.Actions
+namespace PokemonUltimate.Combat.Actions
 {
     /// <summary>
     /// Base class for all battle actions.

@@ -151,12 +151,20 @@ PokemonUltimate/
 │   ├── Enums/                  # Type definitions
 │   └── Constants/              # Centralized strings
 │
+├── PokemonUltimate.Combat/     # Battle system (depends on Core)
+│   ├── Actions/                # BattleAction, MessageAction, etc.
+│   ├── BattleField.cs          # Arena with two sides
+│   ├── BattleSlot.cs           # Active Pokemon slot
+│   ├── BattleSide.cs           # Player/Enemy side
+│   ├── BattleQueue.cs          # Action processor
+│   └── IBattleView.cs          # Visual abstraction
+│
 ├── PokemonUltimate.Content/    # Game data definitions
 │   ├── Catalogs/               # Pokémon & Move definitions
 │   └── Builders/               # Fluent configuration APIs
 │
 ├── PokemonUltimate.Tests/      # Unit & integration tests
-│   └── [42 test files]         # 1165+ test cases
+│   └── [45+ test files]        # 1340+ test cases
 │
 └── PokemonUltimate.Console/    # Smoke test application
 ```

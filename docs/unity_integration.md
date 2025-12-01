@@ -1,12 +1,12 @@
 # Unity Integration Guide
 
-> How to use PokemonUltimate.Core and PokemonUltimate.Content in Unity.
+> How to use PokemonUltimate.Core, PokemonUltimate.Combat, and PokemonUltimate.Content in Unity.
 
 ## Prerequisites
 
 - **Unity 6** (or Unity 2021.3+)
 - **Project Template**: 2D (URP) recommended
-- **.NET Compatibility**: Both DLLs target `netstandard2.1` (Unity compatible)
+- **.NET Compatibility**: All DLLs target `netstandard2.1` (Unity compatible)
 
 ---
 
@@ -23,19 +23,21 @@ dotnet build -c Release
 This produces:
 ```
 PokemonUltimate.Core/bin/Release/netstandard2.1/PokemonUltimate.Core.dll
+PokemonUltimate.Combat/bin/Release/netstandard2.1/PokemonUltimate.Combat.dll
 PokemonUltimate.Content/bin/Release/netstandard2.1/PokemonUltimate.Content.dll
 ```
 
 ### Step 2: Copy to Unity
 
 1. In your Unity project, create folder: `Assets/Plugins/`
-2. Copy both DLLs into `Assets/Plugins/`
+2. Copy all three DLLs into `Assets/Plugins/`
 
 ```
 Unity Project/
 └── Assets/
     └── Plugins/
         ├── PokemonUltimate.Core.dll
+        ├── PokemonUltimate.Combat.dll
         └── PokemonUltimate.Content.dll
 ```
 

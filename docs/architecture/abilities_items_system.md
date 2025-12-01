@@ -8,7 +8,7 @@ To handle this without spaghetti code, we use two patterns:
 2.  **Pipeline Hooks** (for Math): "When calculating Attack, add 50%."
 
 ## 2. The Event Trigger System
-*Namespace: `PokemonGame.Core.Combat.Events`*
+*Namespace: `PokemonUltimate.Combat.Events`*
 
 We define a central **Broadcaster** that notifies listeners of key game phases.
 

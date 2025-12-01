@@ -11,7 +11,7 @@ This system must handle:
 - Field effects (Trick Room)
 
 ## 2. Core Service: `TurnOrderResolver`
-*Namespace: `PokemonGame.Core.Combat.TurnOrder`*
+*Namespace: `PokemonUltimate.Combat.TurnOrder`*
 
 ```csharp
 public static class TurnOrderResolver {

@@ -8,7 +8,7 @@ Instead, it communicates via:
 2.  **IBattleView Interface**: For direct updates (HP Bars, Status Icons, Audio triggers).
 
 ## 2. Presentation Actions
-*Namespace: `PokemonGame.Core.Combat.Actions`*
+*Namespace: `PokemonUltimate.Combat.Actions`*
 
 ### MessageAction (Text)
 ```csharp

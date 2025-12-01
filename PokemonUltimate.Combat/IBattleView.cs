@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace PokemonUltimate.Core.Combat
+namespace PokemonUltimate.Combat
 {
     /// <summary>
     /// Interface for battle visualization/presentation.

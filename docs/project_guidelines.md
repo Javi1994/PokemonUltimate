@@ -273,9 +273,10 @@ _Key constraints defining the game's scope._
 - **Language**: C#.
 - **Project Structure**:
   - **Core** (`PokemonUltimate.Core`): Generic game engine (logic, models, effects). Zero concrete content.
+  - **Combat** (`PokemonUltimate.Combat`): Battle system (BattleField, Actions, Queue). Depends on Core.
   - **Content** (`PokemonUltimate.Content`): Concrete data (Pokémon, Moves, Builders). Depends on Core.
-  - **Tests** (`PokemonUltimate.Tests`): Unit tests for Core + Content. Separated from production code.
-  - **Dependency Flow**: `Content → Core` (Content uses Core, Core never knows about Content).
+  - **Tests** (`PokemonUltimate.Tests`): Unit tests for Core + Combat + Content. Separated from production code.
+  - **Dependency Flow**: `Content → Core`, `Combat → Core` (Core is the foundation, Combat and Content are independent).
 - **Data Layer (The Blueprint Pattern)**:
   - **Blueprints (Immutable)**: `SpeciesData`, `MoveData`. Loaded from ScriptableObjects. Never modified at runtime.
   - **Instances (Mutable)**: `PokemonInstance`, `MoveInstance`. Created from Blueprints. Holds state.

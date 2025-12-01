@@ -5,7 +5,7 @@ Pokemon damage calculation is complex (Stats, Types, Crits, Items, Abilities, We
 To keep this **Robust** and **Testable**, we avoid a single giant function. Instead, we use a **Pipeline Pattern**.
 
 ## 2. Damage Calculation Pipeline
-*Namespace: `PokemonGame.Core.Combat.Damage`*
+*Namespace: `PokemonUltimate.Combat.Damage`*
 
 ### `DamageContext`
 A snapshot of the attack event. Mutable as it passes through the pipeline.
@@ -91,7 +91,7 @@ public static class TypeChart {
 ```
 
 ## 4. Effect Application (Status & Volatile)
-*Namespace: `PokemonGame.Core.Combat.Effects`*
+*Namespace: `PokemonUltimate.Combat.Effects`*
 
 Applying a status isn't just `p.Status = Burn`. We need to check immunities.
 

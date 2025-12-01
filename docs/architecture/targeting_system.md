@@ -9,7 +9,7 @@ It must handle:
 -   **Availability**: Ignoring fainted Pokemon (unless move targets fainted, e.g., Revive).
 
 ## 2. Core Definitions
-*Namespace: `PokemonGame.Core.Combat.Targeting`*
+*Namespace: `PokemonUltimate.Combat.Targeting`*
 
 ### `TargetScope` (The Rule)
 Defined in `MoveData`.
@@ -28,7 +28,7 @@ public enum TargetScope {
 ```
 
 ## 3. The Resolver Service
-*Namespace: `PokemonGame.Core.Combat.Targeting`*
+*Namespace: `PokemonUltimate.Combat.Targeting`*
 
 This service answers the question: *"I want to use Move X. Who can I click on?"*
 

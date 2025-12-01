@@ -1,4 +1,4 @@
-namespace PokemonUltimate.Core.Combat
+namespace PokemonUltimate.Combat
 {
     /// <summary>
     /// Configuration for a battle, defining the number of slots and other rules.

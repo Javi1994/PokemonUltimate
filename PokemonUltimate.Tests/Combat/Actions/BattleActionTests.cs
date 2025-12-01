@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using PokemonUltimate.Core.Combat;
-using PokemonUltimate.Core.Combat.Actions;
+using PokemonUltimate.Combat;
+using PokemonUltimate.Combat.Actions;
 
 namespace PokemonUltimate.Tests.Combat.Actions
 {

@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using PokemonUltimate.Core.Combat;
+using PokemonUltimate.Combat;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;

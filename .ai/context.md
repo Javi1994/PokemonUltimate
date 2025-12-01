@@ -31,11 +31,17 @@ PokemonUltimate/
 │   ├── Enums/      # Type definitions
 │   └── Constants/  # Centralized strings
 │
+├── Combat/         # Battle system (depends on Core)
+│   ├── Actions/    # BattleAction, MessageAction, etc.
+│   ├── BattleField, BattleSlot, BattleSide
+│   ├── BattleQueue # Action processor
+│   └── IBattleView # Visual abstraction
+│
 ├── Content/        # Game data definitions
 │   ├── Catalogs/   # Pokemon & Move definitions
 │   └── Builders/   # Fluent APIs
 │
-└── Tests/          # Mirror structure of Core/Content
+└── Tests/          # Mirror structure of Core/Combat/Content
 ```
 
 ---

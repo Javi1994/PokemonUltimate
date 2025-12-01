@@ -4,7 +4,7 @@ using System.Linq;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.Core.Combat
+namespace PokemonUltimate.Combat
 {
     /// <summary>
     /// Represents the complete battlefield with both player and enemy sides.
@@ -50,15 +50,15 @@ namespace PokemonUltimate.Core.Combat
                 throw new ArgumentNullException(nameof(enemyParty), ErrorMessages.PartyCannotBeNull);
 
             _rules = rules;
-            
+
             // Create sides
             _playerSide = new BattleSide(rules.PlayerSlots, isPlayer: true);
             _enemySide = new BattleSide(rules.EnemySlots, isPlayer: false);
-            
+
             // Set parties
             _playerSide.SetParty(playerParty);
             _enemySide.SetParty(enemyParty);
-            
+
             // Place initial Pokemon in slots
             PlaceInitialPokemon(_playerSide, playerParty);
             PlaceInitialPokemon(_enemySide, enemyParty);
@@ -97,14 +97,14 @@ namespace PokemonUltimate.Core.Combat
                 return _enemySide;
             if (side == _enemySide)
                 return _playerSide;
-            
+
             throw new ArgumentException("Side is not part of this battlefield", nameof(side));
         }
 
         private void PlaceInitialPokemon(BattleSide side, IReadOnlyList<PokemonInstance> party)
         {
             var healthyPokemon = party.Where(p => !p.IsFainted).ToList();
-            
+
             for (int i = 0; i < side.Slots.Count && i < healthyPokemon.Count; i++)
             {
                 side.Slots[i].SetPokemon(healthyPokemon[i]);
