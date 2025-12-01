@@ -93,7 +93,7 @@ docs/
 | Metric | Value |
 |--------|-------|
 | **Lines of Code** | ~8,000+ |
-| **Test Cases** | 1,789 |
+| **Test Cases** | 1,838 |
 | **Test Pass Rate** | 100% |
 | **Compiler Warnings** | 0 |
 | **Architecture Docs** | 16 files |
@@ -145,7 +145,7 @@ PokemonUltimate/
 │   ├── Blueprints/             # Immutable data definitions
 │   ├── Instances/              # Runtime mutable state
 │   ├── Factories/              # Object creation & calculations
-│   ├── Effects/                # Move effect system
+│   ├── Effects/                # Move effect system (21 types)
 │   ├── Evolution/              # Evolution conditions & logic
 │   ├── Registry/               # Data access layer
 │   ├── Enums/                  # Type definitions
