@@ -1,0 +1,123 @@
+# 📋 Pre-Implementation Checklist
+
+> **MANDATORY: Complete this checklist BEFORE writing any code for a new feature.**
+
+---
+
+## 1. 📚 Read Technical Documentation
+
+- [ ] **Find the relevant spec** in `docs/architecture/`
+- [ ] **Read the ENTIRE spec** - Don't skim, understand fully
+- [ ] **Identify ALL components** mentioned in the spec
+- [ ] **Note the expected API** - Method names, parameters, return types
+- [ ] **Understand integration points** - How does this connect to other systems?
+
+## 2. 📊 Analyze Requirements
+
+For each component in the spec, categorize:
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| [Name] | ✅ Implement Now / ⏳ Defer | [Why] |
+
+### Questions to Answer:
+
+- [ ] What is the **minimum viable implementation** for this phase?
+- [ ] What elements are **required** for the system to function?
+- [ ] What elements can be **safely deferred** to later phases?
+- [ ] Are there **dependencies** on other unimplemented systems?
+
+## 3. ✏️ Document Decisions
+
+Before coding, write down:
+
+```markdown
+### Implementation Plan for [Feature Name]
+
+**Spec Document**: `docs/architecture/[name].md`
+
+**Implementing Now:**
+- Component A (required for basic functionality)
+- Component B (required for basic functionality)
+
+**Deferring to Later:**
+- Component C (requires [dependency] not yet implemented)
+- Component D (enhancement, not core functionality)
+
+**API Changes from Spec:**
+- Changed `PlayerSideSlots` to `PlayerSlots` (simpler naming)
+- Added `X` not in spec (discovered during TDD)
+```
+
+## 4. 🔍 Verify Understanding
+
+- [ ] Can I explain what this feature does in one sentence?
+- [ ] Can I list all the classes/interfaces I need to create?
+- [ ] Do I know what tests I'll write first?
+- [ ] Have I identified potential edge cases?
+
+## 5. ✅ Get Approval (if working with team)
+
+- [ ] Shared implementation plan with reviewer
+- [ ] Addressed any concerns about deferred items
+- [ ] Confirmed API naming conventions
+
+---
+
+## Quick Reference: Architecture Docs
+
+| Feature | Spec Document |
+|---------|---------------|
+| Combat System | `combat_system_spec.md` |
+| Battle Field | `battle_field_system.md` |
+| Damage Calculation | `damage_and_effect_system.md` |
+| Turn Order | `turn_order_system.md` |
+| Status Effects | `status_and_stat_system.md` |
+| Victory/Defeat | `victory_defeat_system.md` |
+| Player/AI Input | `player_ai_spec.md` |
+| UI Presentation | `ui_presentation_system.md` |
+
+---
+
+## Example: Pre-Implementation for BattleSlot
+
+```markdown
+### Implementation Plan for BattleSlot
+
+**Spec Document**: `docs/architecture/battle_field_system.md`
+
+**Implementing Now:**
+- BattleSlot.Index (SlotIndex) ✅
+- BattleSlot.Pokemon ✅
+- BattleSlot.IsOccupied (as IsEmpty - inverted) ✅
+- Stat stages management ✅
+- Volatile status management ✅
+
+**Deferring to Later:**
+- BattleSlot.Effects (SlotEffects) - Requires Effect system
+- BattleSlot.ActionProvider - Part of Phase 2.3 (Turn Order)
+- BattleSlot.Side reference - Not needed for current phase
+
+**API Changes from Spec:**
+- `Index` → `SlotIndex` (clearer naming)
+- `IsOccupied` → `IsEmpty` (inverted for clarity)
+- Added `HasFainted` property (useful helper)
+```
+
+---
+
+## When to Skip This Checklist
+
+**Never.** Even for small features, at minimum:
+1. Identify the relevant spec (if any)
+2. Note what you're implementing vs deferring
+3. Proceed with TDD
+
+---
+
+## After Implementation
+
+1. Update the spec if you made improvements
+2. Document any deferred items in the implementation plan
+3. Add to `.ai/context.md` if significant changes
+

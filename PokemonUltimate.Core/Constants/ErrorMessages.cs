@@ -48,6 +48,16 @@ namespace PokemonUltimate.Core.Constants
 
         #endregion
 
+        #region Combat
+
+        public const string SlotIndexCannotBeNegative = "Slot index cannot be negative";
+        public const string CannotModifyHPStatStage = "Cannot modify HP stat stage";
+        public const string SlotCountMustBePositive = "Slot count must be at least 1";
+        public const string PartyCannotBeNull = "Party cannot be null";
+        public const string PartyCannotBeEmpty = "Party cannot be empty";
+
+        #endregion
+
         #region Helpers
 
         /// <summary>

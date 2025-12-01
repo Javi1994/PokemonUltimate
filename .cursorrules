@@ -17,13 +17,18 @@
 
 ### When User Says "Implement X" or "Add X"
 1. Read `.ai/context.md` to understand current state
-2. Find relevant architecture doc in `docs/architecture/`
-3. **Write functional tests FIRST** (TDD mandatory)
-4. Implement the feature
-5. Add edge case tests
-6. Run `dotnet test` to verify
-7. Check `docs/checklists/feature_complete.md`
-8. Update `.ai/context.md` with new state
+2. **CRITICAL: Read relevant architecture doc in `docs/architecture/`**
+   - Identify ALL requirements from the spec
+   - Note any elements to defer to later phases
+   - Understand the expected API (method names, parameters)
+3. **Verify spec compliance** - List what will be implemented vs deferred
+4. **Write functional tests FIRST** (TDD mandatory)
+5. Implement the feature following the spec
+6. Add edge case tests
+7. Run `dotnet test` to verify
+8. **Validate against `docs/combat_use_cases.md`** (if combat-related)
+9. Check `docs/checklists/feature_complete.md`
+10. Update `.ai/context.md` with new state
 
 ### When User Says "Review X" or "Check X"
 1. Read `docs/anti-patterns.md`
@@ -106,6 +111,7 @@ public void Method(int value)
 | What NOT to do | `docs/anti-patterns.md` |
 | Code examples | `docs/examples/good_code.md` |
 | Test examples | `docs/examples/good_tests.md` |
+| Pre-implementation | `docs/checklists/pre_implementation.md` |
 | Feature checklist | `docs/checklists/feature_complete.md` |
 | Combat specs | `docs/architecture/combat_system_spec.md` |
 | Damage formula | `docs/architecture/damage_and_effect_system.md` |

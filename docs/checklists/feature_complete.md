@@ -2,6 +2,18 @@
 
 > **Use this checklist before considering any feature complete.**
 > All items must be checked before moving to the next feature.
+>
+> **Note**: Before starting, ensure you completed `pre_implementation.md` checklist!
+
+---
+
+## 📚 Spec Compliance
+
+-   [ ] **Spec reviewed** - Read relevant `docs/architecture/` document
+-   [ ] **Components match spec** - API follows documented design
+-   [ ] **Deferred items documented** - Listed what's postponed and why
+-   [ ] **Changes noted** - Any deviations from spec are documented
+-   [ ] **Use cases validated** - Check `docs/combat_use_cases.md` (if combat)
 
 ---
 

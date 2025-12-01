@@ -326,6 +326,7 @@ _Quick reference to the main combat systems. See individual specs for details._
 ### Reference Documents
 
 - **Battle Mechanics Catalog** (`battle_mechanics_catalog.md`): Comprehensive list of all BattleActions and IMoveEffects (40+ effects, 25+ actions) with implementation examples and priority ordering.
+- **Combat Use Cases** (`combat_use_cases.md`): Complete reference of ALL Pokemon battle mechanics. **Must validate against this before completing any combat feature.**
 
 ## 6. Testing Strategy
 
@@ -363,7 +364,18 @@ Every feature must have dedicated edge case tests covering boundary conditions a
 | Builders | Null species, level limits, gender validation |
 | Registry | Empty queries, complex filters, LINQ integration |
 
-### 3. Data Validation (Content Integrity)
+### 3. Combat Use Case Validation (Combat Features Only)
+
+**Before completing any combat-related feature**, validate against `docs/combat_use_cases.md`:
+
+1. **Read relevant sections** of the use cases document
+2. **Check implementation** covers all listed behaviors
+3. **Mark items complete** in the document's phase checklist
+4. **Document deferred items** if any mechanics are postponed
+
+This ensures no Pokemon battle mechanic is missed or incorrectly implemented.
+
+### 4. Data Validation (Content Integrity)
 
 Do not write unit tests for every Pokémon. Instead, write **Validators** that run on all data.
 
@@ -375,7 +387,7 @@ Do not write unit tests for every Pokémon. Instead, write **Validators** that r
   - _Check_: "Charizard should be Fire/Flying."
   - _Check_: "All Pokedex numbers should be unique."
 
-### 4. Content State Verification (Specific Cases)
+### 5. Content State Verification (Specific Cases)
 
 For critical content (e.g., "Ember"), verify the **Composition**, not the Execution.
 Since `DamageEffect` and `BurnEffect` are already tested via TDD (Logic Tests), you only need to prove that "Ember" _has_ those effects.
@@ -383,7 +395,7 @@ Since `DamageEffect` and `BurnEffect` are already tested via TDD (Logic Tests), 
 - _Test_: Load "Ember". Assert `Type == Fire`. Assert `Effects` contains `DamageEffect`. Assert `Effects` contains `BurnEffect`.
 - **Benefit**: This proves "Ember works" without simulating a full battle engine for every single move.
 
-### 5. Integration Simulations (Bot Battles)
+### 6. Integration Simulations (Bot Battles)
 
 To catch edge cases, run automated battles between random AI bots.
 

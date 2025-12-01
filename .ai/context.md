@@ -7,13 +7,13 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                           |
-| ----------------- | -------------------------------- |
-| **Current Phase** | Phase 3: Combat System 🚧        |
-| **Sub-Phase**     | 2.1 Battle Foundation (starting) |
-| **Tests**         | 1,165 passing                    |
-| **Warnings**      | 0                                |
-| **Last Updated**  | December 2025                    |
+| Aspect            | Status                            |
+| ----------------- | --------------------------------- |
+| **Current Phase** | Phase 3: Combat System 🚧         |
+| **Sub-Phase**     | 2.1 Battle Foundation ✅ Complete |
+| **Tests**         | 1,298 passing                     |
+| **Warnings**      | 0                                 |
+| **Last Updated**  | December 2025                     |
 
 ---
 
@@ -66,15 +66,15 @@ PokemonUltimate/
 
 See `docs/combat_implementation_plan.md` for full details.
 
-| Sub-Phase              | Status         | Description               |
-| ---------------------- | -------------- | ------------------------- |
-| 2.1 Battle Foundation  | 🚧 In Progress | BattleField, Slot, Side   |
-| 2.2 Action Queue       | ⏳ Pending     | BattleQueue, BattleAction |
-| 2.3 Turn Order         | ⏳ Pending     | TurnOrderResolver         |
-| 2.4 Damage Calculation | ⏳ Pending     | DamagePipeline            |
-| 2.5 Combat Actions     | ⏳ Pending     | UseMoveAction, etc.       |
-| 2.6 Combat Engine      | ⏳ Pending     | CombatEngine, Arbiter     |
-| 2.7 Integration        | ⏳ Pending     | AI, full battles          |
+| Sub-Phase              | Status      | Description               |
+| ---------------------- | ----------- | ------------------------- |
+| 2.1 Battle Foundation  | ✅ Complete | BattleField, Slot, Side   |
+| 2.2 Action Queue       | 🎯 Next     | BattleQueue, BattleAction |
+| 2.3 Turn Order         | ⏳ Pending  | TurnOrderResolver         |
+| 2.4 Damage Calculation | ⏳ Pending  | DamagePipeline            |
+| 2.5 Combat Actions     | ⏳ Pending  | UseMoveAction, etc.       |
+| 2.6 Combat Engine      | ⏳ Pending  | CombatEngine, Arbiter     |
+| 2.7 Integration        | ⏳ Pending  | AI, full battles          |
 
 Reference docs:
 
@@ -127,10 +127,12 @@ Reference docs:
 | `docs/project_guidelines.md`              | 24+ coding rules     |
 | `docs/implementation_plan.md`             | Technical roadmap    |
 | `docs/combat_implementation_plan.md`      | **Combat phases**    |
+| `docs/combat_use_cases.md`                | **All battle cases** |
 | `docs/unity_integration.md`               | Unity setup guide    |
 | `CONTRIBUTING.md`                         | Git workflow & rules |
 | `docs/architecture/combat_system_spec.md` | Combat system design |
-| `docs/checklists/feature_complete.md`     | Quality checklist    |
+| `docs/checklists/pre_implementation.md`   | **Before coding**    |
+| `docs/checklists/feature_complete.md`     | After coding         |
 | `docs/anti-patterns.md`                   | What NOT to do       |
 
 ---
