@@ -122,6 +122,8 @@ Reference docs:
 | ----------------------------------------- | -------------------- |
 | `docs/project_guidelines.md`              | 24+ coding rules     |
 | `docs/implementation_plan.md`             | Technical roadmap    |
+| `docs/unity_integration.md`               | Unity setup guide    |
+| `CONTRIBUTING.md`                         | Git workflow & rules |
 | `docs/architecture/combat_system_spec.md` | Combat system design |
 | `docs/checklists/feature_complete.md`     | Quality checklist    |
 | `docs/anti-patterns.md`                   | What NOT to do       |

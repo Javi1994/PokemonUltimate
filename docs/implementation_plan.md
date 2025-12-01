@@ -253,6 +253,7 @@ Once Step 6 passes, you have a working game engine. Only THEN do you open Unity 
 |------|------|
 | Current state | `.ai/context.md` |
 | Coding rules | `docs/project_guidelines.md` |
+| **Unity setup** | `docs/unity_integration.md` |
 | Combat design | `docs/architecture/combat_system_spec.md` |
 | Damage formulas | `docs/architecture/damage_and_effect_system.md` |
 | Turn order | `docs/architecture/turn_order_system.md` |

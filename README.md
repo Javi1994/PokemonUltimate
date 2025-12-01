@@ -263,6 +263,17 @@ double mult = TypeEffectiveness.GetEffectiveness(
 
 ---
 
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
+- Git workflow (GitHub Flow)
+- Commit message format (Conventional Commits)
+- Branch naming conventions
+- Code review checklist
+- Version tagging
+
+---
+
 ## 📄 License
 
 MIT License - see [LICENSE](./LICENSE)
