@@ -7,13 +7,13 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                         |
-| ----------------- | ------------------------------ |
-| **Current Phase** | Phase 2: Instances ✅ Complete |
-| **Next Phase**    | Phase 3: Combat System         |
-| **Tests**         | 1,165 passing                  |
-| **Warnings**      | 0                              |
-| **Last Updated**  | November 2025                  |
+| Aspect            | Status                           |
+| ----------------- | -------------------------------- |
+| **Current Phase** | Phase 3: Combat System 🚧        |
+| **Sub-Phase**     | 2.1 Battle Foundation (starting) |
+| **Tests**         | 1,165 passing                    |
+| **Warnings**      | 0                                |
+| **Last Updated**  | December 2025                    |
 
 ---
 
@@ -62,21 +62,25 @@ PokemonUltimate/
 
 ---
 
-## 🎯 Next: Combat System
+## 🎯 Combat System Progress
 
-Key components to implement:
+See `docs/combat_implementation_plan.md` for full details.
 
-1. Turn order resolution
-2. Damage calculation
-3. Effect resolution
-4. Battle flow (turns, switching)
-5. Victory/defeat conditions
+| Sub-Phase              | Status         | Description               |
+| ---------------------- | -------------- | ------------------------- |
+| 2.1 Battle Foundation  | 🚧 In Progress | BattleField, Slot, Side   |
+| 2.2 Action Queue       | ⏳ Pending     | BattleQueue, BattleAction |
+| 2.3 Turn Order         | ⏳ Pending     | TurnOrderResolver         |
+| 2.4 Damage Calculation | ⏳ Pending     | DamagePipeline            |
+| 2.5 Combat Actions     | ⏳ Pending     | UseMoveAction, etc.       |
+| 2.6 Combat Engine      | ⏳ Pending     | CombatEngine, Arbiter     |
+| 2.7 Integration        | ⏳ Pending     | AI, full battles          |
 
 Reference docs:
 
+-   `docs/combat_implementation_plan.md` ← **Start here**
 -   `docs/architecture/combat_system_spec.md`
 -   `docs/architecture/damage_and_effect_system.md`
--   `docs/architecture/turn_order_system.md`
 
 ---
 
@@ -122,6 +126,7 @@ Reference docs:
 | ----------------------------------------- | -------------------- |
 | `docs/project_guidelines.md`              | 24+ coding rules     |
 | `docs/implementation_plan.md`             | Technical roadmap    |
+| `docs/combat_implementation_plan.md`      | **Combat phases**    |
 | `docs/unity_integration.md`               | Unity setup guide    |
 | `CONTRIBUTING.md`                         | Git workflow & rules |
 | `docs/architecture/combat_system_spec.md` | Combat system design |
