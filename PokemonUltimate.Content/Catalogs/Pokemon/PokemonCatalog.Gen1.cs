@@ -1,3 +1,4 @@
+using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 
@@ -16,6 +17,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(80, 82, 83, 100, 100, 80)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Overgrow)
+            .HiddenAbility(AbilityCatalog.Chlorophyll)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.VineWhip, Moves.MoveCatalog.Growl)
                 .AtLevel(32, Moves.MoveCatalog.RazorLeaf)
@@ -26,6 +29,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(60, 62, 63, 80, 80, 60)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Overgrow)
+            .HiddenAbility(AbilityCatalog.Chlorophyll)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.VineWhip, Moves.MoveCatalog.Growl)
                 .AtLevel(22, Moves.MoveCatalog.RazorLeaf))
@@ -36,6 +41,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(45, 49, 49, 65, 65, 45)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Overgrow)
+            .HiddenAbility(AbilityCatalog.Chlorophyll)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.Growl)
                 .AtLevel(9, Moves.MoveCatalog.VineWhip)
@@ -50,6 +57,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Types(PokemonType.Fire, PokemonType.Flying)
             .Stats(78, 84, 78, 109, 85, 100)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Blaze)
+            .HiddenAbility(AbilityCatalog.SolarPower)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Scratch, Moves.MoveCatalog.Ember)
                 .AtLevel(46, Moves.MoveCatalog.Flamethrower)
@@ -60,6 +69,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Fire)
             .Stats(58, 64, 58, 80, 65, 80)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Blaze)
+            .HiddenAbility(AbilityCatalog.SolarPower)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Scratch, Moves.MoveCatalog.Growl)
                 .AtLevel(17, Moves.MoveCatalog.Ember)
@@ -71,6 +82,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Fire)
             .Stats(39, 52, 43, 60, 50, 65)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Blaze)
+            .HiddenAbility(AbilityCatalog.SolarPower)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Scratch, Moves.MoveCatalog.Growl)
                 .AtLevel(9, Moves.MoveCatalog.Ember)
@@ -85,6 +98,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Water)
             .Stats(79, 83, 100, 85, 105, 78)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Torrent)
+            .HiddenAbility(AbilityCatalog.RainDish)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.WaterGun)
                 .AtLevel(42, Moves.MoveCatalog.Surf)
@@ -95,6 +110,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Water)
             .Stats(59, 63, 80, 65, 80, 58)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Torrent)
+            .HiddenAbility(AbilityCatalog.RainDish)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.WaterGun)
                 .AtLevel(28, Moves.MoveCatalog.Surf))
@@ -105,6 +122,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Water)
             .Stats(44, 48, 65, 50, 64, 43)
             .GenderRatio(87.5f)
+            .Ability(AbilityCatalog.Torrent)
+            .HiddenAbility(AbilityCatalog.RainDish)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.Growl)
                 .AtLevel(8, Moves.MoveCatalog.WaterGun)
@@ -117,6 +136,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         public static readonly PokemonSpeciesData Raichu = Builders.Pokemon.Define("Raichu", 26)
             .Type(PokemonType.Electric)
             .Stats(60, 90, 55, 90, 80, 110)
+            .Ability(AbilityCatalog.Static)
+            .HiddenAbility(AbilityCatalog.LightningRod)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.ThunderShock, Moves.MoveCatalog.QuickAttack)
                 .ByTM(Moves.MoveCatalog.Thunderbolt, Moves.MoveCatalog.Thunder))
@@ -125,6 +146,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         public static readonly PokemonSpeciesData Pikachu = Builders.Pokemon.Define("Pikachu", 25)
             .Type(PokemonType.Electric)
             .Stats(35, 55, 40, 50, 50, 90)
+            .Ability(AbilityCatalog.Static)
+            .HiddenAbility(AbilityCatalog.LightningRod)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.ThunderShock, Moves.MoveCatalog.Growl)
                 .AtLevel(11, Moves.MoveCatalog.QuickAttack)
@@ -139,6 +162,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Normal)
             .Stats(55, 55, 50, 45, 65, 55)
             .GenderRatio(87.5f)
+            .Abilities(AbilityCatalog.RunAway, AbilityCatalog.Adaptability)
+            .HiddenAbility(AbilityCatalog.Anticipation)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.Growl)
                 .AtLevel(15, Moves.MoveCatalog.QuickAttack))
@@ -150,6 +175,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Normal)
             .Stats(160, 110, 65, 65, 110, 30)
             .GenderRatio(87.5f)
+            .Abilities(AbilityCatalog.Immunity, AbilityCatalog.ThickFat)
+            .HiddenAbility(AbilityCatalog.Gluttony)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.Growl)
                 .AtLevel(35, Moves.MoveCatalog.HyperBeam)
@@ -163,6 +190,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Psychic)
             .Stats(106, 110, 90, 154, 90, 130)
             .Genderless()
+            .Ability(AbilityCatalog.Pressure)
+            .HiddenAbility(AbilityCatalog.Unnerve)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Psychic)
                 .ByTM(Moves.MoveCatalog.Thunderbolt, Moves.MoveCatalog.FireBlast, Moves.MoveCatalog.HydroPump))
@@ -172,6 +201,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .Type(PokemonType.Psychic)
             .Stats(100, 100, 100, 100, 100, 100)
             .Genderless()
+            .Ability(AbilityCatalog.Synchronize)
             .Moves(m => m
                 .StartsWith(Moves.MoveCatalog.Psychic)
                 .ByTM(Moves.MoveCatalog.Thunderbolt, Moves.MoveCatalog.Flamethrower, Moves.MoveCatalog.Surf))

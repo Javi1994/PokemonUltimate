@@ -5,6 +5,7 @@ using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Content.Builders
 {
+    // Note: AbilityData must be imported from PokemonUltimate.Core.Blueprints
     /// <summary>
     /// Fluent builder for creating PokemonSpeciesData instances.
     /// Usage: Pokemon.Define("Pikachu", 25).Type(Electric).Stats(...).Build()
@@ -97,6 +98,38 @@ namespace PokemonUltimate.Content.Builders
             _pokemon.GenderRatio = 0f;
             return this;
         }
+
+        #region Abilities
+
+        /// <summary>
+        /// Set the Pokemon's primary ability.
+        /// </summary>
+        public PokemonBuilder Ability(AbilityData ability)
+        {
+            _pokemon.Ability1 = ability;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the Pokemon's abilities (primary and optional secondary).
+        /// </summary>
+        public PokemonBuilder Abilities(AbilityData primary, AbilityData secondary = null)
+        {
+            _pokemon.Ability1 = primary;
+            _pokemon.Ability2 = secondary;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the Pokemon's hidden ability.
+        /// </summary>
+        public PokemonBuilder HiddenAbility(AbilityData ability)
+        {
+            _pokemon.HiddenAbility = ability;
+            return this;
+        }
+
+        #endregion
 
         /// <summary>
         /// Define the Pokemon's learnset using a fluent builder.

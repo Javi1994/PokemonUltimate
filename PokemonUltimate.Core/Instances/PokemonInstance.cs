@@ -132,6 +132,69 @@ namespace PokemonUltimate.Core.Instances
 
         #endregion
 
+        #region Ability & Item
+
+        /// <summary>
+        /// The Pokemon's active ability.
+        /// Can be primary, secondary, or hidden ability from the species.
+        /// </summary>
+        public AbilityData Ability { get; private set; }
+
+        /// <summary>
+        /// The held item (null if not holding anything).
+        /// </summary>
+        public ItemData HeldItem { get; set; }
+
+        /// <summary>
+        /// Returns true if this Pokemon is holding an item.
+        /// </summary>
+        public bool HasHeldItem => HeldItem != null;
+
+        /// <summary>
+        /// Returns true if this Pokemon has an ability assigned.
+        /// </summary>
+        public bool HasAbility => Ability != null;
+
+        /// <summary>
+        /// Returns true if this Pokemon has the specified ability.
+        /// </summary>
+        public bool HasAbilityNamed(string abilityName) =>
+            Ability != null && Ability.Name.Equals(abilityName, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Returns true if this Pokemon is using its hidden ability.
+        /// </summary>
+        public bool IsUsingHiddenAbility =>
+            Ability != null && Species.HiddenAbility != null && Ability == Species.HiddenAbility;
+
+        /// <summary>
+        /// Changes the Pokemon's ability (used by moves like Skill Swap).
+        /// </summary>
+        public void SetAbility(AbilityData ability)
+        {
+            Ability = ability;
+        }
+
+        /// <summary>
+        /// Gives an item to the Pokemon.
+        /// </summary>
+        public void GiveItem(ItemData item)
+        {
+            HeldItem = item;
+        }
+
+        /// <summary>
+        /// Removes and returns the held item.
+        /// </summary>
+        public ItemData TakeItem()
+        {
+            var item = HeldItem;
+            HeldItem = null;
+            return item;
+        }
+
+        #endregion
+
         #region Battle State
 
         /// <summary>
@@ -207,7 +270,9 @@ namespace PokemonUltimate.Core.Instances
             Gender gender,
             List<MoveInstance> moves,
             int friendship = 70,
-            bool isShiny = false)
+            bool isShiny = false,
+            AbilityData ability = null,
+            ItemData heldItem = null)
         {
             Species = species ?? throw new ArgumentNullException(nameof(species));
             InstanceId = Guid.NewGuid().ToString();
@@ -230,6 +295,10 @@ namespace PokemonUltimate.Core.Instances
 
             // Moves
             Moves = moves ?? new List<MoveInstance>();
+
+            // Ability & Item
+            Ability = ability ?? species.Ability1;
+            HeldItem = heldItem;
 
             // Battle state - initialize to defaults
             Status = PersistentStatus.None;

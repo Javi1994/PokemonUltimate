@@ -55,6 +55,25 @@ namespace PokemonUltimate.Core.Blueprints
         /// </summary>
         public float GenderRatio { get; set; } = 50f;
 
+        #region Abilities
+
+        /// <summary>
+        /// Primary ability (most Pokemon have this).
+        /// </summary>
+        public AbilityData Ability1 { get; set; }
+
+        /// <summary>
+        /// Secondary ability (optional, some Pokemon don't have one).
+        /// </summary>
+        public AbilityData Ability2 { get; set; }
+
+        /// <summary>
+        /// Hidden ability (rare, obtained through special means).
+        /// </summary>
+        public AbilityData HiddenAbility { get; set; }
+
+        #endregion
+
         /// <summary>
         /// IIdentifiable implementation - Name serves as the unique ID.
         /// </summary>
@@ -89,6 +108,37 @@ namespace PokemonUltimate.Core.Blueprints
         /// Returns true if this Pokemon can be either gender.
         /// </summary>
         public bool HasBothGenders => GenderRatio > 0 && GenderRatio < 100;
+
+        /// <summary>
+        /// Returns true if this Pokemon has a secondary ability.
+        /// </summary>
+        public bool HasSecondaryAbility => Ability2 != null;
+
+        /// <summary>
+        /// Returns true if this Pokemon has a hidden ability.
+        /// </summary>
+        public bool HasHiddenAbility => HiddenAbility != null;
+
+        /// <summary>
+        /// Gets all possible abilities for this Pokemon.
+        /// </summary>
+        public IEnumerable<AbilityData> GetAllAbilities()
+        {
+            if (Ability1 != null) yield return Ability1;
+            if (Ability2 != null) yield return Ability2;
+            if (HiddenAbility != null) yield return HiddenAbility;
+        }
+
+        /// <summary>
+        /// Gets a random non-hidden ability for this Pokemon.
+        /// </summary>
+        public AbilityData GetRandomAbility(Random random = null)
+        {
+            random = random ?? new Random();
+            if (Ability2 != null && random.Next(2) == 1)
+                return Ability2;
+            return Ability1;
+        }
 
         /// <summary>
         /// Checks if this Pokemon has a specific type (primary or secondary).

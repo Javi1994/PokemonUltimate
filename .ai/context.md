@@ -7,13 +7,13 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                             |
-| ----------------- | ---------------------------------- |
-| **Current Phase** | Phase 3: Combat System 🚧          |
-| **Sub-Phase**     | 2.4 Damage Calculation ✅ Complete |
-| **Tests**         | 1,453 passing                      |
-| **Warnings**      | 0                                  |
-| **Last Updated**  | December 2025                      |
+| Aspect            | Status                         |
+| ----------------- | ------------------------------ |
+| **Current Phase** | Phase 3: Combat System 🚧      |
+| **Sub-Phase**     | 2.5 Combat Actions (preparing) |
+| **Tests**         | 1,541 passing                  |
+| **Warnings**      | 0                              |
+| **Last Updated**  | December 2025                  |
 
 ---
 
@@ -38,7 +38,7 @@ PokemonUltimate/
 │   └── IBattleView # Visual abstraction
 │
 ├── Content/        # Game data definitions
-│   ├── Catalogs/   # Pokemon & Move definitions
+│   ├── Catalogs/   # Pokemon, Move, Ability, Item definitions
 │   └── Builders/   # Fluent APIs
 │
 └── Tests/          # Mirror structure of Core/Combat/Content
@@ -55,6 +55,8 @@ PokemonUltimate/
 -   [x] BaseStats with validation
 -   [x] Type system (18 types)
 -   [x] Nature system (25 natures)
+-   [x] AbilityData (25 Gen3 abilities)
+-   [x] ItemData (23 items: held items, berries)
 
 ### Phase 2: Instances
 
@@ -65,6 +67,11 @@ PokemonUltimate/
 -   [x] Level up system with move learning
 -   [x] Evolution system (Level, Item, Trade, Friendship)
 -   [x] Registries (Pokemon, Move) with query methods
+-   [x] **Ability & Item linked to PokemonInstance** ← NEW
+    -   Species define Ability1, Ability2, HiddenAbility
+    -   Instance has assigned Ability (random or specified)
+    -   Instance can hold ItemData
+    -   All Gen1 Pokemon in catalog have abilities assigned
 
 ---
 

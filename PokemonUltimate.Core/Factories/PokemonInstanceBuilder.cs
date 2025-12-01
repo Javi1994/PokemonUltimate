@@ -44,6 +44,11 @@ namespace PokemonUltimate.Core.Factories
         private bool? _isShiny;
         private const int ShinyOdds = 4096; // 1/4096 chance
 
+        // Ability and Item
+        private AbilityData _ability;
+        private bool _useHiddenAbility;
+        private ItemData _heldItem;
+
         // For testing/special cases
         private int? _overrideMaxHP;
         private int? _overrideAttack;
@@ -103,6 +108,26 @@ namespace PokemonUltimate.Core.Factories
         {
             return new PokemonInstanceBuilder(species, level)
                 .WithNature(nature)
+                .Build();
+        }
+
+        /// <summary>
+        /// Quick creation with hidden ability.
+        /// </summary>
+        public static PokemonInstance CreateWithHiddenAbility(PokemonSpeciesData species, int level)
+        {
+            return new PokemonInstanceBuilder(species, level)
+                .WithHiddenAbility()
+                .Build();
+        }
+
+        /// <summary>
+        /// Quick creation with specific held item.
+        /// </summary>
+        public static PokemonInstance CreateWithItem(PokemonSpeciesData species, int level, ItemData item)
+        {
+            return new PokemonInstanceBuilder(species, level)
+                .Holding(item)
                 .Build();
         }
 
@@ -556,6 +581,70 @@ namespace PokemonUltimate.Core.Factories
 
         #endregion
 
+        #region Ability Configuration
+
+        /// <summary>
+        /// Set a specific ability.
+        /// </summary>
+        public PokemonInstanceBuilder WithAbility(AbilityData ability)
+        {
+            _ability = ability;
+            _useHiddenAbility = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Use the species' hidden ability.
+        /// </summary>
+        public PokemonInstanceBuilder WithHiddenAbility()
+        {
+            _useHiddenAbility = true;
+            _ability = null;
+            return this;
+        }
+
+        /// <summary>
+        /// Use a random normal ability from the species (Ability1 or Ability2).
+        /// </summary>
+        public PokemonInstanceBuilder WithRandomAbility()
+        {
+            _ability = null;
+            _useHiddenAbility = false;
+            return this;
+        }
+
+        #endregion
+
+        #region Held Item Configuration
+
+        /// <summary>
+        /// Give this Pokemon a held item.
+        /// </summary>
+        public PokemonInstanceBuilder Holding(ItemData item)
+        {
+            _heldItem = item;
+            return this;
+        }
+
+        /// <summary>
+        /// Alias for Holding.
+        /// </summary>
+        public PokemonInstanceBuilder WithItem(ItemData item)
+        {
+            return Holding(item);
+        }
+
+        /// <summary>
+        /// Clear any held item.
+        /// </summary>
+        public PokemonInstanceBuilder NoItem()
+        {
+            _heldItem = null;
+            return this;
+        }
+
+        #endregion
+
         #region Stat Overrides (for testing)
 
         /// <summary>
@@ -628,11 +717,14 @@ namespace PokemonUltimate.Core.Factories
             // Determine shiny
             bool isShiny = _isShiny ?? (_random.Next(ShinyOdds) == 0);
 
+            // Determine ability
+            AbilityData ability = DetermineAbility();
+
             // Create instance
             var pokemon = new PokemonInstance(
                 _species, _level, hp, attack, defense,
                 spAttack, spDefense, speed, nature, gender, moves,
-                _friendship, isShiny);
+                _friendship, isShiny, ability, _heldItem);
 
             // Apply optional configurations
             if (_nickname != null)
@@ -809,6 +901,20 @@ namespace PokemonUltimate.Core.Factories
             }
         }
 
+        private AbilityData DetermineAbility()
+        {
+            // Specific ability provided
+            if (_ability != null)
+                return _ability;
+
+            // Hidden ability requested
+            if (_useHiddenAbility && _species.HiddenAbility != null)
+                return _species.HiddenAbility;
+
+            // Random ability from species
+            return _species.GetRandomAbility(_random);
+        }
+
         #endregion
     }
 
@@ -841,6 +947,22 @@ namespace PokemonUltimate.Core.Factories
         public static PokemonInstance Random(PokemonSpeciesData species, int level)
         {
             return PokemonInstanceBuilder.CreateRandom(species, level);
+        }
+
+        /// <summary>
+        /// Quick creation with hidden ability.
+        /// </summary>
+        public static PokemonInstance WithHiddenAbility(PokemonSpeciesData species, int level)
+        {
+            return PokemonInstanceBuilder.CreateWithHiddenAbility(species, level);
+        }
+
+        /// <summary>
+        /// Quick creation with held item.
+        /// </summary>
+        public static PokemonInstance WithItem(PokemonSpeciesData species, int level, ItemData item)
+        {
+            return PokemonInstanceBuilder.CreateWithItem(species, level, item);
         }
 
         /// <summary>
