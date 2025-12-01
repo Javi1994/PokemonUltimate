@@ -79,6 +79,7 @@ See `docs/combat_implementation_plan.md` for full details.
 Reference docs:
 
 -   `docs/combat_implementation_plan.md` ← **Start here**
+-   `docs/architecture/action_system_spec.md` ← **⭐ Action system**
 -   `docs/architecture/combat_system_spec.md`
 -   `docs/architecture/damage_and_effect_system.md`
 
@@ -128,6 +129,7 @@ Reference docs:
 | `docs/implementation_plan.md`             | Technical roadmap    |
 | `docs/combat_implementation_plan.md`      | **Combat phases**    |
 | `docs/combat_use_cases.md`                | **All battle cases** |
+| `docs/architecture/action_system_spec.md` | **⭐ Action system** |
 | `docs/unity_integration.md`               | Unity setup guide    |
 | `CONTRIBUTING.md`                         | Git workflow & rules |
 | `docs/architecture/combat_system_spec.md` | Combat system design |
