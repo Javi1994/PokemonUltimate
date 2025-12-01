@@ -55,6 +55,12 @@ namespace PokemonUltimate.Core.Enums
         /// <summary>Immune to weather damage (Sand Veil, Snow Cloak).</summary>
         WeatherDamageImmunity,
         
+        // === TERRAIN ===
+        /// <summary>Summons terrain on switch-in (Grassy Surge, Electric Surge).</summary>
+        SummonTerrain,
+        /// <summary>Heals or benefits in certain terrain (Grass Pelt).</summary>
+        TerrainBoost,
+        
         // === CONTACT DAMAGE ===
         /// <summary>Damages attacker on contact (Rough Skin, Iron Barbs).</summary>
         DamageOnContact,

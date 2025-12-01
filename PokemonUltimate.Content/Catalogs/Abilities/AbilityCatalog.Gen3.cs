@@ -189,7 +189,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData Drizzle = Ability.Define("Drizzle")
             .Description("Summons rain on entry.")
             .Gen(3)
-            .SummonsWeather(Weather.Rain)
+            .SummonsWeather(Core.Enums.Weather.Rain)
             .Build();
 
         /// <summary>
@@ -198,7 +198,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData Drought = Ability.Define("Drought")
             .Description("Summons harsh sunlight on entry.")
             .Gen(3)
-            .SummonsWeather(Weather.Sun)
+            .SummonsWeather(Core.Enums.Weather.Sun)
             .Build();
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData SandStream = Ability.Define("Sand Stream")
             .Description("Summons a sandstorm on entry.")
             .Gen(3)
-            .SummonsWeather(Weather.Sandstorm)
+            .SummonsWeather(Core.Enums.Weather.Sandstorm)
             .Build();
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData SwiftSwim = Ability.Define("Swift Swim")
             .Description("Doubles Speed in rain.")
             .Gen(3)
-            .SpeedBoostInWeather(Weather.Rain)
+            .SpeedBoostInWeather(Core.Enums.Weather.Rain)
             .Build();
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData Chlorophyll = Ability.Define("Chlorophyll")
             .Description("Doubles Speed in sunlight.")
             .Gen(3)
-            .SpeedBoostInWeather(Weather.Sun)
+            .SpeedBoostInWeather(Core.Enums.Weather.Sun)
             .Build();
 
         // ===== SURVIVAL ABILITIES =====

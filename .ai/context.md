@@ -7,13 +7,13 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                         |
-| ----------------- | ------------------------------ |
-| **Current Phase** | Phase 3: Combat System 🚧      |
-| **Sub-Phase**     | 2.5 Combat Actions (preparing) |
-| **Tests**         | 1,600 passing                  |
-| **Warnings**      | 0                              |
-| **Last Updated**  | December 2025                  |
+| Aspect            | Status                     |
+| ----------------- | -------------------------- |
+| **Current Phase** | Phase 3: Combat System 🚧  |
+| **Sub-Phase**     | 2.5 Combat Actions (ready) |
+| **Tests**         | 1,721 passing              |
+| **Warnings**      | 0                          |
+| **Last Updated**  | December 2025              |
 
 ---
 
@@ -58,6 +58,8 @@ PokemonUltimate/
 -   [x] AbilityData (25 Gen3 abilities + additional)
 -   [x] ItemData (23 items: held items, berries)
 -   [x] StatusEffectData (15 status effects: 6 persistent + 9 volatile)
+-   [x] WeatherData (9 weather conditions: 5 standard + 3 primal + fog)
+-   [x] TerrainData (4 terrains: Grassy, Electric, Psychic, Misty)
 
 ### Phase 2: Instances
 

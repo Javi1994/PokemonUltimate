@@ -24,6 +24,7 @@ namespace PokemonUltimate.Core.Builders
         private float _multiplier = 1.0f;
         private float _hpThreshold;
         private Weather? _weatherCondition;
+        private Terrain? _terrainCondition;
 
         private AbilityBuilder(string name)
         {
@@ -342,6 +343,30 @@ namespace PokemonUltimate.Core.Builders
             return this;
         }
 
+        /// <summary>
+        /// Summons terrain on switch-in (Grassy Surge, Electric Surge).
+        /// </summary>
+        public AbilityBuilder SummonsTerrain(Terrain terrain)
+        {
+            _effect = AbilityEffect.SummonTerrain;
+            _terrainCondition = terrain;
+            _triggers |= AbilityTrigger.OnSwitchIn;
+            return this;
+        }
+
+        /// <summary>
+        /// Benefits from terrain (Grass Pelt, Surge Surfer).
+        /// </summary>
+        public AbilityBuilder TerrainBoost(Terrain terrain, Stat stat, float multiplier = 1.5f)
+        {
+            _effect = AbilityEffect.TerrainBoost;
+            _terrainCondition = terrain;
+            _targetStat = stat;
+            _multiplier = multiplier;
+            _triggers |= AbilityTrigger.Passive;
+            return this;
+        }
+
         #endregion
 
         #region Build
@@ -363,7 +388,8 @@ namespace PokemonUltimate.Core.Builders
                 _secondaryAffectedType,
                 _multiplier,
                 _hpThreshold,
-                _weatherCondition);
+                _weatherCondition,
+                _terrainCondition);
         }
 
         #endregion

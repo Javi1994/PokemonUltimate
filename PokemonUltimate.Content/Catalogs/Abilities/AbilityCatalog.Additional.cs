@@ -28,7 +28,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData RainDish = Ability.Define("Rain Dish")
             .Description("The Pokémon gradually regains HP in rain.")
             .Gen(3)
-            .HealsPercentInWeather(Weather.Rain, 0.0625f)
+            .HealsPercentInWeather(Core.Enums.Weather.Rain, 0.0625f)
             .Build();
 
         /// <summary>

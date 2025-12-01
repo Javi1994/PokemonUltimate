@@ -95,6 +95,11 @@ namespace PokemonUltimate.Core.Blueprints
         /// </summary>
         public Weather? WeatherCondition { get; }
 
+        /// <summary>
+        /// Terrain type for terrain-related abilities (Grassy Surge, etc.).
+        /// </summary>
+        public Terrain? TerrainCondition { get; }
+
         #endregion
 
         #region Constructor
@@ -114,7 +119,8 @@ namespace PokemonUltimate.Core.Blueprints
             PokemonType? secondaryAffectedType,
             float multiplier,
             float hpThreshold,
-            Weather? weatherCondition)
+            Weather? weatherCondition,
+            Terrain? terrainCondition)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -131,6 +137,7 @@ namespace PokemonUltimate.Core.Blueprints
             Multiplier = multiplier;
             HPThreshold = hpThreshold;
             WeatherCondition = weatherCondition;
+            TerrainCondition = terrainCondition;
         }
 
         #endregion

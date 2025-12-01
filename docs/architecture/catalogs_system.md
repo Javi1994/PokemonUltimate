@@ -73,6 +73,18 @@ PokemonUltimate.Content/Catalogs/Status/
 └── StatusCatalog.cs            # All status effects (15 statuses)
 ```
 
+### Weather Catalog (NEW ✅)
+```
+PokemonUltimate.Content/Catalogs/Weather/
+└── WeatherCatalog.cs           # All weather conditions (9 weathers)
+```
+
+### Terrain Catalog (NEW ✅)
+```
+PokemonUltimate.Content/Catalogs/Terrain/
+└── TerrainCatalog.cs           # All terrain conditions (4 terrains)
+```
+
 ### Builders
 ```
 PokemonUltimate.Content/Builders/
@@ -85,7 +97,9 @@ PokemonUltimate.Content/Builders/
 PokemonUltimate.Core/Builders/
 ├── AbilityBuilder.cs           # Ability.Define("Intimidate")
 ├── ItemBuilder.cs              # Item.Define("Leftovers")
-└── StatusEffectBuilder.cs      # Status.Define("Burn")
+├── StatusEffectBuilder.cs      # Status.Define("Burn")
+├── WeatherBuilder.cs           # WeatherEffect.Define("Rain")
+└── TerrainBuilder.cs           # TerrainEffect.Define("Grassy Terrain")
 ```
 
 ## 4. Pokemon Builder System ✅ NEW
@@ -231,6 +245,21 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 |------|----------|
 | Persistent | Burn, Paralysis, Sleep, Poison, BadlyPoisoned, Freeze |
 | Volatile | Confusion, Attract, Flinch, LeechSeed, Curse, Encore, Taunt, Torment, Disable |
+
+### WeatherCatalog (9 Weathers) ✅ NEW
+| Category | Weather |
+|----------|---------|
+| Standard (5 turns) | Rain, Sun (Harsh Sunlight), Sandstorm, Hail, Snow |
+| Primal (indefinite) | Heavy Rain, Extremely Harsh Sunlight, Strong Winds |
+| Special | Fog |
+
+### TerrainCatalog (4 Terrains) ✅ NEW
+| Terrain | Boost | Special Effect |
+|---------|-------|----------------|
+| Grassy | Grass 1.3x | Heals 1/16 HP, halves Earthquake |
+| Electric | Electric 1.3x | Prevents Sleep |
+| Psychic | Psychic 1.3x | Blocks Priority |
+| Misty | - | Dragon 0.5x, prevents all status |
 
 ## 6. Adding New Content
 

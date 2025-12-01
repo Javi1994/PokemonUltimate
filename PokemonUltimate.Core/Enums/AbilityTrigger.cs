@@ -69,6 +69,12 @@ namespace PokemonUltimate.Core.Enums
         /// <summary>Each turn during weather.</summary>
         OnWeatherTick = 1 << 20,
         
+        // === TERRAIN EVENTS ===
+        /// <summary>When terrain changes.</summary>
+        OnTerrainChange = 1 << 21,
+        /// <summary>Each turn during terrain.</summary>
+        OnTerrainTick = 1 << 22,
+        
         // === PASSIVE (always active, no trigger needed) ===
         /// <summary>Ability provides passive stat modification.</summary>
         Passive = 1 << 30,
