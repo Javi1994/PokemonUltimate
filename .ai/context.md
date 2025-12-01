@@ -7,13 +7,13 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                            |
-| ----------------- | --------------------------------- |
-| **Current Phase** | Phase 3: Combat System 🚧         |
-| **Sub-Phase**     | 2.1 Battle Foundation ✅ Complete |
-| **Tests**         | 1,298 passing                     |
-| **Warnings**      | 0                                 |
-| **Last Updated**  | December 2025                     |
+| Aspect            | Status                       |
+| ----------------- | ---------------------------- |
+| **Current Phase** | Phase 3: Combat System 🚧    |
+| **Sub-Phase**     | 2.2 Action Queue ✅ Complete |
+| **Tests**         | 1,336 passing                |
+| **Warnings**      | 0                            |
+| **Last Updated**  | December 2025                |
 
 ---
 
@@ -69,8 +69,8 @@ See `docs/combat_implementation_plan.md` for full details.
 | Sub-Phase              | Status      | Description               |
 | ---------------------- | ----------- | ------------------------- |
 | 2.1 Battle Foundation  | ✅ Complete | BattleField, Slot, Side   |
-| 2.2 Action Queue       | 🎯 Next     | BattleQueue, BattleAction |
-| 2.3 Turn Order         | ⏳ Pending  | TurnOrderResolver         |
+| 2.2 Action Queue       | ✅ Complete | BattleQueue, BattleAction |
+| 2.3 Turn Order         | 🎯 Next     | TurnOrderResolver         |
 | 2.4 Damage Calculation | ⏳ Pending  | DamagePipeline            |
 | 2.5 Combat Actions     | ⏳ Pending  | UseMoveAction, etc.       |
 | 2.6 Combat Engine      | ⏳ Pending  | CombatEngine, Arbiter     |

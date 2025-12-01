@@ -678,9 +678,9 @@ Most moves miss, except:
 - [x] 5.2: Volatile status flags
 - [x] 7.1: Switch resets state
 
-### Phase 2.2: Action Queue
-- [ ] 2.4: Action execution order
-- [ ] 2.5: End of turn processing structure
+### Phase 2.2: Action Queue ✅
+- [x] 2.4: Action execution order (BattleQueue FIFO + InsertAtFront for reactions)
+- [x] 2.5: End of turn processing structure (queue empty = turn complete)
 
 ### Phase 2.3: Turn Order
 - [ ] 2.2: Priority brackets
