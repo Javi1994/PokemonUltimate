@@ -342,13 +342,32 @@ Tests/Combat/TurnOrderResolverTests.cs
 
 ### Completion Checklist
 
-- [ ] `TurnOrderResolver` implemented
-- [ ] Priority extraction working
-- [ ] Speed calculation with modifiers
-- [ ] Paralysis penalty applied
-- [ ] Stat stage modifiers applied
-- [ ] Random tiebreaker for equal speeds
-- [ ] All tests pass
+- [x] `TurnOrderResolver` implemented (21 functional tests)
+- [x] Priority extraction working
+- [x] Speed calculation with modifiers
+- [x] Paralysis penalty applied (×0.5)
+- [x] Stat stage modifiers applied (±6 stages)
+- [x] Random tiebreaker for equal speeds
+- [x] **Edge case tests** (27 tests)
+- [x] All tests pass (48 TurnOrder tests)
+- [x] No compiler warnings
+
+### Spec Compliance Notes
+
+**Implemented (matches spec):**
+- `TurnOrderResolver.SortActions()` - sorts by priority DESC, then speed DESC
+- `GetPriority()` - returns action.Priority
+- `GetEffectiveSpeed()` - base speed × stage modifier × status modifier
+- Stat stage formula: +stages = (2+n)/2, -stages = 2/(2+n)
+- Paralysis: ×0.5 speed
+- Random tiebreaker for equal speeds
+
+**Deferred to Later Phases:**
+- Switch priority (+6) - SwitchAction not yet implemented
+- Choice Scarf (×1.5) - Item system
+- Tailwind (×2.0) - Field effects
+- Trick Room (reverse order) - Field effects
+- Ability modifiers (Swift Swim, etc.)
 
 ---
 

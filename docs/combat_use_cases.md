@@ -682,10 +682,10 @@ Most moves miss, except:
 - [x] 2.4: Action execution order (BattleQueue FIFO + InsertAtFront for reactions)
 - [x] 2.5: End of turn processing structure (queue empty = turn complete)
 
-### Phase 2.3: Turn Order
-- [ ] 2.2: Priority brackets
-- [ ] 2.3: Speed modifiers
-- [ ] 7.1: Switch priority
+### Phase 2.3: Turn Order ✅
+- [x] 2.2: Priority brackets (BattleAction.Priority, TurnOrderResolver sorts by priority)
+- [x] 2.3: Speed modifiers (stat stages ±6, paralysis ×0.5)
+- [ ] 7.1: Switch priority (deferred - SwitchAction not yet implemented)
 
 ### Phase 2.4: Damage Calculation
 - [ ] 4.1: Base damage formula
