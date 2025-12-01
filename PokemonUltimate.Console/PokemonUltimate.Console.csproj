@@ -10,6 +10,7 @@
     <ItemGroup>
       <ProjectReference Include="..\PokemonUltimate.Core\PokemonUltimate.Core.csproj" />
       <ProjectReference Include="..\PokemonUltimate.Content\PokemonUltimate.Content.csproj" />
+      <ProjectReference Include="..\PokemonUltimate.Combat\PokemonUltimate.Combat.csproj" />
     </ItemGroup>
 
 </Project>

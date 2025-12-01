@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using PokemonUltimate.Content.Builders;
+using System.Threading.Tasks;
+using PokemonUltimate.Core.Builders;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
@@ -8,8 +9,23 @@ using PokemonUltimate.Core.Evolution.Conditions;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 using PokemonUltimate.Core.Registry;
+// Combat
+using PokemonUltimate.Combat;
+using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Damage.Steps;
+using PokemonUltimate.Content.Builders;
+// Catalogs
 using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
 using PokemonCatalog = PokemonUltimate.Content.Catalogs.Pokemon.PokemonCatalog;
+using AbilityCatalog = PokemonUltimate.Content.Catalogs.Abilities.AbilityCatalog;
+using ItemCatalog = PokemonUltimate.Content.Catalogs.Items.ItemCatalog;
+using StatusCatalog = PokemonUltimate.Content.Catalogs.Status.StatusCatalog;
+using WeatherCatalog = PokemonUltimate.Content.Catalogs.Weather.WeatherCatalog;
+using TerrainCatalog = PokemonUltimate.Content.Catalogs.Terrain.TerrainCatalog;
+using HazardCatalog = PokemonUltimate.Content.Catalogs.Field.HazardCatalog;
+using SideConditionCatalog = PokemonUltimate.Content.Catalogs.Field.SideConditionCatalog;
+using FieldEffectCatalog = PokemonUltimate.Content.Catalogs.Field.FieldEffectCatalog;
 using Pokemon = PokemonUltimate.Core.Factories.Pokemon;
 
 namespace PokemonUltimate.Console;
@@ -59,7 +75,7 @@ class Program
         Test("GetByPokedexNumber finds #25", () => pokemonRegistry.GetByPokedexNumber(25)?.Name == "Pikachu");
         Test("GetByType finds Fire moves", () => moveRegistry.GetByType(PokemonType.Fire).Any());
         Test("GetByCategory finds Status moves", () => moveRegistry.GetByCategory(MoveCategory.Status).Any());
-        Test("Same instance from catalog and registry", () => 
+        Test("Same instance from catalog and registry", () =>
             ReferenceEquals(PokemonCatalog.Pikachu, pokemonRegistry.GetByName("Pikachu")));
 
         // ═══════════════════════════════════════════════════════
@@ -70,7 +86,7 @@ class Program
         var charizard = PokemonCatalog.Charizard;
         Test("Charizard has name", () => charizard.Name == "Charizard");
         Test("Charizard has Pokedex #6", () => charizard.PokedexNumber == 6);
-        Test("Charizard is Fire/Flying", () => 
+        Test("Charizard is Fire/Flying", () =>
             charizard.PrimaryType == PokemonType.Fire && charizard.SecondaryType == PokemonType.Flying);
         Test("Charizard.IsDualType", () => charizard.IsDualType);
         Test("Charizard.HasType(Fire)", () => charizard.HasType(PokemonType.Fire));
@@ -91,7 +107,7 @@ class Program
         Test("Charmander has Learnset", () => charmander.Learnset != null && charmander.Learnset.Count > 0);
         Test("Charmander.GetStartingMoves() returns moves", () => charmander.GetStartingMoves().Any());
         Test("Charmander can learn Ember", () => charmander.CanLearn(MoveCatalog.Ember));
-        Test("Charmander learns Ember at level 9", () => 
+        Test("Charmander learns Ember at level 9", () =>
             charmander.GetMovesAtLevel(9).Any(m => m.Move.Name == "Ember"));
 
         PrintInfo($"Charmander starting moves: {string.Join(", ", charmander.GetStartingMoves().Select(m => m.Move.Name))}");
@@ -103,7 +119,7 @@ class Program
         PrintSection("EVOLUTIONS");
 
         Test("Charmander.CanEvolve", () => charmander.CanEvolve);
-        Test("Charmander evolves to Charmeleon", () => 
+        Test("Charmander evolves to Charmeleon", () =>
             charmander.Evolutions.Any(e => e.Target.Name == "Charmeleon"));
         Test("Charizard cannot evolve", () => !charizard.CanEvolve);
 
@@ -117,7 +133,7 @@ class Program
         var pikachu = PokemonCatalog.Pikachu;
         Test("Pikachu evolves with Thunder Stone", () =>
             pikachu.Evolutions.Any(e => e.HasCondition<ItemCondition>()));
-        
+
         var pikachuEvo = pikachu.Evolutions.First();
         PrintInfo($"Pikachu → {pikachuEvo.Target.Name} ({pikachuEvo.Description})");
 
@@ -138,11 +154,11 @@ class Program
         // ═══════════════════════════════════════════════════════
         PrintSection("NATURE SYSTEM");
 
-        Test("NatureData.GetStatMultiplier works", () => 
+        Test("NatureData.GetStatMultiplier works", () =>
             NatureData.GetStatMultiplier(Nature.Adamant, Stat.Attack) == 1.1f);
-        Test("Adamant increases Attack", () => 
+        Test("Adamant increases Attack", () =>
             NatureData.GetIncreasedStat(Nature.Adamant) == Stat.Attack);
-        Test("Adamant decreases SpAttack", () => 
+        Test("Adamant decreases SpAttack", () =>
             NatureData.GetDecreasedStat(Nature.Adamant) == Stat.SpAttack);
         Test("Hardy is neutral", () => NatureData.IsNeutral(Nature.Hardy));
         Test("Adamant is not neutral", () => !NatureData.IsNeutral(Nature.Adamant));
@@ -272,14 +288,14 @@ class Program
         Test("MoveInstance has Move reference", () => moveInstance.Move == MoveCatalog.Thunderbolt);
         Test("MoveInstance starts at full PP", () => moveInstance.CurrentPP == moveInstance.MaxPP);
         Test("MoveInstance.HasPP is true", () => moveInstance.HasPP);
-        
+
         moveInstance.Use();
         moveInstance.Use();
         Test("Use() decreases PP", () => moveInstance.CurrentPP == moveInstance.MaxPP - 2);
-        
+
         moveInstance.Restore(1);
         Test("Restore() increases PP", () => moveInstance.CurrentPP == moveInstance.MaxPP - 1);
-        
+
         moveInstance.RestoreFully();
         Test("RestoreFully() restores max PP", () => moveInstance.CurrentPP == moveInstance.MaxPP);
 
@@ -307,7 +323,7 @@ class Program
         var atkNeutral = StatCalculator.CalculateStat(100, 50, Nature.Hardy, Stat.Attack);
         var atkBoosted = StatCalculator.CalculateStat(100, 50, Nature.Adamant, Stat.Attack);
         var atkReduced = StatCalculator.CalculateStat(100, 50, Nature.Modest, Stat.Attack);
-        
+
         Test("Neutral nature with max IVs/EVs", () => atkNeutral == 152);
         Test("Boosting nature = +10%", () => atkBoosted == 167);
         Test("Reducing nature = -10%", () => atkReduced == 136);
@@ -491,20 +507,20 @@ class Program
         var levelUpMon = Pokemon.Create(PokemonCatalog.Charmander, 10)
             .WithNeutralNature()
             .Build();
-        
+
         Test("CanLevelUp is false without exp", () => !levelUpMon.CanLevelUp());
-        
+
         levelUpMon.CurrentExp = StatCalculator.GetExpForLevel(11);
         Test("CanLevelUp is true with exp", () => levelUpMon.CanLevelUp());
-        
+
         var oldMaxHP = levelUpMon.MaxHP;
         var levelsGained = levelUpMon.AddExperience(0); // Already has exp
         Test("AddExperience levels up", () => levelUpMon.Level == 11);
         Test("Stats recalculate on level up", () => levelUpMon.MaxHP > oldMaxHP);
-        
+
         Test("LevelUp() forces level up", () => { levelUpMon.LevelUp(); return levelUpMon.Level == 12; });
         Test("LevelUpTo() reaches target", () => { levelUpMon.LevelUpTo(20); return levelUpMon.Level == 20; });
-        
+
         // Experience methods
         Test("GetExpForNextLevel works", () => levelUpMon.GetExpForNextLevel() == StatCalculator.GetExpForLevel(21));
         Test("GetExpToNextLevel works", () => levelUpMon.GetExpToNextLevel() >= 0);
@@ -520,14 +536,14 @@ class Program
         var evoCharmander = Pokemon.Create(PokemonCatalog.Charmander, 15)
             .WithNeutralNature()
             .Build();
-        
+
         Test("CanEvolve is false at level 15", () => !evoCharmander.CanEvolve());
-        
+
         evoCharmander.LevelUpTo(16);
         Test("CanEvolve is true at level 16", () => evoCharmander.CanEvolve());
-        Test("GetAvailableEvolution returns Charmeleon", () => 
+        Test("GetAvailableEvolution returns Charmeleon", () =>
             evoCharmander.GetAvailableEvolution()?.Target.Name == "Charmeleon");
-        
+
         var oldHP = evoCharmander.MaxHP;
         var evolved = evoCharmander.TryEvolve();
         Test("TryEvolve returns new species", () => evolved?.Name == "Charmeleon");
@@ -542,7 +558,7 @@ class Program
         var evoEevee = Pokemon.Create(PokemonCatalog.Eevee, 20)
             .WithHighFriendship()
             .Build();
-        
+
         Test("Eevee has no evolutions defined yet", () => !evoEevee.CanEvolve());
         Test("Eevee still tracks friendship correctly", () => evoEevee.HasHighFriendship);
 
@@ -556,9 +572,9 @@ class Program
         var stabMon = Pokemon.Create(PokemonCatalog.Pikachu, 50)
             .WithStabMoves()
             .Build();
-        
+
         Test("WithStabMoves creates moveset", () => stabMon.Moves.Count > 0);
-        
+
         // Count STAB moves (Electric for Pikachu)
         var stabCount = stabMon.Moves.Count(m => m.Move.Type == PokemonType.Electric);
         PrintInfo($"STAB moves selected: {stabCount}/{stabMon.Moves.Count} are Electric");
@@ -566,36 +582,328 @@ class Program
         var strongMon = Pokemon.Create(PokemonCatalog.Charizard, 50)
             .WithStrongMoves()
             .Build();
-        
+
         Test("WithStrongMoves creates moveset", () => strongMon.Moves.Count > 0);
-        
+
         var optimalMon = Pokemon.Create(PokemonCatalog.Charizard, 50)
             .WithOptimalMoves()
             .Build();
-        
+
         Test("WithOptimalMoves creates moveset", () => optimalMon.Moves.Count > 0);
 
         PrintInfo($"Strong moves: {string.Join(", ", strongMon.Moves.Select(m => m.Move.Name))}");
         PrintInfo($"Optimal moves: {string.Join(", ", optimalMon.Moves.Select(m => m.Move.Name))}");
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 23: COMPLETE POKEMON LISTING
+        // SECTION 23: ABILITY DATA
+        // ═══════════════════════════════════════════════════════
+        PrintSection("ABILITY DATA");
+
+        Test("AbilityCatalog.Intimidate exists", () => AbilityCatalog.Intimidate != null);
+        Test("AbilityCatalog.Static exists", () => AbilityCatalog.Static != null);
+        Test("AbilityCatalog.Blaze exists", () => AbilityCatalog.Blaze != null);
+        Test("Abilities have names", () => !string.IsNullOrEmpty(AbilityCatalog.Intimidate.Name));
+        Test("Abilities have descriptions", () => !string.IsNullOrEmpty(AbilityCatalog.Static.Description));
+        Test("Intimidate has triggers", () => AbilityCatalog.Intimidate.Triggers != AbilityTrigger.None);
+
+        // Pokemon with abilities
+        var pikachuWithAbility = PokemonCatalog.Pikachu;
+        Test("Pikachu has Ability1", () => pikachuWithAbility.Ability1 != null);
+        Test("Pikachu has HiddenAbility", () => pikachuWithAbility.HiddenAbility != null);
+
+        PrintInfo($"Abilities in catalog: Intimidate, Static, Blaze, Levitate, Sturdy...");
+        PrintInfo($"Pikachu abilities: {pikachuWithAbility.Ability1?.Name}, Hidden: {pikachuWithAbility.HiddenAbility?.Name}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 24: ITEM DATA
+        // ═══════════════════════════════════════════════════════
+        PrintSection("ITEM DATA");
+
+        Test("ItemCatalog.Leftovers exists", () => ItemCatalog.Leftovers != null);
+        Test("ItemCatalog.ChoiceBand exists", () => ItemCatalog.ChoiceBand != null);
+        Test("ItemCatalog.FocusSash exists", () => ItemCatalog.FocusSash != null);
+        Test("Items have names", () => !string.IsNullOrEmpty(ItemCatalog.Leftovers.Name));
+        Test("Leftovers is HeldItem category", () => ItemCatalog.Leftovers.Category == ItemCategory.HeldItem);
+        Test("Choice Band has stat boost", () => ItemCatalog.ChoiceBand.StatMultiplier > 1.0f);
+
+        PrintInfo($"Items: Leftovers, Choice Band/Scarf/Specs, Life Orb, Focus Sash...");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 25: STATUS EFFECT DATA
+        // ═══════════════════════════════════════════════════════
+        PrintSection("STATUS EFFECT DATA");
+
+        Test("StatusCatalog.Burn exists", () => StatusCatalog.Burn != null);
+        Test("StatusCatalog.Paralysis exists", () => StatusCatalog.Paralysis != null);
+        Test("StatusCatalog.Confusion exists", () => StatusCatalog.Confusion != null);
+        Test("Burn is persistent", () => StatusCatalog.Burn.IsPersistent);
+        Test("Burn deals end-of-turn damage", () => StatusCatalog.Burn.EndOfTurnDamage > 0);
+        Test("Burn halves physical attack", () => StatusCatalog.Burn.AttackMultiplier == 0.5f);
+        Test("Paralysis halves speed", () => StatusCatalog.Paralysis.SpeedMultiplier == 0.5f);
+        Test("Confusion is volatile", () => !StatusCatalog.Confusion.IsPersistent);
+        Test("Fire types immune to Burn", () =>
+            StatusCatalog.Burn.ImmuneTypes.Contains(PokemonType.Fire));
+
+        PrintInfo($"Persistent: Burn, Paralysis, Sleep, Poison, BadlyPoisoned, Freeze");
+        PrintInfo($"Volatile: Confusion, Attract, Flinch, LeechSeed, Curse, Encore, Taunt, Torment, Disable");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 26: WEATHER DATA
+        // ═══════════════════════════════════════════════════════
+        PrintSection("WEATHER DATA");
+
+        Test("WeatherCatalog.Rain exists", () => WeatherCatalog.Rain != null);
+        Test("WeatherCatalog.Sun exists", () => WeatherCatalog.Sun != null);
+        Test("WeatherCatalog.Sandstorm exists", () => WeatherCatalog.Sandstorm != null);
+        Test("Weather has names", () => !string.IsNullOrEmpty(WeatherCatalog.Rain.Name));
+        Test("Rain boosts Water power", () => WeatherCatalog.Rain.GetTypePowerMultiplier(PokemonType.Water) > 1.0f);
+        Test("Sun boosts Fire power", () => WeatherCatalog.Sun.GetTypePowerMultiplier(PokemonType.Fire) > 1.0f);
+        Test("Sandstorm deals damage", () => WeatherCatalog.Sandstorm.EndOfTurnDamage > 0);
+
+        PrintInfo($"Standard: Rain, Sun, Sandstorm, Hail, Snow");
+        PrintInfo($"Primal: HeavyRain, ExtremelyHarshSunlight, StrongWinds");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 27: TERRAIN DATA
+        // ═══════════════════════════════════════════════════════
+        PrintSection("TERRAIN DATA");
+
+        Test("TerrainCatalog.Grassy exists", () => TerrainCatalog.Grassy != null);
+        Test("TerrainCatalog.Electric exists", () => TerrainCatalog.Electric != null);
+        Test("TerrainCatalog.Psychic exists", () => TerrainCatalog.Psychic != null);
+        Test("TerrainCatalog.Misty exists", () => TerrainCatalog.Misty != null);
+        Test("Terrain has names", () => !string.IsNullOrEmpty(TerrainCatalog.Grassy.Name));
+        Test("Grassy boosts Grass power", () => TerrainCatalog.Grassy.GetTypePowerMultiplier(PokemonType.Grass) > 1.0f);
+        Test("Grassy heals each turn", () => TerrainCatalog.Grassy.HealsEachTurn);
+        Test("Psychic blocks priority", () => TerrainCatalog.Psychic.BlocksPriorityMoves);
+
+        PrintInfo($"Terrains: Grassy, Electric, Psychic, Misty");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 28: HAZARD DATA
+        // ═══════════════════════════════════════════════════════
+        PrintSection("HAZARD DATA");
+
+        Test("HazardCatalog.StealthRock exists", () => HazardCatalog.StealthRock != null);
+        Test("HazardCatalog.Spikes exists", () => HazardCatalog.Spikes != null);
+        Test("HazardCatalog.ToxicSpikes exists", () => HazardCatalog.ToxicSpikes != null);
+        Test("HazardCatalog.StickyWeb exists", () => HazardCatalog.StickyWeb != null);
+        Test("Hazards have names", () => !string.IsNullOrEmpty(HazardCatalog.StealthRock.Name));
+        Test("Stealth Rock is Rock type damage", () => HazardCatalog.StealthRock.DamageType == PokemonType.Rock);
+        Test("Spikes has 3 layers", () => HazardCatalog.Spikes.MaxLayers == 3);
+        Test("Toxic Spikes applies poison", () => HazardCatalog.ToxicSpikes.AppliesStatus);
+
+        PrintInfo($"Hazards: Stealth Rock, Spikes (3 layers), Toxic Spikes (2 layers), Sticky Web");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 29: SIDE CONDITION DATA
+        // ═══════════════════════════════════════════════════════
+        PrintSection("SIDE CONDITION DATA");
+
+        Test("SideConditionCatalog.Reflect exists", () => SideConditionCatalog.Reflect != null);
+        Test("SideConditionCatalog.LightScreen exists", () => SideConditionCatalog.LightScreen != null);
+        Test("SideConditionCatalog.Tailwind exists", () => SideConditionCatalog.Tailwind != null);
+        Test("Reflect reduces physical damage", () =>
+            SideConditionCatalog.Reflect.ReducesDamageFrom == MoveCategory.Physical);
+        Test("Light Screen reduces special damage", () =>
+            SideConditionCatalog.LightScreen.ReducesDamageFrom == MoveCategory.Special);
+        Test("Tailwind doubles speed", () => SideConditionCatalog.Tailwind.SpeedMultiplier == 2.0f);
+
+        PrintInfo($"Screens: Reflect, Light Screen, Aurora Veil");
+        PrintInfo($"Protection: Safeguard, Mist, Lucky Chant");
+        PrintInfo($"Speed: Tailwind");
+        PrintInfo($"Guards: Wide Guard, Quick Guard, Mat Block");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 30: FIELD EFFECT DATA
+        // ═══════════════════════════════════════════════════════
+        PrintSection("FIELD EFFECT DATA");
+
+        Test("FieldEffectCatalog.TrickRoom exists", () => FieldEffectCatalog.TrickRoom != null);
+        Test("FieldEffectCatalog.Gravity exists", () => FieldEffectCatalog.Gravity != null);
+        Test("Trick Room reverses speed", () => FieldEffectCatalog.TrickRoom.ReversesSpeedOrder);
+        Test("Magic Room disables items", () => FieldEffectCatalog.MagicRoom.DisablesItems);
+        Test("Wonder Room swaps defenses", () => FieldEffectCatalog.WonderRoom.SwapsDefenses);
+        Test("Gravity grounds all Pokemon", () => FieldEffectCatalog.Gravity.GroundsAllPokemon);
+
+        PrintInfo($"Rooms: Trick Room, Magic Room, Wonder Room");
+        PrintInfo($"Other: Gravity, Ion Deluge, Fairy Lock, Mud Sport, Water Sport");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 31: NEW MOVE EFFECTS
+        // ═══════════════════════════════════════════════════════
+        PrintSection("NEW MOVE EFFECTS");
+
+        // Test new effect types
+        Test("VolatileStatusEffect works", () =>
+            new VolatileStatusEffect(VolatileStatus.Confusion, 100).EffectType == EffectType.VolatileStatus);
+        Test("ProtectionEffect works", () =>
+            new ProtectionEffect(ProtectionType.Full).EffectType == EffectType.Protection);
+        Test("ChargingEffect works", () =>
+            new ChargingEffect { SemiInvulnerable = true }.EffectType == EffectType.Charging);
+        Test("DelayedDamageEffect works", () =>
+            new DelayedDamageEffect(2, false).EffectType == EffectType.DelayedDamage);
+        Test("ForceSwitchEffect works", () =>
+            new ForceSwitchEffect(true).EffectType == EffectType.ForceSwitch);
+        Test("BindingEffect works", () =>
+            new BindingEffect("wrapped").EffectType == EffectType.Binding);
+        Test("SwitchAfterAttackEffect works", () =>
+            new SwitchAfterAttackEffect(true).EffectType == EffectType.SwitchAfterAttack);
+        Test("FieldConditionEffect works", () =>
+            new FieldConditionEffect { ConditionType = FieldConditionType.Weather }.EffectType == EffectType.FieldCondition);
+        Test("SelfDestructEffect works", () =>
+            new SelfDestructEffect(SelfDestructType.Explosion).EffectType == EffectType.SelfDestruct);
+        Test("RevengeEffect works", () =>
+            new RevengeEffect(MoveCategory.Physical, 2.0f).EffectType == EffectType.Revenge);
+        Test("MoveRestrictionEffect works", () =>
+            new MoveRestrictionEffect(MoveRestrictionType.Taunt, 3).EffectType == EffectType.MoveRestriction);
+        Test("PriorityModifierEffect works", () =>
+            new PriorityModifierEffect { Condition = PriorityCondition.TerrainBased }.EffectType == EffectType.PriorityModifier);
+
+        PrintInfo($"Total effect types: {Enum.GetNames(typeof(EffectType)).Length}");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 32: COMBAT FOUNDATION
+        // ═══════════════════════════════════════════════════════
+        PrintSection("COMBAT FOUNDATION");
+
+        // BattleSlot (without side reference for simple test)
+        var slot = new BattleSlot(0);
+        var combatPikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+        slot.SetPokemon(combatPikachu);
+        
+        Test("BattleSlot holds Pokemon", () => slot.Pokemon == combatPikachu);
+        Test("BattleSlot starts with 0 Attack stage", () => slot.GetStatStage(Stat.Attack) == 0);
+        
+        slot.ModifyStatStage(Stat.Attack, 2);
+        Test("ModifyStatStage works", () => slot.GetStatStage(Stat.Attack) == 2);
+        
+        slot.AddVolatileStatus(VolatileStatus.Confusion);
+        Test("AddVolatileStatus works", () => slot.HasVolatileStatus(VolatileStatus.Confusion));
+        
+        slot.ResetBattleState();
+        Test("ResetBattleState clears stages", () => slot.GetStatStage(Stat.Attack) == 0);
+
+        // BattleSide
+        var playerSide = new BattleSide(2, isPlayer: true);
+        Test("BattleSide creates slots", () => playerSide.Slots.Count == 2);
+        Test("BattleSide.IsPlayer", () => playerSide.IsPlayer);
+
+        // BattleField with parties
+        var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charizard, 50) };
+        var battleRules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
+        
+        var field = new BattleField();
+        field.Initialize(battleRules, playerParty, enemyParty);
+        
+        Test("BattleField has PlayerSide", () => field.PlayerSide != null);
+        Test("BattleField has EnemySide", () => field.EnemySide != null);
+        Test("BattleField.Rules is set", () => field.Rules != null);
+
+        PrintInfo($"Combat structures: BattleSlot, BattleSide, BattleField ready");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 33: BATTLE QUEUE
+        // ═══════════════════════════════════════════════════════
+        PrintSection("BATTLE QUEUE");
+
+        var battleQueue = new BattleQueue();
+        var testAction = new MessageAction("Test message");
+        
+        battleQueue.Enqueue(testAction);
+        Test("BattleQueue.Enqueue works", () => battleQueue.Count == 1);
+        
+        battleQueue.Clear();
+        Test("BattleQueue.Clear works", () => battleQueue.Count == 0);
+
+        // Process queue
+        var executedActions = 0;
+        var processQueue = new BattleQueue();
+        processQueue.Enqueue(new TestAction(() => executedActions++));
+        processQueue.Enqueue(new TestAction(() => executedActions++));
+        
+        processQueue.ProcessQueue(field, new NullBattleView()).Wait();
+        Test("BattleQueue.ProcessQueue executes all", () => executedActions == 2);
+
+        PrintInfo($"BattleQueue: Enqueue, EnqueueRange, InsertAtFront, ProcessQueue ready");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 34: TURN ORDER RESOLVER
+        // ═══════════════════════════════════════════════════════
+        PrintSection("TURN ORDER RESOLVER");
+
+        var fastPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50); // Speed ~110
+        var slowPokemon = PokemonFactory.Create(PokemonCatalog.Snorlax, 50); // Speed ~30
+        
+        var fastSlot = new BattleSlot(0);
+        fastSlot.SetPokemon(fastPokemon);
+        var slowSlot = new BattleSlot(1);
+        slowSlot.SetPokemon(slowPokemon);
+
+        var turnActions = new[]
+        {
+            new TestMoveAction(slowSlot, 0),
+            new TestMoveAction(fastSlot, 0)
+        };
+
+        var sorted = TurnOrderResolver.SortActions(turnActions, field);
+        Test("Faster Pokemon moves first", () => sorted[0].User == fastSlot);
+
+        // Priority test
+        var priorityActions = new[]
+        {
+            new TestMoveAction(slowSlot, 1), // Quick Attack priority
+            new TestMoveAction(fastSlot, 0)  // Normal move
+        };
+
+        var prioritySorted = TurnOrderResolver.SortActions(priorityActions, field);
+        Test("Priority beats speed", () => prioritySorted[0].User == slowSlot);
+
+        PrintInfo($"TurnOrderResolver: Priority > Speed > Random");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 35: DAMAGE PIPELINE
+        // ═══════════════════════════════════════════════════════
+        PrintSection("DAMAGE PIPELINE");
+
+        // Create slots with Pokemon for damage calculation
+        var attackerSlot = new BattleSlot(0);
+        var defenderSlot = new BattleSlot(1);
+        attackerSlot.SetPokemon(PokemonFactory.Create(PokemonCatalog.Charizard, 50));
+        defenderSlot.SetPokemon(PokemonFactory.Create(PokemonCatalog.Venusaur, 50));
+        var attackMove = MoveCatalog.Flamethrower;
+
+        var pipeline = new DamagePipeline(); // Uses default steps
+
+        var damageContext = pipeline.Calculate(attackerSlot, defenderSlot, attackMove, field, forceCritical: false, fixedRandomValue: 1.0f);
+        
+        Test("DamagePipeline calculates damage", () => damageContext.FinalDamage > 0);
+        Test("STAB applied (Charizard Fire)", () => damageContext.IsStab);
+        Test("Type effectiveness (Fire vs Grass)", () => damageContext.TypeEffectiveness == 2.0f);
+
+        PrintInfo($"Damage: {damageContext.FinalDamage} (STAB: {damageContext.IsStab}, Effectiveness: {damageContext.TypeEffectiveness}x)");
+        PrintInfo($"DamagePipeline steps: Base → Crit → Random → STAB → TypeEff → Burn");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 37: COMPLETE POKEMON LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL POKEMON IN CATALOG");
 
         foreach (var poke in PokemonCatalog.All.OrderBy(p => p.PokedexNumber))
         {
-            var types = poke.IsDualType 
-                ? $"{poke.PrimaryType}/{poke.SecondaryType}" 
+            var types = poke.IsDualType
+                ? $"{poke.PrimaryType}/{poke.SecondaryType}"
                 : poke.PrimaryType.ToString();
-            var evoInfo = poke.CanEvolve 
-                ? $" → {poke.Evolutions.First().Target.Name}" 
+            var evoInfo = poke.CanEvolve
+                ? $" → {poke.Evolutions.First().Target.Name}"
                 : "";
-            PrintInfo($"#{poke.PokedexNumber:D3} {poke.Name,-12} [{types,-15}] BST:{poke.BaseStats.Total}{evoInfo}");
+            var abilityInfo = poke.Ability1 != null ? $" [{poke.Ability1.Name}]" : "";
+            PrintInfo($"#{poke.PokedexNumber:D3} {poke.Name,-12} [{types,-15}] BST:{poke.BaseStats.Total}{abilityInfo}{evoInfo}");
         }
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 21: COMPLETE MOVE LISTING
+        // SECTION 38: COMPLETE MOVE LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL MOVES IN CATALOG");
 
@@ -680,7 +988,7 @@ class Program
     {
         System.Console.WriteLine();
         System.Console.WriteLine();
-        
+
         if (_failedTests == 0)
         {
             System.Console.ForegroundColor = ConsoleColor.Green;
@@ -695,13 +1003,66 @@ class Program
             System.Console.WriteLine($"║  ✗ {_failedTests} TESTS FAILED out of {_passedTests + _failedTests}                            ║");
             System.Console.WriteLine("╚═══════════════════════════════════════════════════════════════╝");
         }
-        
+
         System.Console.ResetColor();
         System.Console.WriteLine();
         System.Console.WriteLine($"  Passed: {_passedTests}");
         System.Console.WriteLine($"  Failed: {_failedTests}");
         System.Console.WriteLine($"  Total:  {_passedTests + _failedTests}");
         System.Console.WriteLine();
+    }
+
+    #endregion
+
+    #region Test Helper Classes
+
+    /// <summary>
+    /// Simple action for testing queue execution.
+    /// </summary>
+    private class TestAction : BattleAction
+    {
+        private readonly Action _action;
+
+        public TestAction(Action action) : base(null)
+        {
+            _action = action;
+        }
+
+        public override System.Collections.Generic.IEnumerable<BattleAction> ExecuteLogic(BattleField field)
+        {
+            _action();
+            return Array.Empty<BattleAction>();
+        }
+
+        public override Task ExecuteVisual(IBattleView view)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    /// <summary>
+    /// Simple move action for testing turn order.
+    /// </summary>
+    private class TestMoveAction : BattleAction
+    {
+        private readonly int _priority;
+
+        public override int Priority => _priority;
+
+        public TestMoveAction(BattleSlot user, int priority) : base(user)
+        {
+            _priority = priority;
+        }
+
+        public override System.Collections.Generic.IEnumerable<BattleAction> ExecuteLogic(BattleField field)
+        {
+            return Array.Empty<BattleAction>();
+        }
+
+        public override Task ExecuteVisual(IBattleView view)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     #endregion
