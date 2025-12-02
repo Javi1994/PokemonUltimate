@@ -104,7 +104,7 @@
 
 ### 2.5 End of Turn Phase
 - [ ] Weather damage (Sandstorm, Hail)
-- [ ] Status damage (Burn, Poison, Badly Poisoned)
+- [x] Status damage (Burn, Poison, Badly Poisoned) ✅ Phase 2.8
 - [ ] Binding damage (Wrap, Fire Spin)
 - [ ] Leech Seed drain
 - [ ] Ingrain heal
@@ -225,7 +225,7 @@ Where:
 ### 5.1 Persistent Status (One at a time)
 
 #### Burn
-- [ ] 1/16 HP damage at end of turn
+- [x] 1/16 HP damage at end of turn ✅ Phase 2.8
 - [ ] Attack halved for physical moves
 - [ ] Fire types immune
 - [ ] Can be inflicted by: Will-O-Wisp, Flamethrower (10%), etc.
@@ -246,10 +246,10 @@ Where:
 - [ ] Cured by: Awakening, being attacked by Wake-Up Slap
 
 #### Poison
-- [ ] 1/8 HP damage at end of turn
-- [ ] Poison and Steel types immune
-- [ ] Badly Poisoned: 1/16, 2/16, 3/16... (increases each turn)
-- [ ] Badly Poisoned counter resets on switch
+- [x] 1/8 HP damage at end of turn ✅ Phase 2.8
+- [ ] Poison and Steel types immune (handled in ApplyStatusAction)
+- [x] Badly Poisoned: 1/16, 2/16, 3/16... (increases each turn) ✅ Phase 2.8
+- [ ] Badly Poisoned counter resets on switch (handled in SwitchAction)
 - [ ] Cured by: Pecha Berry, Antidote
 
 #### Freeze
@@ -718,6 +718,15 @@ Most moves miss, except:
 - [x] TargetResolver for move targeting
 
 **Status**: ✅ **100% Complete**
+
+### Phase 2.8: End-of-Turn Effects ✅
+- [x] Status damage processing (`EndOfTurnProcessor`)
+- [x] Burn damage (1/16 Max HP per turn)
+- [x] Poison damage (1/8 Max HP per turn)
+- [x] Badly Poisoned escalating damage (counter-based)
+- [x] Integration into `CombatEngine.RunTurn()`
+
+**Status**: ✅ **Core Complete** - Status damage implemented, item effects deferred
 
 ### Future Phases
 - [ ] 8: Entry effects (hazards)

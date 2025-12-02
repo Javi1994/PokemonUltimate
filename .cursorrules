@@ -30,6 +30,7 @@
    - List what will be implemented vs deferred
    - Ensure spec has all necessary details (interfaces, classes, methods, examples)
    - If spec is incomplete, update it before implementation
+   - Document any API changes from spec (with rationale)
 
 3. **TDD: Write Functional Tests FIRST**
    - Create test file following naming: `[Feature]Tests.cs`
@@ -47,26 +48,59 @@
    - Create `[Feature]EdgeCasesTests.cs`
    - Test null inputs, boundary conditions, invalid states
    - Test real-world scenarios
-   - If tests reveal missing functionality → implement it
+   - **If tests reveal missing functionality → implement it immediately** (Test-Driven Discovery)
 
-6. **Verify Implementation**
+6. **Write Integration Tests** (MANDATORY if feature interacts with multiple systems)
+   - **When Required:**
+     - Feature creates actions that interact with BattleQueue
+     - Feature modifies state that affects other systems
+     - Feature is a system boundary (e.g., Status → End-of-Turn → Damage)
+     - Feature coordinates multiple components (e.g., CombatEngine → TurnOrderResolver → BattleQueue)
+   - **What to Test:**
+     - System interactions (A → B → C)
+     - Cascading effects (Action → Reaction → Outcome)
+     - State consistency across systems
+   - **Where:** Create `[Feature]IntegrationTests.cs` in `Tests/[Module]/Integration/`
+   - **Naming:** `[System1]_[System2]_[ExpectedBehavior]`
+   - **If Unsure:** Ask "Does this feature work with other systems?" If yes → Write integration tests
+
+7. **Validate Against Use Cases** (Combat features only)
+   - Read relevant sections of `docs/combat_use_cases.md`
+   - Verify implementation covers all listed behaviors
+   - Mark items as complete in the use cases document
+   - Document any deferred items with rationale
+   - **If use case reveals missing functionality → implement it immediately**
+
+8. **Verify Implementation**
    - Run `dotnet build` - Verify no warnings
    - Run `dotnet test` - Verify all tests pass
-   - **Validate against `docs/combat_use_cases.md`** (if combat-related)
-   - Check `docs/checklists/feature_complete.md`
-
-7. **Update Documentation**
-   - Update `.ai/context.md` with new state
-   - Update relevant architecture docs if API changed
-   - Update status documents (e.g., `player_input_status.md`)
-   - Update implementation plan if phase completed
+   - Check `docs/checklists/feature_complete.md` for final verification
    - Mention test count in response
+
+9. **Update Documentation**
+   - **Immediate Updates** (before moving on):
+     - Update `.ai/context.md` with new state (phase, test count, completed systems)
+     - Mark use cases as complete in `docs/combat_use_cases.md` (if applicable)
+     - Update test count in response
+   
+   - **If API Changed:**
+     - Update relevant architecture doc in `docs/architecture/`
+     - Note changes in spec document with rationale
+   
+   - **If New Pattern Introduced:**
+     - Create new architecture doc OR update existing pattern doc
+     - Document rationale in `.ai/context.md` under "Key Architectural Decisions"
+   
+   - **Status Documents:**
+     - Update phase-specific status docs (e.g., `player_input_status.md`) if they exist
+     - Update implementation plan if phase completed
 
 ### When User Says "Review X" or "Check X"
 1. Read `docs/anti-patterns.md`
 2. Verify against `docs/project_guidelines.md`
-3. List issues found
-4. Fix issues if requested
+3. Check `docs/checklists/feature_complete.md` for completeness
+4. List issues found
+5. Fix issues if requested
 
 ### When User Says "Edge Cases" or "Test X"
 1. Read `docs/examples/good_tests.md` for patterns
@@ -74,6 +108,51 @@
 3. Test invalid inputs (null, negative, overflow)
 4. Add real-world verification if applicable
 5. If tests reveal missing functionality → implement it
+
+### When User Says "Refactor X" or "Improve X"
+1. **Identify Scope**
+   - Read current implementation
+   - Identify what needs improvement
+   - Check `docs/anti-patterns.md` for violations
+   - Verify tests exist (if not, write them first using TDD)
+
+2. **Refactor Safely**
+   - Make small, incremental changes
+   - Run tests after each change
+   - Maintain API compatibility (or document breaking changes)
+   - Follow existing patterns from codebase
+
+3. **Update Documentation**
+   - Update architecture docs if pattern changed
+   - Update `.ai/context.md` if significant
+   - Document rationale for changes
+
+### When Issues Arise During Implementation
+
+**If Spec is Incomplete:**
+1. Stop implementation
+2. Complete the spec first in `docs/architecture/`
+3. Document what was missing
+4. Resume implementation
+
+**If Spec is Incorrect:**
+1. Document the discrepancy
+2. Decide: Fix spec or change implementation?
+3. If changing implementation, update spec to match
+4. Note decision in `.ai/context.md` under "Key Architectural Decisions"
+
+**If Discovery Requires Architectural Change:**
+1. Pause current work
+2. Document the discovery
+3. Evaluate impact on other systems
+4. Update architecture docs if needed
+5. Resume with updated understanding
+
+**If Test Reveals Missing Functionality:**
+1. **DO NOT** skip the test or mark it as "future work"
+2. Implement the missing functionality immediately (Test-Driven Discovery)
+3. Update spec/documentation if needed
+4. Continue until feature is complete
 
 ## ✅ Mandatory Rules (Always Apply)
 
@@ -94,12 +173,14 @@
 ### Testing
 - **TDD** → Tests before implementation
 - **Naming** → `MethodName_Scenario_ExpectedResult`
-- **Two-phase** → Functional tests, then edge cases
+- **Three-phase** → Functional tests, then edge cases, then integration tests
 - **Real-world** → Verify against official game data when applicable
+- **Test-Driven Discovery** → If test reveals missing functionality, implement it
 
 ### Documentation
 - **XML docs** → All public APIs
 - **Update context** → After major features
+- **Document decisions** → Architectural changes go in `.ai/context.md`
 
 ## 🔍 Quick Reference
 
@@ -147,6 +228,9 @@ public void Method(int value)
 | Feature checklist | `docs/checklists/feature_complete.md` |
 | Combat specs | `docs/architecture/combat_system_spec.md` |
 | Damage formula | `docs/architecture/damage_and_effect_system.md` |
+| Integration tests | `docs/testing/integration_testing_guide.md` |
+| Troubleshooting | `docs/workflow/troubleshooting.md` |
+| Refactoring | `docs/workflow/refactoring_guide.md` |
 
 ## 🔄 After Completing Work
 
@@ -155,6 +239,18 @@ Always:
 2. Run `dotnet test` - Verify all pass
 3. Update `.ai/context.md` if major changes
 4. Mention test count in response
+5. Verify against `docs/checklists/feature_complete.md`
+
+## ⚡ Quick Verification Checklist
+
+Before marking feature complete, verify:
+- [ ] All tests pass (`dotnet test`)
+- [ ] No warnings (`dotnet build`)
+- [ ] `.ai/context.md` updated
+- [ ] Use cases validated (if combat-related)
+- [ ] Integration tests written (if applicable)
+- [ ] Documentation updated
+- [ ] Test count mentioned in response
 
 ## 🎮 Project-Specific Knowledge
 
@@ -176,4 +272,4 @@ Always:
 ### Current Phase
 - ✅ Phase 1: Core Data (Complete)
 - ✅ Phase 2: Instances (Complete)  
-- 🎯 Phase 3: Combat System (Next)
+- 🎯 Phase 3: Combat System (In Progress)

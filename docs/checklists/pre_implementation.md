@@ -55,6 +55,8 @@ Before coding, write down:
 - [ ] Can I list all the classes/interfaces I need to create?
 - [ ] Do I know what tests I'll write first?
 - [ ] Have I identified potential edge cases?
+- [ ] Do I know which systems this feature will interact with?
+- [ ] Have I identified integration test scenarios?
 
 ## 5. ✅ Get Approval (if working with team)
 
@@ -76,6 +78,14 @@ Before coding, write down:
 | Victory/Defeat | `victory_defeat_system.md` |
 | Player/AI Input | `player_ai_spec.md` |
 | UI Presentation | `ui_presentation_system.md` |
+
+## Additional Resources
+
+| Need | Document |
+|------|----------|
+| Troubleshooting | `docs/workflow/troubleshooting.md` |
+| Refactoring | `docs/workflow/refactoring_guide.md` |
+| Integration Tests | `docs/testing/integration_testing_guide.md` |
 
 ---
 
@@ -106,12 +116,21 @@ Before coding, write down:
 
 ---
 
+## 5. 🔗 Identify Integration Points
+
+- [ ] Does this feature interact with other systems?
+- [ ] Will it create actions that go through BattleQueue?
+- [ ] Will it modify state that affects other systems?
+- [ ] Is it a system boundary (e.g., Status → End-of-Turn)?
+- [ ] If yes to any → Plan integration tests
+
 ## When to Skip This Checklist
 
 **Never.** Even for small features, at minimum:
 1. Identify the relevant spec (if any)
 2. Note what you're implementing vs deferring
-3. Proceed with TDD
+3. Identify integration points
+4. Proceed with TDD
 
 ---
 
@@ -120,4 +139,6 @@ Before coding, write down:
 1. Update the spec if you made improvements
 2. Document any deferred items in the implementation plan
 3. Add to `.ai/context.md` if significant changes
+4. Mark use cases as complete (if combat-related)
+5. Write integration tests if integration points identified
 

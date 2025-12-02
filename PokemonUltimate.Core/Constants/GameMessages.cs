@@ -34,6 +34,13 @@ namespace PokemonUltimate.Core.Constants
         public const string MoveMissed = "The attack missed!";
 
         #endregion
+
+        #region Status Effects
+
+        public const string StatusBurnDamage = "{0} is hurt by its burn!";
+        public const string StatusPoisonDamage = "{0} is hurt by poison!";
+
+        #endregion
     }
 }
 

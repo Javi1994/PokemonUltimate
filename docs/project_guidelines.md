@@ -10,9 +10,10 @@ _These rules are absolute. All code must adhere to them._
     - Avoid `MonoBehaviour` for game logic. Use it only for View/Input.
     - **Rule of Thumb**: If you can't write a unit test for it in a separate C# console project, it belongs in the View layer, not the Logic layer.
     - **TDD Mandate**: Every feature MUST include comprehensive tests.
-      - **Two-Phase Testing**:
+      - **Three-Phase Testing**:
         1.  **Functional Tests**: Verify the feature works as designed (happy path).
         2.  **Edge Case Tests**: Verify boundary conditions, limits, and real-world scenarios.
+        3.  **Integration Tests**: Verify the feature works correctly with other systems.
       - Write tests immediately after (or before) the implementation.
       - No code is considered "done" until all its tests pass.
       - Run `dotnet test` after each implementation to ensure all tests pass.
@@ -21,6 +22,17 @@ _These rules are absolute. All code must adhere to them._
       - Tests are not just validation—they are **feature discovery tools**.
       - Example: Testing `Registry.GetByMinPower()` revealed it didn't exist → implement it.
       - This ensures the API is complete and robust before moving to the next feature.
+    - **Integration Testing Standard**:
+      - **When to Create**: After implementing a feature that interacts with multiple systems.
+      - **What to Test**: Verify components work together correctly (e.g., Action → Queue → Processing, Status → End-of-Turn → Damage).
+      - **Where**: Place in `Tests/[Module]/Integration/` directory.
+      - **Naming**: `[Feature]IntegrationTests.cs` (e.g., `EndOfTurnIntegrationTests.cs`).
+      - **Focus**: Test interactions between systems, not individual unit behavior.
+      - **Examples**: 
+        - `DamageAction` → `FaintAction` generation
+        - `UseMoveAction` → Multiple effect actions
+        - `SwitchAction` → State reset
+        - `CombatEngine` → `TurnOrderResolver` → `BattleQueue`
 
 2.  **Everything is an Action (The Queue Pattern)**:
 
@@ -289,8 +301,47 @@ _Key constraints defining the game's scope._
 
 - Every major system must have a corresponding Specification Document in `docs/architecture/`.
 - Every major flow must have a Mermaid diagram.
+- Workflow guides must be maintained in `docs/workflow/`.
+- Testing guides must be maintained in `docs/testing/`.
 
-## 5. Core Systems Reference
+## 5. Development Workflow Reference
+
+_Quick reference to workflow guides and processes._
+
+| Need | Document |
+|------|----------|
+| Troubleshooting | `docs/workflow/troubleshooting.md` |
+| Refactoring | `docs/workflow/refactoring_guide.md` |
+| Integration Tests | `docs/testing/integration_testing_guide.md` |
+| Pre-Implementation | `docs/checklists/pre_implementation.md` |
+| Feature Complete | `docs/checklists/feature_complete.md` |
+| AI Workflow | `.cursorrules` |
+
+### AI-Assisted Development Process
+
+The project uses a comprehensive AI workflow defined in `.cursorrules`:
+
+1. **Read Context & Specs** - Understand current state and requirements
+2. **Verify Spec Completeness** - Ensure all details documented
+3. **TDD: Write Functional Tests** - Tests before implementation
+4. **Implement Feature** - Follow spec and existing patterns
+5. **Write Edge Case Tests** - Boundary conditions and real-world scenarios
+6. **Write Integration Tests** - System interactions (if applicable)
+7. **Validate Use Cases** - Check against combat use cases document
+8. **Verify Implementation** - Build, test, check checklists
+9. **Update Documentation** - Context, architecture docs, use cases
+
+### Problem-Solving Process
+
+When issues arise during implementation:
+- **Spec incomplete** → Complete spec first
+- **Spec incorrect** → Document discrepancy, fix spec or implementation
+- **Test reveals missing feature** → Implement immediately (Test-Driven Discovery)
+- **Architectural change needed** → Document discovery, evaluate impact, update architecture
+
+See `docs/workflow/troubleshooting.md` for detailed problem-solving guide.
+
+## 6. Core Systems Reference
 
 _Quick reference to the main combat systems. See individual specs for details._
 
@@ -329,7 +380,7 @@ _Quick reference to the main combat systems. See individual specs for details._
 - **Battle Mechanics Catalog** (`battle_mechanics_catalog.md`): Comprehensive list of all BattleActions and IMoveEffects (40+ effects, 25+ actions) with implementation examples and priority ordering.
 - **Combat Use Cases** (`combat_use_cases.md`): Complete reference of ALL Pokemon battle mechanics. **Must validate against this before completing any combat feature.**
 
-## 6. Testing Strategy
+## 7. Testing Strategy
 
 _How to ensure correctness for both Logic and Content._
 
@@ -412,8 +463,34 @@ To catch edge cases, run automated battles between random AI bots.
        ↓
 3. Write Edge Case Tests (boundaries, real-world)
        ↓
-4. Test reveals missing functionality?
+4. Write Integration Tests (if feature interacts with multiple systems)
+       ↓
+5. Test reveals missing functionality?
        ↓
    YES → Implement the missing feature → Go to step 2
    NO  → Feature complete ✓
 ```
+
+### Integration Testing Workflow
+
+**When to Write Integration Tests:**
+- Feature creates actions that interact with BattleQueue
+- Feature modifies state that affects other systems
+- Feature is a system boundary (e.g., Status → End-of-Turn → Damage)
+- Feature coordinates multiple components
+
+**What to Test:**
+- System interactions (A → B → C)
+- Cascading effects (Action → Reaction → Outcome)
+- State consistency across systems
+
+**Where:**
+- `Tests/[Module]/Integration/[Feature]IntegrationTests.cs`
+
+**Examples:**
+- `StatusEffectsIntegrationTests` - Status ↔ DamagePipeline
+- `StatChangesIntegrationTests` - Stat Changes ↔ DamagePipeline/TurnOrderResolver
+- `ActionSystemIntegrationTests` - Actions ↔ BattleQueue
+- `FullBattleTests` - End-to-end battle scenarios
+
+See `docs/testing/integration_testing_guide.md` for complete guide.

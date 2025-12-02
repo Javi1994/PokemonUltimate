@@ -7,13 +7,14 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                                        |
-| ----------------- | --------------------------------------------- |
-| **Current Phase** | Phase 3: Combat System ✅                     |
-| **Sub-Phase**     | 2.7 Integration ✅ Complete + Player Input ✅ |
-| **Tests**         | 2,051+ passing                                |
-| **Warnings**      | 0                                             |
-| **Last Updated**  | December 2025                                 |
+| Aspect                | Status                              |
+| --------------------- | ----------------------------------- |
+| **Current Phase**     | Phase 3: Combat System ✅           |
+| **Sub-Phase**         | 2.8 End-of-Turn Effects ✅ Complete |
+| **Tests**             | 2,075+ passing                      |
+| **Integration Tests** | 66 tests (system interactions)      |
+| **Warnings**          | 0                                   |
+| **Last Updated**      | December 2025                       |
 
 ---
 
@@ -96,15 +97,16 @@ PokemonUltimate/
 
 See `docs/combat_implementation_plan.md` for full details.
 
-| Sub-Phase              | Status      | Description                                            |
-| ---------------------- | ----------- | ------------------------------------------------------ |
-| 2.1 Battle Foundation  | ✅ Complete | BattleField, Slot, Side                                |
-| 2.2 Action Queue       | ✅ Complete | BattleQueue, BattleAction                              |
-| 2.3 Turn Order         | ✅ Complete | TurnOrderResolver                                      |
-| 2.4 Damage Calculation | ✅ Complete | DamagePipeline                                         |
-| 2.5 Combat Actions     | ✅ Complete | All actions implemented                                |
-| 2.6 Combat Engine      | ✅ Complete | CombatEngine, Arbiter                                  |
-| 2.7 Integration        | ✅ Complete | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
+| Sub-Phase               | Status      | Description                                            |
+| ----------------------- | ----------- | ------------------------------------------------------ |
+| 2.1 Battle Foundation   | ✅ Complete | BattleField, Slot, Side                                |
+| 2.2 Action Queue        | ✅ Complete | BattleQueue, BattleAction                              |
+| 2.3 Turn Order          | ✅ Complete | TurnOrderResolver                                      |
+| 2.4 Damage Calculation  | ✅ Complete | DamagePipeline                                         |
+| 2.5 Combat Actions      | ✅ Complete | All actions implemented                                |
+| 2.6 Combat Engine       | ✅ Complete | CombatEngine, Arbiter                                  |
+| 2.7 Integration         | ✅ Complete | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
+| 2.8 End-of-Turn Effects | ✅ Complete | EndOfTurnProcessor, Status damage (Burn/Poison/Toxic)  |
 
 Reference docs:
 
@@ -119,14 +121,17 @@ Reference docs:
 
 ## 📐 Key Architectural Decisions
 
-| Decision                            | Rationale                                           |
-| ----------------------------------- | --------------------------------------------------- |
-| Blueprint/Instance pattern          | Immutable data vs mutable runtime state             |
-| Partial classes for PokemonInstance | File size management, separation of concerns        |
-| Nullable disabled in Tests/Content  | Practical for testing patterns, Unity compatibility |
-| Centralized constants               | No magic strings, easy maintenance                  |
-| Fail-fast exceptions                | Clear error detection, no silent failures           |
-| IMoveEffect composition             | Moves can have multiple effects                     |
+| Decision                            | Rationale                                                           |
+| ----------------------------------- | ------------------------------------------------------------------- |
+| Blueprint/Instance pattern          | Immutable data vs mutable runtime state                             |
+| Partial classes for PokemonInstance | File size management, separation of concerns                        |
+| Nullable disabled in Tests/Content  | Practical for testing patterns, Unity compatibility                 |
+| Centralized constants               | No magic strings, easy maintenance                                  |
+| Fail-fast exceptions                | Clear error detection, no silent failures                           |
+| IMoveEffect composition             | Moves can have multiple effects                                     |
+| Three-Phase Testing                 | Functional → Edge Cases → Integration ensures complete coverage     |
+| Integration Test Standard           | Mandatory for system interactions, ensures components work together |
+| Structured Workflow                 | Clear process for implementation, troubleshooting, and refactoring  |
 
 ---
 
@@ -147,28 +152,37 @@ Reference docs:
 
 ### Testing
 
--   Functional tests first, then edge cases
+-   **Three-Phase Testing**: Functional tests → Edge cases → Integration tests
 -   Test file mirrors source file location
 -   Use descriptive test names: `MethodName_Scenario_ExpectedResult`
+-   **Integration Tests**: 66 tests covering system interactions
+-   Status Effects ↔ DamagePipeline
+-   Stat Changes ↔ DamagePipeline/TurnOrderResolver
+-   Actions ↔ BattleQueue ↔ CombatEngine
+-   Full battle end-to-end scenarios
 
 ---
 
 ## 📚 Key Reference Documents
 
-| Document                                  | Purpose              |
-| ----------------------------------------- | -------------------- |
-| `docs/project_guidelines.md`              | 24+ coding rules     |
-| `docs/implementation_plan.md`             | Technical roadmap    |
-| `docs/combat_implementation_plan.md`      | **Combat phases**    |
-| `docs/combat_use_cases.md`                | **All battle cases** |
-| `docs/architecture/action_system_spec.md` | **⭐ Action system** |
-| `docs/architecture/effects_bible.md`      | **📖 Effects guide** |
-| `docs/unity_integration.md`               | Unity setup guide    |
-| `CONTRIBUTING.md`                         | Git workflow & rules |
-| `docs/architecture/combat_system_spec.md` | Combat system design |
-| `docs/checklists/pre_implementation.md`   | **Before coding**    |
-| `docs/checklists/feature_complete.md`     | After coding         |
-| `docs/anti-patterns.md`                   | What NOT to do       |
+| Document                                    | Purpose                       |
+| ------------------------------------------- | ----------------------------- |
+| `docs/project_guidelines.md`                | 24+ coding rules              |
+| `.cursorrules`                              | **AI workflow rules**         |
+| `docs/implementation_plan.md`               | Technical roadmap             |
+| `docs/combat_implementation_plan.md`        | **Combat phases**             |
+| `docs/combat_use_cases.md`                  | **All battle cases**          |
+| `docs/architecture/action_system_spec.md`   | **⭐ Action system**          |
+| `docs/architecture/effects_bible.md`        | **📖 Effects guide**          |
+| `docs/unity_integration.md`                 | Unity setup guide             |
+| `CONTRIBUTING.md`                           | Git workflow & rules          |
+| `docs/architecture/combat_system_spec.md`   | Combat system design          |
+| `docs/checklists/pre_implementation.md`     | **Before coding**             |
+| `docs/checklists/feature_complete.md`       | After coding                  |
+| `docs/workflow/troubleshooting.md`          | **Problem-solving guide**     |
+| `docs/workflow/refactoring_guide.md`        | **Safe refactoring process**  |
+| `docs/testing/integration_testing_guide.md` | **Integration test patterns** |
+| `docs/anti-patterns.md`                     | What NOT to do                |
 
 ---
 

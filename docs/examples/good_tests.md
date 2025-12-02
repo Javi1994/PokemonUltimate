@@ -246,3 +246,73 @@ public class PokemonInstanceEvolutionTests
 - Test one state change per test
 - Verify both changed and preserved state
 
+---
+
+## 🔗 Integration Test Example
+
+```csharp
+[TestFixture]
+public class StatusEffectsIntegrationTests
+{
+    [Test]
+    public void Burn_PhysicalMove_ReducesDamageBy50Percent()
+    {
+        // Arrange - Set up full battle scenario
+        var field = new BattleField();
+        var attacker = CreatePokemon(PokemonCatalog.Charizard, level: 50);
+        var defender = CreatePokemon(PokemonCatalog.Blastoise, level: 50);
+        
+        // Apply Burn status
+        attacker.Status = StatusEffect.Burn;
+        
+        field.PlayerSide.Slots[0].SetPokemon(attacker);
+        field.EnemySide.Slots[0].SetPokemon(defender);
+        
+        var move = CreateMove(MoveCatalog.Flamethrower); // Physical move
+        
+        // Act - Execute move through full pipeline
+        var action = new UseMoveAction(attacker, move, defender);
+        action.ExecuteLogic(field);
+        
+        // Assert - Verify Burn affected damage
+        var expectedDamage = CalculateExpectedDamage(move, attacker, defender) * 0.5f;
+        var actualDamage = defender.MaxHP - defender.CurrentHP;
+        
+        Assert.That(actualDamage, Is.EqualTo(expectedDamage).Within(0.1f));
+    }
+    
+    [Test]
+    public void StatusDamage_EndOfTurn_CausesFaint()
+    {
+        // Arrange - Pokemon with low HP and Burn
+        var pokemon = CreatePokemon(PokemonCatalog.Charizard, level: 50);
+        pokemon.CurrentHP = 5; // Very low HP
+        pokemon.Status = StatusEffect.Burn;
+        
+        var field = new BattleField();
+        field.PlayerSide.Slots[0].SetPokemon(pokemon);
+        
+        // Act - Process end-of-turn effects
+        var endOfTurnActions = EndOfTurnProcessor.ProcessEffects(field);
+        
+        // Process actions through queue
+        var queue = new BattleQueue();
+        queue.EnqueueRange(endOfTurnActions);
+        queue.ProcessQueue(field, new NullBattleView());
+        
+        // Assert - Pokemon should have fainted
+        Assert.That(pokemon.HasFainted, Is.True);
+        Assert.That(field.PlayerSide.Slots[0].HasFainted, Is.True);
+    }
+}
+```
+
+**Key Points:**
+- Test **system interactions**, not individual units
+- Use real components (CombatEngine, BattleQueue, etc.)
+- Verify cascading effects (Status → Damage → Faint)
+- Test end-to-end scenarios
+- Place in `Tests/[Module]/Integration/` directory
+
+See `docs/testing/integration_testing_guide.md` for complete guide.
+

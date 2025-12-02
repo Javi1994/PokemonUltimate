@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Instances;
@@ -151,8 +152,13 @@ namespace PokemonUltimate.Combat
             // 4. Process the queue
             await Queue.ProcessQueue(Field, _view);
 
-            // 5. End-of-turn effects (deferred to Phase 2.7+)
-            // TODO: Process status damage, Leftovers, etc.
+            // 5. End-of-turn effects
+            var endOfTurnActions = EndOfTurnProcessor.ProcessEffects(Field);
+            if (endOfTurnActions.Count > 0)
+            {
+                Queue.EnqueueRange(endOfTurnActions);
+                await Queue.ProcessQueue(Field, _view);
+            }
         }
     }
 }

@@ -91,7 +91,7 @@ The combat system in PokemonUltimate follows the **"Everything is an Action"** p
 - `ExecuteVisual(IBattleView view)`: Shows visual feedback to player
 
 **Design Decisions**:
-- Two-phase execution separates game logic from presentation
+- Two-phase execution separates game logic from presentation (Logic → Visual)
 - Reaction actions allow actions to trigger other actions
 - Priority system ensures correct turn order
 

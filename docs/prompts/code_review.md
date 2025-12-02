@@ -15,10 +15,11 @@
 ### Review Focus
 - [ ] Architecture alignment with docs/architecture/
 - [ ] Compliance with docs/project_guidelines.md
-- [ ] Test coverage (functional + edge cases)
+- [ ] Test coverage (functional + edge cases + integration tests if applicable)
 - [ ] Error handling (fail-fast, centralized messages)
 - [ ] Code quality (no magic strings, proper naming)
 - [ ] Performance considerations
+- [ ] Integration with other systems (if applicable)
 
 ### Specific Concerns
 [Any specific areas you want examined]

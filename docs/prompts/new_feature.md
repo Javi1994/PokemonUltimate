@@ -30,8 +30,10 @@ Read the following before implementing:
 ### Acceptance Criteria
 - [ ] Functional tests pass
 - [ ] Edge case tests pass
+- [ ] Integration tests pass (if applicable)
 - [ ] No warnings
 - [ ] Documentation updated
+- [ ] Use cases validated (if combat-related)
 ```
 
 ---
