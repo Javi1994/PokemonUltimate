@@ -660,9 +660,12 @@ Most moves miss, except:
 - [x] HP threshold (Blaze, Torrent, Overgrow) ✅
 
 ### 13.2 Common Battle Items
-- [x] Choice Band: +50% Attack stat ✅ (IStatModifier implemented)
-- [ ] Choice Specs/Scarf: +50% SpAttack/Speed stat (deferred - same pattern as Choice Band)
-- [x] Life Orb: +30% damage multiplier ✅ (IStatModifier implemented)
+- [x] Choice Band: +50% Attack stat ✅
+- [x] Choice Specs: +50% SpAttack stat ✅
+- [x] Choice Scarf: +50% Speed stat ✅ (integrated in TurnOrderResolver)
+- [x] Life Orb: +30% damage multiplier ✅
+- [x] Assault Vest: +50% SpDefense stat ✅
+- [x] Eviolite: +50% Defense/SpDefense if can evolve ✅
 - [ ] Life Orb recoil: 10% HP loss after move (requires OnAfterMove trigger - deferred)
 - [x] Leftovers: Heal 1/16 HP per turn ✅
 - [ ] Focus Sash: Survive one hit at 1 HP (requires OnWouldFaint trigger)

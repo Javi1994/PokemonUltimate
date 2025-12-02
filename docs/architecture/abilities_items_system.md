@@ -301,7 +301,7 @@ public class ItemStatModifier : IStatModifier {
 
 2. **AttackerAbilityStep**: Applies ability damage multipliers (after STAB)
    ```csharp
-   // New step in DamagePipeline
+   // Step in DamagePipeline
    public class AttackerAbilityStep : IDamageStep {
        public void Process(DamageContext context) {
            if (context.Attacker.Pokemon.Ability != null) {
@@ -315,7 +315,7 @@ public class ItemStatModifier : IStatModifier {
 
 3. **AttackerItemStep**: Applies item damage multipliers (after ability step)
    ```csharp
-   // New step in DamagePipeline
+   // Step in DamagePipeline
    public class AttackerItemStep : IDamageStep {
        public void Process(DamageContext context) {
            if (context.Attacker.Pokemon.HeldItem != null) {
@@ -329,9 +329,19 @@ public class ItemStatModifier : IStatModifier {
 
 ### Implemented Items & Abilities ✅
 
+**Items:**
 - **Choice Band**: +50% Attack stat (applied in BaseDamageStep)
+- **Choice Specs**: +50% SpAttack stat (applied in BaseDamageStep)
+- **Choice Scarf**: +50% Speed stat (applied in TurnOrderResolver.GetEffectiveSpeed)
 - **Life Orb**: +30% damage multiplier (applied in AttackerItemStep)
+- **Assault Vest**: +50% SpDefense stat (applied in BaseDamageStep)
+- **Eviolite**: +50% Defense/SpDefense if Pokemon can evolve (applied in BaseDamageStep)
+
+**Abilities:**
 - **Blaze**: +50% Fire damage when HP ≤ 33% (applied in AttackerAbilityStep)
+- **Torrent**: +50% Water damage when HP ≤ 33% (applied in AttackerAbilityStep)
+- **Overgrow**: +50% Grass damage when HP ≤ 33% (applied in AttackerAbilityStep)
+- **Swarm**: +50% Bug damage when HP ≤ 33% (applied in AttackerAbilityStep)
 
 ## 5. The Event Manager
 The `CombatEngine` is responsible for firing these triggers.

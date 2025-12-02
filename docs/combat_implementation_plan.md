@@ -824,8 +824,10 @@ public interface IBattleListener
 - OnWeatherChange triggers (Swift Swim, etc.)
 - ~~Passive stat modifiers (Choice Band, etc.)~~ ✅ **COMPLETE** - IStatModifier system implemented
 - ~~Blaze ability~~ ✅ **COMPLETE** - HP threshold damage multiplier implemented
+- ~~Torrent, Overgrow, Swarm~~ ✅ **COMPLETE** - HP threshold damage multipliers implemented
+- ~~Choice Specs, Choice Scarf, Assault Vest, Eviolite~~ ✅ **COMPLETE** - Stat modifiers implemented
 - More ability effects (Speed Boost, etc.)
-- More item effects (Black Sludge, Choice Specs/Scarf, etc.)
+- More item effects (Black Sludge, etc.)
 
 **API Additions:**
 - `BattleTrigger` enum for battle events

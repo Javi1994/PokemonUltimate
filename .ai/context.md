@@ -10,9 +10,9 @@
 | Aspect                | Status                          |
 | --------------------- | ------------------------------- |
 | **Current Phase**     | Phase 3: Combat System ✅       |
-| **Sub-Phase**         | 2.10 Pipeline Hooks ✅ Complete |
-| **Tests**             | 2,208+ passing                  |
-| **Integration Tests** | 83 tests (system interactions)  |
+| **Sub-Phase**         | 2.10 Pipeline Hooks ✅ Extended |
+| **Tests**             | 2,231+ passing                  |
+| **Integration Tests** | 83+ tests (system interactions) |
 | **Warnings**          | 0                               |
 | **Last Updated**      | December 2025                   |
 
@@ -99,18 +99,18 @@ PokemonUltimate/
 
 See `docs/combat_implementation_plan.md` for full details.
 
-| Sub-Phase               | Status      | Description                                                                |
-| ----------------------- | ----------- | -------------------------------------------------------------------------- |
-| 2.1 Battle Foundation   | ✅ Complete | BattleField, Slot, Side                                                    |
-| 2.2 Action Queue        | ✅ Complete | BattleQueue, BattleAction                                                  |
-| 2.3 Turn Order          | ✅ Complete | TurnOrderResolver                                                          |
-| 2.4 Damage Calculation  | ✅ Complete | DamagePipeline                                                             |
-| 2.5 Combat Actions      | ✅ Complete | All actions implemented                                                    |
-| 2.6 Combat Engine       | ✅ Complete | CombatEngine, Arbiter                                                      |
-| 2.7 Integration         | ✅ Complete | RandomAI, AlwaysAttackAI, TargetResolver, Full battles                     |
-| 2.8 End-of-Turn Effects | ✅ Complete | EndOfTurnProcessor, Status damage (Burn/Poison/Toxic)                      |
-| 2.9 Abilities & Items   | ✅ Complete | BattleTrigger system, AbilityListener, ItemListener, Leftovers, Intimidate |
-| 2.10 Pipeline Hooks     | ✅ Complete | IStatModifier system, Choice Band, Life Orb, Blaze                         |
+| Sub-Phase               | Status      | Description                                                                                                   |
+| ----------------------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
+| 2.1 Battle Foundation   | ✅ Complete | BattleField, Slot, Side                                                                                       |
+| 2.2 Action Queue        | ✅ Complete | BattleQueue, BattleAction                                                                                     |
+| 2.3 Turn Order          | ✅ Complete | TurnOrderResolver                                                                                             |
+| 2.4 Damage Calculation  | ✅ Complete | DamagePipeline                                                                                                |
+| 2.5 Combat Actions      | ✅ Complete | All actions implemented                                                                                       |
+| 2.6 Combat Engine       | ✅ Complete | CombatEngine, Arbiter                                                                                         |
+| 2.7 Integration         | ✅ Complete | RandomAI, AlwaysAttackAI, TargetResolver, Full battles                                                        |
+| 2.8 End-of-Turn Effects | ✅ Complete | EndOfTurnProcessor, Status damage (Burn/Poison/Toxic)                                                         |
+| 2.9 Abilities & Items   | ✅ Complete | BattleTrigger system, AbilityListener, ItemListener, Leftovers, Intimidate                                    |
+| 2.10 Pipeline Hooks     | ✅ Extended | IStatModifier system, Choice Band/Specs/Scarf, Life Orb, Assault Vest, Eviolite, Blaze/Torrent/Overgrow/Swarm |
 
 Reference docs:
 

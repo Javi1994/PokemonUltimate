@@ -365,6 +365,159 @@ namespace PokemonUltimate.Tests.Combat.Damage.Integration
             Assert.That(context.IsStab, Is.True); // Fire move on Fire Pokemon
         }
 
+        [Test]
+        public void DamagePipeline_WithTorrent_InFullBattleContext()
+        {
+            // Setup: Full battle scenario with Torrent
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            squirtle.SetAbility(AbilityCatalog.Torrent);
+            squirtle.CurrentHP = (int)(squirtle.MaxHP * 0.30f);
+            
+            // Use a neutral target (Normal type) so type effectiveness is 1.0x
+            var eevee = PokemonFactory.Create(PokemonCatalog.Eevee, 50);
+            var field = CreateBattleField(squirtle, eevee);
+            
+            // Re-apply ability and HP after field initialization
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.Pokemon.SetAbility(AbilityCatalog.Torrent);
+            attackerSlot.Pokemon.CurrentHP = (int)(attackerSlot.Pokemon.MaxHP * 0.30f);
+            
+            var defenderSlot = field.EnemySide.Slots[0];
+            var move = MoveCatalog.WaterGun; // Water type, STAB
+            
+            // Calculate damage in full pipeline context with fixed random value
+            var context = _pipeline.Calculate(attackerSlot, defenderSlot, move, field, false, 1.0f);
+            
+            // Verify all steps processed correctly
+            Assert.That(context.BaseDamage, Is.GreaterThan(0));
+            Assert.That(context.FinalDamage, Is.GreaterThan(0));
+            Assert.That(context.Multiplier, Is.GreaterThan(1.0f)); // Should include Torrent multiplier
+            Assert.That(context.IsStab, Is.True); // Water move on Water Pokemon
+        }
+
+        [Test]
+        public void DamagePipeline_WithOvergrow_InFullBattleContext()
+        {
+            // Setup: Full battle scenario with Overgrow
+            var bulbasaur = PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50);
+            bulbasaur.SetAbility(AbilityCatalog.Overgrow);
+            bulbasaur.CurrentHP = (int)(bulbasaur.MaxHP * 0.30f);
+            
+            // Use a neutral target (Normal type) so type effectiveness is 1.0x
+            var eevee = PokemonFactory.Create(PokemonCatalog.Eevee, 50);
+            var field = CreateBattleField(bulbasaur, eevee);
+            
+            // Re-apply ability and HP after field initialization
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.Pokemon.SetAbility(AbilityCatalog.Overgrow);
+            attackerSlot.Pokemon.CurrentHP = (int)(attackerSlot.Pokemon.MaxHP * 0.30f);
+            
+            var defenderSlot = field.EnemySide.Slots[0];
+            var move = MoveCatalog.VineWhip; // Grass type, STAB
+            
+            // Calculate damage in full pipeline context with fixed random value
+            var context = _pipeline.Calculate(attackerSlot, defenderSlot, move, field, false, 1.0f);
+            
+            // Verify all steps processed correctly
+            Assert.That(context.BaseDamage, Is.GreaterThan(0));
+            Assert.That(context.FinalDamage, Is.GreaterThan(0));
+            Assert.That(context.Multiplier, Is.GreaterThan(1.0f)); // Should include Overgrow multiplier
+            Assert.That(context.IsStab, Is.True); // Grass move on Grass Pokemon
+        }
+
+        [Test]
+        public void DamagePipeline_WithSwarm_InFullBattleContext()
+        {
+            // Note: Swarm ability modifier structure verified - requires Bug move for full test
+            // Since we don't have Bug Pokemon/moves in catalog, we test the modifier structure
+            var pokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            pokemon.SetAbility(AbilityCatalog.Swarm);
+            pokemon.CurrentHP = (int)(pokemon.MaxHP * 0.30f);
+            
+            // Use a neutral target (Normal type) so type effectiveness is 1.0x
+            var eevee = PokemonFactory.Create(PokemonCatalog.Eevee, 50);
+            var field = CreateBattleField(pokemon, eevee);
+            
+            // Re-apply ability and HP after field initialization
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.Pokemon.SetAbility(AbilityCatalog.Swarm);
+            attackerSlot.Pokemon.CurrentHP = (int)(attackerSlot.Pokemon.MaxHP * 0.30f);
+            
+            var defenderSlot = field.EnemySide.Slots[0];
+            var move = MoveCatalog.Tackle; // Non-Bug move - Swarm won't activate
+            
+            // Calculate damage in full pipeline context with fixed random value
+            var context = _pipeline.Calculate(attackerSlot, defenderSlot, move, field, false, 1.0f);
+            
+            // Verify all steps processed correctly
+            Assert.That(context.BaseDamage, Is.GreaterThan(0));
+            Assert.That(context.FinalDamage, Is.GreaterThan(0));
+            // Swarm only boosts Bug moves, so multiplier should be 1.0x for non-Bug moves
+            Assert.That(context.Multiplier, Is.GreaterThanOrEqualTo(1.0f));
+        }
+
+        [Test]
+        public void DamagePipeline_WithChoiceSpecs_InFullBattleContext()
+        {
+            // Setup: Full battle scenario with Choice Specs
+            var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            pikachu.HeldItem = ItemCatalog.ChoiceSpecs;
+            
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            var field = CreateBattleField(pikachu, squirtle);
+            
+            var attackerSlot = field.PlayerSide.Slots[0];
+            var defenderSlot = field.EnemySide.Slots[0];
+            var move = MoveCatalog.ThunderShock; // Special move
+            
+            // Calculate damage in full pipeline context
+            var context = _pipeline.Calculate(attackerSlot, defenderSlot, move, field);
+            
+            // Verify all steps processed correctly
+            Assert.That(context.BaseDamage, Is.GreaterThan(0));
+            Assert.That(context.FinalDamage, Is.GreaterThan(0));
+            Assert.That(context.TypeEffectiveness, Is.GreaterThan(0));
+            
+            // Compare with same Pokemon without Choice Specs
+            pikachu.HeldItem = null;
+            var fieldWithoutItem = CreateBattleField(pikachu, squirtle);
+            var contextWithoutItem = _pipeline.Calculate(
+                fieldWithoutItem.PlayerSide.Slots[0],
+                fieldWithoutItem.EnemySide.Slots[0],
+                move,
+                fieldWithoutItem);
+            
+            // Choice Specs should increase base damage (SpAttack stat boost)
+            Assert.That(context.BaseDamage, Is.GreaterThan(contextWithoutItem.BaseDamage));
+        }
+
+        [Test]
+        public void BaseDamageStep_ChoiceSpecs_StacksWithStatStages()
+        {
+            // Setup: Pikachu with Choice Specs and +2 SpAttack stat stage
+            var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            pikachu.HeldItem = ItemCatalog.ChoiceSpecs;
+            
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            var field = CreateBattleField(pikachu, squirtle);
+            
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.ModifyStatStage(Stat.SpAttack, 2); // +2 SpAttack
+            
+            var defenderSlot = field.EnemySide.Slots[0];
+            var move = MoveCatalog.ThunderShock; // Special move
+            
+            var context = _pipeline.Calculate(attackerSlot, defenderSlot, move, field);
+            
+            // Should have higher damage than without stat stage
+            var fieldNoStage = CreateBattleField(pikachu, squirtle);
+            var attackerSlotNoStage = fieldNoStage.PlayerSide.Slots[0];
+            attackerSlotNoStage.Pokemon.HeldItem = ItemCatalog.ChoiceSpecs;
+            var contextNoStage = _pipeline.Calculate(attackerSlotNoStage, fieldNoStage.EnemySide.Slots[0], move, fieldNoStage);
+            
+            Assert.That(context.BaseDamage, Is.GreaterThan(contextNoStage.BaseDamage));
+        }
+
         #endregion
 
         #region Helper Methods

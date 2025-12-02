@@ -23,7 +23,7 @@ namespace PokemonUltimate.Combat.Damage
 
         /// <summary>
         /// Gets the stat multiplier from the item.
-        /// Handles items like Choice Band (+50% Attack), Assault Vest (+50% SpDef), etc.
+        /// Handles items like Choice Band (+50% Attack), Assault Vest (+50% SpDef), Eviolite, etc.
         /// </summary>
         public float GetStatMultiplier(BattleSlot holder, Stat stat, BattleField field)
         {
@@ -31,6 +31,17 @@ namespace PokemonUltimate.Combat.Damage
                 throw new ArgumentNullException(nameof(holder), ErrorMessages.SlotCannotBeNull);
             if (field == null)
                 throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
+
+            // Special case: Eviolite boosts Defense and SpDefense by 50% if Pokemon can evolve
+            if (_itemData.Name == "Eviolite")
+            {
+                if ((stat == Stat.Defense || stat == Stat.SpDefense) && 
+                    holder.Pokemon.Species.CanEvolve)
+                {
+                    return 1.5f;
+                }
+                return 1.0f;
+            }
 
             // Check if this item modifies the requested stat
             if (_itemData.TargetStat == stat && _itemData.StatMultiplier > 0f)

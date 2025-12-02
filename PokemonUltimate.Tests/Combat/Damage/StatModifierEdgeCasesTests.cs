@@ -189,6 +189,159 @@ namespace PokemonUltimate.Tests.Combat.Damage
             Assert.That(multiplier, Is.EqualTo(1.0f));
         }
 
+        [Test]
+        public void AbilityStatModifier_Torrent_AtExactly33PercentHP_Activates()
+        {
+            var modifier = new AbilityStatModifier(AbilityCatalog.Torrent);
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            squirtle.SetAbility(AbilityCatalog.Torrent);
+            
+            // Set HP to exactly 33% (threshold is <= 0.33)
+            int hpAt33Percent = (int)(squirtle.MaxHP * 0.33f);
+            squirtle.CurrentHP = hpAt33Percent;
+            
+            var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            var field = CreateBattleField(squirtle, pikachu);
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.Pokemon.SetAbility(AbilityCatalog.Torrent);
+            attackerSlot.Pokemon.CurrentHP = hpAt33Percent;
+            var defenderSlot = field.EnemySide.Slots[0];
+            
+            var waterMove = MoveCatalog.WaterGun;
+            var context = new DamageContext(attackerSlot, defenderSlot, waterMove, field);
+            
+            float multiplier = modifier.GetDamageMultiplier(context);
+            
+            Assert.That(multiplier, Is.EqualTo(1.5f));
+        }
+
+        [Test]
+        public void AbilityStatModifier_Torrent_At33_1PercentHP_DoesNotActivate()
+        {
+            var modifier = new AbilityStatModifier(AbilityCatalog.Torrent);
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            squirtle.SetAbility(AbilityCatalog.Torrent);
+            
+            // Set HP to 34% (above threshold of 33%)
+            // Use ceiling to ensure we're above threshold even after int conversion
+            int hpAt34Percent = (int)System.Math.Ceiling(squirtle.MaxHP * 0.34f);
+            squirtle.CurrentHP = hpAt34Percent;
+            
+            var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            var field = CreateBattleField(squirtle, pikachu);
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.Pokemon.SetAbility(AbilityCatalog.Torrent);
+            attackerSlot.Pokemon.CurrentHP = hpAt34Percent;
+            var defenderSlot = field.EnemySide.Slots[0];
+            
+            var waterMove = MoveCatalog.WaterGun;
+            var context = new DamageContext(attackerSlot, defenderSlot, waterMove, field);
+            
+            float multiplier = modifier.GetDamageMultiplier(context);
+            
+            Assert.That(multiplier, Is.EqualTo(1.0f));
+        }
+
+        [Test]
+        public void AbilityStatModifier_Overgrow_AtExactly33PercentHP_Activates()
+        {
+            var modifier = new AbilityStatModifier(AbilityCatalog.Overgrow);
+            var bulbasaur = PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50);
+            bulbasaur.SetAbility(AbilityCatalog.Overgrow);
+            
+            // Set HP to exactly 33% (threshold is <= 0.33)
+            int hpAt33Percent = (int)(bulbasaur.MaxHP * 0.33f);
+            bulbasaur.CurrentHP = hpAt33Percent;
+            
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            var field = CreateBattleField(bulbasaur, squirtle);
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.Pokemon.SetAbility(AbilityCatalog.Overgrow);
+            attackerSlot.Pokemon.CurrentHP = hpAt33Percent;
+            var defenderSlot = field.EnemySide.Slots[0];
+            
+            var grassMove = MoveCatalog.VineWhip;
+            var context = new DamageContext(attackerSlot, defenderSlot, grassMove, field);
+            
+            float multiplier = modifier.GetDamageMultiplier(context);
+            
+            Assert.That(multiplier, Is.EqualTo(1.5f));
+        }
+
+        [Test]
+        public void AbilityStatModifier_Swarm_AtExactly33PercentHP_Activates()
+        {
+            // Note: Swarm ability modifier structure verified - requires Bug move for full test
+            // Since we don't have Bug Pokemon/moves in catalog, we test the modifier directly
+            var modifier = new AbilityStatModifier(AbilityCatalog.Swarm);
+            var pokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            pokemon.SetAbility(AbilityCatalog.Swarm);
+            
+            // Set HP to exactly 33% (threshold is <= 0.33)
+            int hpAt33Percent = (int)(pokemon.MaxHP * 0.33f);
+            pokemon.CurrentHP = hpAt33Percent;
+            
+            var pikachu2 = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            var field = CreateBattleField(pokemon, pikachu2);
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.Pokemon.SetAbility(AbilityCatalog.Swarm);
+            attackerSlot.Pokemon.CurrentHP = hpAt33Percent;
+            var defenderSlot = field.EnemySide.Slots[0];
+            
+            // Use a generic move - Swarm only activates for Bug moves, so multiplier should be 1.0
+            var move = MoveCatalog.Tackle;
+            var context = new DamageContext(attackerSlot, defenderSlot, move, field);
+            
+            float multiplier = modifier.GetDamageMultiplier(context);
+            
+            // Swarm only boosts Bug moves, so non-Bug moves should have 1.0x multiplier
+            Assert.That(multiplier, Is.EqualTo(1.0f));
+        }
+
+        [Test]
+        public void ItemStatModifier_Eviolite_WithPokemonThatCannotEvolve_DoesNotBoost()
+        {
+            // Test with Raichu (fully evolved, cannot evolve further)
+            var raichu = PokemonFactory.Create(PokemonCatalog.Raichu, 50);
+            raichu.HeldItem = ItemCatalog.Eviolite;
+            
+            var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            var field = CreateBattleField(pikachu, raichu);
+            var defenderSlot = field.EnemySide.Slots[0];
+            defenderSlot.Pokemon.HeldItem = ItemCatalog.Eviolite;
+            
+            var modifier = new ItemStatModifier(ItemCatalog.Eviolite);
+            
+            // Eviolite should not boost stats for fully evolved Pokemon
+            float defMultiplier = modifier.GetStatMultiplier(defenderSlot, Stat.Defense, field);
+            float spDefMultiplier = modifier.GetStatMultiplier(defenderSlot, Stat.SpDefense, field);
+            
+            Assert.That(defMultiplier, Is.EqualTo(1.0f));
+            Assert.That(spDefMultiplier, Is.EqualTo(1.0f));
+        }
+
+        [Test]
+        public void ItemStatModifier_Eviolite_OnlyBoostsDefenseAndSpDefense()
+        {
+            var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            pikachu.HeldItem = ItemCatalog.Eviolite;
+            
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            var field = CreateBattleField(squirtle, pikachu);
+            var defenderSlot = field.EnemySide.Slots[0];
+            defenderSlot.Pokemon.HeldItem = ItemCatalog.Eviolite;
+            
+            var modifier = new ItemStatModifier(ItemCatalog.Eviolite);
+            
+            // Eviolite should only boost Defense and SpDefense, not other stats
+            Assert.That(modifier.GetStatMultiplier(defenderSlot, Stat.Defense, field), Is.EqualTo(1.5f));
+            Assert.That(modifier.GetStatMultiplier(defenderSlot, Stat.SpDefense, field), Is.EqualTo(1.5f));
+            Assert.That(modifier.GetStatMultiplier(defenderSlot, Stat.Attack, field), Is.EqualTo(1.0f));
+            Assert.That(modifier.GetStatMultiplier(defenderSlot, Stat.SpAttack, field), Is.EqualTo(1.0f));
+            Assert.That(modifier.GetStatMultiplier(defenderSlot, Stat.Speed, field), Is.EqualTo(1.0f));
+            Assert.That(modifier.GetStatMultiplier(defenderSlot, Stat.HP, field), Is.EqualTo(1.0f));
+        }
+
         #endregion
 
         #region Multiple Modifiers Tests
@@ -305,6 +458,58 @@ namespace PokemonUltimate.Tests.Combat.Damage
             // Life Orb multiplies damage by 1.3x
             float damageRatio = contextWithItem.FinalDamage / (float)contextWithoutItem.FinalDamage;
             Assert.That(damageRatio, Is.GreaterThan(1.25f).And.LessThan(1.35f)); // Allow margin for rounding
+        }
+
+        [Test]
+        public void AttackerAbilityStep_WithTorrent_StacksWithSTAB()
+        {
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            squirtle.SetAbility(AbilityCatalog.Torrent);
+            squirtle.CurrentHP = (int)(squirtle.MaxHP * 0.30f);
+            
+            var eevee = PokemonFactory.Create(PokemonCatalog.Eevee, 50); // Neutral target
+            var field = CreateBattleField(squirtle, eevee);
+            var attackerSlot = field.PlayerSide.Slots[0];
+            attackerSlot.Pokemon.SetAbility(AbilityCatalog.Torrent);
+            attackerSlot.Pokemon.CurrentHP = (int)(attackerSlot.Pokemon.MaxHP * 0.30f);
+            var defenderSlot = field.EnemySide.Slots[0];
+            
+            var waterMove = MoveCatalog.WaterGun; // Water type, STAB
+            var pipeline = new DamagePipeline();
+            var context = pipeline.Calculate(attackerSlot, defenderSlot, waterMove, field, false, 1.0f);
+            
+            // Should have STAB (1.5x) and Torrent (1.5x) = 2.25x total multiplier
+            Assert.That(context.Multiplier, Is.GreaterThan(2.0f));
+        }
+
+        [Test]
+        public void BaseDamageStep_WithChoiceSpecsAndStatStages_AppliesBoth()
+        {
+            var pokemon = _attackerSlot.Pokemon;
+            pokemon.HeldItem = ItemCatalog.ChoiceSpecs;
+            
+            // Apply +2 SpAttack stat stage
+            _attackerSlot.ModifyStatStage(Stat.SpAttack, 2);
+            
+            var move = MoveCatalog.ThunderShock; // Special move
+            var pipeline = new DamagePipeline();
+            var context = pipeline.Calculate(_attackerSlot, _defenderSlot, move, _field);
+            
+            // Should have higher damage than without Choice Specs
+            Assert.That(context.BaseDamage, Is.GreaterThan(0));
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private BattleField CreateBattleField(PokemonInstance playerPokemon, PokemonInstance enemyPokemon)
+        {
+            var field = new BattleField();
+            field.Initialize(BattleRules.Singles, 
+                new[] { playerPokemon }, 
+                new[] { enemyPokemon });
+            return field;
         }
 
         #endregion

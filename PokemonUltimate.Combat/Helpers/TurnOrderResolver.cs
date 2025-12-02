@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Combat.Helpers
@@ -70,7 +71,9 @@ namespace PokemonUltimate.Combat.Helpers
             // Apply status conditions
             speed *= GetStatusMultiplier(slot.Pokemon.Status);
 
-            // Future: Apply item modifiers (Choice Scarf, Iron Ball)
+            // Apply item modifiers (Choice Scarf, Iron Ball)
+            speed *= GetItemSpeedMultiplier(slot, field);
+
             // Future: Apply ability modifiers (Swift Swim, Sand Rush)
             // Future: Apply field effects (Tailwind, Trick Room)
 
@@ -111,6 +114,21 @@ namespace PokemonUltimate.Combat.Helpers
             }
 
             return 1.0f;
+        }
+
+        /// <summary>
+        /// Gets the speed multiplier from held items (Choice Scarf, etc.).
+        /// </summary>
+        /// <param name="slot">The slot to check.</param>
+        /// <param name="field">The battlefield for context.</param>
+        /// <returns>The speed multiplier (1.0f if no modification).</returns>
+        private static float GetItemSpeedMultiplier(BattleSlot slot, BattleField field)
+        {
+            if (slot?.Pokemon?.HeldItem == null)
+                return 1.0f;
+
+            var itemModifier = new ItemStatModifier(slot.Pokemon.HeldItem);
+            return itemModifier.GetStatMultiplier(slot, Stat.Speed, field);
         }
     }
 }
