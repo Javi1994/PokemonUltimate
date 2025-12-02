@@ -98,15 +98,37 @@ namespace PokemonUltimate.Tests.Combat.Actions
         public void ExecuteLogic_WithStatusEffect_ReturnsStatusAction()
         {
             // Use a move with status effect (like Thunder Wave)
+            // Note: ThunderWave has 90% accuracy, so we need to run multiple times
+            // or verify that when it hits, it generates the status action
             var statusMove = new MoveInstance(MoveCatalog.ThunderWave);
             _user.Moves[0] = statusMove;
 
-            var action = new UseMoveAction(_userSlot, _targetSlot, statusMove);
-            var reactions = action.ExecuteLogic(_field).ToList();
+            // Run multiple times to account for accuracy (90%)
+            bool foundStatusAction = false;
+            for (int i = 0; i < 20; i++)
+            {
+                // Reset move PP for each attempt
+                var testMove = new MoveInstance(MoveCatalog.ThunderWave);
+                _user.Moves[0] = testMove;
+                
+                var action = new UseMoveAction(_userSlot, _targetSlot, testMove);
+                var reactions = action.ExecuteLogic(_field).ToList();
 
-            // Should have message and status action
-            Assert.That(reactions, Has.Count.GreaterThanOrEqualTo(2));
-            Assert.That(reactions.Any(r => r is ApplyStatusAction), Is.True);
+                // Check if move hit (has more than just the "used" message)
+                if (reactions.Count > 1 && !reactions.Any(r => r is MessageAction msg && msg.Message.Contains("missed")))
+                {
+                    // Move hit, check for status action
+                    if (reactions.Any(r => r is ApplyStatusAction))
+                    {
+                        foundStatusAction = true;
+                        break;
+                    }
+                }
+            }
+
+            // Should have found status action at least once when move hit
+            Assert.That(foundStatusAction, Is.True, 
+                "Status action should be generated when ThunderWave hits (90% accuracy, 100% status chance)");
         }
 
         [Test]
@@ -219,6 +241,10 @@ namespace PokemonUltimate.Tests.Combat.Actions
         public Task PlaySwitchOutAnimation(BattleSlot slot) => Task.CompletedTask;
 
         public Task PlaySwitchInAnimation(BattleSlot slot) => Task.CompletedTask;
+        public Task<BattleActionType> SelectActionType(BattleSlot slot) => Task.FromResult(BattleActionType.Fight);
+        public Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves) => Task.FromResult(moves?.FirstOrDefault());
+        public Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets) => Task.FromResult(validTargets?.FirstOrDefault());
+        public Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon) => Task.FromResult(availablePokemon?.FirstOrDefault());
     }
 }
 

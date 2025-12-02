@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.BattleDemo
 {
@@ -325,6 +326,40 @@ namespace PokemonUltimate.BattleDemo
                 MessageAction msgAction => $"Msg({msgAction.Message.Substring(0, Math.Min(20, msgAction.Message.Length))}...)",
                 _ => action.GetType().Name.Replace("Action", "")
             };
+        }
+
+        // ========== Player Input Methods (Stubs for AI vs AI demo) ==========
+
+        /// <summary>
+        /// Stub implementation - not used in AI vs AI demo.
+        /// </summary>
+        public Task<BattleActionType> SelectActionType(BattleSlot slot)
+        {
+            throw new NotImplementedException("Player input not implemented in AI vs AI demo");
+        }
+
+        /// <summary>
+        /// Stub implementation - not used in AI vs AI demo.
+        /// </summary>
+        public Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves)
+        {
+            throw new NotImplementedException("Player input not implemented in AI vs AI demo");
+        }
+
+        /// <summary>
+        /// Stub implementation - not used in AI vs AI demo.
+        /// </summary>
+        public Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets)
+        {
+            throw new NotImplementedException("Player input not implemented in AI vs AI demo");
+        }
+
+        /// <summary>
+        /// Stub implementation - not used in AI vs AI demo.
+        /// </summary>
+        public Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon)
+        {
+            throw new NotImplementedException("Player input not implemented in AI vs AI demo");
         }
     }
 }

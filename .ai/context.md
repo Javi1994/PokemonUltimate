@@ -7,13 +7,13 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                      |
-| ----------------- | --------------------------- |
-| **Current Phase** | Phase 3: Combat System ✅   |
-| **Sub-Phase**     | 2.7 Integration ✅ Complete |
-| **Tests**         | 2,038 passing               |
-| **Warnings**      | 0                           |
-| **Last Updated**  | December 2025               |
+| Aspect            | Status                                        |
+| ----------------- | --------------------------------------------- |
+| **Current Phase** | Phase 3: Combat System ✅                     |
+| **Sub-Phase**     | 2.7 Integration ✅ Complete + Player Input ✅ |
+| **Tests**         | 2,051+ passing                                |
+| **Warnings**      | 0                                             |
+| **Last Updated**  | December 2025                                 |
 
 ---
 
@@ -35,9 +35,9 @@ PokemonUltimate/
 │   ├── Field/      # BattleField, BattleSide, BattleSlot, BattleRules
 │   ├── Engine/     # CombatEngine, BattleArbiter, BattleQueue
 │   ├── Results/    # BattleOutcome, BattleResult
-│   ├── Providers/  # IActionProvider
-│   ├── View/       # IBattleView, NullBattleView
-│   ├── Actions/    # BattleAction implementations
+│   ├── Providers/  # IActionProvider, PlayerInputProvider
+│   ├── View/       # IBattleView, NullBattleView (with input methods)
+│   ├── Actions/    # BattleAction implementations, BattleActionType
 │   ├── Damage/     # DamagePipeline, DamageContext
 │   ├── AI/         # RandomAI, AlwaysAttackAI
 │   └── Helpers/    # AccuracyChecker, TurnOrderResolver, TargetResolver

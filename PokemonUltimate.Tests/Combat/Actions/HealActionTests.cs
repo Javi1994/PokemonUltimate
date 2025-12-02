@@ -143,6 +143,10 @@ namespace PokemonUltimate.Tests.Combat.Actions
         public Task PlaySwitchOutAnimation(BattleSlot slot) => Task.CompletedTask;
 
         public Task PlaySwitchInAnimation(BattleSlot slot) => Task.CompletedTask;
+        public Task<BattleActionType> SelectActionType(BattleSlot slot) => Task.FromResult(BattleActionType.Fight);
+        public Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves) => Task.FromResult(moves?.FirstOrDefault());
+        public Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets) => Task.FromResult(validTargets?.FirstOrDefault());
+        public Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon) => Task.FromResult(availablePokemon?.FirstOrDefault());
     }
 }
 

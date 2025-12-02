@@ -20,29 +20,110 @@ public interface IActionProvider {
 ### A. `PlayerInputProvider` (Manual Control)
 Connects the Logic to the View/UI.
 
+**Location**: `PokemonUltimate.Combat/Providers/PlayerInputProvider.cs`
+
+**Constructor**:
+```csharp
+public PlayerInputProvider(IBattleView view)
+{
+    _view = view ?? throw new ArgumentNullException(nameof(view));
+}
+```
+
+**Complete Implementation**:
 ```csharp
 public class PlayerInputProvider : IActionProvider {
-    private IBattleView _view;
+    private readonly IBattleView _view;
+
+    public PlayerInputProvider(IBattleView view)
+    {
+        _view = view ?? throw new ArgumentNullException(nameof(view));
+    }
 
     public async Task<BattleAction> GetAction(BattleField field, BattleSlot mySlot) {
-        // 1. Select Move
-        var move = await _view.SelectMove(mySlot.Pokemon.Moves);
+        if (field == null)
+            throw new ArgumentNullException(nameof(field));
+        if (mySlot == null)
+            throw new ArgumentNullException(nameof(mySlot));
+        if (mySlot.IsEmpty || mySlot.HasFainted)
+            return null; // Can't act if fainted
 
-        // 2. Get Valid Targets (using the Resolver)
-        var validTargets = TargetResolver.GetValidTargets(mySlot, move.Data, field);
+        // 1. Show action menu (Fight/Switch/Item/Run)
+        var actionType = await _view.SelectActionType(mySlot);
 
-        // 3. Select Target
-        BattleSlot target = null;
+        // 2. Route based on selection
+        switch (actionType) {
+            case BattleActionType.Fight:
+                return await HandleFightAction(field, mySlot);
+            
+            case BattleActionType.Switch:
+                return await HandleSwitchAction(field, mySlot);
+            
+            case BattleActionType.Item:
+                // Future: Item usage
+                throw new NotImplementedException("Item usage not yet implemented");
+            
+            case BattleActionType.Run:
+                // Future: Flee from battle
+                throw new NotImplementedException("Run not yet implemented");
+            
+            default:
+                throw new ArgumentException($"Unknown action type: {actionType}");
+        }
+    }
+
+    private async Task<BattleAction> HandleFightAction(BattleField field, BattleSlot mySlot) {
+        // 1. Get available moves (with PP > 0)
+        var availableMoves = mySlot.Pokemon.Moves.Where(m => m.HasPP).ToList();
+        if (availableMoves.Count == 0)
+            return null; // No moves available
+
+        // 2. Select move
+        var moveInstance = await _view.SelectMove(availableMoves);
+        if (moveInstance == null)
+            return null; // Player cancelled
+
+        // 3. Get valid targets
+        var validTargets = TargetResolver.GetValidTargets(mySlot, moveInstance.Move, field);
+        if (validTargets.Count == 0)
+            return null; // No valid targets
+
+        // 4. Select target (auto-select if only one)
+        BattleSlot target;
         if (validTargets.Count == 1) {
             target = validTargets[0]; // Auto-select
         } else {
             target = await _view.SelectTarget(validTargets);
+            if (target == null)
+                return null; // Player cancelled
         }
-        
-        return new UseMoveAction(mySlot, move.Data, target);
+
+        return new UseMoveAction(mySlot, target, moveInstance);
+    }
+
+    private async Task<BattleAction> HandleSwitchAction(BattleField field, BattleSlot mySlot) {
+        // 1. Get available Pokemon to switch to
+        var side = mySlot.Side;
+        var availablePokemon = side.GetAvailableSwitches().ToList();
+        if (availablePokemon.Count == 0)
+            return null; // No Pokemon available to switch
+
+        // 2. Select Pokemon to switch in
+        var newPokemon = await _view.SelectSwitch(availablePokemon);
+        if (newPokemon == null)
+            return null; // Player cancelled
+
+        return new SwitchAction(mySlot, newPokemon);
     }
 }
 ```
+
+**Key Behaviors**:
+- Returns `null` if slot is empty/fainted (no action)
+- Returns `null` if no moves available (should be handled by UI, but defensive)
+- Returns `null` if player cancels selection
+- Auto-selects target if only one valid option
+- Validates all inputs before creating actions
 
 ### B. `AIActionProvider` (The Bot)
 Pure logic decision maker.
@@ -336,6 +417,99 @@ The flow remains perfectly consistent with our "Everything is an Action" rule.
 
 ---
 
+## 12. Player Input API Specification
+
+### 12.1 `IBattleView` Input Methods
+
+**Required Methods**:
+
+```csharp
+/// <summary>
+/// Prompts the player to select an action type (Fight/Switch/Item/Run).
+/// </summary>
+/// <param name="slot">The slot requesting input.</param>
+/// <returns>The selected action type.</returns>
+Task<BattleActionType> SelectActionType(BattleSlot slot);
+
+/// <summary>
+/// Prompts the player to select a move from available moves.
+/// </summary>
+/// <param name="moves">List of available moves (with PP > 0).</param>
+/// <returns>The selected move instance, or null if cancelled.</returns>
+Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves);
+
+/// <summary>
+/// Prompts the player to select a target slot.
+/// </summary>
+/// <param name="validTargets">List of valid target slots.</param>
+/// <returns>The selected target slot, or null if cancelled.</returns>
+Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets);
+
+/// <summary>
+/// Prompts the player to select a Pokemon to switch in.
+/// </summary>
+/// <param name="availablePokemon">List of available Pokemon (not fainted, not active).</param>
+/// <returns>The selected Pokemon instance, or null if cancelled.</returns>
+Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon);
+```
+
+### 12.2 `BattleActionType` Enum
+
+**Location**: `PokemonUltimate.Combat/Actions/BattleActionType.cs`
+
+```csharp
+/// <summary>
+/// Types of actions a player can choose during battle.
+/// </summary>
+public enum BattleActionType
+{
+    /// <summary>
+    /// Use a move to attack or apply an effect.
+    /// </summary>
+    Fight,
+
+    /// <summary>
+    /// Switch to a different Pokemon.
+    /// </summary>
+    Switch,
+
+    /// <summary>
+    /// Use an item (Potion, Poke Ball, etc.).
+    /// </summary>
+    Item, // Future feature
+
+    /// <summary>
+    /// Attempt to flee from battle.
+    /// </summary>
+    Run // Future feature
+}
+```
+
+### 12.3 Use Cases
+
+**UC-PI-1: Player Selects Move**
+- Player chooses Fight → SelectMove shows 4 moves → Player picks Thunderbolt → Auto-selects target (1v1) → Returns UseMoveAction
+
+**UC-PI-2: Player Selects Move with Multiple Targets**
+- Player chooses Fight → SelectMove → Player picks Earthquake → SelectTarget shows 2 enemies → Player picks target → Returns UseMoveAction
+
+**UC-PI-3: Player Switches Pokemon**
+- Player chooses Switch → SelectSwitch shows available Pokemon → Player picks Bulbasaur → Returns SwitchAction
+
+**UC-PI-4: No Moves Available**
+- Player chooses Fight → No moves with PP → Returns null (should be handled by UI, but defensive)
+
+**UC-PI-5: No Pokemon Available to Switch**
+- Player chooses Switch → No available Pokemon → Returns null
+
+**UC-PI-6: Player Cancels Selection**
+- Player chooses Fight → SelectMove → Player cancels → Returns null
+
+**UC-PI-7: Fainted Pokemon**
+- Slot is fainted → GetAction returns null immediately (no input requested)
+
+---
+
 **Status**: Phase 2.7 - Implementation in progress  
 **Last Updated**: December 2025  
-**Related Docs**: `targeting_system.md`, `combat_system_spec.md`
+**Related Docs**: `targeting_system.md`, `combat_system_spec.md`, `player_input_status.md`

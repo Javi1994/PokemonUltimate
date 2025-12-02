@@ -16,19 +16,51 @@
 ## 📋 Development Workflow
 
 ### When User Says "Implement X" or "Add X"
-1. Read `.ai/context.md` to understand current state
-2. **CRITICAL: Read relevant architecture doc in `docs/architecture/`**
+**MANDATORY WORKFLOW - Follow ALL steps in order:**
+
+1. **Read Context & Specs**
+   - Read `.ai/context.md` to understand current state
+   - **CRITICAL: Read relevant architecture doc in `docs/architecture/`**
+   - If spec is incomplete or missing details, **COMPLETE IT FIRST**
    - Identify ALL requirements from the spec
    - Note any elements to defer to later phases
    - Understand the expected API (method names, parameters)
-3. **Verify spec compliance** - List what will be implemented vs deferred
-4. **Write functional tests FIRST** (TDD mandatory)
-5. Implement the feature following the spec
-6. Add edge case tests
-7. Run `dotnet test` to verify
-8. **Validate against `docs/combat_use_cases.md`** (if combat-related)
-9. Check `docs/checklists/feature_complete.md`
-10. Update `.ai/context.md` with new state
+
+2. **Verify Spec Completeness**
+   - List what will be implemented vs deferred
+   - Ensure spec has all necessary details (interfaces, classes, methods, examples)
+   - If spec is incomplete, update it before implementation
+
+3. **TDD: Write Functional Tests FIRST**
+   - Create test file following naming: `[Feature]Tests.cs`
+   - Write tests for ALL main scenarios from the spec
+   - Use naming: `MethodName_Scenario_ExpectedResult`
+   - Tests should compile but fail (red phase)
+
+4. **Implement Feature**
+   - Follow the spec exactly
+   - Use existing patterns from codebase
+   - Follow all coding rules (no magic strings, fail-fast, etc.)
+   - Make tests pass (green phase)
+
+5. **Write Edge Case Tests**
+   - Create `[Feature]EdgeCasesTests.cs`
+   - Test null inputs, boundary conditions, invalid states
+   - Test real-world scenarios
+   - If tests reveal missing functionality → implement it
+
+6. **Verify Implementation**
+   - Run `dotnet build` - Verify no warnings
+   - Run `dotnet test` - Verify all tests pass
+   - **Validate against `docs/combat_use_cases.md`** (if combat-related)
+   - Check `docs/checklists/feature_complete.md`
+
+7. **Update Documentation**
+   - Update `.ai/context.md` with new state
+   - Update relevant architecture docs if API changed
+   - Update status documents (e.g., `player_input_status.md`)
+   - Update implementation plan if phase completed
+   - Mention test count in response
 
 ### When User Says "Review X" or "Check X"
 1. Read `docs/anti-patterns.md`

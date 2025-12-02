@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Tests.Combat.Actions
 {
@@ -101,6 +103,10 @@ namespace PokemonUltimate.Tests.Combat.Actions
             public Task ShowStatChange(BattleSlot slot, string statName, int stages) => Task.CompletedTask;
             public Task PlaySwitchOutAnimation(BattleSlot slot) => Task.CompletedTask;
             public Task PlaySwitchInAnimation(BattleSlot slot) => Task.CompletedTask;
+            public Task<BattleActionType> SelectActionType(BattleSlot slot) => Task.FromResult(BattleActionType.Fight);
+            public Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves) => Task.FromResult(moves?.FirstOrDefault());
+            public Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets) => Task.FromResult(validTargets?.FirstOrDefault());
+            public Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon) => Task.FromResult(availablePokemon?.FirstOrDefault());
         }
 
         #endregion

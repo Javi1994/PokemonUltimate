@@ -1,10 +1,13 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Combat
 {
     /// <summary>
-    /// Interface for battle visualization/presentation.
-    /// Implementations handle animations, UI updates, and player feedback.
+    /// Interface for battle visualization/presentation and player input.
+    /// Implementations handle animations, UI updates, player feedback, and input collection.
     /// </summary>
     public interface IBattleView
     {
@@ -66,6 +69,36 @@ namespace PokemonUltimate.Combat
         /// </summary>
         /// <param name="slot">The slot being switched in.</param>
         Task PlaySwitchInAnimation(BattleSlot slot);
+
+        // ========== Player Input Methods ==========
+
+        /// <summary>
+        /// Prompts the player to select an action type (Fight/Switch/Item/Run).
+        /// </summary>
+        /// <param name="slot">The slot requesting input.</param>
+        /// <returns>The selected action type.</returns>
+        Task<BattleActionType> SelectActionType(BattleSlot slot);
+
+        /// <summary>
+        /// Prompts the player to select a move from available moves.
+        /// </summary>
+        /// <param name="moves">List of available moves (with PP > 0).</param>
+        /// <returns>The selected move instance, or null if cancelled.</returns>
+        Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves);
+
+        /// <summary>
+        /// Prompts the player to select a target slot.
+        /// </summary>
+        /// <param name="validTargets">List of valid target slots.</param>
+        /// <returns>The selected target slot, or null if cancelled.</returns>
+        Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets);
+
+        /// <summary>
+        /// Prompts the player to select a Pokemon to switch in.
+        /// </summary>
+        /// <param name="availablePokemon">List of available Pokemon (not fainted, not active).</param>
+        /// <returns>The selected Pokemon instance, or null if cancelled.</returns>
+        Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon);
     }
 }
 

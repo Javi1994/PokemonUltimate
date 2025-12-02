@@ -1,10 +1,15 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Combat
 {
     /// <summary>
     /// No-op implementation of IBattleView for testing.
     /// All methods complete immediately without doing anything.
+    /// Input methods return default values (first option or null).
     /// </summary>
     public class NullBattleView : IBattleView
     {
@@ -30,6 +35,19 @@ namespace PokemonUltimate.Combat
         public Task PlaySwitchOutAnimation(BattleSlot slot) => Task.CompletedTask;
 
         public Task PlaySwitchInAnimation(BattleSlot slot) => Task.CompletedTask;
+
+        // Input methods - return defaults for testing
+        public Task<BattleActionType> SelectActionType(BattleSlot slot) => 
+            Task.FromResult(BattleActionType.Fight);
+
+        public Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves) => 
+            Task.FromResult(moves?.FirstOrDefault());
+
+        public Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets) => 
+            Task.FromResult(validTargets?.FirstOrDefault());
+
+        public Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon) => 
+            Task.FromResult(availablePokemon?.FirstOrDefault());
     }
 }
 
