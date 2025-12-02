@@ -855,6 +855,12 @@ PokemonUltimate.Combat/
 | `architecture/status_and_stat_system.md` | Status effects |
 | `checklists/pre_combat.md` | Pre-implementation checklist |
 
+## Tools & Demos
+
+| Tool | Purpose |
+|------|---------|
+| `PokemonUltimate.BattleDemo` | Visual AI vs AI battle simulator with debug information. Demonstrates combat system with turn-by-turn display, damage calculations, stat changes, and action queue processing. |
+
 ---
 
 ## Version History

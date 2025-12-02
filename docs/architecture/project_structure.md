@@ -10,7 +10,7 @@ PokemonUltimate/
 ├── PokemonUltimate.Core/          → Generic game engine (logic only)
 ├── PokemonUltimate.Content/       → Concrete game data (Pokémon, Moves, etc.)
 ├── PokemonUltimate.Tests/         → Unit tests for Core + Content
-├── PokemonUltimate.Console/       → Console application (for testing)
+├── PokemonUltimate.SmokeTests/    → Runtime smoke tests (for testing)
 └── docs/                           → Architecture documentation
 ```
 
@@ -123,10 +123,10 @@ PokemonUltimate.Tests/
 └── Registry/                       → Registry tests
 ```
 
-### 4. PokemonUltimate.Console
+### 4. PokemonUltimate.SmokeTests
 **Target Framework**: `net8.0`  
-**Purpose**: Console application for testing game logic without Unity  
-**Dependencies**: `PokemonUltimate.Core`, `PokemonUltimate.Content`
+**Purpose**: Runtime smoke tests for validating all systems work correctly outside of unit tests  
+**Dependencies**: `PokemonUltimate.Core`, `PokemonUltimate.Content`, `PokemonUltimate.Combat`
 
 ---
 
@@ -168,8 +168,9 @@ PokemonUltimate.Tests.Catalogs.Moves // Tests for Content.Catalogs.Moves
 
 ```mermaid
 graph TD
-    Console[PokemonUltimate.Console] --> Content
-    Console --> Core
+    SmokeTests[PokemonUltimate.SmokeTests] --> Content
+    SmokeTests --> Core
+    SmokeTests --> Combat
     Tests[PokemonUltimate.Tests] --> Content
     Tests --> Core
     Content[PokemonUltimate.Content] --> Core
@@ -178,13 +179,13 @@ graph TD
     style Core fill:#4CAF50,color:#fff
     style Content fill:#2196F3,color:#fff
     style Tests fill:#FF9800,color:#fff
-    style Console fill:#9C27B0,color:#fff
+    style SmokeTests fill:#9C27B0,color:#fff
 ```
 
 ### Dependency Rules
 1. ✅ **Content → Core**: Content depends on Core (uses Models, Enums, Builders)
 2. ✅ **Tests → Core + Content**: Tests can reference both
-3. ✅ **Console → Core + Content**: Console can use both
+3. ✅ **SmokeTests → Core + Content + Combat**: SmokeTests can use all systems
 4. ❌ **Core → Content**: Core must NEVER know about Content
 5. ❌ **Core → Tests**: Core must NEVER depend on Tests
 

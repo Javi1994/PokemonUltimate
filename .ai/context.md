@@ -46,7 +46,11 @@ PokemonUltimate/
 │   ├── Catalogs/   # Pokemon, Move, Ability, Item definitions
 │   └── Builders/   # Fluent APIs
 │
-└── Tests/          # Mirror structure of Core/Combat/Content
+├── Tests/          # Mirror structure of Core/Combat/Content
+│
+└── BattleDemo/     # Visual AI vs AI battle simulator
+    ├── ConsoleBattleView.cs  # Console implementation of IBattleView
+    └── Program.cs            # Battle scenarios and debug display
 ```
 
 ---

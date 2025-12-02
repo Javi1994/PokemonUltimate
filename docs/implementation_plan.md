@@ -35,7 +35,7 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 | Class Library `PokemonUltimate.Core` (netstandard2.1) | ✅ |
 | Class Library `PokemonUltimate.Content` (netstandard2.1) | ✅ |
 | NUnit Project `PokemonUltimate.Tests` (net8.0) | ✅ |
-| Console App `PokemonUltimate.Console` (net8.0) | ✅ |
+| Smoke Tests `PokemonUltimate.SmokeTests` (net8.0) | ✅ |
 | Documentation structure (`docs/`) | ✅ |
 | AI infrastructure (`.ai/`, `.cursorrules`) | ✅ |
 | Unity Project | ⏳ Later |

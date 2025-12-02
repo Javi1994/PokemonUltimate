@@ -166,7 +166,11 @@ PokemonUltimate/
 ├── PokemonUltimate.Tests/      # Unit & integration tests
 │   └── [45+ test files]        # 1340+ test cases
 │
-└── PokemonUltimate.Console/    # Smoke test application
+├── PokemonUltimate.SmokeTests/ # Runtime smoke tests for all systems
+│
+└── PokemonUltimate.BattleDemo/ # Visual AI vs AI battle simulator
+    ├── ConsoleBattleView.cs    # Console battle visualization
+    └── Program.cs              # Battle scenarios with debug info
 ```
 
 ### Core Patterns
@@ -212,6 +216,9 @@ dotnet build
 
 # Run tests
 dotnet test
+
+# Run battle demo (AI vs AI battles)
+dotnet run --project PokemonUltimate.BattleDemo
 ```
 
 ---
@@ -260,14 +267,32 @@ double mult = TypeEffectiveness.GetEffectiveness(
 
 ---
 
+## 🎮 Battle Demo
+
+Watch AI vs AI battles with detailed debug information:
+
+```bash
+dotnet run --project PokemonUltimate.BattleDemo
+```
+
+Features:
+- **Visual Battle Display**: HP bars, status effects, turn-by-turn progress
+- **Debug Information**: Damage calculations, stat changes, action queue processing
+- **Multiple Scenarios**: Pre-configured battle scenarios
+- **User-Controlled Pace**: Press ENTER to advance each turn
+
+See `PokemonUltimate.BattleDemo/README.md` for more details.
+
+---
+
 ## 🎯 Roadmap
 
 | Phase | Status | Description |
 |-------|--------|-------------|
 | **Phase 1: Core Data** | ✅ Complete | Species, moves, types, stats |
 | **Phase 2: Instances** | ✅ Complete | Pokemon instances, evolution, level up |
-| **Phase 3: Combat** | 🚧 In Progress | Turn order, damage, effects, battle flow |
-| **Phase 4: AI & UI** | ⏳ Planned | AI opponents, presentation |
+| **Phase 3: Combat** | ✅ Complete | Turn order, damage, effects, battle flow, AI |
+| **Phase 4: UI** | ⏳ Planned | Player input, Unity integration |
 
 ---
 

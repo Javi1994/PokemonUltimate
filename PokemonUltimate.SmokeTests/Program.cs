@@ -30,7 +30,7 @@ using SideConditionCatalog = PokemonUltimate.Content.Catalogs.Field.SideConditio
 using FieldEffectCatalog = PokemonUltimate.Content.Catalogs.Field.FieldEffectCatalog;
 using Pokemon = PokemonUltimate.Core.Factories.Pokemon;
 
-namespace PokemonUltimate.Console;
+namespace PokemonUltimate.SmokeTests;
 
 /// <summary>
 /// Runtime smoke test for all data systems.
