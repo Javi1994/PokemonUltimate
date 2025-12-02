@@ -1,4 +1,5 @@
 using System;
+using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Combat.Damage.Steps
@@ -43,6 +44,13 @@ namespace PokemonUltimate.Combat.Damage.Steps
             defenseStat = ApplyStatStage(defenseStat, context.Defender.GetStatStage(
                 move.Category == MoveCategory.Physical ? Stat.Defense : Stat.SpDefense));
 
+            // Apply stat modifiers from abilities and items
+            attackStat = ApplyStatModifiers(attackStat, context.Attacker, 
+                move.Category == MoveCategory.Physical ? Stat.Attack : Stat.SpAttack, context.Field);
+            
+            defenseStat = ApplyStatModifiers(defenseStat, context.Defender,
+                move.Category == MoveCategory.Physical ? Stat.Defense : Stat.SpDefense, context.Field);
+
             // Ensure minimum values
             attackStat = Math.Max(1, attackStat);
             defenseStat = Math.Max(1, defenseStat);
@@ -71,6 +79,27 @@ namespace PokemonUltimate.Combat.Damage.Steps
             }
 
             return (int)(baseStat * multiplier);
+        }
+
+        private int ApplyStatModifiers(int statValue, BattleSlot slot, Stat stat, BattleField field)
+        {
+            float multiplier = 1.0f;
+
+            // Check ability modifier
+            if (slot.Pokemon.Ability != null)
+            {
+                var abilityModifier = new AbilityStatModifier(slot.Pokemon.Ability);
+                multiplier *= abilityModifier.GetStatMultiplier(slot, stat, field);
+            }
+
+            // Check item modifier
+            if (slot.Pokemon.HeldItem != null)
+            {
+                var itemModifier = new ItemStatModifier(slot.Pokemon.HeldItem);
+                multiplier *= itemModifier.GetStatMultiplier(slot, stat, field);
+            }
+
+            return (int)(statValue * multiplier);
         }
     }
 }

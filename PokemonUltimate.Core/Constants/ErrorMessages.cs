@@ -61,6 +61,7 @@ namespace PokemonUltimate.Core.Constants
         public const string SlotCannotBeNull = "Battle slot cannot be null";
         public const string AbilityCannotBeNull = "Ability cannot be null";
         public const string ItemCannotBeNull = "Item cannot be null";
+        public const string ContextCannotBeNull = "Damage context cannot be null";
 
         #endregion
 

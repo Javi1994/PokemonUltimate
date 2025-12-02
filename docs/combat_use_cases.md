@@ -657,11 +657,13 @@ Most moves miss, except:
 - [x] End of turn (Speed Boost - deferred, system ready)
 - [ ] Weather change (Swift Swim - deferred)
 - [ ] Terrain change (deferred)
-- [ ] HP threshold (Blaze, Torrent - deferred)
+- [x] HP threshold (Blaze, Torrent, Overgrow) ✅
 
 ### 13.2 Common Battle Items
-- [ ] Choice Band/Specs/Scarf: +50% stat, locked to one move (requires IStatModifier)
-- [ ] Life Orb: +30% damage, 10% recoil (requires OnAfterMove trigger)
+- [x] Choice Band: +50% Attack stat ✅ (IStatModifier implemented)
+- [ ] Choice Specs/Scarf: +50% SpAttack/Speed stat (deferred - same pattern as Choice Band)
+- [x] Life Orb: +30% damage multiplier ✅ (IStatModifier implemented)
+- [ ] Life Orb recoil: 10% HP loss after move (requires OnAfterMove trigger - deferred)
 - [x] Leftovers: Heal 1/16 HP per turn ✅
 - [ ] Focus Sash: Survive one hit at 1 HP (requires OnWouldFaint trigger)
 - [ ] Assault Vest: +50% SpDef, no status moves (requires passive stat modifier)

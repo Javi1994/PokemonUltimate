@@ -819,12 +819,13 @@ public interface IBattleListener
 
 **Deferred to Later Phases:**
 - OnBeforeMove triggers (Truant, etc.)
-- OnAfterMove triggers (Life Orb recoil)
+- OnAfterMove triggers (Life Orb recoil - damage multiplier ✅, recoil deferred)
 - OnDamageTaken triggers (Static, Rough Skin)
 - OnWeatherChange triggers (Swift Swim, etc.)
-- Passive stat modifiers (Choice Band, etc.) - requires `IStatModifier` interface
-- More ability effects (Blaze, Speed Boost, etc.)
-- More item effects (Black Sludge, Choice items, etc.)
+- ~~Passive stat modifiers (Choice Band, etc.)~~ ✅ **COMPLETE** - IStatModifier system implemented
+- ~~Blaze ability~~ ✅ **COMPLETE** - HP threshold damage multiplier implemented
+- More ability effects (Speed Boost, etc.)
+- More item effects (Black Sludge, Choice Specs/Scarf, etc.)
 
 **API Additions:**
 - `BattleTrigger` enum for battle events

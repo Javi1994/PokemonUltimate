@@ -1,0 +1,38 @@
+using System;
+
+namespace PokemonUltimate.Combat.Damage.Steps
+{
+    /// <summary>
+    /// Applies damage multipliers from the attacker's ability.
+    /// Handles abilities like Blaze, Torrent, Overgrow that boost damage when HP is low.
+    /// </summary>
+    public class AttackerAbilityStep : IDamageStep
+    {
+        /// <summary>
+        /// Processes the damage context and applies ability-based damage multipliers.
+        /// </summary>
+        /// <param name="context">The damage context to modify.</param>
+        public void Process(DamageContext context)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context), Core.Constants.ErrorMessages.ContextCannotBeNull);
+
+            var attacker = context.Attacker.Pokemon;
+
+            // Check if attacker has an ability
+            if (attacker.Ability == null)
+                return;
+
+            // Create ability modifier adapter
+            var abilityModifier = new AbilityStatModifier(attacker.Ability);
+            float multiplier = abilityModifier.GetDamageMultiplier(context);
+
+            // Apply multiplier if different from 1.0
+            if (Math.Abs(multiplier - 1.0f) > 0.001f)
+            {
+                context.Multiplier *= multiplier;
+            }
+        }
+    }
+}
+

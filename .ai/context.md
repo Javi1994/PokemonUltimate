@@ -7,14 +7,14 @@
 
 ## 📍 Current Project State
 
-| Aspect                | Status                              |
-| --------------------- | ----------------------------------- |
-| **Current Phase**     | Phase 3: Combat System ✅           |
-| **Sub-Phase**         | 2.9 Abilities & Items ✅ Complete   |
-| **Tests**             | 2,165+ passing                      |
-| **Integration Tests** | 70 tests (system interactions)      |
-| **Warnings**          | 0                                   |
-| **Last Updated**      | December 2025                       |
+| Aspect                | Status                          |
+| --------------------- | ------------------------------- |
+| **Current Phase**     | Phase 3: Combat System ✅       |
+| **Sub-Phase**         | 2.10 Pipeline Hooks ✅ Complete |
+| **Tests**             | 2,208+ passing                  |
+| **Integration Tests** | 83 tests (system interactions)  |
+| **Warnings**          | 0                               |
+| **Last Updated**      | December 2025                   |
 
 ---
 
@@ -36,11 +36,12 @@ PokemonUltimate/
 │   ├── Field/      # BattleField, BattleSide, BattleSlot, BattleRules
 │   ├── Engine/     # CombatEngine, BattleArbiter, BattleQueue, EndOfTurnProcessor
 │   ├── Events/     # BattleTrigger, IBattleListener, AbilityListener, ItemListener, BattleTriggerProcessor
+│   ├── Damage/Steps/ # BaseDamageStep, AttackerAbilityStep, AttackerItemStep, etc.
 │   ├── Results/    # BattleOutcome, BattleResult
 │   ├── Providers/  # IActionProvider, PlayerInputProvider
 │   ├── View/       # IBattleView, NullBattleView (with input methods)
 │   ├── Actions/    # BattleAction implementations, BattleActionType
-│   ├── Damage/     # DamagePipeline, DamageContext
+│   ├── Damage/     # DamagePipeline, DamageContext, IStatModifier, AbilityStatModifier, ItemStatModifier
 │   ├── AI/         # RandomAI, AlwaysAttackAI
 │   └── Helpers/    # AccuracyChecker, TurnOrderResolver, TargetResolver
 │
@@ -98,17 +99,18 @@ PokemonUltimate/
 
 See `docs/combat_implementation_plan.md` for full details.
 
-| Sub-Phase               | Status      | Description                                            |
-| ----------------------- | ----------- | ------------------------------------------------------ |
-| 2.1 Battle Foundation   | ✅ Complete | BattleField, Slot, Side                                |
-| 2.2 Action Queue        | ✅ Complete | BattleQueue, BattleAction                              |
-| 2.3 Turn Order          | ✅ Complete | TurnOrderResolver                                      |
-| 2.4 Damage Calculation  | ✅ Complete | DamagePipeline                                         |
-| 2.5 Combat Actions      | ✅ Complete | All actions implemented                                |
-| 2.6 Combat Engine       | ✅ Complete | CombatEngine, Arbiter                                  |
-| 2.7 Integration         | ✅ Complete | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
-| 2.8 End-of-Turn Effects | ✅ Complete | EndOfTurnProcessor, Status damage (Burn/Poison/Toxic)  |
+| Sub-Phase               | Status      | Description                                                                |
+| ----------------------- | ----------- | -------------------------------------------------------------------------- |
+| 2.1 Battle Foundation   | ✅ Complete | BattleField, Slot, Side                                                    |
+| 2.2 Action Queue        | ✅ Complete | BattleQueue, BattleAction                                                  |
+| 2.3 Turn Order          | ✅ Complete | TurnOrderResolver                                                          |
+| 2.4 Damage Calculation  | ✅ Complete | DamagePipeline                                                             |
+| 2.5 Combat Actions      | ✅ Complete | All actions implemented                                                    |
+| 2.6 Combat Engine       | ✅ Complete | CombatEngine, Arbiter                                                      |
+| 2.7 Integration         | ✅ Complete | RandomAI, AlwaysAttackAI, TargetResolver, Full battles                     |
+| 2.8 End-of-Turn Effects | ✅ Complete | EndOfTurnProcessor, Status damage (Burn/Poison/Toxic)                      |
 | 2.9 Abilities & Items   | ✅ Complete | BattleTrigger system, AbilityListener, ItemListener, Leftovers, Intimidate |
+| 2.10 Pipeline Hooks     | ✅ Complete | IStatModifier system, Choice Band, Life Orb, Blaze                         |
 
 Reference docs:
 
@@ -123,18 +125,19 @@ Reference docs:
 
 ## 📐 Key Architectural Decisions
 
-| Decision                            | Rationale                                                           |
-| ----------------------------------- | ------------------------------------------------------------------- |
-| Blueprint/Instance pattern          | Immutable data vs mutable runtime state                             |
-| Partial classes for PokemonInstance | File size management, separation of concerns                        |
-| Nullable disabled in Tests/Content  | Practical for testing patterns, Unity compatibility                 |
-| Centralized constants               | No magic strings, easy maintenance                                  |
-| Fail-fast exceptions                | Clear error detection, no silent failures                           |
-| IMoveEffect composition             | Moves can have multiple effects                                     |
-| Three-Phase Testing                 | Functional → Edge Cases → Integration ensures complete coverage     |
-| Integration Test Standard           | Mandatory for system interactions, ensures components work together |
-| Structured Workflow                 | Clear process for implementation, troubleshooting, and refactoring  |
-| Event-Driven Abilities & Items      | IBattleListener pattern for reactive effects, keeps engine clean    |
+| Decision                            | Rationale                                                                               |
+| ----------------------------------- | --------------------------------------------------------------------------------------- |
+| Blueprint/Instance pattern          | Immutable data vs mutable runtime state                                                 |
+| Partial classes for PokemonInstance | File size management, separation of concerns                                            |
+| Nullable disabled in Tests/Content  | Practical for testing patterns, Unity compatibility                                     |
+| Centralized constants               | No magic strings, easy maintenance                                                      |
+| Fail-fast exceptions                | Clear error detection, no silent failures                                               |
+| IMoveEffect composition             | Moves can have multiple effects                                                         |
+| Three-Phase Testing                 | Functional → Edge Cases → Integration ensures complete coverage                         |
+| Integration Test Standard           | Mandatory for system interactions, ensures components work together                     |
+| Structured Workflow                 | Clear process for implementation, troubleshooting, and refactoring                      |
+| Event-Driven Abilities & Items      | IBattleListener pattern for reactive effects, keeps engine clean                        |
+| Pipeline Hooks for Modifiers        | IStatModifier pattern for passive stat/damage modifiers, integrates with DamagePipeline |
 
 ---
 
@@ -158,11 +161,12 @@ Reference docs:
 -   **Three-Phase Testing**: Functional tests → Edge cases → Integration tests
 -   Test file mirrors source file location
 -   Use descriptive test names: `MethodName_Scenario_ExpectedResult`
--   **Integration Tests**: 70 tests covering system interactions
+-   **Integration Tests**: 83 tests covering system interactions
 -   Status Effects ↔ DamagePipeline
 -   Stat Changes ↔ DamagePipeline/TurnOrderResolver
 -   Actions ↔ BattleQueue ↔ CombatEngine
 -   Abilities & Items ↔ CombatEngine (OnSwitchIn, OnTurnEnd triggers)
+-   Stat Modifiers ↔ DamagePipeline (Choice Band, Life Orb, Blaze)
 -   Full battle end-to-end scenarios
 
 ---

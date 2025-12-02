@@ -217,40 +217,121 @@ public class IntimidateAbility : IBattleListener {
 }
 ```
 
-## 4. Pipeline Hooks (Passive Stats)
+## 4. Pipeline Hooks (Passive Stats) ✅ **IMPLEMENTED**
+
 For things that don't create Actions but modify numbers (e.g., *Choice Band*), we use the **Damage Pipeline**.
 
-We add a new interface `IStatModifier`.
-
+### `IStatModifier` Interface ✅
 ```csharp
 public interface IStatModifier {
-    float GetStatMultiplier(BattleSlot holder, Stat stat);
-    float GetDamageMultiplier(DamageContext ctx);
+    /// <summary>
+    /// Gets the stat multiplier for a specific stat.
+    /// Returns 1.0f if no modification.
+    /// </summary>
+    float GetStatMultiplier(BattleSlot holder, Stat stat, BattleField field);
+    
+    /// <summary>
+    /// Gets the damage multiplier for an attack.
+    /// Returns 1.0f if no modification.
+    /// </summary>
+    float GetDamageMultiplier(DamageContext context);
 }
 ```
 
-### Example: `ChoiceBand`
+### Adapters ✅
+We use adapter classes to convert `AbilityData` and `ItemData` to `IStatModifier`:
+
 ```csharp
-public class ChoiceBandItem : IStatModifier {
-    public float GetStatMultiplier(BattleSlot holder, Stat stat) {
-        if (stat == Stat.Attack) return 1.5f;
+// AbilityStatModifier - Converts AbilityData to IStatModifier
+public class AbilityStatModifier : IStatModifier {
+    private readonly AbilityData _abilityData;
+    
+    public float GetStatMultiplier(BattleSlot holder, Stat stat, BattleField field) {
+        // Currently no abilities provide passive stat multipliers
+        // Future: Huge Power, Pure Power
         return 1.0f;
     }
-    // ...
+    
+    public float GetDamageMultiplier(DamageContext context) {
+        // Check for HP threshold abilities (Blaze, Torrent, Overgrow)
+        if (_abilityData.HPThreshold > 0f && _abilityData.AffectedType.HasValue) {
+            var pokemon = context.Attacker.Pokemon;
+            float hpPercent = (float)pokemon.CurrentHP / pokemon.MaxHP;
+            
+            if (hpPercent <= _abilityData.HPThreshold && 
+                context.Move.Type == _abilityData.AffectedType.Value) {
+                return _abilityData.Multiplier; // e.g., 1.5f for Blaze
+            }
+        }
+        return 1.0f;
+    }
+}
+
+// ItemStatModifier - Converts ItemData to IStatModifier
+public class ItemStatModifier : IStatModifier {
+    private readonly ItemData _itemData;
+    
+    public float GetStatMultiplier(BattleSlot holder, Stat stat, BattleField field) {
+        if (_itemData.TargetStat == stat && _itemData.StatMultiplier > 0f) {
+            return _itemData.StatMultiplier; // e.g., 1.5f for Choice Band
+        }
+        return 1.0f;
+    }
+    
+    public float GetDamageMultiplier(DamageContext context) {
+        if (_itemData.DamageMultiplier > 0f) {
+            return _itemData.DamageMultiplier; // e.g., 1.3f for Life Orb
+        }
+        return 1.0f;
+    }
 }
 ```
 
-**Integration in Pipeline:**
-The `StatRatioStep` in the Damage Pipeline iterates over the Attacker's Item/Ability and asks for multipliers.
+**Integration in Pipeline:** ✅
 
-```csharp
-// Inside StatRatioStep.Process()
-float multiplier = 1.0f;
-if (attacker.Item is IStatModifier mod) {
-    multiplier *= mod.GetStatMultiplier(attacker, Stat.Attack);
-}
-atk *= multiplier;
-```
+1. **BaseDamageStep**: Applies stat modifiers before calculating stat ratio
+   ```csharp
+   // Inside BaseDamageStep.Process()
+   if (attacker.Pokemon.HeldItem != null) {
+       var itemModifier = new ItemStatModifier(attacker.Pokemon.HeldItem);
+       float multiplier = itemModifier.GetStatMultiplier(attacker, stat, field);
+       effectiveStat *= multiplier;
+   }
+   ```
+
+2. **AttackerAbilityStep**: Applies ability damage multipliers (after STAB)
+   ```csharp
+   // New step in DamagePipeline
+   public class AttackerAbilityStep : IDamageStep {
+       public void Process(DamageContext context) {
+           if (context.Attacker.Pokemon.Ability != null) {
+               var abilityModifier = new AbilityStatModifier(context.Attacker.Pokemon.Ability);
+               float multiplier = abilityModifier.GetDamageMultiplier(context);
+               context.Multiplier *= multiplier;
+           }
+       }
+   }
+   ```
+
+3. **AttackerItemStep**: Applies item damage multipliers (after ability step)
+   ```csharp
+   // New step in DamagePipeline
+   public class AttackerItemStep : IDamageStep {
+       public void Process(DamageContext context) {
+           if (context.Attacker.Pokemon.HeldItem != null) {
+               var itemModifier = new ItemStatModifier(context.Attacker.Pokemon.HeldItem);
+               float multiplier = itemModifier.GetDamageMultiplier(context);
+               context.Multiplier *= multiplier;
+           }
+       }
+   }
+   ```
+
+### Implemented Items & Abilities ✅
+
+- **Choice Band**: +50% Attack stat (applied in BaseDamageStep)
+- **Life Orb**: +30% damage multiplier (applied in AttackerItemStep)
+- **Blaze**: +50% Fire damage when HP ≤ 33% (applied in AttackerAbilityStep)
 
 ## 5. The Event Manager
 The `CombatEngine` is responsible for firing these triggers.

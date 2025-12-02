@@ -47,14 +47,14 @@ public class DamagePipeline {
 
     public DamagePipeline() {
         _steps = new List<IDamageStep> {
-            new BasePowerStep(),
-            new StatRatioStep(), // (Atk / Def)
-            new LevelFactorStep(),
-            new CriticalHitStep(),
-            new TypeEffectivenessStep(),
-            new StabStep(), // Same Type Attack Bonus
-            new RandomRollStep(), // 0.85 to 1.0
-            new FinalModifierStep() // Life Orb, Screens
+            new BaseDamageStep(),        // 1. Calculate base damage (includes stat modifiers)
+            new CriticalHitStep(),       // 2. Check for critical hit (1.5x)
+            new RandomFactorStep(),      // 3. Apply random factor (0.85-1.0)
+            new StabStep(),              // 4. Apply STAB bonus (1.5x)
+            new AttackerAbilityStep(),   // 5. Apply ability damage multipliers (Blaze, etc.)
+            new AttackerItemStep(),      // 6. Apply item damage multipliers (Life Orb, etc.)
+            new TypeEffectivenessStep(), // 7. Apply type effectiveness
+            new BurnStep(),              // 8. Apply burn penalty (0.5x for physical)
         };
     }
 

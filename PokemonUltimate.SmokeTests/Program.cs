@@ -1326,7 +1326,132 @@ class Program
         PrintInfo($"Integration: Triggers work in CombatEngine and SwitchAction");
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 40: COMPLETE POKEMON LISTING
+        // SECTION 40: PIPELINE HOOKS (STAT & DAMAGE MODIFIERS)
+        // ═══════════════════════════════════════════════════════
+        try
+        {
+            PrintSection("PIPELINE HOOKS (STAT & DAMAGE MODIFIERS)");
+
+            // IStatModifier interface
+            Test("IStatModifier interface exists", () => typeof(IStatModifier).IsInterface);
+            Test("AbilityStatModifier implements IStatModifier", () => typeof(AbilityStatModifier).GetInterfaces().Contains(typeof(IStatModifier)));
+            Test("ItemStatModifier implements IStatModifier", () => typeof(ItemStatModifier).GetInterfaces().Contains(typeof(IStatModifier)));
+
+            // Choice Band - Stat modifier
+            var choiceBandPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            choiceBandPokemon.HeldItem = ItemCatalog.ChoiceBand;
+            var choiceBandField = new BattleField();
+            var choiceBandPlayerParty = new[] { choiceBandPokemon };
+            var choiceBandEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
+            choiceBandField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+                choiceBandPlayerParty, choiceBandEnemyParty);
+
+            var choiceBandSlot = choiceBandField.PlayerSide.Slots[0];
+            var choiceBandModifier = new ItemStatModifier(ItemCatalog.ChoiceBand);
+            Test("Choice Band returns 1.5x for Attack stat", () => 
+                Math.Abs(choiceBandModifier.GetStatMultiplier(choiceBandSlot, Stat.Attack, choiceBandField) - 1.5f) < 0.001f);
+            Test("Choice Band returns 1.0x for other stats", () => 
+                Math.Abs(choiceBandModifier.GetStatMultiplier(choiceBandSlot, Stat.Defense, choiceBandField) - 1.0f) < 0.001f);
+
+            // Test Choice Band in damage calculation
+            var choiceBandPipeline = new DamagePipeline();
+            var choiceBandMove = MoveCatalog.Tackle; // Physical move
+            var choiceBandContext = choiceBandPipeline.Calculate(choiceBandSlot, choiceBandField.EnemySide.Slots[0], 
+                choiceBandMove, choiceBandField, false, 1.0f);
+            
+            choiceBandPokemon.HeldItem = null;
+            var choiceBandFieldNoItem = new BattleField();
+            choiceBandFieldNoItem.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+                new[] { choiceBandPokemon }, choiceBandEnemyParty);
+            var choiceBandContextNoItem = choiceBandPipeline.Calculate(choiceBandFieldNoItem.PlayerSide.Slots[0], 
+                choiceBandFieldNoItem.EnemySide.Slots[0], choiceBandMove, choiceBandFieldNoItem, false, 1.0f);
+            
+            Test("Choice Band increases base damage", () => choiceBandContext.BaseDamage > choiceBandContextNoItem.BaseDamage);
+
+            // Life Orb - Damage modifier
+            var lifeOrbPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            lifeOrbPokemon.HeldItem = ItemCatalog.LifeOrb;
+            var lifeOrbField = new BattleField();
+            var lifeOrbPlayerParty = new[] { lifeOrbPokemon };
+            var lifeOrbEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
+            lifeOrbField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+                lifeOrbPlayerParty, lifeOrbEnemyParty);
+
+            var lifeOrbSlot = lifeOrbField.PlayerSide.Slots[0];
+            var lifeOrbMove = MoveCatalog.ThunderShock;
+            var lifeOrbContext = new DamageContext(lifeOrbSlot, lifeOrbField.EnemySide.Slots[0], lifeOrbMove, lifeOrbField);
+            var lifeOrbModifier = new ItemStatModifier(ItemCatalog.LifeOrb);
+            Test("Life Orb returns 1.3x damage multiplier", () => 
+                Math.Abs(lifeOrbModifier.GetDamageMultiplier(lifeOrbContext) - 1.3f) < 0.001f);
+
+            // Test Life Orb in damage calculation
+            var lifeOrbPipeline = new DamagePipeline();
+            var lifeOrbContextWithItem = lifeOrbPipeline.Calculate(lifeOrbSlot, lifeOrbField.EnemySide.Slots[0], 
+                lifeOrbMove, lifeOrbField, false, 1.0f);
+            
+            lifeOrbPokemon.HeldItem = null;
+            var lifeOrbFieldNoItem = new BattleField();
+            lifeOrbFieldNoItem.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+                new[] { lifeOrbPokemon }, lifeOrbEnemyParty);
+            var lifeOrbContextNoItem = lifeOrbPipeline.Calculate(lifeOrbFieldNoItem.PlayerSide.Slots[0], 
+                lifeOrbFieldNoItem.EnemySide.Slots[0], lifeOrbMove, lifeOrbFieldNoItem, false, 1.0f);
+            
+            Test("Life Orb increases final damage", () => lifeOrbContextWithItem.FinalDamage > lifeOrbContextNoItem.FinalDamage);
+
+            // Blaze - Ability damage modifier
+            var blazePokemon = PokemonFactory.Create(PokemonCatalog.Charizard, 50);
+            blazePokemon.SetAbility(AbilityCatalog.Blaze);
+            blazePokemon.CurrentHP = (int)(blazePokemon.MaxHP * 0.30f); // Below 33% threshold
+            var blazeField = new BattleField();
+            var blazePlayerParty = new[] { blazePokemon };
+            var blazeEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
+            blazeField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+                blazePlayerParty, blazeEnemyParty);
+
+            var blazeSlot = blazeField.PlayerSide.Slots[0];
+            var blazeMove = MoveCatalog.Ember; // Fire move
+            var blazeContext = new DamageContext(blazeSlot, blazeField.EnemySide.Slots[0], blazeMove, blazeField);
+            var blazeModifier = new AbilityStatModifier(AbilityCatalog.Blaze);
+            Test("Blaze returns 1.5x damage multiplier when HP is low", () => 
+                Math.Abs(blazeModifier.GetDamageMultiplier(blazeContext) - 1.5f) < 0.001f);
+
+            // Test Blaze doesn't activate when HP is high
+            blazePokemon.CurrentHP = (int)(blazePokemon.MaxHP * 0.50f); // Above 33% threshold
+            var blazeContextHighHP = new DamageContext(blazeSlot, blazeField.EnemySide.Slots[0], blazeMove, blazeField);
+            Test("Blaze returns 1.0x when HP is high", () => 
+                Math.Abs(blazeModifier.GetDamageMultiplier(blazeContextHighHP) - 1.0f) < 0.001f);
+
+            // Test Blaze in damage calculation
+            blazePokemon.CurrentHP = (int)(blazePokemon.MaxHP * 0.30f); // Below threshold
+            var blazePipeline = new DamagePipeline();
+            var blazeContextWithAbility = blazePipeline.Calculate(blazeSlot, blazeField.EnemySide.Slots[0], 
+                blazeMove, blazeField, false, 1.0f);
+            
+            blazePokemon.SetAbility(null);
+            var blazeFieldNoAbility = new BattleField();
+            blazeFieldNoAbility.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+                new[] { blazePokemon }, blazeEnemyParty);
+            var blazeContextNoAbility = blazePipeline.Calculate(blazeFieldNoAbility.PlayerSide.Slots[0], 
+                blazeFieldNoAbility.EnemySide.Slots[0], blazeMove, blazeFieldNoAbility, false, 1.0f);
+            
+            Test("Blaze increases final damage when HP is low", () => blazeContextWithAbility.FinalDamage > blazeContextNoAbility.FinalDamage);
+
+            PrintInfo($"IStatModifier system: Passive stat and damage modifiers");
+            PrintInfo($"Choice Band: +50% Attack stat (applied in BaseDamageStep)");
+            PrintInfo($"Life Orb: +30% damage (applied in AttackerItemStep)");
+            PrintInfo($"Blaze: +50% Fire damage when HP < 33% (applied in AttackerAbilityStep)");
+            PrintInfo($"Integration: Modifiers work correctly in full DamagePipeline");
+        }
+        catch (Exception ex)
+        {
+            System.Console.ForegroundColor = ConsoleColor.Red;
+            System.Console.WriteLine($"ERROR in Section 40: {ex.Message}");
+            System.Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            System.Console.ResetColor();
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 41: COMPLETE POKEMON LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL POKEMON IN CATALOG");
 
@@ -1343,7 +1468,7 @@ class Program
         }
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 41: COMPLETE MOVE LISTING
+        // SECTION 42: COMPLETE MOVE LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL MOVES IN CATALOG");
 
