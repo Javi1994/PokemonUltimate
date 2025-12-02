@@ -213,13 +213,14 @@ namespace PokemonUltimate.Tests.Combat
         }
 
         [Test]
-        public async Task InsertAtFront_EmptyCollection_DoesNothing()
+        public Task InsertAtFront_EmptyCollection_DoesNothing()
         {
             _queue.Enqueue(new MessageAction("One"));
 
             _queue.InsertAtFront(new List<BattleAction>());
 
             Assert.That(_queue.Count, Is.EqualTo(1));
+            return Task.CompletedTask;
         }
 
         [Test]

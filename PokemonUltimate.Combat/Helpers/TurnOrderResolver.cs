@@ -4,10 +4,11 @@ using System.Linq;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Core.Enums;
 
-namespace PokemonUltimate.Combat
+namespace PokemonUltimate.Combat.Helpers
 {
     /// <summary>
     /// Sorts battle actions by priority and speed to determine turn order.
+    /// Centralized turn order resolution system for combat engine.
     /// </summary>
     public static class TurnOrderResolver
     {

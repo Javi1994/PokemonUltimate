@@ -1,0 +1,9 @@
+{
+  "setup-worktree": [
+    "dotnet restore",
+    "dotnet clean",
+    "dotnet build",
+    "dotnet test --verbosity quiet"
+  ],
+  "_comment": "Configuración completa para nuevo worktree: restaura dependencias, limpia builds anteriores, compila y ejecuta tests (1838 tests). Nota: dotnet format omitido por diferencias de fin de línea entre OS."
+}

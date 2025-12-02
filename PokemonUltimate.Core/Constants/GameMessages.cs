@@ -23,6 +23,17 @@ namespace PokemonUltimate.Core.Constants
         public const string HitsRange = "Hits {0}-{1} times.";
 
         #endregion
+
+        #region Move Execution
+
+        public const string MoveNoPP = "{0} has no PP left!";
+        public const string MoveFlinched = "{0} flinched and couldn't move!";
+        public const string MoveAsleep = "{0} is fast asleep.";
+        public const string MoveFrozen = "{0} is frozen solid!";
+        public const string MoveParalyzed = "{0} is paralyzed! It can't move!";
+        public const string MoveMissed = "The attack missed!";
+
+        #endregion
     }
 }
 

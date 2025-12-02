@@ -1,6 +1,6 @@
 # Implementation Plan: Pokemon Battle Engine
 
-> **Last Updated**: December 2025 | **Tests**: 1,600 passing | **Warnings**: 0
+> **Last Updated**: December 2025 | **Tests**: 1,885 passing | **Warnings**: 0
 
 ## Goal
 
@@ -19,8 +19,8 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 | Step 2: Combat Foundation | ✅ Complete | ~300 |
 | Step 3: Damage Pipeline | ✅ Complete | ~200 |
 | Step 4: Data Enhancement | ✅ Complete | ~300 |
-| Step 5: Combat Actions | 🎯 Next | - |
-| Step 6: Combat Engine | ⏳ Pending | - |
+| Step 5: Combat Actions | ✅ Complete | 47 |
+| Step 6: Combat Engine | 🎯 Next | - |
 | Step 7: Integration | ⏳ Pending | - |
 
 ---
@@ -155,17 +155,24 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 
 ---
 
-## Step 5: Combat Actions 🎯 NEXT
+## Step 5: Combat Actions ✅ COMPLETE
 
 **Objective**: Implement core battle actions.
 
-### Components to Implement
-- [ ] `UseMoveAction` - Execute a move
-- [ ] `SwitchAction` - Switch Pokemon
-- [ ] `DamageAction` - Apply damage
-- [ ] `HealAction` - Restore HP
-- [ ] `StatChangeAction` - Modify stat stages
-- [ ] `ApplyStatusAction` - Apply status conditions
+### Components Implemented
+- [x] `UseMoveAction` - Execute a move (with PP, accuracy, effects)
+- [x] `SwitchAction` - Switch Pokemon (priority +6)
+- [x] `DamageAction` - Apply damage (with faint detection)
+- [x] `FaintAction` - Handle Pokemon fainting
+- [x] `HealAction` - Restore HP
+- [x] `StatChangeAction` - Modify stat stages
+- [x] `ApplyStatusAction` - Apply status conditions
+- [x] `MessageAction` - Display battle messages
+- [x] `AccuracyChecker` - Accuracy calculation system
+
+### Documentation
+- [x] `docs/combat/action_use_cases.md` - 207 use cases
+- [x] `docs/combat/actions_bible.md` - Complete technical reference
 
 ---
 

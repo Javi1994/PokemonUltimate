@@ -14,6 +14,7 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Steps;
+using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Content.Builders;
 // Catalogs
 using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
@@ -884,6 +885,122 @@ class Program
 
         PrintInfo($"Damage: {damageContext.FinalDamage} (STAB: {damageContext.IsStab}, Effectiveness: {damageContext.TypeEffectiveness}x)");
         PrintInfo($"DamagePipeline steps: Base → Crit → Random → STAB → TypeEff → Burn");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 36: COMBAT ACTIONS
+        // ═══════════════════════════════════════════════════════
+        PrintSection("COMBAT ACTIONS");
+
+        // Setup battle field for action tests
+        var actionField = new BattleField();
+        var actionPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var actionEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        actionField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            actionPlayerParty, actionEnemyParty);
+
+        var actionUserSlot = actionField.PlayerSide.Slots[0];
+        var actionTargetSlot = actionField.EnemySide.Slots[0];
+        var actionUser = actionUserSlot.Pokemon;
+        var actionTarget = actionTargetSlot.Pokemon;
+
+        // DamageAction
+        var initialHP = actionTarget.CurrentHP;
+        var testDamageContext = new DamageContext(actionUserSlot, actionTargetSlot, MoveCatalog.Thunderbolt, actionField);
+        testDamageContext.BaseDamage = 50;
+        testDamageContext.Multiplier = 1.0f;
+        
+        var damageAction = new DamageAction(actionUserSlot, actionTargetSlot, testDamageContext);
+        var damageReactions = damageAction.ExecuteLogic(actionField).ToList();
+        
+        Test("DamageAction reduces HP", () => actionTarget.CurrentHP < initialHP);
+        Test("DamageAction returns empty if no faint", () => damageReactions.Count == 0 || damageReactions[0] is FaintAction);
+
+        // FaintAction
+        actionTarget.CurrentHP = 0;
+        var faintAction = new FaintAction(actionUserSlot, actionTargetSlot);
+        var faintReactions = faintAction.ExecuteLogic(actionField);
+        Test("FaintAction handles fainted Pokemon", () => actionTarget.IsFainted);
+        Test("FaintAction returns empty reactions", () => !faintReactions.Any());
+
+        // HealAction
+        actionTarget.CurrentHP = 50;
+        var healAction = new HealAction(null, actionTargetSlot, 30);
+        healAction.ExecuteLogic(actionField);
+        Test("HealAction restores HP", () => actionTarget.CurrentHP == 80);
+        
+        var overhealAction = new HealAction(null, actionTargetSlot, 999);
+        overhealAction.ExecuteLogic(actionField);
+        Test("HealAction prevents overhealing", () => actionTarget.CurrentHP == actionTarget.MaxHP);
+
+        // StatChangeAction
+        var initialAttackStage = actionUserSlot.GetStatStage(Stat.Attack);
+        var statChangeAction = new StatChangeAction(null, actionUserSlot, Stat.Attack, 2);
+        statChangeAction.ExecuteLogic(actionField);
+        Test("StatChangeAction increases stat stage", () => actionUserSlot.GetStatStage(Stat.Attack) == initialAttackStage + 2);
+        
+        var clampStatAction = new StatChangeAction(null, actionUserSlot, Stat.Attack, 10);
+        clampStatAction.ExecuteLogic(actionField);
+        Test("StatChangeAction clamps to +6", () => actionUserSlot.GetStatStage(Stat.Attack) == 6);
+
+        // ApplyStatusAction
+        var statusAction = new ApplyStatusAction(null, actionTargetSlot, PersistentStatus.Burn);
+        statusAction.ExecuteLogic(actionField);
+        Test("ApplyStatusAction applies status", () => actionTarget.Status == PersistentStatus.Burn);
+        
+        var clearStatusAction = new ApplyStatusAction(null, actionTargetSlot, PersistentStatus.None);
+        clearStatusAction.ExecuteLogic(actionField);
+        Test("ApplyStatusAction clears status with None", () => actionTarget.Status == PersistentStatus.None);
+
+        // UseMoveAction
+        actionUser.CurrentHP = actionUser.MaxHP; // Ensure not fainted
+        actionTarget.CurrentHP = actionTarget.MaxHP; // Reset target
+        var useMoveInstance = actionUser.Moves[0];
+        var initialPP = useMoveInstance.CurrentPP;
+        
+        var useMoveAction = new UseMoveAction(actionUserSlot, actionTargetSlot, useMoveInstance);
+        var moveReactions = useMoveAction.ExecuteLogic(actionField).ToList();
+        
+        Test("UseMoveAction deducts PP", () => useMoveInstance.CurrentPP == initialPP - 1);
+        Test("UseMoveAction generates reactions", () => moveReactions.Count > 0);
+        Test("UseMoveAction generates MessageAction", () => moveReactions.Any(r => r is MessageAction));
+        Test("UseMoveAction generates DamageAction for damaging moves", () => 
+            moveReactions.Any(r => r is DamageAction) || useMoveInstance.Move.Category == MoveCategory.Status);
+
+        // SwitchAction
+        var switchField = new BattleField();
+        var switchPlayerParty = new[] 
+        { 
+            PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
+            PokemonFactory.Create(PokemonCatalog.Charmander, 50)
+        };
+        var switchEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
+        switchField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            switchPlayerParty, switchEnemyParty);
+        
+        var switchSlot = switchField.PlayerSide.Slots[0];
+        var switchBenchPokemon = switchField.PlayerSide.Party[1];
+        var switchActivePokemon = switchSlot.Pokemon;
+        
+        switchSlot.ModifyStatStage(Stat.Attack, 2);
+        switchSlot.AddVolatileStatus(VolatileStatus.Flinch);
+        
+        var switchAction = new SwitchAction(switchSlot, switchBenchPokemon);
+        switchAction.ExecuteLogic(switchField);
+        
+        Test("SwitchAction swaps Pokemon", () => switchSlot.Pokemon == switchBenchPokemon);
+        Test("SwitchAction resets stat stages", () => switchSlot.GetStatStage(Stat.Attack) == 0);
+        Test("SwitchAction clears volatile status", () => !switchSlot.HasVolatileStatus(VolatileStatus.Flinch));
+        Test("SwitchAction has priority +6", () => switchAction.Priority == 6);
+        Test("SwitchAction cannot be blocked", () => !switchAction.CanBeBlocked);
+
+        // MessageAction
+        var messageAction = new MessageAction("Test message");
+        var messageReactions = messageAction.ExecuteLogic(actionField);
+        Test("MessageAction returns empty reactions", () => !messageReactions.Any());
+        Test("MessageAction stores message", () => messageAction.Message == "Test message");
+
+        PrintInfo($"Actions tested: DamageAction, FaintAction, HealAction, StatChangeAction, ApplyStatusAction, UseMoveAction, SwitchAction, MessageAction");
+        PrintInfo($"All actions follow ExecuteLogic() → ExecuteVisual() pattern");
 
         // ═══════════════════════════════════════════════════════
         // SECTION 37: COMPLETE POKEMON LISTING

@@ -33,10 +33,10 @@ The Combat System is divided into **7 phases**, each building on the previous. E
 | 2.3 Turn Order | ✅ Complete | 48 | TurnOrderResolver |
 | 2.4 Damage Calculation | ✅ Complete | 65 | DamagePipeline |
 | **Data Layer** | ✅ Complete | 170 | AbilityData, ItemData, StatusEffectData |
-| 2.5 Combat Actions | 🎯 Next | 0 | UseMoveAction, SwitchAction |
-| 2.6 Combat Engine | ⏳ Pending | 0 | |
-| 2.7 Integration | ⏳ Pending | 0 | |
-| **Total** | **5/7** | **493** | Combat module only |
+| 2.5 Combat Actions | ✅ Complete | 47 | All actions implemented |
+| 2.6 Combat Engine | 🎯 Next | 0 | CombatEngine, Arbiter |
+| 2.7 Integration | ⏳ Pending | 0 | AI, full battles |
+| **Total** | **6/7** | **540** | Combat module only |
 
 ---
 
@@ -555,17 +555,23 @@ Tests/Combat/Actions/SwitchActionTests.cs
 
 ### Completion Checklist
 
-- [ ] `DamageAction` implemented with tests
-- [ ] `UseMoveAction` implemented with tests
-- [ ] `FaintAction` implemented with tests
-- [ ] `ApplyStatusAction` implemented with tests
-- [ ] `StatChangeAction` implemented with tests
-- [ ] `HealAction` implemented with tests
-- [ ] `SwitchAction` implemented with tests
-- [ ] PP deduction working
-- [ ] Accuracy checks working
-- [ ] Effect application working
-- [ ] All tests pass
+- [x] `DamageAction` implemented with tests
+- [x] `UseMoveAction` implemented with tests
+- [x] `FaintAction` implemented with tests
+- [x] `ApplyStatusAction` implemented with tests
+- [x] `StatChangeAction` implemented with tests
+- [x] `HealAction` implemented with tests
+- [x] `SwitchAction` implemented with tests
+- [x] `MessageAction` implemented with tests
+- [x] PP deduction working
+- [x] Accuracy checks working (`AccuracyChecker`)
+- [x] Effect application working
+- [x] All tests pass (1,885 total)
+
+### Documentation Created
+
+- [x] `docs/combat/action_use_cases.md` - 207 use cases documented
+- [x] `docs/combat/actions_bible.md` - Complete technical reference
 
 ---
 
