@@ -7,13 +7,13 @@
 
 ## 📍 Current Project State
 
-| Aspect            | Status                    |
-| ----------------- | ------------------------- |
-| **Current Phase** | Phase 3: Combat System 🚧 |
-| **Sub-Phase**     | 2.7 Integration (next)    |
-| **Tests**         | 2,000 passing             |
-| **Warnings**      | 0                         |
-| **Last Updated**  | December 2025             |
+| Aspect            | Status                      |
+| ----------------- | --------------------------- |
+| **Current Phase** | Phase 3: Combat System ✅   |
+| **Sub-Phase**     | 2.7 Integration ✅ Complete |
+| **Tests**         | 2,038 passing               |
+| **Warnings**      | 0                           |
+| **Last Updated**  | December 2025               |
 
 ---
 
@@ -39,7 +39,8 @@ PokemonUltimate/
 │   ├── View/       # IBattleView, NullBattleView
 │   ├── Actions/    # BattleAction implementations
 │   ├── Damage/     # DamagePipeline, DamageContext
-│   └── Helpers/    # AccuracyChecker, TurnOrderResolver
+│   ├── AI/         # RandomAI, AlwaysAttackAI
+│   └── Helpers/    # AccuracyChecker, TurnOrderResolver, TargetResolver
 │
 ├── Content/        # Game data definitions
 │   ├── Catalogs/   # Pokemon, Move, Ability, Item definitions
@@ -91,15 +92,15 @@ PokemonUltimate/
 
 See `docs/combat_implementation_plan.md` for full details.
 
-| Sub-Phase              | Status      | Description               |
-| ---------------------- | ----------- | ------------------------- |
-| 2.1 Battle Foundation  | ✅ Complete | BattleField, Slot, Side   |
-| 2.2 Action Queue       | ✅ Complete | BattleQueue, BattleAction |
-| 2.3 Turn Order         | ✅ Complete | TurnOrderResolver         |
-| 2.4 Damage Calculation | ✅ Complete | DamagePipeline            |
-| 2.5 Combat Actions     | ✅ Complete | All actions implemented   |
-| 2.6 Combat Engine      | ✅ Complete | CombatEngine, Arbiter     |
-| 2.7 Integration        | 🎯 Next     | AI, full battles          |
+| Sub-Phase              | Status      | Description                                            |
+| ---------------------- | ----------- | ------------------------------------------------------ |
+| 2.1 Battle Foundation  | ✅ Complete | BattleField, Slot, Side                                |
+| 2.2 Action Queue       | ✅ Complete | BattleQueue, BattleAction                              |
+| 2.3 Turn Order         | ✅ Complete | TurnOrderResolver                                      |
+| 2.4 Damage Calculation | ✅ Complete | DamagePipeline                                         |
+| 2.5 Combat Actions     | ✅ Complete | All actions implemented                                |
+| 2.6 Combat Engine      | ✅ Complete | CombatEngine, Arbiter                                  |
+| 2.7 Integration        | ✅ Complete | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
 
 Reference docs:
 

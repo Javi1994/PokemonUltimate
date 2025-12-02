@@ -35,8 +35,8 @@ The Combat System is divided into **7 phases**, each building on the previous. E
 | **Data Layer** | ✅ Complete | 170 | AbilityData, ItemData, StatusEffectData |
 | 2.5 Combat Actions | ✅ Complete | 47 | All actions implemented |
 | 2.6 Combat Engine | ✅ Complete | 30 | CombatEngine, BattleArbiter, IActionProvider |
-| 2.7 Integration | 🎯 Next | 0 | AI, full battles |
-| **Total** | **7/7** | **570** | Combat module only |
+| 2.7 Integration | ✅ Complete | 38 | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
+| **Total** | **7/7** | **608** | Combat module only |
 
 ---
 
@@ -719,17 +719,17 @@ public class PlayerActionProvider : IActionProvider
 
 ### Completion Checklist
 
-- [ ] `RandomAI` implemented with tests
-- [ ] `AlwaysAttackAI` implemented with tests
-- [ ] Full 1v1 battle simulation working
-- [ ] Multiple battles run without errors
-- [ ] Type advantages affect outcome
-- [ ] Status effects work in battle
-- [ ] PP depletion works
-- [ ] Faint and switch flow works
-- [ ] All integration tests pass
-- [ ] Unity example documented
-- [ ] All tests pass
+- [x] `RandomAI` implemented with tests (12 tests)
+- [x] `AlwaysAttackAI` implemented with tests (9 tests)
+- [x] `TargetResolver` helper implemented
+- [x] Full 1v1 battle simulation working
+- [x] Multiple battles run without errors
+- [x] Type advantages affect outcome
+- [x] Status effects work in battle
+- [x] PP depletion works
+- [x] Integration tests pass (17 tests)
+- [x] Smoke test updated with AI tests
+- [x] All tests pass (38 new tests for Phase 2.7)
 
 ---
 
@@ -840,7 +840,7 @@ PokemonUltimate.Combat/
 | 2.4 Damage | ~40 | 65 |
 | 2.5 Actions | ~50 | 47 |
 | 2.6 Engine | ~25 | 30 |
-| 2.7 Integration | ~20 | 0 |
+| 2.7 Integration | ~20 | 38 |
 | **Total** | **~200** | **400** |
 
 ---

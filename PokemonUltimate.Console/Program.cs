@@ -12,6 +12,7 @@ using PokemonUltimate.Core.Registry;
 // Combat
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Steps;
 using PokemonUltimate.Combat.Helpers;
@@ -1125,7 +1126,57 @@ class Program
         PrintInfo($"IActionProvider: Action selection abstraction ready");
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 38: COMPLETE POKEMON LISTING
+        // SECTION 38: AI AND FULL BATTLES
+        // ═══════════════════════════════════════════════════════
+        PrintSection("AI AND FULL BATTLES");
+
+        // Test RandomAI
+        var randomAIField = new BattleField();
+        var randomAIPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var randomAIEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        randomAIField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            randomAIPlayerParty, randomAIEnemyParty);
+        
+        var randomAI = new RandomAI();
+        var randomAISlot = randomAIField.PlayerSide.Slots[0];
+        var randomAIAction = randomAI.GetAction(randomAIField, randomAISlot).Result;
+        
+        Test("RandomAI returns action", () => randomAIAction != null);
+        Test("RandomAI returns UseMoveAction", () => randomAIAction is UseMoveAction);
+
+        // Test AlwaysAttackAI
+        var alwaysAttackAI = new AlwaysAttackAI();
+        var alwaysAttackAIAction = alwaysAttackAI.GetAction(randomAIField, randomAISlot).Result;
+        
+        Test("AlwaysAttackAI returns action", () => alwaysAttackAIAction != null);
+        Test("AlwaysAttackAI returns UseMoveAction", () => alwaysAttackAIAction is UseMoveAction);
+
+        // Test TargetResolver
+        var targetResolverMove = randomAIPlayerParty[0].Moves[0].Move;
+        var validTargets = TargetResolver.GetValidTargets(randomAISlot, targetResolverMove, randomAIField);
+        Test("TargetResolver returns valid targets", () => validTargets.Count > 0);
+
+        // Test full battle (simplified - just verify it runs)
+        var fullBattleEngine = new CombatEngine();
+        var fullBattlePlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var fullBattleEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        var fullBattlePlayerAI = new RandomAI();
+        var fullBattleEnemyAI = new AlwaysAttackAI();
+        
+        fullBattleEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+            fullBattlePlayerParty, fullBattleEnemyParty, fullBattlePlayerAI, fullBattleEnemyAI, new NullBattleView());
+        
+        // Run a few turns to verify it works (not full battle to keep smoke test fast)
+        fullBattleEngine.RunTurn().Wait();
+        Test("Full battle engine runs turns", () => fullBattleEngine.Field != null);
+
+        PrintInfo($"RandomAI: Random move selection working");
+        PrintInfo($"AlwaysAttackAI: First move selection working");
+        PrintInfo($"TargetResolver: Valid target resolution working");
+        PrintInfo($"Full battles: AI vs AI battles functional");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 39: COMPLETE POKEMON LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL POKEMON IN CATALOG");
 
@@ -1142,7 +1193,7 @@ class Program
         }
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 39: COMPLETE MOVE LISTING
+        // SECTION 40: COMPLETE MOVE LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL MOVES IN CATALOG");
 

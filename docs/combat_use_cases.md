@@ -685,7 +685,7 @@ Most moves miss, except:
 ### Phase 2.3: Turn Order ✅
 - [x] 2.2: Priority brackets (BattleAction.Priority, TurnOrderResolver sorts by priority)
 - [x] 2.3: Speed modifiers (stat stages ±6, paralysis ×0.5)
-- [ ] 7.1: Switch priority (deferred - SwitchAction not yet implemented)
+- [x] 7.1: Switch priority (+6 priority in `SwitchAction`)
 
 ### Phase 2.4: Damage Calculation ✅
 - [x] 4.1: Base damage formula (BaseDamageStep with Gen 3+ formula)
@@ -695,21 +695,29 @@ Most moves miss, except:
 - [x] 3.4: Move categories (Physical/Special/Status routing)
 - [x] Status moves: Zero damage for power 0 moves
 
-### Phase 2.5: Combat Actions
-- [ ] 3.1: Pre-move checks
-- [ ] 3.2: Accuracy check
-- [ ] 5.1: Persistent status effects
-- [ ] 5.2: Volatile status effects
-- [ ] 6.4: Stat change moves
+### Phase 2.5: Combat Actions ✅
+- [x] 3.1: Pre-move checks (PP, Sleep, Freeze, Paralysis, Flinch)
+- [x] 3.2: Accuracy check (`AccuracyChecker` with stages)
+- [x] 5.1: Persistent status effects (`ApplyStatusAction`)
+- [x] 5.2: Volatile status effects (Flinch implemented, others pending)
+- [x] 6.4: Stat change moves (`StatChangeAction`)
 
-### Phase 2.6: Combat Engine
-- [ ] 2.1-2.5: Complete turn flow
-- [ ] 12.1-12.3: Victory/defeat conditions
-- [ ] 11.2: Delayed moves (Future Sight)
+**Status**: ✅ **Core Complete** - Basic status application works, end-of-turn effects deferred
 
-### Phase 2.7: Integration
-- [ ] Full battle simulation
-- [ ] All basic mechanics working together
+### Phase 2.6: Combat Engine ✅
+- [x] 2.1-2.5: Complete turn flow (`CombatEngine.RunTurn()`)
+- [x] 12.1-12.3: Victory/defeat conditions (`BattleArbiter`)
+- [ ] 11.2: Delayed moves (Future Sight) ⏳ Deferred to future phase
+
+**Status**: ✅ **Core Complete** - Turn flow and victory detection working
+
+### Phase 2.7: Integration ✅
+- [x] Full battle simulation (`CombatEngine.RunBattle()`)
+- [x] AI vs AI battles (`RandomAI`, `AlwaysAttackAI`)
+- [x] All basic mechanics working together
+- [x] TargetResolver for move targeting
+
+**Status**: ✅ **100% Complete**
 
 ### Future Phases
 - [ ] 8: Entry effects (hazards)
