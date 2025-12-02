@@ -66,6 +66,7 @@ namespace PokemonUltimate.Tests.Catalogs.Moves
         {
             var damagingMoves = MoveCatalog.All
                 .Where(m => m.Category != MoveCategory.Status)
+                .Where(m => !m.HasEffect<FixedDamageEffect>()) // Exclude fixed damage moves (Dragon Rage)
                 .ToList();
 
             foreach (var move in damagingMoves)
@@ -126,8 +127,13 @@ namespace PokemonUltimate.Tests.Catalogs.Moves
         [Test]
         public void Test_All_Moves_Have_At_Least_One_Effect()
         {
+            var movesWithoutEffects = new[] { "Splash", "Teleport" }; // Moves that intentionally have no effects
+            
             foreach (var move in MoveCatalog.All)
             {
+                if (movesWithoutEffects.Contains(move.Name))
+                    continue; // Skip moves that intentionally have no effects
+                    
                 Assert.That(move.Effects.Count, Is.GreaterThan(0),
                     $"{move.Name} should have at least one effect");
             }

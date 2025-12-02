@@ -11,9 +11,11 @@
 | --------------------- | ------------------------------- |
 | **Current Phase**     | Phase 3: Combat System ✅       |
 | **Sub-Phase**         | 2.10 Pipeline Hooks ✅ Extended |
-| **Tests**             | 2,231+ passing                  |
+| **Tests**             | 2,311 passing                   |
 | **Integration Tests** | 83+ tests (system interactions) |
 | **Warnings**          | 0                               |
+| **Pokemon Catalog**   | 26 Pokemon (Gen1)               |
+| **Move Catalog**      | 36 Moves (12 types)             |
 | **Last Updated**      | December 2025                   |
 
 ---
@@ -111,6 +113,7 @@ See `docs/combat_implementation_plan.md` for full details.
 | 2.8 End-of-Turn Effects | ✅ Complete | EndOfTurnProcessor, Status damage (Burn/Poison/Toxic)                                                         |
 | 2.9 Abilities & Items   | ✅ Complete | BattleTrigger system, AbilityListener, ItemListener, Leftovers, Intimidate                                    |
 | 2.10 Pipeline Hooks     | ✅ Extended | IStatModifier system, Choice Band/Specs/Scarf, Life Orb, Assault Vest, Eviolite, Blaze/Torrent/Overgrow/Swarm |
+| 2.11 Recoil & Drain     | ✅ Complete | RecoilEffect (25%, 33%, 50%), DrainEffect (50%, 75%)                                                          |
 
 Reference docs:
 

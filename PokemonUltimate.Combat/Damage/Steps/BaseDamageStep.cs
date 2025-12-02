@@ -1,5 +1,6 @@
 using System;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Combat.Damage.Steps
@@ -15,6 +16,14 @@ namespace PokemonUltimate.Combat.Damage.Steps
             var attacker = context.Attacker.Pokemon;
             var defender = context.Defender.Pokemon;
             var move = context.Move;
+
+            // Fixed damage moves (like Dragon Rage) bypass the damage formula
+            if (move.HasEffect<FixedDamageEffect>())
+            {
+                var fixedDamage = move.GetEffect<FixedDamageEffect>();
+                context.BaseDamage = fixedDamage.Amount;
+                return;
+            }
 
             // Get relevant stats based on move category
             int attackStat;

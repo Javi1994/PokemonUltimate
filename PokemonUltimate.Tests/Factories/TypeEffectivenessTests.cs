@@ -139,6 +139,50 @@ namespace PokemonUltimate.Tests.Factories
             Assert.That(eff, Is.EqualTo(0.5f));
         }
 
+        [Test]
+        public void Water_Against_RockGround_Is_4x()
+        {
+            // Water is super effective vs both Rock (2x) and Ground (2x) = 4x
+            // This applies to Geodude, Graveler, Golem
+            float eff = TypeEffectiveness.GetEffectiveness(PokemonType.Water, PokemonType.Rock, PokemonType.Ground);
+            Assert.That(eff, Is.EqualTo(4.0f));
+        }
+
+        [Test]
+        public void Grass_Against_RockGround_Is_4x()
+        {
+            // Grass is super effective vs both Rock (2x) and Ground (2x) = 4x
+            float eff = TypeEffectiveness.GetEffectiveness(PokemonType.Grass, PokemonType.Rock, PokemonType.Ground);
+            Assert.That(eff, Is.EqualTo(4.0f));
+        }
+
+        [Test]
+        public void Ground_Against_WaterFlying_Is_Immune()
+        {
+            // Ground is super effective vs Water (2x) but immune vs Flying (0x) = 0x
+            // This applies to Gyarados
+            float eff = TypeEffectiveness.GetEffectiveness(PokemonType.Ground, PokemonType.Water, PokemonType.Flying);
+            Assert.That(eff, Is.EqualTo(0.0f));
+        }
+
+        [Test]
+        public void Electric_Against_WaterFlying_Is_4x()
+        {
+            // Electric is super effective vs Water (2x) and super effective vs Flying (2x) = 4x
+            // This applies to Gyarados
+            float eff = TypeEffectiveness.GetEffectiveness(PokemonType.Electric, PokemonType.Water, PokemonType.Flying);
+            Assert.That(eff, Is.EqualTo(4.0f));
+        }
+
+        [Test]
+        public void Rock_Against_WaterFlying_Is_2x()
+        {
+            // Rock is neutral vs Water (1x) and super effective vs Flying (2x) = 2x
+            // This applies to Gyarados
+            float eff = TypeEffectiveness.GetEffectiveness(PokemonType.Rock, PokemonType.Water, PokemonType.Flying);
+            Assert.That(eff, Is.EqualTo(2.0f));
+        }
+
         #endregion
 
         #region STAB Tests
@@ -162,6 +206,62 @@ namespace PokemonUltimate.Tests.Factories
         {
             float stab = TypeEffectiveness.GetSTABMultiplier(PokemonType.Water, PokemonType.Fire, PokemonType.Flying);
             Assert.That(stab, Is.EqualTo(1.0f));
+        }
+
+        [Test]
+        public void STAB_Ghost_With_Ghost_Poison()
+        {
+            // Gengar (Ghost/Poison) using Ghost move = STAB
+            float stab = TypeEffectiveness.GetSTABMultiplier(PokemonType.Ghost, PokemonType.Ghost, PokemonType.Poison);
+            Assert.That(stab, Is.EqualTo(1.5f));
+        }
+
+        [Test]
+        public void STAB_Poison_With_Ghost_Poison()
+        {
+            // Gengar (Ghost/Poison) using Poison move = STAB
+            float stab = TypeEffectiveness.GetSTABMultiplier(PokemonType.Poison, PokemonType.Ghost, PokemonType.Poison);
+            Assert.That(stab, Is.EqualTo(1.5f));
+        }
+
+        [Test]
+        public void STAB_Rock_With_Rock_Ground()
+        {
+            // Golem (Rock/Ground) using Rock move = STAB
+            float stab = TypeEffectiveness.GetSTABMultiplier(PokemonType.Rock, PokemonType.Rock, PokemonType.Ground);
+            Assert.That(stab, Is.EqualTo(1.5f));
+        }
+
+        [Test]
+        public void STAB_Ground_With_Rock_Ground()
+        {
+            // Golem (Rock/Ground) using Ground move = STAB
+            float stab = TypeEffectiveness.GetSTABMultiplier(PokemonType.Ground, PokemonType.Rock, PokemonType.Ground);
+            Assert.That(stab, Is.EqualTo(1.5f));
+        }
+
+        [Test]
+        public void STAB_Water_With_Water_Flying()
+        {
+            // Gyarados (Water/Flying) using Water move = STAB
+            float stab = TypeEffectiveness.GetSTABMultiplier(PokemonType.Water, PokemonType.Water, PokemonType.Flying);
+            Assert.That(stab, Is.EqualTo(1.5f));
+        }
+
+        [Test]
+        public void STAB_Flying_With_Water_Flying()
+        {
+            // Gyarados (Water/Flying) using Flying move = STAB
+            float stab = TypeEffectiveness.GetSTABMultiplier(PokemonType.Flying, PokemonType.Water, PokemonType.Flying);
+            Assert.That(stab, Is.EqualTo(1.5f));
+        }
+
+        [Test]
+        public void STAB_Dragon_With_Dragon_Type()
+        {
+            // Dragon type Pokemon using Dragon move = STAB
+            float stab = TypeEffectiveness.GetSTABMultiplier(PokemonType.Dragon, PokemonType.Dragon, null);
+            Assert.That(stab, Is.EqualTo(1.5f));
         }
 
         #endregion

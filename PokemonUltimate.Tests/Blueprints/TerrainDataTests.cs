@@ -257,6 +257,24 @@ namespace PokemonUltimate.Tests.Blueprints
         }
 
         [Test]
+        public void IsGrounded_WaterFlying_ReturnsFalse()
+        {
+            // Gyarados (Water/Flying) should not be grounded
+            bool grounded = TerrainData.IsGrounded(PokemonType.Water, PokemonType.Flying, null, null);
+
+            Assert.That(grounded, Is.False, "Gyarados (Water/Flying) should not be grounded");
+        }
+
+        [Test]
+        public void IsGrounded_RockGround_ReturnsTrue()
+        {
+            // Geodude/Golem (Rock/Ground) should be grounded
+            bool grounded = TerrainData.IsGrounded(PokemonType.Rock, PokemonType.Ground, null, null);
+
+            Assert.That(grounded, Is.True, "Geodude/Golem (Rock/Ground) should be grounded");
+        }
+
+        [Test]
         public void IsGrounded_LevitateAbility_ReturnsFalse()
         {
             bool grounded = TerrainData.IsGrounded(PokemonType.Ghost, null, "Levitate", null);

@@ -200,7 +200,7 @@ Where:
 - [ ] Freeze-Dry is super effective vs Water
 
 ### 4.4 Fixed Damage
-- [ ] Dragon Rage: Always 40 damage
+- [x] Dragon Rage: Always 40 damage ✅
 - [ ] Sonic Boom: Always 20 damage
 - [ ] Seismic Toss: Damage = User's level
 - [ ] Night Shade: Damage = User's level
@@ -209,14 +209,14 @@ Where:
 - [ ] OHKO moves: Fissure, Horn Drill, Guillotine, Sheer Cold
 
 ### 4.5 Recoil & Drain
-- [ ] **Recoil**: User takes % of damage dealt
+- [x] **Recoil**: User takes % of damage dealt ✅
   - 1/4: Take Down, Double-Edge
   - 1/3: Brave Bird, Flare Blitz, Wood Hammer
   - 1/2: Head Smash
-- [ ] **Drain**: User heals % of damage dealt
+- [x] **Drain**: User heals % of damage dealt ✅
   - 1/2: Absorb, Mega Drain, Giga Drain
   - 3/4: Drain Punch, Horn Leech
-- [ ] **Crash damage**: If move misses (High Jump Kick, Jump Kick)
+- [ ] **Crash damage**: If move misses (High Jump Kick, Jump Kick) (Deferred)
 
 ---
 

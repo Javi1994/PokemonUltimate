@@ -162,21 +162,15 @@ namespace PokemonUltimate.Tests.Combat.Damage
                 field);
 
             // Water vs Fire = 2x, Water vs Flying = 1x → Actually just 2x
-            // Let's verify what we actually get
             // Fire/Flying: Fire is weak to Water (2x), Flying is neutral to Water (1x)
             // So it's 2x * 1x = 2x, NOT 4x
-            // For 4x, we need a Pokemon weak on both types to Water
-            // Actually Rock/Ground would be 4x to Water, but we don't have that
-            // Change test to verify what we have
             Assert.That(context.TypeEffectiveness, Is.EqualTo(2.0f));
         }
 
         [Test]
         public void Calculate_DualTypeResistance_QuartersMultiplier()
         {
-            // Fire vs Water/Ground would be 0.25x but we don't have Water/Ground
-            // Fire vs Grass/Poison (Bulbasaur): Fire vs Grass = 2x, Fire vs Poison = 1x = 2x total
-            // Let's test Electric vs Grass/Poison instead: 0.5x * 1x = 0.5x
+            // Electric vs Grass/Poison (Bulbasaur): Electric vs Grass = 0.5x, Electric vs Poison = 1x = 0.5x total
             var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
             var bulbasaur = PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50);
             
@@ -191,6 +185,47 @@ namespace PokemonUltimate.Tests.Combat.Damage
 
             // Electric vs Grass = 0.5x, Electric vs Poison = 1x
             Assert.That(context.TypeEffectiveness, Is.EqualTo(0.5f));
+        }
+
+        [Test]
+        public void Calculate_4xSuperEffective_WithRockGround()
+        {
+            // Water vs Rock/Ground (Golem) = 4x (Water is 2x vs both Rock and Ground)
+            var squirtle = PokemonFactory.Create(PokemonCatalog.Squirtle, 50);
+            var golem = PokemonFactory.Create(PokemonCatalog.Golem, 50);
+            
+            var field = CreateBattleField(squirtle, golem);
+            var waterGun = MoveCatalog.WaterGun; // Water type
+
+            var context = _pipeline.Calculate(
+                field.PlayerSide.Slots[0], 
+                field.EnemySide.Slots[0], 
+                waterGun, 
+                field);
+
+            // Water vs Rock = 2x, Water vs Ground = 2x → 4x total
+            Assert.That(context.TypeEffectiveness, Is.EqualTo(4.0f));
+        }
+
+        [Test]
+        public void Calculate_GroundImmune_AgainstFlying()
+        {
+            // Ground vs Water/Flying (Gyarados) = 0x (Ground is immune vs Flying)
+            var geodude = PokemonFactory.Create(PokemonCatalog.Geodude, 50);
+            var gyarados = PokemonFactory.Create(PokemonCatalog.Gyarados, 50);
+            
+            var field = CreateBattleField(geodude, gyarados);
+            var earthquake = MoveCatalog.Earthquake; // Ground type
+
+            var context = _pipeline.Calculate(
+                field.PlayerSide.Slots[0], 
+                field.EnemySide.Slots[0], 
+                earthquake, 
+                field);
+
+            // Ground vs Water = 2x, but Ground vs Flying = 0x → immunity wins
+            Assert.That(context.TypeEffectiveness, Is.EqualTo(0f));
+            Assert.That(context.FinalDamage, Is.EqualTo(0));
         }
 
         #endregion
@@ -233,6 +268,82 @@ namespace PokemonUltimate.Tests.Combat.Damage
                 field);
 
             Assert.That(context.IsStab, Is.False);
+        }
+
+        [Test]
+        public void Calculate_STAB_WithGhostType()
+        {
+            // Gengar using Ghost move = STAB
+            var gengar = PokemonFactory.Create(PokemonCatalog.Gengar, 50);
+            var eevee = PokemonFactory.Create(PokemonCatalog.Eevee, 50);
+            
+            var field = CreateBattleField(gengar, eevee);
+            var shadowBall = MoveCatalog.ShadowBall; // Ghost type
+
+            var context = _pipeline.Calculate(
+                field.PlayerSide.Slots[0], 
+                field.EnemySide.Slots[0], 
+                shadowBall, 
+                field);
+
+            Assert.That(context.IsStab, Is.True);
+        }
+
+        [Test]
+        public void Calculate_STAB_WithRockType()
+        {
+            // Golem using Rock move = STAB
+            var golem = PokemonFactory.Create(PokemonCatalog.Golem, 50);
+            var eevee = PokemonFactory.Create(PokemonCatalog.Eevee, 50);
+            
+            var field = CreateBattleField(golem, eevee);
+            var rockThrow = MoveCatalog.RockThrow; // Rock type
+
+            var context = _pipeline.Calculate(
+                field.PlayerSide.Slots[0], 
+                field.EnemySide.Slots[0], 
+                rockThrow, 
+                field);
+
+            Assert.That(context.IsStab, Is.True);
+        }
+
+        [Test]
+        public void Calculate_STAB_WithFlyingType()
+        {
+            // Gyarados using Flying move = STAB
+            var gyarados = PokemonFactory.Create(PokemonCatalog.Gyarados, 50);
+            var eevee = PokemonFactory.Create(PokemonCatalog.Eevee, 50);
+            
+            var field = CreateBattleField(gyarados, eevee);
+            var wingAttack = MoveCatalog.WingAttack; // Flying type
+
+            var context = _pipeline.Calculate(
+                field.PlayerSide.Slots[0], 
+                field.EnemySide.Slots[0], 
+                wingAttack, 
+                field);
+
+            Assert.That(context.IsStab, Is.True);
+        }
+
+        [Test]
+        public void Calculate_STAB_WithPoisonType()
+        {
+            // Gengar using Poison move = STAB
+            var gengar = PokemonFactory.Create(PokemonCatalog.Gengar, 50);
+            var eevee = PokemonFactory.Create(PokemonCatalog.Eevee, 50);
+            
+            var field = CreateBattleField(gengar, eevee);
+            var sludgeBomb = MoveCatalog.SludgeBomb; // Poison type
+
+            var context = _pipeline.Calculate(
+                field.PlayerSide.Slots[0], 
+                field.EnemySide.Slots[0], 
+                sludgeBomb, 
+                field);
+
+            Assert.That(context.IsStab, Is.True);
         }
 
         [Test]

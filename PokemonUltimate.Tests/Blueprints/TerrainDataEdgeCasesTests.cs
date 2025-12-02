@@ -113,8 +113,9 @@ namespace PokemonUltimate.Tests.Blueprints
         [Test]
         public void IsGrounded_FlyingSecondary_ReturnsFalse()
         {
-            // Water/Flying like Gyarados
+            // Water/Flying like Gyarados - should not be grounded
             bool grounded = TerrainData.IsGrounded(PokemonType.Water, PokemonType.Flying, null, null);
+            Assert.That(grounded, Is.False, "Gyarados (Water/Flying) should not be grounded");
 
             Assert.That(grounded, Is.False);
         }

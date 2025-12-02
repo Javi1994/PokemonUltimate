@@ -61,22 +61,22 @@ namespace PokemonUltimate.Tests.Combat.Integration
 
             var moveInstance = new MoveInstance(physicalMove);
 
-            // Apply Burn status to attacker
-            var applyStatusAction = new ApplyStatusAction(_attackerSlot, _attackerSlot, PersistentStatus.Burn);
-            applyStatusAction.ExecuteLogic(_field);
+            // Use fixed random value to ensure consistent results
+            float fixedRandom = 1.0f; // Use same random value for both calculations
 
             // Calculate damage WITHOUT burn (baseline)
             var pipelineWithoutBurn = new DamagePipeline();
             _attacker.Status = PersistentStatus.None; // Reset status
-            var contextWithoutBurn = pipelineWithoutBurn.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field);
+            var contextWithoutBurn = pipelineWithoutBurn.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field, false, fixedRandom);
             float damageWithoutBurn = contextWithoutBurn.FinalDamage;
 
-            // Apply Burn again
-            _attacker.Status = PersistentStatus.Burn;
+            // Apply Burn status to attacker
+            var applyStatusAction = new ApplyStatusAction(_attackerSlot, _attackerSlot, PersistentStatus.Burn);
+            applyStatusAction.ExecuteLogic(_field);
 
-            // Act - Calculate damage WITH burn
+            // Act - Calculate damage WITH burn (using same random value)
             var pipelineWithBurn = new DamagePipeline();
-            var contextWithBurn = pipelineWithBurn.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field);
+            var contextWithBurn = pipelineWithBurn.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field, false, fixedRandom);
             float damageWithBurn = contextWithBurn.FinalDamage;
 
             // Assert - Burn should reduce physical damage by 50%

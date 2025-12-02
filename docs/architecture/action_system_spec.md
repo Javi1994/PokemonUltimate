@@ -246,6 +246,8 @@ public enum BattleTrigger
 │                       └─ Sturdy activates                               │
 │                                                                          │
 │  OnAfterMove                                                             │
+│       ├─ Move recoil (RecoilEffect) ✅                                  │
+│       ├─ Move drain (DrainEffect) ✅                                    │
 │       ├─ Life Orb recoil                                                │
 │       ├─ Choice item lock                                               │
 │       └─ Shell Bell heal                                                │
@@ -799,7 +801,7 @@ private async Task FireTriggers(BattleTrigger trigger, TriggerContext baseContex
 
 | Action | Description | Triggered By |
 |--------|-------------|--------------|
-| `DamageAction` | Apply HP damage | Moves, Recoil, Status |
+| `DamageAction` | Apply HP damage | Moves, RecoilEffect, Status |
 | `HealAction` | Restore HP | Moves, Items, Abilities |
 | `FaintAction` | Pokemon faints | HP reaching 0 |
 | `StatChangeAction` | Modify stat stage | Moves, Abilities |

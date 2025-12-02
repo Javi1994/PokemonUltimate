@@ -336,6 +336,40 @@ namespace PokemonUltimate.Tests.Factories
         }
 
         [Test]
+        [Description("Golem (Rock/Ground) key matchups")]
+        public void Matchups_Golem()
+        {
+            // Rock/Ground type
+            // Water is 2x vs Rock, 2x vs Ground = 4x total
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Water, PokemonType.Rock, PokemonType.Ground), Is.EqualTo(4.0f), "Water 4x");
+            // Grass is 2x vs Rock, 2x vs Ground = 4x total
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Grass, PokemonType.Rock, PokemonType.Ground), Is.EqualTo(4.0f), "Grass 4x");
+            // Fighting is 2x vs Rock, 1x vs Ground = 2x total
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Fighting, PokemonType.Rock, PokemonType.Ground), Is.EqualTo(2.0f), "Fighting 2x");
+            // Ground is 2x vs Rock, 1x vs Ground = 2x total
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Ground, PokemonType.Rock, PokemonType.Ground), Is.EqualTo(2.0f), "Ground 2x");
+            // Electric is immune vs Ground = 0x
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Electric, PokemonType.Rock, PokemonType.Ground), Is.EqualTo(0.0f), "Electric immune");
+        }
+
+        [Test]
+        [Description("Gyarados (Water/Flying) key matchups")]
+        public void Matchups_Gyarados()
+        {
+            // Water/Flying type
+            // Electric is 2x vs Water, 2x vs Flying = 4x total
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Electric, PokemonType.Water, PokemonType.Flying), Is.EqualTo(4.0f), "Electric 4x");
+            // Rock is 1x vs Water, 2x vs Flying = 2x total
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Rock, PokemonType.Water, PokemonType.Flying), Is.EqualTo(2.0f), "Rock 2x");
+            // Ground is 2x vs Water, but immune vs Flying = 0x
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Ground, PokemonType.Water, PokemonType.Flying), Is.EqualTo(0.0f), "Ground immune");
+            // Grass is 2x vs Water, 0.5x vs Flying = 1x total
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Grass, PokemonType.Water, PokemonType.Flying), Is.EqualTo(1.0f), "Grass neutral");
+            // Fire is 0.5x vs Water, 1x vs Flying = 0.5x total (Flying is neutral to Fire)
+            Assert.That(TypeEffectiveness.GetEffectiveness(PokemonType.Fire, PokemonType.Water, PokemonType.Flying), Is.EqualTo(0.5f), "Fire 0.5x");
+        }
+
+        [Test]
         [Description("Fairy type defensive matchups")]
         public void Matchups_Fairy_Defense()
         {

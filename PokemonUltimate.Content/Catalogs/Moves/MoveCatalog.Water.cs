@@ -31,11 +31,21 @@ namespace PokemonUltimate.Content.Catalogs.Moves
             .WithEffects(e => e.Damage())
             .Build();
 
+        public static readonly MoveData Waterfall = Move.Define("Waterfall")
+            .Description("The user charges at the target and may make it flinch.")
+            .Type(PokemonType.Water)
+            .Physical(80, 100, 15)
+            .WithEffects(e => e
+                .Damage()
+                .MayFlinch(20))
+            .Build();
+
         static partial void RegisterWater()
         {
             _all.Add(WaterGun);
             _all.Add(Surf);
             _all.Add(HydroPump);
+            _all.Add(Waterfall);
         }
     }
 }

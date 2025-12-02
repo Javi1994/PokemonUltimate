@@ -70,6 +70,11 @@ namespace PokemonUltimate.Content.Catalogs.Moves
             RegisterElectric();
             RegisterGround();
             RegisterPsychic();
+            RegisterGhost();
+            RegisterRock();
+            RegisterFlying();
+            RegisterPoison();
+            RegisterDragon();
         }
 
         // Partial methods - implemented in separate files
@@ -80,6 +85,11 @@ namespace PokemonUltimate.Content.Catalogs.Moves
         static partial void RegisterElectric();
         static partial void RegisterGround();
         static partial void RegisterPsychic();
+        static partial void RegisterGhost();
+        static partial void RegisterRock();
+        static partial void RegisterFlying();
+        static partial void RegisterPoison();
+        static partial void RegisterDragon();
     }
 }
 

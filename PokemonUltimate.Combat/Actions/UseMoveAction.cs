@@ -145,28 +145,41 @@ namespace PokemonUltimate.Combat.Actions
 
         /// <summary>
         /// Processes all move effects and adds corresponding actions.
+        /// Processes damage first, then effects that depend on damage (recoil, drain), then other effects.
         /// </summary>
         private void ProcessEffects(BattleField field, List<BattleAction> actions)
         {
             var random = new Random();
             int damageDealt = 0;
 
+            // First pass: Process damage effect to get damageDealt
             foreach (var effect in Move.Effects)
             {
+                if (effect is DamageEffect damageEffect)
+                {
+                    // Calculate and apply damage
+                    var pipeline = new DamagePipeline();
+                    var context = pipeline.Calculate(User, Target, Move, field);
+                    
+                    if (context.FinalDamage > 0)
+                    {
+                        var damageAction = new DamageAction(User, Target, context);
+                        actions.Add(damageAction);
+                        damageDealt = context.FinalDamage;
+                    }
+                    break; // Only process first DamageEffect
+                }
+            }
+
+            // Second pass: Process all other effects (including recoil/drain that depend on damageDealt)
+            foreach (var effect in Move.Effects)
+            {
+                // Skip DamageEffect (already processed in first pass)
+                if (effect is DamageEffect)
+                    continue;
+
                 switch (effect)
                 {
-                    case DamageEffect damageEffect:
-                        // Calculate and apply damage
-                        var pipeline = new DamagePipeline();
-                        var context = pipeline.Calculate(User, Target, Move, field);
-                        
-                        if (context.FinalDamage > 0)
-                        {
-                            var damageAction = new DamageAction(User, Target, context);
-                            actions.Add(damageAction);
-                            damageDealt = context.FinalDamage;
-                        }
-                        break;
 
                     case StatusEffect statusEffect:
                         // Check chance
@@ -187,27 +200,39 @@ namespace PokemonUltimate.Combat.Actions
                         break;
 
                     case HealEffect healEffect:
-                        // Heal user by percentage
+                        // Heal user by percentage of max HP
                         var healAmount = (int)(User.Pokemon.MaxHP * healEffect.HealPercent / 100f);
                         actions.Add(new HealAction(User, User, healAmount));
                         break;
 
                     case RecoilEffect recoilEffect:
                         // Apply recoil damage to user (if damage was dealt)
+                        // Recoil always deals at least 1 HP if damage was dealt
                         if (damageDealt > 0)
                         {
                             int recoilDamage = (int)(damageDealt * recoilEffect.RecoilPercent / 100f);
-                            if (recoilDamage > 0)
+                            recoilDamage = System.Math.Max(1, recoilDamage); // At least 1 HP
+                            
+                            // Create a simple damage context for recoil
+                            var recoilContext = new DamageContext(User, User, Move, field)
                             {
-                                // Create a simple damage context for recoil
-                                var recoilContext = new DamageContext(User, User, Move, field)
-                                {
-                                    BaseDamage = recoilDamage,
-                                    Multiplier = 1.0f,
-                                    TypeEffectiveness = 1.0f
-                                };
-                                actions.Add(new DamageAction(User, User, recoilContext));
-                            }
+                                BaseDamage = recoilDamage,
+                                Multiplier = 1.0f,
+                                TypeEffectiveness = 1.0f
+                            };
+                            actions.Add(new DamageAction(User, User, recoilContext));
+                        }
+                        break;
+
+                    case DrainEffect drainEffect:
+                        // Heal user by percentage of damage dealt (if damage was dealt)
+                        // Drain always heals at least 1 HP if damage was dealt
+                        if (damageDealt > 0)
+                        {
+                            int drainHealAmount = (int)(damageDealt * drainEffect.DrainPercent / 100f);
+                            drainHealAmount = System.Math.Max(1, drainHealAmount); // At least 1 HP
+                            
+                            actions.Add(new HealAction(User, User, drainHealAmount));
                         }
                         break;
 

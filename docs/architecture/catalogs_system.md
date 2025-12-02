@@ -48,7 +48,12 @@ PokemonUltimate.Content/Catalogs/Moves/
 ├── MoveCatalog.Grass.cs        # Grass-type moves
 ├── MoveCatalog.Electric.cs     # Electric-type moves
 ├── MoveCatalog.Ground.cs       # Ground-type moves
-└── MoveCatalog.Psychic.cs      # Psychic-type moves
+├── MoveCatalog.Psychic.cs      # Psychic-type moves
+├── MoveCatalog.Ghost.cs        # Ghost-type moves
+├── MoveCatalog.Rock.cs         # Rock-type moves
+├── MoveCatalog.Flying.cs       # Flying-type moves
+├── MoveCatalog.Poison.cs       # Poison-type moves
+└── MoveCatalog.Dragon.cs       # Dragon-type moves
 ```
 
 ### Ability Catalog (NEW ✅)
@@ -191,7 +196,7 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 
 ## 5. Current Content
 
-### PokemonCatalog (15 Pokemon - Gen 1)
+### PokemonCatalog (26 Pokemon - Gen 1)
 | Pokemon | Pokedex # | Types | BST | Evolves To |
 |---------|-----------|-------|-----|------------|
 | Bulbasaur | 1 | Grass/Poison | 318 | Ivysaur @16 |
@@ -205,21 +210,37 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 | Blastoise | 9 | Water | 530 | - |
 | Pikachu | 25 | Electric | 320 | Raichu (Thunder Stone) |
 | Raichu | 26 | Electric | 485 | - |
+| Geodude | 74 | Rock/Ground | 300 | Graveler @25 |
+| Graveler | 75 | Rock/Ground | 390 | Golem (Trade) |
+| Golem | 76 | Rock/Ground | 495 | - |
+| Abra | 63 | Psychic | 310 | Kadabra @16 |
+| Kadabra | 64 | Psychic | 400 | Alakazam (Trade) |
+| Alakazam | 65 | Psychic | 500 | - |
+| Gastly | 92 | Ghost/Poison | 310 | Haunter @25 |
+| Haunter | 93 | Ghost/Poison | 405 | Gengar (Trade) |
+| Gengar | 94 | Ghost/Poison | 500 | - |
+| Magikarp | 129 | Water | 200 | Gyarados @20 |
+| Gyarados | 130 | Water/Flying | 540 | - |
 | Eevee | 133 | Normal | 325 | (multiple) |
 | Snorlax | 143 | Normal | 540 | - |
 | Mewtwo | 150 | Psychic | 680 | - |
 | Mew | 151 | Psychic | 600 | - |
 
-### MoveCatalog (20 Moves)
+### MoveCatalog (36 Moves)
 | Type | Moves |
 |------|-------|
-| Normal | Tackle, Scratch, Quick Attack, Hyper Beam, Growl |
+| Normal | Tackle, Scratch, Quick Attack, Hyper Beam, Growl, Defense Curl, Splash |
 | Fire | Ember, Flamethrower, Fire Blast |
-| Water | Water Gun, Surf, Hydro Pump |
+| Water | Water Gun, Surf, Hydro Pump, Waterfall |
 | Grass | Vine Whip, Razor Leaf, Solar Beam |
 | Electric | Thunder Shock, Thunderbolt, Thunder, Thunder Wave |
 | Ground | Earthquake |
-| Psychic | Psychic |
+| Psychic | Psychic, Teleport, Confusion, Psybeam, Hypnosis |
+| Ghost | Lick, Shadow Ball |
+| Rock | Rock Throw, Rock Slide |
+| Flying | Wing Attack, Fly |
+| Poison | Poison Sting, Sludge Bomb |
+| Dragon | Dragon Rage |
 
 ### AbilityCatalog (35 Abilities) ✅ NEW
 | Category | Abilities |

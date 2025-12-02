@@ -162,6 +162,47 @@ namespace PokemonUltimate.Tests.Combat.Integration
             Assert.That(context.RandomFactor, Is.LessThanOrEqualTo(1.0f));
         }
 
+        [Test]
+        public void DamagePipeline_FixedDamage_DragonRage_AlwaysDeals40()
+        {
+            // Arrange - Dragon Rage always deals exactly 40 HP damage
+            var gyarados = PokemonFactory.Create(PokemonCatalog.Gyarados, 50);
+            var weakDefender = PokemonFactory.Create(PokemonCatalog.Magikarp, 50);
+            var strongDefender = PokemonFactory.Create(PokemonCatalog.Snorlax, 50);
+            
+            var fieldWeak = new BattleField();
+            fieldWeak.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+                new[] { gyarados },
+                new[] { weakDefender });
+            
+            var fieldStrong = new BattleField();
+            fieldStrong.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+                new[] { gyarados },
+                new[] { strongDefender });
+
+            var dragonRage = MoveCatalog.DragonRage;
+            var pipeline = new DamagePipeline();
+
+            // Act
+            var contextWeak = pipeline.Calculate(
+                fieldWeak.PlayerSide.Slots[0],
+                fieldWeak.EnemySide.Slots[0],
+                dragonRage,
+                fieldWeak,
+                fixedRandomValue: 1.0f);
+            
+            var contextStrong = pipeline.Calculate(
+                fieldStrong.PlayerSide.Slots[0],
+                fieldStrong.EnemySide.Slots[0],
+                dragonRage,
+                fieldStrong,
+                fixedRandomValue: 1.0f);
+
+            // Assert - Fixed damage should be exactly 40 regardless of stats
+            Assert.That(contextWeak.FinalDamage, Is.EqualTo(40), "Dragon Rage should deal exactly 40 HP to weak Pokemon");
+            Assert.That(contextStrong.FinalDamage, Is.EqualTo(40), "Dragon Rage should deal exactly 40 HP to strong Pokemon");
+        }
+
         #endregion
     }
 }

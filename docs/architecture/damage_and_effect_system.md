@@ -47,7 +47,7 @@ public class DamagePipeline {
 
     public DamagePipeline() {
         _steps = new List<IDamageStep> {
-            new BaseDamageStep(),        // 1. Calculate base damage (includes stat modifiers)
+            new BaseDamageStep(),        // 1. Calculate base damage (includes stat modifiers, handles FixedDamageEffect)
             new CriticalHitStep(),       // 2. Check for critical hit (1.5x)
             new RandomFactorStep(),      // 3. Apply random factor (0.85-1.0)
             new StabStep(),              // 4. Apply STAB bonus (1.5x)

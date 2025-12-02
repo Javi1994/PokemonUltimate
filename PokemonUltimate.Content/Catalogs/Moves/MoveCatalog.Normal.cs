@@ -46,6 +46,20 @@ namespace PokemonUltimate.Content.Catalogs.Moves
             .WithEffects(e => e.LowerAttack())
             .Build();
 
+        public static readonly MoveData DefenseCurl = Move.Define("Defense Curl")
+            .Description("The user curls up to conceal weak spots and raise its Defense stat.")
+            .Type(PokemonType.Normal)
+            .Status(100, 40)
+            .WithEffects(e => e.RaiseDefense())
+            .Build();
+
+        public static readonly MoveData Splash = Move.Define("Splash")
+            .Description("The user just flops and splashes around to no effect at all...")
+            .Type(PokemonType.Normal)
+            .Status(100, 40)
+            .WithEffects(e => { }) // No effects - does nothing
+            .Build();
+
         static partial void RegisterNormal()
         {
             _all.Add(Tackle);
@@ -53,6 +67,8 @@ namespace PokemonUltimate.Content.Catalogs.Moves
             _all.Add(QuickAttack);
             _all.Add(HyperBeam);
             _all.Add(Growl);
+            _all.Add(DefenseCurl);
+            _all.Add(Splash);
         }
     }
 }

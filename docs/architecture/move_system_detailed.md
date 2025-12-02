@@ -233,8 +233,14 @@ public class CombatContext {
     *   *Generates*: `StatChangeAction` (see status_and_stat_system.md).
 4.  **`MultiHitEffect`**: Repeats the other effects 2-5 times.
     *   *Generates*: Multiple sequences of Actions.
-5.  **`RecoilEffect`**: User takes % of damage dealt.
-    *   *Generates*: `DamageAction` targeting the user.
+5.  **`RecoilEffect`**: User takes % of damage dealt. ✅ Implemented
+    *   *Fields*: `RecoilPercent` (25%, 33%, 50%)
+    *   *Generates*: `DamageAction` targeting the user (based on final damage from pipeline)
+    *   *Note*: Always deals at least 1 HP if damage was dealt
+6.  **`DrainEffect`**: User heals % of damage dealt. ✅ Implemented
+    *   *Fields*: `DrainPercent` (50%, 75%)
+    *   *Generates*: `HealAction` for the user (based on final damage from pipeline)
+    *   *Note*: Always heals at least 1 HP if damage was dealt, cannot exceed MaxHP
 
 > [!NOTE]
 > For a complete list of all possible effects and actions, see `battle_mechanics_catalog.md`.

@@ -183,6 +183,148 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
                 .ByTM(Moves.MoveCatalog.Earthquake, Moves.MoveCatalog.Psychic))
             .Build();
 
+        // ===== GHOST/POISON LINE (Gengar → Haunter → Gastly) =====
+
+        public static readonly PokemonSpeciesData Gengar = Builders.Pokemon.Define("Gengar", 94)
+            .Types(PokemonType.Ghost, PokemonType.Poison)
+            .Stats(60, 65, 60, 130, 75, 110)
+            .GenderRatio(50f)
+            .Ability(AbilityCatalog.Levitate)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Lick, Moves.MoveCatalog.Hypnosis)
+                .AtLevel(25, Moves.MoveCatalog.ShadowBall)
+                .AtLevel(50, Moves.MoveCatalog.SludgeBomb))
+            .Build();
+
+        public static readonly PokemonSpeciesData Haunter = Builders.Pokemon.Define("Haunter", 93)
+            .Types(PokemonType.Ghost, PokemonType.Poison)
+            .Stats(45, 50, 45, 115, 55, 95)
+            .GenderRatio(50f)
+            .Ability(AbilityCatalog.Levitate)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Lick, Moves.MoveCatalog.Hypnosis)
+                .AtLevel(25, Moves.MoveCatalog.ShadowBall))
+            .EvolvesTo(Gengar, e => e.ByTrade())
+            .Build();
+
+        public static readonly PokemonSpeciesData Gastly = Builders.Pokemon.Define("Gastly", 92)
+            .Types(PokemonType.Ghost, PokemonType.Poison)
+            .Stats(30, 35, 30, 100, 35, 80)
+            .GenderRatio(50f)
+            .Ability(AbilityCatalog.Levitate)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Lick, Moves.MoveCatalog.Hypnosis)
+                .AtLevel(21, Moves.MoveCatalog.ShadowBall))
+            .EvolvesTo(Haunter, e => e.AtLevel(25))
+            .Build();
+
+        // ===== ROCK/GROUND LINE (Golem → Graveler → Geodude) =====
+
+        public static readonly PokemonSpeciesData Golem = Builders.Pokemon.Define("Golem", 76)
+            .Types(PokemonType.Rock, PokemonType.Ground)
+            .Stats(80, 120, 130, 55, 65, 45)
+            .GenderRatio(50f)
+            .Abilities(AbilityCatalog.Sturdy, AbilityCatalog.ClearBody)
+            .HiddenAbility(AbilityCatalog.SandStream)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.DefenseCurl)
+                .AtLevel(11, Moves.MoveCatalog.RockThrow)
+                .AtLevel(29, Moves.MoveCatalog.Earthquake)
+                .AtLevel(50, Moves.MoveCatalog.RockSlide))
+            .Build();
+
+        public static readonly PokemonSpeciesData Graveler = Builders.Pokemon.Define("Graveler", 75)
+            .Types(PokemonType.Rock, PokemonType.Ground)
+            .Stats(55, 95, 115, 45, 45, 35)
+            .GenderRatio(50f)
+            .Abilities(AbilityCatalog.Sturdy, AbilityCatalog.ClearBody)
+            .HiddenAbility(AbilityCatalog.SandStream)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.DefenseCurl)
+                .AtLevel(11, Moves.MoveCatalog.RockThrow)
+                .AtLevel(29, Moves.MoveCatalog.Earthquake))
+            .EvolvesTo(Golem, e => e.ByTrade())
+            .Build();
+
+        public static readonly PokemonSpeciesData Geodude = Builders.Pokemon.Define("Geodude", 74)
+            .Types(PokemonType.Rock, PokemonType.Ground)
+            .Stats(40, 80, 100, 30, 30, 20)
+            .GenderRatio(50f)
+            .Abilities(AbilityCatalog.Sturdy, AbilityCatalog.ClearBody)
+            .HiddenAbility(AbilityCatalog.SandStream)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.DefenseCurl)
+                .AtLevel(11, Moves.MoveCatalog.RockThrow)
+                .AtLevel(26, Moves.MoveCatalog.Earthquake))
+            .EvolvesTo(Graveler, e => e.AtLevel(25))
+            .Build();
+
+        // ===== WATER/FLYING LINE (Gyarados → Magikarp) =====
+
+        public static readonly PokemonSpeciesData Gyarados = Builders.Pokemon.Define("Gyarados", 130)
+            .Types(PokemonType.Water, PokemonType.Flying)
+            .Stats(95, 125, 79, 60, 100, 81)
+            .GenderRatio(50f)
+            .Ability(AbilityCatalog.Intimidate)
+            .HiddenAbility(AbilityCatalog.SpeedBoost)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.Splash)
+                .AtLevel(21, Moves.MoveCatalog.Waterfall)
+                .AtLevel(30, Moves.MoveCatalog.DragonRage)
+                .AtLevel(50, Moves.MoveCatalog.HydroPump))
+            .Build();
+
+        public static readonly PokemonSpeciesData Magikarp = Builders.Pokemon.Define("Magikarp", 129)
+            .Type(PokemonType.Water)
+            .Stats(20, 10, 55, 15, 20, 80)
+            .GenderRatio(50f)
+            .Ability(AbilityCatalog.SwiftSwim)
+            .HiddenAbility(AbilityCatalog.RoughSkin)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Splash, Moves.MoveCatalog.Tackle))
+            .EvolvesTo(Gyarados, e => e.AtLevel(20))
+            .Build();
+
+        // ===== PSYCHIC LINE (Alakazam → Kadabra → Abra) =====
+
+        public static readonly PokemonSpeciesData Alakazam = Builders.Pokemon.Define("Alakazam", 65)
+            .Type(PokemonType.Psychic)
+            .Stats(55, 50, 45, 135, 95, 120)
+            .GenderRatio(75f)
+            .Abilities(AbilityCatalog.Synchronize, AbilityCatalog.ClearBody)
+            .HiddenAbility(AbilityCatalog.Synchronize)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Teleport, Moves.MoveCatalog.Confusion)
+                .AtLevel(16, Moves.MoveCatalog.Psybeam)
+                .AtLevel(36, Moves.MoveCatalog.Psychic)
+                .ByTM(Moves.MoveCatalog.Thunderbolt, Moves.MoveCatalog.FireBlast))
+            .Build();
+
+        public static readonly PokemonSpeciesData Kadabra = Builders.Pokemon.Define("Kadabra", 64)
+            .Type(PokemonType.Psychic)
+            .Stats(40, 35, 30, 120, 70, 105)
+            .GenderRatio(75f)
+            .Abilities(AbilityCatalog.Synchronize, AbilityCatalog.ClearBody)
+            .HiddenAbility(AbilityCatalog.Synchronize)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Teleport, Moves.MoveCatalog.Confusion)
+                .AtLevel(16, Moves.MoveCatalog.Psybeam)
+                .AtLevel(36, Moves.MoveCatalog.Psychic))
+            .EvolvesTo(Alakazam, e => e.ByTrade())
+            .Build();
+
+        public static readonly PokemonSpeciesData Abra = Builders.Pokemon.Define("Abra", 63)
+            .Type(PokemonType.Psychic)
+            .Stats(25, 20, 15, 105, 55, 90)
+            .GenderRatio(75f)
+            .Abilities(AbilityCatalog.Synchronize, AbilityCatalog.ClearBody)
+            .HiddenAbility(AbilityCatalog.Synchronize)
+            .Moves(m => m
+                .StartsWith(Moves.MoveCatalog.Teleport)
+                .AtLevel(16, Moves.MoveCatalog.Confusion))
+            .EvolvesTo(Kadabra, e => e.AtLevel(16))
+            .Build();
+
         // ===== LEGENDARY/MYTHICAL =====
         // Legendaries are typically genderless
 
@@ -229,6 +371,21 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             // Normal
             _all.Add(Eevee);
             _all.Add(Snorlax);
+            // Ghost/Poison
+            _all.Add(Gastly);
+            _all.Add(Haunter);
+            _all.Add(Gengar);
+            // Rock/Ground
+            _all.Add(Geodude);
+            _all.Add(Graveler);
+            _all.Add(Golem);
+            // Water/Flying
+            _all.Add(Magikarp);
+            _all.Add(Gyarados);
+            // Psychic
+            _all.Add(Abra);
+            _all.Add(Kadabra);
+            _all.Add(Alakazam);
             // Legendary
             _all.Add(Mewtwo);
             _all.Add(Mew);

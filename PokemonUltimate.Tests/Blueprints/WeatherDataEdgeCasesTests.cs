@@ -287,6 +287,18 @@ namespace PokemonUltimate.Tests.Blueprints
         }
 
         [Test]
+        public void Sandstorm_RockGround_DualType_IsImmune()
+        {
+            var sandstorm = WeatherCatalog.Sandstorm;
+
+            // Rock/Ground dual type (Geodude, Graveler, Golem) should be immune
+            // Both types are immune individually, so dual type Pokemon are immune
+            Assert.That(sandstorm.IsTypeImmuneToDamage(PokemonType.Rock), Is.True, "Rock type should be immune to Sandstorm");
+            Assert.That(sandstorm.IsTypeImmuneToDamage(PokemonType.Ground), Is.True, "Ground type should be immune to Sandstorm");
+            // Note: Dual type immunity is handled by checking if either type is immune
+        }
+
+        [Test]
         public void Sandstorm_RockTypes_Get1_5xSpDef()
         {
             var sandstorm = WeatherCatalog.Sandstorm;

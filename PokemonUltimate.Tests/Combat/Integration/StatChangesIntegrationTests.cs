@@ -62,18 +62,18 @@ namespace PokemonUltimate.Tests.Combat.Integration
                 Effects = new List<IMoveEffect> { new DamageEffect() }
             };
 
-            // Calculate damage WITHOUT stat change (baseline)
+            // Calculate damage WITHOUT stat change (baseline) - use fixed random for consistency
             var pipelineWithoutStatChange = new DamagePipeline();
-            var contextWithoutStatChange = pipelineWithoutStatChange.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field);
+            var contextWithoutStatChange = pipelineWithoutStatChange.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field, fixedRandomValue: 1.0f);
             float damageWithoutStatChange = contextWithoutStatChange.FinalDamage;
 
             // Apply Attack +2 stat change
             var statChangeAction = new StatChangeAction(_attackerSlot, _attackerSlot, Stat.Attack, 2);
             statChangeAction.ExecuteLogic(_field);
 
-            // Act - Calculate damage WITH stat change
+            // Act - Calculate damage WITH stat change - use same fixed random
             var pipelineWithStatChange = new DamagePipeline();
-            var contextWithStatChange = pipelineWithStatChange.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field);
+            var contextWithStatChange = pipelineWithStatChange.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field, fixedRandomValue: 1.0f);
             float damageWithStatChange = contextWithStatChange.FinalDamage;
 
             // Assert - Attack +2 should increase damage
@@ -150,18 +150,18 @@ namespace PokemonUltimate.Tests.Combat.Integration
                 Effects = new List<IMoveEffect> { new DamageEffect() }
             };
 
-            // Calculate damage WITHOUT stat change (baseline)
+            // Calculate damage WITHOUT stat change (baseline) - use fixed random for consistency
             var pipelineWithoutStatChange = new DamagePipeline();
-            var contextWithoutStatChange = pipelineWithoutStatChange.Calculate(_attackerSlot, _defenderSlot, specialMove, _field);
+            var contextWithoutStatChange = pipelineWithoutStatChange.Calculate(_attackerSlot, _defenderSlot, specialMove, _field, fixedRandomValue: 1.0f);
             float damageWithoutStatChange = contextWithoutStatChange.FinalDamage;
 
             // Apply SpAttack +2 stat change
             var statChangeAction = new StatChangeAction(_attackerSlot, _attackerSlot, Stat.SpAttack, 2);
             statChangeAction.ExecuteLogic(_field);
 
-            // Act - Calculate damage WITH stat change
+            // Act - Calculate damage WITH stat change - use same fixed random
             var pipelineWithStatChange = new DamagePipeline();
-            var contextWithStatChange = pipelineWithStatChange.Calculate(_attackerSlot, _defenderSlot, specialMove, _field);
+            var contextWithStatChange = pipelineWithStatChange.Calculate(_attackerSlot, _defenderSlot, specialMove, _field, fixedRandomValue: 1.0f);
             float damageWithStatChange = contextWithStatChange.FinalDamage;
 
             // Assert - SpAttack +2 should increase damage
