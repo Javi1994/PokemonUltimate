@@ -58,6 +58,9 @@ namespace PokemonUltimate.Core.Constants
         public const string PartyCannotBeNull = "Party cannot be null";
         public const string PartyCannotBeEmpty = "Party cannot be empty";
         public const string BattleQueueInfiniteLoop = "Battle queue exceeded maximum iterations (1000). Possible infinite loop.";
+        public const string SlotCannotBeNull = "Battle slot cannot be null";
+        public const string AbilityCannotBeNull = "Ability cannot be null";
+        public const string ItemCannotBeNull = "Item cannot be null";
 
         #endregion
 

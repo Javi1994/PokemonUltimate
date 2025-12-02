@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Instances;
 
@@ -79,7 +80,10 @@ namespace PokemonUltimate.Combat.Actions
 
             // Battle state is reset automatically by SetPokemon -> ResetBattleState
 
-            return Enumerable.Empty<BattleAction>();
+            // Trigger OnSwitchIn for abilities and items
+            var switchInActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, field);
+            
+            return switchInActions;
         }
 
         /// <summary>

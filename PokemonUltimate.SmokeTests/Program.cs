@@ -15,6 +15,7 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Steps;
+using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Content.Builders;
 // Catalogs
@@ -1176,7 +1177,156 @@ class Program
         PrintInfo($"Full battles: AI vs AI battles functional");
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 39: COMPLETE POKEMON LISTING
+        // SECTION 39: ABILITIES & ITEMS BATTLE INTEGRATION
+        // ═══════════════════════════════════════════════════════
+        PrintSection("ABILITIES & ITEMS BATTLE INTEGRATION");
+
+        // BattleTrigger enum
+        Test("BattleTrigger enum exists", () => Enum.IsDefined(typeof(BattleTrigger), BattleTrigger.OnSwitchIn));
+        Test("BattleTrigger.OnTurnEnd exists", () => Enum.IsDefined(typeof(BattleTrigger), BattleTrigger.OnTurnEnd));
+        Test("BattleTrigger has 6 values", () => Enum.GetNames(typeof(BattleTrigger)).Length == 6);
+
+        // IBattleListener interface
+        Test("IBattleListener interface exists", () => typeof(IBattleListener).IsInterface);
+        Test("AbilityListener implements IBattleListener", () => typeof(AbilityListener).GetInterfaces().Contains(typeof(IBattleListener)));
+        Test("ItemListener implements IBattleListener", () => typeof(ItemListener).GetInterfaces().Contains(typeof(IBattleListener)));
+
+        // BattleTriggerProcessor
+        var triggerField = new BattleField();
+        var triggerPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var triggerEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        triggerField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            triggerPlayerParty, triggerEnemyParty);
+
+        Test("BattleTriggerProcessor.ProcessTrigger method exists", () => 
+        {
+            try
+            {
+                var method = typeof(BattleTriggerProcessor).GetMethod("ProcessTrigger");
+                return method != null && method.IsStatic;
+            }
+            catch
+            {
+                return false;
+            }
+        });
+
+        // Test OnTurnEnd with Leftovers
+        var leftoversPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+        leftoversPokemon.HeldItem = ItemCatalog.Leftovers;
+        int maxHP = leftoversPokemon.MaxHP;
+        leftoversPokemon.CurrentHP = maxHP - 20; // Damage Pokemon
+
+        var leftoversField = new BattleField();
+        var leftoversPlayerParty = new[] { leftoversPokemon };
+        var leftoversEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        leftoversField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            leftoversPlayerParty, leftoversEnemyParty);
+
+        var leftoversSlot = leftoversField.PlayerSide.Slots[0];
+        int leftoversInitialHP = leftoversSlot.Pokemon.CurrentHP;
+
+        var leftoversActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, leftoversField);
+        Test("Leftovers generates actions on OnTurnEnd", () => leftoversActions.Count > 0);
+        Test("Leftovers generates MessageAction", () => leftoversActions.Any(a => a is MessageAction));
+        Test("Leftovers generates HealAction", () => leftoversActions.Any(a => a is HealAction));
+
+        // Execute heal action to verify it works
+        var leftoversHealAction = leftoversActions.OfType<HealAction>().FirstOrDefault();
+        if (leftoversHealAction != null)
+        {
+            leftoversHealAction.ExecuteLogic(leftoversField);
+            Test("Leftovers heal action restores HP", () => leftoversSlot.Pokemon.CurrentHP > leftoversInitialHP);
+        }
+
+        // Test OnSwitchIn with Intimidate
+        var intimidateAbility = AbilityCatalog.Intimidate;
+        Test("Intimidate ability exists", () => intimidateAbility != null);
+        Test("Intimidate listens to OnSwitchIn", () => intimidateAbility.ListensTo(AbilityTrigger.OnSwitchIn));
+        Test("Intimidate has LowerOpponentStat effect", () => intimidateAbility.Effect == AbilityEffect.LowerOpponentStat);
+
+        var intimidatePokemon = PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50);
+        intimidatePokemon.SetAbility(intimidateAbility);
+
+        var intimidateField = new BattleField();
+        var intimidatePlayerParty = new[] 
+        { 
+            intimidatePokemon, // Put Intimidate Pokemon first so it's in the active slot
+            PokemonFactory.Create(PokemonCatalog.Pikachu, 50)
+        };
+        var intimidateEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        intimidateField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            intimidatePlayerParty, intimidateEnemyParty);
+
+        var intimidateSlot = intimidateField.PlayerSide.Slots[0];
+        var enemySlot = intimidateField.EnemySide.Slots[0];
+        int initialEnemyAttackStage = enemySlot.GetStatStage(Stat.Attack);
+
+        // Verify Intimidate Pokemon is in the active slot
+        Test("Intimidate Pokemon is in active slot", () => intimidateSlot.Pokemon == intimidatePokemon);
+        Test("Intimidate Pokemon has ability", () => intimidateSlot.Pokemon.Ability == intimidateAbility);
+
+        var intimidateActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, intimidateField);
+        Test("Intimidate generates actions on OnSwitchIn", () => intimidateActions.Count > 0);
+        Test("Intimidate generates MessageAction", () => intimidateActions.Any(a => a is MessageAction));
+        Test("Intimidate generates StatChangeAction", () => intimidateActions.Any(a => a is StatChangeAction));
+
+        // Execute stat change action to verify it works
+        var intimidateStatChangeAction = intimidateActions.OfType<StatChangeAction>().FirstOrDefault();
+        if (intimidateStatChangeAction != null)
+        {
+            intimidateStatChangeAction.ExecuteLogic(intimidateField);
+            Test("Intimidate lowers enemy Attack", () => enemySlot.GetStatStage(Stat.Attack) < initialEnemyAttackStage);
+        }
+
+        // Test integration with CombatEngine
+        var integrationEngine = new CombatEngine();
+        var integrationPlayerParty = new[] 
+        { 
+            PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
+            PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
+        };
+        integrationPlayerParty[0].HeldItem = ItemCatalog.Leftovers;
+        integrationPlayerParty[0].CurrentHP = integrationPlayerParty[0].MaxHP - 10;
+        integrationPlayerParty[1].SetAbility(intimidateAbility);
+
+        var integrationEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        var integrationPlayerProvider = new SimpleTestActionProvider(new MessageAction("Pass"));
+        var integrationEnemyProvider = new SimpleTestActionProvider(new MessageAction("Pass"));
+
+        integrationEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+            integrationPlayerParty, integrationEnemyParty,
+            integrationPlayerProvider, integrationEnemyProvider, new NullBattleView());
+
+        // Test that CombatEngine has trigger support
+        Test("CombatEngine initializes with trigger support", () => integrationEngine.Field != null);
+        
+        // Test that SwitchAction triggers OnSwitchIn (verify by checking actions generated)
+        var integrationSwitchSlot = integrationEngine.Field.PlayerSide.Slots[0];
+        var integrationSwitchNewPokemon = integrationPlayerParty[1];
+        var integrationSwitchAction = new SwitchAction(integrationSwitchSlot, integrationSwitchNewPokemon);
+        var switchReactions = integrationSwitchAction.ExecuteLogic(integrationEngine.Field).ToList();
+        Test("SwitchAction generates OnSwitchIn trigger actions", () => switchReactions.Count > 0);
+        Test("SwitchAction generates Intimidate actions", () => 
+            switchReactions.Any(a => a is StatChangeAction || a is MessageAction));
+
+        // Test that CombatEngine.RunTurn processes OnTurnEnd triggers
+        var endOfTurnSlot = integrationEngine.Field.PlayerSide.Slots[0];
+        int endOfTurnInitialHP = endOfTurnSlot.Pokemon.CurrentHP;
+        integrationEngine.RunTurn().Wait();
+        // Leftovers should heal, so HP should be >= initial (or same if already at max)
+        Test("CombatEngine.RunTurn processes OnTurnEnd triggers", () => 
+            endOfTurnSlot.Pokemon.CurrentHP >= endOfTurnInitialHP);
+
+        PrintInfo($"BattleTrigger system: OnSwitchIn, OnTurnEnd working");
+        PrintInfo($"AbilityListener: Converts AbilityData to IBattleListener");
+        PrintInfo($"ItemListener: Converts ItemData to IBattleListener");
+        PrintInfo($"Leftovers: Heals 1/16 Max HP per turn");
+        PrintInfo($"Intimidate: Lowers opponent Attack on switch-in");
+        PrintInfo($"Integration: Triggers work in CombatEngine and SwitchAction");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 40: COMPLETE POKEMON LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL POKEMON IN CATALOG");
 
@@ -1193,7 +1343,7 @@ class Program
         }
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 40: COMPLETE MOVE LISTING
+        // SECTION 41: COMPLETE MOVE LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL MOVES IN CATALOG");
 

@@ -41,6 +41,13 @@ namespace PokemonUltimate.Core.Constants
         public const string StatusPoisonDamage = "{0} is hurt by poison!";
 
         #endregion
+
+        #region Abilities & Items
+
+        public const string AbilityActivated = "{0}'s {1}!";
+        public const string ItemActivated = "{0}'s {1}!";
+
+        #endregion
     }
 }
 

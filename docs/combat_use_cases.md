@@ -649,24 +649,24 @@ Most moves miss, except:
 ## 13. Abilities & Items
 
 ### 13.1 Ability Triggers
-- [ ] On switch-in
-- [ ] On being hit
-- [ ] On hitting opponent
-- [ ] On status change
-- [ ] On stat change
-- [ ] End of turn
-- [ ] Weather change
-- [ ] Terrain change
-- [ ] HP threshold
+- [x] On switch-in (Intimidate implemented)
+- [ ] On being hit (Static, Rough Skin - deferred)
+- [ ] On hitting opponent (deferred)
+- [ ] On status change (deferred)
+- [ ] On stat change (deferred)
+- [x] End of turn (Speed Boost - deferred, system ready)
+- [ ] Weather change (Swift Swim - deferred)
+- [ ] Terrain change (deferred)
+- [ ] HP threshold (Blaze, Torrent - deferred)
 
 ### 13.2 Common Battle Items
-- [ ] Choice Band/Specs/Scarf: +50% stat, locked to one move
-- [ ] Life Orb: +30% damage, 10% recoil
-- [ ] Leftovers: Heal 1/16 HP per turn
-- [ ] Focus Sash: Survive one hit at 1 HP (full HP only)
-- [ ] Assault Vest: +50% SpDef, no status moves
-- [ ] Rocky Helmet: Attacker takes 1/6 HP on contact
-- [ ] Eviolite: +50% Def/SpDef for non-fully evolved
+- [ ] Choice Band/Specs/Scarf: +50% stat, locked to one move (requires IStatModifier)
+- [ ] Life Orb: +30% damage, 10% recoil (requires OnAfterMove trigger)
+- [x] Leftovers: Heal 1/16 HP per turn ✅
+- [ ] Focus Sash: Survive one hit at 1 HP (requires OnWouldFaint trigger)
+- [ ] Assault Vest: +50% SpDef, no status moves (requires passive stat modifier)
+- [ ] Rocky Helmet: Attacker takes 1/6 HP on contact (requires OnContactReceived trigger)
+- [ ] Eviolite: +50% Def/SpDef for non-fully evolved (requires passive stat modifier)
 
 ---
 
@@ -726,7 +726,20 @@ Most moves miss, except:
 - [x] Badly Poisoned escalating damage (counter-based)
 - [x] Integration into `CombatEngine.RunTurn()`
 
-**Status**: ✅ **Core Complete** - Status damage implemented, item effects deferred
+**Status**: ✅ **Core Complete** - Status damage implemented
+
+### Phase 2.9: Abilities & Items Battle Integration ✅
+- [x] BattleTrigger enum (`OnSwitchIn`, `OnTurnEnd`, etc.)
+- [x] IBattleListener interface
+- [x] AbilityListener adapter (converts AbilityData to IBattleListener)
+- [x] ItemListener adapter (converts ItemData to IBattleListener)
+- [x] BattleTriggerProcessor (processes triggers for all active Pokemon)
+- [x] OnSwitchIn trigger integration (in `SwitchAction`)
+- [x] OnTurnEnd trigger integration (in `CombatEngine`)
+- [x] Leftovers item effect (heals 1/16 Max HP per turn)
+- [x] Intimidate ability effect (lowers opponent Attack on switch-in)
+
+**Status**: ✅ **Core Complete** - Event-driven system implemented, basic effects working
 
 ### Future Phases
 - [ ] 8: Entry effects (hazards)
@@ -734,7 +747,8 @@ Most moves miss, except:
 - [ ] 10.2-10.3: Advanced targeting
 - [ ] 11.1: Pursuit
 - [ ] 11.3-11.6: Special move mechanics
-- [ ] 13: Abilities & Items
+- [ ] 13.1: More ability triggers (OnDamageTaken, OnBeforeMove, etc.)
+- [ ] 13.2: More item effects (Choice items, Life Orb, etc.)
 
 ---
 

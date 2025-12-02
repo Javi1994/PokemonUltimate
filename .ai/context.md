@@ -10,9 +10,9 @@
 | Aspect                | Status                              |
 | --------------------- | ----------------------------------- |
 | **Current Phase**     | Phase 3: Combat System ✅           |
-| **Sub-Phase**         | 2.8 End-of-Turn Effects ✅ Complete |
-| **Tests**             | 2,075+ passing                      |
-| **Integration Tests** | 66 tests (system interactions)      |
+| **Sub-Phase**         | 2.9 Abilities & Items ✅ Complete   |
+| **Tests**             | 2,165+ passing                      |
+| **Integration Tests** | 70 tests (system interactions)      |
 | **Warnings**          | 0                                   |
 | **Last Updated**      | December 2025                       |
 
@@ -34,7 +34,8 @@ PokemonUltimate/
 │
 ├── Combat/         # Battle system (depends on Core)
 │   ├── Field/      # BattleField, BattleSide, BattleSlot, BattleRules
-│   ├── Engine/     # CombatEngine, BattleArbiter, BattleQueue
+│   ├── Engine/     # CombatEngine, BattleArbiter, BattleQueue, EndOfTurnProcessor
+│   ├── Events/     # BattleTrigger, IBattleListener, AbilityListener, ItemListener, BattleTriggerProcessor
 │   ├── Results/    # BattleOutcome, BattleResult
 │   ├── Providers/  # IActionProvider, PlayerInputProvider
 │   ├── View/       # IBattleView, NullBattleView (with input methods)
@@ -107,6 +108,7 @@ See `docs/combat_implementation_plan.md` for full details.
 | 2.6 Combat Engine       | ✅ Complete | CombatEngine, Arbiter                                  |
 | 2.7 Integration         | ✅ Complete | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
 | 2.8 End-of-Turn Effects | ✅ Complete | EndOfTurnProcessor, Status damage (Burn/Poison/Toxic)  |
+| 2.9 Abilities & Items   | ✅ Complete | BattleTrigger system, AbilityListener, ItemListener, Leftovers, Intimidate |
 
 Reference docs:
 
@@ -132,6 +134,7 @@ Reference docs:
 | Three-Phase Testing                 | Functional → Edge Cases → Integration ensures complete coverage     |
 | Integration Test Standard           | Mandatory for system interactions, ensures components work together |
 | Structured Workflow                 | Clear process for implementation, troubleshooting, and refactoring  |
+| Event-Driven Abilities & Items      | IBattleListener pattern for reactive effects, keeps engine clean    |
 
 ---
 
@@ -155,10 +158,11 @@ Reference docs:
 -   **Three-Phase Testing**: Functional tests → Edge cases → Integration tests
 -   Test file mirrors source file location
 -   Use descriptive test names: `MethodName_Scenario_ExpectedResult`
--   **Integration Tests**: 66 tests covering system interactions
+-   **Integration Tests**: 70 tests covering system interactions
 -   Status Effects ↔ DamagePipeline
 -   Stat Changes ↔ DamagePipeline/TurnOrderResolver
 -   Actions ↔ BattleQueue ↔ CombatEngine
+-   Abilities & Items ↔ CombatEngine (OnSwitchIn, OnTurnEnd triggers)
 -   Full battle end-to-end scenarios
 
 ---

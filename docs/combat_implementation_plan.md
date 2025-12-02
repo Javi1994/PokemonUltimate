@@ -36,7 +36,9 @@ The Combat System is divided into **7 phases**, each building on the previous. E
 | 2.5 Combat Actions | ✅ Complete | 47 | All actions implemented |
 | 2.6 Combat Engine | ✅ Complete | 30 | CombatEngine, BattleArbiter, IActionProvider |
 | 2.7 Integration | ✅ Complete | 38 | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
-| **Total** | **7/7** | **608** | Combat module only |
+| 2.8 End-of-Turn Effects | ✅ Complete | 25 | EndOfTurnProcessor, Status damage |
+| 2.9 Abilities & Items | ✅ Complete | 12 | BattleTrigger system, AbilityListener, ItemListener |
+| **Total** | **9/9** | **645+** | Combat module only |
 
 ---
 
@@ -730,6 +732,104 @@ public class PlayerActionProvider : IActionProvider
 - [x] Integration tests pass (17 tests)
 - [x] Smoke test updated with AI tests
 - [x] All tests pass (38 new tests for Phase 2.7)
+
+---
+
+## Phase 2.9: Abilities & Items Battle Integration
+
+**Goal**: Integrate abilities and items into battle flow using event-driven triggers.
+
+**Depends on**: Phase 2.8 (End-of-Turn Effects)
+
+### Components
+
+| Component | File | Description |
+|-----------|------|-------------|
+| `BattleTrigger` | `Combat/Events/BattleTrigger.cs` | Enum for battle event triggers |
+| `IBattleListener` | `Combat/Events/IBattleListener.cs` | Interface for reactive effects |
+| `AbilityListener` | `Combat/Events/AbilityListener.cs` | Adapts AbilityData to IBattleListener |
+| `ItemListener` | `Combat/Events/ItemListener.cs` | Adapts ItemData to IBattleListener |
+| `BattleTriggerProcessor` | `Combat/Events/BattleTriggerProcessor.cs` | Processes triggers for all active Pokemon |
+
+### BattleTrigger Enum
+
+```csharp
+public enum BattleTrigger
+{
+    OnSwitchIn,      // Intimidate
+    OnBeforeMove,    // Truant (future)
+    OnAfterMove,     // Life Orb recoil (future)
+    OnDamageTaken,   // Static, Rough Skin (future)
+    OnTurnEnd,       // Leftovers, Speed Boost
+    OnWeatherChange  // Swift Swim (future)
+}
+```
+
+### IBattleListener Interface
+
+```csharp
+public interface IBattleListener
+{
+    IEnumerable<BattleAction> OnTrigger(BattleTrigger trigger, BattleSlot holder, BattleField field);
+}
+```
+
+### Integration Points
+
+1. **OnSwitchIn**: Triggered in `SwitchAction.ExecuteLogic()` after Pokemon switches in
+2. **OnTurnEnd**: Triggered in `CombatEngine.RunTurn()` after end-of-turn status damage
+
+### Implemented Effects
+
+#### Items
+- **Leftovers**: Heals 1/16 Max HP at end of turn
+
+#### Abilities
+- **Intimidate**: Lowers opponent Attack by 1 stage on switch-in
+
+### Tests
+
+- **Functional Tests**: 8 tests (`BattleTriggerProcessorTests`)
+- **Integration Tests**: 4 tests (`AbilitiesItemsIntegrationTests`)
+- **Total**: 12 new tests
+
+### Completion Checklist
+
+- [x] `BattleTrigger` enum defined
+- [x] `IBattleListener` interface defined
+- [x] `AbilityListener` implemented
+- [x] `ItemListener` implemented
+- [x] `BattleTriggerProcessor` implemented
+- [x] OnSwitchIn trigger integrated in `SwitchAction`
+- [x] OnTurnEnd trigger integrated in `CombatEngine`
+- [x] Leftovers item effect working
+- [x] Intimidate ability effect working
+- [x] Functional tests passing (8 tests)
+- [x] Integration tests passing (4 tests)
+- [x] All existing tests still passing (2,165 total)
+- [x] No compiler warnings
+
+### Spec Compliance Notes
+
+**Implemented (matches spec):**
+- Event-driven trigger system (`IBattleListener`)
+- Ability and Item adapters (`AbilityListener`, `ItemListener`)
+- Centralized trigger processing (`BattleTriggerProcessor`)
+- Integration with `CombatEngine` and `SwitchAction`
+
+**Deferred to Later Phases:**
+- OnBeforeMove triggers (Truant, etc.)
+- OnAfterMove triggers (Life Orb recoil)
+- OnDamageTaken triggers (Static, Rough Skin)
+- OnWeatherChange triggers (Swift Swim, etc.)
+- Passive stat modifiers (Choice Band, etc.) - requires `IStatModifier` interface
+- More ability effects (Blaze, Speed Boost, etc.)
+- More item effects (Black Sludge, Choice items, etc.)
+
+**API Additions:**
+- `BattleTrigger` enum for battle events
+- `IBattleListener` interface for reactive effects
+- `BattleTriggerProcessor.ProcessTrigger()` static method
 
 ---
 
