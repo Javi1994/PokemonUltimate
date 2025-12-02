@@ -7,16 +7,17 @@
 
 ## 📍 Current Project State
 
-| Aspect                | Status                          |
-| --------------------- | ------------------------------- |
-| **Current Phase**     | Phase 3: Combat System ✅       |
-| **Sub-Phase**         | 2.10 Pipeline Hooks ✅ Extended |
-| **Tests**             | 2,311 passing                   |
-| **Integration Tests** | 83+ tests (system interactions) |
-| **Warnings**          | 0                               |
-| **Pokemon Catalog**   | 26 Pokemon (Gen1)               |
-| **Move Catalog**      | 36 Moves (12 types)             |
-| **Last Updated**      | December 2025                   |
+| Aspect                  | Status                                |
+| ----------------------- | ------------------------------------- |
+| **Current Phase**       | Phase 3: Combat System ✅             |
+| **Sub-Phase**           | 2.10 Pipeline Hooks ✅ Extended       |
+| **Tests**               | 2,311 passing                         |
+| **Integration Tests**   | 83+ tests (system interactions)       |
+| **Test Reorganization** | In Progress (see implementation task) |
+| **Warnings**            | 0                                     |
+| **Pokemon Catalog**     | 26 Pokemon (Gen1)                     |
+| **Move Catalog**        | 36 Moves (12 types)                   |
+| **Last Updated**        | December 2025                         |
 
 ---
 
@@ -51,7 +52,10 @@ PokemonUltimate/
 │   ├── Catalogs/   # Pokemon, Move, Ability, Item definitions
 │   └── Builders/   # Fluent APIs
 │
-├── Tests/          # Mirror structure of Core/Combat/Content
+├── Tests/          # Organized by purpose: Systems/, Blueprints/, Data/
+│   ├── Systems/    # Tests de sistemas (CÓMO funcionan)
+│   ├── Blueprints/ # Tests de estructura de datos (CÓMO son)
+│   └── Data/       # Tests de contenido específico (QUÉ contienen)
 │
 └── BattleDemo/     # Visual AI vs AI battle simulator
     ├── ConsoleBattleView.cs  # Console implementation of IBattleView
@@ -141,6 +145,7 @@ Reference docs:
 | Structured Workflow                 | Clear process for implementation, troubleshooting, and refactoring                      |
 | Event-Driven Abilities & Items      | IBattleListener pattern for reactive effects, keeps engine clean                        |
 | Pipeline Hooks for Modifiers        | IStatModifier pattern for passive stat/damage modifiers, integrates with DamagePipeline |
+| Test Structure Organization         | Systems/Blueprints/Data separation for clear test organization and easy navigation      |
 
 ---
 
@@ -161,8 +166,16 @@ Reference docs:
 
 ### Testing
 
+-   **Test Structure**: All tests MUST follow structure in `docs/testing/test_structure_definition.md`
+-   **Systems/** - Tests de sistemas (CÓMO funcionan los sistemas)
+-   **Blueprints/** - Tests de estructura de datos (CÓMO son los datos)
+-   **Data/** - Tests de contenido específico (QUÉ contienen los datos)
 -   **Three-Phase Testing**: Functional tests → Edge cases → Integration tests
--   Test file mirrors source file location
+-   **Test Types**:
+-   Functional: `*Tests.cs` - Comportamiento normal y esperado
+-   Edge Cases: `*EdgeCasesTests.cs` - Casos límite y condiciones especiales
+-   Integration: `*IntegrationTests.cs` - Integración entre sistemas (en `Systems/*/Integration/`)
+-   **Data/Catalogs**: Un archivo por cada elemento (Pokemon, Move, Item, Ability)
 -   Use descriptive test names: `MethodName_Scenario_ExpectedResult`
 -   **Integration Tests**: 83 tests covering system interactions
 -   Status Effects ↔ DamagePipeline
@@ -171,29 +184,32 @@ Reference docs:
 -   Abilities & Items ↔ CombatEngine (OnSwitchIn, OnTurnEnd triggers)
 -   Stat Modifiers ↔ DamagePipeline (Choice Band, Life Orb, Blaze)
 -   Full battle end-to-end scenarios
+-   **Test Reorganization**: Currently in progress - see `docs/testing/test_reorganization_implementation_task.md`
 
 ---
 
 ## 📚 Key Reference Documents
 
-| Document                                    | Purpose                       |
-| ------------------------------------------- | ----------------------------- |
-| `docs/project_guidelines.md`                | 24+ coding rules              |
-| `.cursorrules`                              | **AI workflow rules**         |
-| `docs/implementation_plan.md`               | Technical roadmap             |
-| `docs/combat_implementation_plan.md`        | **Combat phases**             |
-| `docs/combat_use_cases.md`                  | **All battle cases**          |
-| `docs/architecture/action_system_spec.md`   | **⭐ Action system**          |
-| `docs/architecture/effects_bible.md`        | **📖 Effects guide**          |
-| `docs/unity_integration.md`                 | Unity setup guide             |
-| `CONTRIBUTING.md`                           | Git workflow & rules          |
-| `docs/architecture/combat_system_spec.md`   | Combat system design          |
-| `docs/checklists/pre_implementation.md`     | **Before coding**             |
-| `docs/checklists/feature_complete.md`       | After coding                  |
-| `docs/workflow/troubleshooting.md`          | **Problem-solving guide**     |
-| `docs/workflow/refactoring_guide.md`        | **Safe refactoring process**  |
-| `docs/testing/integration_testing_guide.md` | **Integration test patterns** |
-| `docs/anti-patterns.md`                     | What NOT to do                |
+| Document                                                  | Purpose                        |
+| --------------------------------------------------------- | ------------------------------ |
+| `docs/project_guidelines.md`                              | 24+ coding rules               |
+| `.cursorrules`                                            | **AI workflow rules**          |
+| `docs/implementation_plan.md`                             | Technical roadmap              |
+| `docs/combat_implementation_plan.md`                      | **Combat phases**              |
+| `docs/combat_use_cases.md`                                | **All battle cases**           |
+| `docs/architecture/action_system_spec.md`                 | **⭐ Action system**           |
+| `docs/architecture/effects_bible.md`                      | **📖 Effects guide**           |
+| `docs/unity_integration.md`                               | Unity setup guide              |
+| `CONTRIBUTING.md`                                         | Git workflow & rules           |
+| `docs/architecture/combat_system_spec.md`                 | Combat system design           |
+| `docs/checklists/pre_implementation.md`                   | **Before coding**              |
+| `docs/checklists/feature_complete.md`                     | After coding                   |
+| `docs/workflow/troubleshooting.md`                        | **Problem-solving guide**      |
+| `docs/workflow/refactoring_guide.md`                      | **Safe refactoring process**   |
+| `docs/testing/integration_testing_guide.md`               | **Integration test patterns**  |
+| `docs/testing/test_structure_definition.md`               | **⭐ Test structure standard** |
+| `docs/testing/test_reorganization_implementation_task.md` | **Test reorganization task**   |
+| `docs/anti-patterns.md`                                   | What NOT to do                 |
 
 ---
 
@@ -206,3 +222,9 @@ After completing a major feature:
 3. Add any new architectural decisions
 4. Update test count
 5. Update "Last Updated" date
+
+**During Test Reorganization:**
+
+-   After completing each phase, update test reorganization status
+-   Mark completed phases in test structure section
+-   Update test count if tests are added/removed during reorganization

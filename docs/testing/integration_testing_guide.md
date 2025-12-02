@@ -16,14 +16,33 @@ Create integration tests when implementing features that:
 
 ### Directory Organization
 
+**IMPORTANT**: All tests MUST follow the structure defined in `docs/testing/test_structure_definition.md`.
+
 ```
-Tests/
-├── [Module]/
-│   ├── [Feature]Tests.cs          # Functional tests
-│   ├── [Feature]EdgeCasesTests.cs  # Edge case tests
-│   └── Integration/                # Integration tests
-│       ├── [Feature]IntegrationTests.cs
-│       └── [System]IntegrationTests.cs
+PokemonUltimate.Tests/
+├── Systems/                         # Tests de sistemas
+│   ├── Combat/                      # Sistema de combate
+│   │   ├── [Feature]Tests.cs        # Functional tests
+│   │   ├── [Feature]EdgeCasesTests.cs # Edge case tests
+│   │   └── Integration/              # Integration tests
+│   │       ├── Actions/              # Action integration tests
+│   │       ├── Damage/               # Damage integration tests
+│   │       ├── Engine/               # Engine integration tests
+│   │       └── System/               # Full system integration tests
+│   │           ├── [Feature]IntegrationTests.cs
+│   │           └── [System]IntegrationTests.cs
+│   └── [Other Systems]/
+│
+├── Blueprints/                      # Tests de estructura de datos
+│   └── [Blueprint]Tests.cs
+│
+└── Data/                            # Tests de contenido específico
+    ├── Catalogs/                    # Tests de catálogos
+    │   ├── Pokemon/[Pokemon]Tests.cs  # Un archivo por Pokemon
+    │   ├── Moves/[Move]Tests.cs      # Un archivo por Move
+    │   ├── Items/[Item]Tests.cs      # Un archivo por Item
+    │   └── Abilities/[Ability]Tests.cs # Un archivo por Ability
+    └── Validation/                  # Validación contra datos oficiales
 ```
 
 ### Naming Convention

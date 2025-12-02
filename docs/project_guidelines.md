@@ -25,7 +25,7 @@ _These rules are absolute. All code must adhere to them._
     - **Integration Testing Standard**:
       - **When to Create**: After implementing a feature that interacts with multiple systems.
       - **What to Test**: Verify components work together correctly (e.g., Action → Queue → Processing, Status → End-of-Turn → Damage).
-      - **Where**: Place in `Tests/[Module]/Integration/` directory.
+      - **Where**: Place in `Systems/[Module]/Integration/` directory (see Test Structure below).
       - **Naming**: `[Feature]IntegrationTests.cs` (e.g., `EndOfTurnIntegrationTests.cs`).
       - **Focus**: Test interactions between systems, not individual unit behavior.
       - **Examples**: 
@@ -33,6 +33,21 @@ _These rules are absolute. All code must adhere to them._
         - `UseMoveAction` → Multiple effect actions
         - `SwitchAction` → State reset
         - `CombatEngine` → `TurnOrderResolver` → `BattleQueue`
+    - **Test Structure Standard**:
+      - **MANDATORY**: All tests MUST follow the structure defined in `docs/testing/test_structure_definition.md`.
+      - **Three Main Categories**:
+        1. **Systems/** - Tests de sistemas (CÓMO funcionan los sistemas)
+        2. **Blueprints/** - Tests de estructura de datos (CÓMO son los datos)
+        3. **Data/** - Tests de contenido específico (QUÉ contienen los datos)
+      - **Test Types**:
+        - **Functional Tests**: `*Tests.cs` - Test comportamiento normal y esperado
+        - **Edge Cases**: `*EdgeCasesTests.cs` - Test casos límite y condiciones especiales
+        - **Integration**: `*IntegrationTests.cs` - Test integración entre sistemas
+      - **Data/Catalogs Organization**:
+        - **One file per catalog element** (Pokemon, Move, Item, Ability)
+        - Example: `Data/Catalogs/Pokemon/PikachuTests.cs`, `Data/Catalogs/Moves/FlamethrowerTests.cs`
+        - Allows quick access to tests for any specific element
+      - **See**: `docs/testing/test_structure_definition.md` for complete structure and rules
 
 2.  **Everything is an Action (The Queue Pattern)**:
 

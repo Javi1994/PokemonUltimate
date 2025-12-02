@@ -26,6 +26,8 @@
 -   [ ] **Real-world tests** - Verified against actual game data (when applicable)
 -   [ ] **No skipped tests** - All tests enabled and passing
 -   [ ] **Test naming** - Follows `MethodName_Scenario_ExpectedResult` pattern
+-   [ ] **Test structure** - Follows structure in `docs/testing/test_structure_definition.md`
+-   [ ] **Test location** - Tests in correct directory (Systems/, Blueprints/, or Data/)
 -   [ ] **Test-Driven Discovery** - All missing functionality revealed by tests has been implemented
 
 ## 🏗️ Code Quality

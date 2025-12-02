@@ -33,6 +33,11 @@
    - Document any API changes from spec (with rationale)
 
 3. **TDD: Write Functional Tests FIRST**
+   - **CRITICAL: Follow test structure in `docs/testing/test_structure_definition.md`**
+   - **Test Location**: 
+     - System tests → `Systems/[Module]/[Component]Tests.cs`
+     - Blueprint tests → `Blueprints/[Blueprint]Tests.cs`
+     - Data tests → `Data/[Category]/[Element]Tests.cs`
    - Create test file following naming: `[Feature]Tests.cs`
    - Write tests for ALL main scenarios from the spec
    - Use naming: `MethodName_Scenario_ExpectedResult`
@@ -45,7 +50,7 @@
    - Make tests pass (green phase)
 
 5. **Write Edge Case Tests**
-   - Create `[Feature]EdgeCasesTests.cs`
+   - Create `[Feature]EdgeCasesTests.cs` in same directory as functional tests
    - Test null inputs, boundary conditions, invalid states
    - Test real-world scenarios
    - **If tests reveal missing functionality → implement it immediately** (Test-Driven Discovery)
@@ -60,7 +65,11 @@
      - System interactions (A → B → C)
      - Cascading effects (Action → Reaction → Outcome)
      - State consistency across systems
-   - **Where:** Create `[Feature]IntegrationTests.cs` in `Tests/[Module]/Integration/`
+   - **Where:** Create `[Feature]IntegrationTests.cs` in `Systems/[Module]/Integration/[Category]/`
+     - Actions integration → `Systems/Combat/Integration/Actions/`
+     - Damage integration → `Systems/Combat/Integration/Damage/`
+     - Engine integration → `Systems/Combat/Integration/Engine/`
+     - System integration → `Systems/Combat/Integration/System/`
    - **Naming:** `[System1]_[System2]_[ExpectedBehavior]`
    - **If Unsure:** Ask "Does this feature work with other systems?" If yes → Write integration tests
 
@@ -166,11 +175,23 @@
 ### Architecture
 - **Core/** → Logic only, NO game data
 - **Content/** → Game data, catalogs, builders
-- **Tests/** → Mirror source structure
+- **Tests/** → Organized by purpose: Systems/, Blueprints/, Data/
+  - **Systems/** → Tests de sistemas (CÓMO funcionan)
+  - **Blueprints/** → Tests de estructura de datos (CÓMO son)
+  - **Data/** → Tests de contenido específico (QUÉ contienen)
 - **Blueprints** → Immutable (no setters)
 - **Instances** → Mutable runtime state
 
 ### Testing
+- **Test Structure** → MUST follow `docs/testing/test_structure_definition.md`
+  - **Systems/** → Tests de sistemas (CÓMO funcionan)
+  - **Blueprints/** → Tests de estructura de datos (CÓMO son)
+  - **Data/** → Tests de contenido específico (QUÉ contienen)
+- **Test Types**:
+  - Functional: `*Tests.cs` - Comportamiento normal
+  - Edge Cases: `*EdgeCasesTests.cs` - Casos límite
+  - Integration: `*IntegrationTests.cs` - Integración entre sistemas (en `Systems/*/Integration/`)
+- **Data/Catalogs** → Un archivo por cada elemento (Pokemon, Move, Item, Ability)
 - **TDD** → Tests before implementation
 - **Naming** → `MethodName_Scenario_ExpectedResult`
 - **Three-phase** → Functional tests, then edge cases, then integration tests
@@ -229,6 +250,8 @@ public void Method(int value)
 | Combat specs | `docs/architecture/combat_system_spec.md` |
 | Damage formula | `docs/architecture/damage_and_effect_system.md` |
 | Integration tests | `docs/testing/integration_testing_guide.md` |
+| Test structure | `docs/testing/test_structure_definition.md` |
+| Test reorganization | `docs/testing/test_reorganization_implementation_task.md` |
 | Troubleshooting | `docs/workflow/troubleshooting.md` |
 | Refactoring | `docs/workflow/refactoring_guide.md` |
 
