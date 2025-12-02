@@ -404,6 +404,7 @@ Before marking actions as complete, verify:
 
 ---
 
-**Last Updated**: Phase 2.5 Complete  
-**Status**: ✅ All use cases covered for implemented actions
+**Last Updated**: Phase 2.6 Complete  
+**Status**: ✅ All use cases covered for implemented actions  
+**Related Docs**: See `actions_bible.md` for implementation details, `coverage_verification.md` for test mapping
 

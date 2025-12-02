@@ -50,6 +50,12 @@ namespace PokemonUltimate.Combat
         public VolatileStatus VolatileStatus => _volatileStatus;
 
         /// <summary>
+        /// The action provider for this slot (player input, AI, etc.).
+        /// Can be null if not assigned yet.
+        /// </summary>
+        public IActionProvider ActionProvider { get; set; }
+
+        /// <summary>
         /// Creates a new battle slot without a side reference (for testing).
         /// </summary>
         /// <param name="slotIndex">The index of this slot (0-based, cannot be negative).</param>

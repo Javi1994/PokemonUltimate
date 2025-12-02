@@ -38,6 +38,7 @@ namespace PokemonUltimate.Core.Constants
         public const string PokemonCannotBeNull = "Pokemon cannot be null";
         public const string TargetSpeciesCannotBeNull = "Target species cannot be null";
         public const string EvolutionTargetNotValid = "{0} cannot evolve to {1}";
+        public const string FieldCannotBeNull = "Battle field cannot be null";
 
         #endregion
 

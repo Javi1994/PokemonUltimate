@@ -2,7 +2,8 @@
 
 > **Purpose**: Complete technical reference for all combat actions in PokemonUltimate.  
 > **Audience**: Developers implementing, testing, or extending the combat system.  
-> **Status**: ✅ Phase 2.5 Actions Documented
+> **Status**: ✅ Phase 2.6 Actions Documented  
+**Related Docs**: See `action_use_cases.md` for use case checklist, `coverage_verification.md` for test coverage
 
 ---
 

@@ -216,11 +216,14 @@ PokemonUltimate/
 │   └── Constants/     # Centralized strings
 │
 ├── Combat/            # Battle system (NEW)
-│   ├── Actions/       # BattleAction, MessageAction
+│   ├── Field/         # BattleField, BattleSide, BattleSlot, BattleRules
+│   ├── Engine/        # CombatEngine, BattleArbiter, BattleQueue
+│   ├── Results/       # BattleOutcome, BattleResult
+│   ├── Providers/     # IActionProvider
+│   ├── View/          # IBattleView, NullBattleView
+│   ├── Actions/       # BattleAction implementations
 │   ├── Damage/        # DamagePipeline, IDamageStep
-│   ├── BattleField, BattleSide, BattleSlot
-│   ├── BattleQueue, TurnOrderResolver
-│   └── IBattleView, NullBattleView
+│   └── Helpers/       # AccuracyChecker, TurnOrderResolver
 │
 ├── Content/           # Game data
 │   ├── Catalogs/      # Pokemon, Move, Ability, Item, Status

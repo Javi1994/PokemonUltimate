@@ -10,8 +10,8 @@
 | Aspect            | Status                    |
 | ----------------- | ------------------------- |
 | **Current Phase** | Phase 3: Combat System 🚧 |
-| **Sub-Phase**     | 2.6 Combat Engine (next)  |
-| **Tests**         | 1,885 passing             |
+| **Sub-Phase**     | 2.7 Integration (next)    |
+| **Tests**         | 2,000 passing             |
 | **Warnings**      | 0                         |
 | **Last Updated**  | December 2025             |
 
@@ -32,10 +32,14 @@ PokemonUltimate/
 │   └── Constants/  # Centralized strings
 │
 ├── Combat/         # Battle system (depends on Core)
-│   ├── Actions/    # BattleAction, MessageAction, etc.
-│   ├── BattleField, BattleSlot, BattleSide
-│   ├── BattleQueue # Action processor
-│   └── IBattleView # Visual abstraction
+│   ├── Field/      # BattleField, BattleSide, BattleSlot, BattleRules
+│   ├── Engine/     # CombatEngine, BattleArbiter, BattleQueue
+│   ├── Results/    # BattleOutcome, BattleResult
+│   ├── Providers/  # IActionProvider
+│   ├── View/       # IBattleView, NullBattleView
+│   ├── Actions/    # BattleAction implementations
+│   ├── Damage/     # DamagePipeline, DamageContext
+│   └── Helpers/    # AccuracyChecker, TurnOrderResolver
 │
 ├── Content/        # Game data definitions
 │   ├── Catalogs/   # Pokemon, Move, Ability, Item definitions
@@ -94,8 +98,8 @@ See `docs/combat_implementation_plan.md` for full details.
 | 2.3 Turn Order         | ✅ Complete | TurnOrderResolver         |
 | 2.4 Damage Calculation | ✅ Complete | DamagePipeline            |
 | 2.5 Combat Actions     | ✅ Complete | All actions implemented   |
-| 2.6 Combat Engine      | 🎯 Next     | CombatEngine, Arbiter     |
-| 2.7 Integration        | ⏳ Pending  | AI, full battles          |
+| 2.6 Combat Engine      | ✅ Complete | CombatEngine, Arbiter     |
+| 2.7 Integration        | 🎯 Next     | AI, full battles          |
 
 Reference docs:
 

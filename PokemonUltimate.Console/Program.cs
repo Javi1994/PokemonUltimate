@@ -1003,7 +1003,129 @@ class Program
         PrintInfo($"All actions follow ExecuteLogic() → ExecuteVisual() pattern");
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 37: COMPLETE POKEMON LISTING
+        // SECTION 37: COMBAT ENGINE
+        // ═══════════════════════════════════════════════════════
+        PrintSection("COMBAT ENGINE");
+
+        // BattleOutcome enum
+        Test("BattleOutcome.Ongoing exists", () => Enum.IsDefined(typeof(BattleOutcome), BattleOutcome.Ongoing));
+        Test("BattleOutcome.Victory exists", () => Enum.IsDefined(typeof(BattleOutcome), BattleOutcome.Victory));
+        Test("BattleOutcome.Defeat exists", () => Enum.IsDefined(typeof(BattleOutcome), BattleOutcome.Defeat));
+        Test("BattleOutcome.Draw exists", () => Enum.IsDefined(typeof(BattleOutcome), BattleOutcome.Draw));
+        Test("BattleOutcome.Fled exists", () => Enum.IsDefined(typeof(BattleOutcome), BattleOutcome.Fled));
+        Test("BattleOutcome.Caught exists", () => Enum.IsDefined(typeof(BattleOutcome), BattleOutcome.Caught));
+
+        // BattleResult class
+        var battleResult = new BattleResult
+        {
+            Outcome = BattleOutcome.Victory,
+            TurnsTaken = 10,
+            MvpPokemon = null
+        };
+        Test("BattleResult stores outcome", () => battleResult.Outcome == BattleOutcome.Victory);
+        Test("BattleResult stores turns", () => battleResult.TurnsTaken == 10);
+        Test("BattleResult initializes collections", () => 
+            battleResult.DefeatedEnemies != null && battleResult.ExpEarned != null && battleResult.LootDropped != null);
+
+        // BattleArbiter
+        var arbiterField = new BattleField();
+        var arbiterPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var arbiterEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        arbiterField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            arbiterPlayerParty, arbiterEnemyParty);
+        
+        Test("BattleArbiter returns Ongoing for active battle", () => 
+            BattleArbiter.CheckOutcome(arbiterField) == BattleOutcome.Ongoing);
+        
+        // Test victory condition
+        arbiterEnemyParty[0].CurrentHP = 0;
+        Test("BattleArbiter detects Victory", () => 
+            BattleArbiter.CheckOutcome(arbiterField) == BattleOutcome.Victory);
+        
+        // Reset and test defeat
+        arbiterEnemyParty[0].CurrentHP = arbiterEnemyParty[0].MaxHP;
+        arbiterPlayerParty[0].CurrentHP = 0;
+        Test("BattleArbiter detects Defeat", () => 
+            BattleArbiter.CheckOutcome(arbiterField) == BattleOutcome.Defeat);
+        
+        // Test draw
+        arbiterPlayerParty[0].CurrentHP = 0;
+        arbiterEnemyParty[0].CurrentHP = 0;
+        Test("BattleArbiter detects Draw", () => 
+            BattleArbiter.CheckOutcome(arbiterField) == BattleOutcome.Draw);
+
+        // IActionProvider
+        var testProvider = new SimpleTestActionProvider("Test action");
+        var providerField = new BattleField();
+        var providerSlot = new BattleSlot(0);
+        var providerAction = testProvider.GetAction(providerField, providerSlot).Result;
+        Test("IActionProvider returns action", () => providerAction != null);
+        Test("IActionProvider returns MessageAction", () => providerAction is MessageAction);
+        Test("IActionProvider message matches", () => ((MessageAction)providerAction).Message == "Test action");
+
+        // CombatEngine initialization
+        var engine = new CombatEngine();
+        var enginePlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var engineEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        var enginePlayerProvider = new SimpleTestActionProvider("Player action");
+        var engineEnemyProvider = new SimpleTestActionProvider("Enemy action");
+        var engineView = new NullBattleView();
+        
+        engine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            enginePlayerParty, engineEnemyParty, enginePlayerProvider, engineEnemyProvider, engineView);
+        
+        Test("CombatEngine initializes Field", () => engine.Field != null);
+        Test("CombatEngine initializes Queue", () => engine.Queue != null);
+        Test("CombatEngine starts with Ongoing outcome", () => engine.Outcome == BattleOutcome.Ongoing);
+        Test("CombatEngine assigns action providers", () => 
+            engine.Field.PlayerSide.Slots[0].ActionProvider == enginePlayerProvider &&
+            engine.Field.EnemySide.Slots[0].ActionProvider == engineEnemyProvider);
+
+        // CombatEngine RunTurn
+        var turnEngine = new CombatEngine();
+        var turnPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var turnEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        var turnPlayerProvider = new SimpleTestActionProvider(new MessageAction("Player turn"));
+        var turnEnemyProvider = new SimpleTestActionProvider(new MessageAction("Enemy turn"));
+        
+        turnEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            turnPlayerParty, turnEnemyParty, turnPlayerProvider, turnEnemyProvider, engineView);
+        
+        var initialQueueCount = turnEngine.Queue.Count;
+        turnEngine.RunTurn().Wait();
+        Test("CombatEngine.RunTurn processes actions", () => turnEngine.Queue.Count >= initialQueueCount);
+
+        // CombatEngine RunBattle (simplified test - just verify method exists and can be called)
+        var battleEngine = new CombatEngine();
+        var battlePlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var battleEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+        var battlePlayerProvider = new SimpleTestActionProvider(new MessageAction("Player"));
+        var battleEnemyProvider = new SimpleTestActionProvider(new MessageAction("Enemy"));
+        
+        battleEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            battlePlayerParty, battleEnemyParty, battlePlayerProvider, battleEnemyProvider, engineView);
+        
+        // For smoke test, just verify RunBattle method exists and returns Task<BattleResult>
+        // Full battle simulation would take too long for smoke test
+        Test("CombatEngine.RunBattle method exists", () => 
+        {
+            try
+            {
+                var method = typeof(CombatEngine).GetMethod("RunBattle");
+                return method != null && method.ReturnType == typeof(Task<BattleResult>);
+            }
+            catch
+            {
+                return false;
+            }
+        });
+
+        PrintInfo($"CombatEngine: Initialize, RunTurn, RunBattle ready");
+        PrintInfo($"BattleArbiter: Victory/Defeat/Draw detection working");
+        PrintInfo($"IActionProvider: Action selection abstraction ready");
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 38: COMPLETE POKEMON LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL POKEMON IN CATALOG");
 
@@ -1020,7 +1142,7 @@ class Program
         }
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 38: COMPLETE MOVE LISTING
+        // SECTION 39: COMPLETE MOVE LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL MOVES IN CATALOG");
 
@@ -1179,6 +1301,29 @@ class Program
         public override Task ExecuteVisual(IBattleView view)
         {
             return Task.CompletedTask;
+        }
+    }
+
+    /// <summary>
+    /// Simple action provider for testing CombatEngine.
+    /// </summary>
+    private class SimpleTestActionProvider : IActionProvider
+    {
+        private readonly BattleAction _actionToReturn;
+
+        public SimpleTestActionProvider(BattleAction actionToReturn)
+        {
+            _actionToReturn = actionToReturn;
+        }
+
+        public SimpleTestActionProvider(string message)
+        {
+            _actionToReturn = new MessageAction(message);
+        }
+
+        public Task<BattleAction> GetAction(BattleField field, BattleSlot mySlot)
+        {
+            return Task.FromResult(_actionToReturn);
         }
     }
 

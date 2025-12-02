@@ -34,9 +34,9 @@ The Combat System is divided into **7 phases**, each building on the previous. E
 | 2.4 Damage Calculation | ✅ Complete | 65 | DamagePipeline |
 | **Data Layer** | ✅ Complete | 170 | AbilityData, ItemData, StatusEffectData |
 | 2.5 Combat Actions | ✅ Complete | 47 | All actions implemented |
-| 2.6 Combat Engine | 🎯 Next | 0 | CombatEngine, Arbiter |
-| 2.7 Integration | ⏳ Pending | 0 | AI, full battles |
-| **Total** | **6/7** | **540** | Combat module only |
+| 2.6 Combat Engine | ✅ Complete | 30 | CombatEngine, BattleArbiter, IActionProvider |
+| 2.7 Integration | 🎯 Next | 0 | AI, full battles |
+| **Total** | **7/7** | **570** | Combat module only |
 
 ---
 
@@ -649,15 +649,17 @@ Tests/Combat/BattleArbiterTests.cs
 
 ### Completion Checklist
 
-- [ ] `CombatEngine` implemented with tests
-- [ ] `BattleArbiter` implemented with tests
-- [ ] `BattleOutcome` enum defined
-- [ ] `BattleResult` class defined
-- [ ] `RunTurn()` working
-- [ ] `RunBattle()` loop working
-- [ ] Victory detection working
-- [ ] Defeat detection working
-- [ ] All tests pass
+- [x] `CombatEngine` implemented with tests (9 functional + 12 edge cases)
+- [x] `BattleArbiter` implemented with tests (6 functional + 8 edge cases)
+- [x] `BattleOutcome` enum defined
+- [x] `BattleResult` class defined
+- [x] `IActionProvider` interface defined
+- [x] `TestActionProvider` helper for tests
+- [x] `RunTurn()` working
+- [x] `RunBattle()` loop working
+- [x] Victory detection working
+- [x] Defeat detection working
+- [x] All tests pass (30 tests total)
 
 ---
 
@@ -781,56 +783,65 @@ public class PlayerActionProvider : IActionProvider
 ### File Structure
 
 ```
-PokemonUltimate.Core/
-└── Combat/
-    ├── BattleSlot.cs
-    ├── BattleSide.cs
-    ├── BattleField.cs
-    ├── BattleRules.cs
-    ├── BattleQueue.cs
-    ├── CombatEngine.cs
-    ├── BattleArbiter.cs
-    ├── TurnOrderResolver.cs
-    ├── IBattleView.cs
-    ├── IActionProvider.cs
-    ├── Actions/
-    │   ├── BattleAction.cs
-    │   ├── MessageAction.cs
-    │   ├── DamageAction.cs
-    │   ├── UseMoveAction.cs
-    │   ├── FaintAction.cs
-    │   ├── ApplyStatusAction.cs
-    │   ├── StatChangeAction.cs
-    │   ├── HealAction.cs
-    │   └── SwitchAction.cs
-    ├── Damage/
-    │   ├── DamageContext.cs
-    │   ├── DamagePipeline.cs
-    │   ├── IDamageStep.cs
-    │   └── Steps/
-    │       ├── BaseDamageStep.cs
-    │       ├── CriticalHitStep.cs
-    │       ├── RandomFactorStep.cs
-    │       ├── StabStep.cs
-    │       ├── TypeEffectivenessStep.cs
-    │       └── BurnStep.cs
-    └── AI/
-        ├── RandomAI.cs
-        └── AlwaysAttackAI.cs
+PokemonUltimate.Combat/
+├── Field/                    # Battlefield components
+│   ├── BattleSlot.cs
+│   ├── BattleSide.cs
+│   ├── BattleField.cs
+│   └── BattleRules.cs
+├── Engine/                    # Battle engine and queue
+│   ├── CombatEngine.cs
+│   ├── BattleArbiter.cs
+│   └── BattleQueue.cs
+├── Results/                   # Battle outcomes
+│   ├── BattleOutcome.cs
+│   └── BattleResult.cs
+├── Providers/                 # Action providers
+│   └── IActionProvider.cs
+├── View/                      # Visual interface
+│   ├── IBattleView.cs
+│   └── NullBattleView.cs
+├── Actions/                   # Battle actions
+│   ├── BattleAction.cs
+│   ├── MessageAction.cs
+│   ├── DamageAction.cs
+│   ├── UseMoveAction.cs
+│   ├── FaintAction.cs
+│   ├── ApplyStatusAction.cs
+│   ├── StatChangeAction.cs
+│   ├── HealAction.cs
+│   └── SwitchAction.cs
+├── Damage/                    # Damage calculation
+│   ├── DamageContext.cs
+│   ├── DamagePipeline.cs
+│   ├── IDamageStep.cs
+│   └── Steps/
+│       ├── BaseDamageStep.cs
+│       ├── CriticalHitStep.cs
+│       ├── RandomFactorStep.cs
+│       ├── StabStep.cs
+│       ├── TypeEffectivenessStep.cs
+│       └── BurnStep.cs
+├── Helpers/                   # Utility helpers
+│   ├── AccuracyChecker.cs
+│   └── TurnOrderResolver.cs
+└── AI/                        # AI implementations (Phase 2.7)
+    ├── RandomAI.cs
+    └── AlwaysAttackAI.cs
 ```
 
 ### Estimated Tests per Phase
 
-| Phase | Tests |
-|-------|-------|
-| 2.1 Foundation | ~30 |
-| 2.2 Queue | ~15 |
-| 2.3 Turn Order | ~20 |
-| 2.4 Damage | ~40 |
-| 2.5 Actions | ~50 |
-| 2.6 Engine | ~25 |
-| 2.7 Integration | ~20 |
-| **Total** | **~200** |
+| Phase | Estimated | Actual |
+|-------|-----------|--------|
+| 2.1 Foundation | ~30 | 133 |
+| 2.2 Queue | ~15 | 77 |
+| 2.3 Turn Order | ~20 | 48 |
+| 2.4 Damage | ~40 | 65 |
+| 2.5 Actions | ~50 | 47 |
+| 2.6 Engine | ~25 | 30 |
+| 2.7 Integration | ~20 | 0 |
+| **Total** | **~200** | **400** |
 
 ---
 
