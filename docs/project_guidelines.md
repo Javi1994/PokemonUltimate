@@ -43,9 +43,10 @@ _These rules are absolute. All code must adhere to them._
         - **Functional Tests**: `*Tests.cs` - Test comportamiento normal y esperado
         - **Edge Cases**: `*EdgeCasesTests.cs` - Test casos límite y condiciones especiales
         - **Integration**: `*IntegrationTests.cs` - Test integración entre sistemas
-      - **Data/Catalogs Organization**:
+      - **Data Organization**:
         - **One file per catalog element** (Pokemon, Move, Item, Ability)
-        - Example: `Data/Catalogs/Pokemon/PikachuTests.cs`, `Data/Catalogs/Moves/FlamethrowerTests.cs`
+        - Example: `Data/Pokemon/PikachuTests.cs`, `Data/Moves/FlamethrowerTests.cs`
+        - General catalog tests in `Data/Catalogs/` (e.g., `PokemonCatalogTests.cs`, `MoveCatalogTests.cs`)
         - Allows quick access to tests for any specific element
       - **See**: `docs/testing/test_structure_definition.md` for complete structure and rules
 

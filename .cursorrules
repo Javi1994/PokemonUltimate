@@ -37,7 +37,8 @@
    - **Test Location**: 
      - System tests → `Systems/[Module]/[Component]Tests.cs`
      - Blueprint tests → `Blueprints/[Blueprint]Tests.cs`
-     - Data tests → `Data/[Category]/[Element]Tests.cs`
+     - Data tests → `Data/Pokemon/[Pokemon]Tests.cs`, `Data/Moves/[Move]Tests.cs`, etc.
+     - Catalog tests → `Data/Catalogs/[Catalog]Tests.cs` (general catalog tests)
    - Create test file following naming: `[Feature]Tests.cs`
    - Write tests for ALL main scenarios from the spec
    - Use naming: `MethodName_Scenario_ExpectedResult`
@@ -191,7 +192,8 @@
   - Functional: `*Tests.cs` - Comportamiento normal
   - Edge Cases: `*EdgeCasesTests.cs` - Casos límite
   - Integration: `*IntegrationTests.cs` - Integración entre sistemas (en `Systems/*/Integration/`)
-- **Data/Catalogs** → Un archivo por cada elemento (Pokemon, Move, Item, Ability)
+- **Data Organization** → Un archivo por cada elemento en `Data/Pokemon/`, `Data/Moves/`, etc.
+  - Tests generales de catálogos en `Data/Catalogs/` (PokemonCatalogTests.cs, MoveCatalogTests.cs)
 - **TDD** → Tests before implementation
 - **Naming** → `MethodName_Scenario_ExpectedResult`
 - **Three-phase** → Functional tests, then edge cases, then integration tests

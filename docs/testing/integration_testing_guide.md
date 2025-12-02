@@ -37,11 +37,15 @@ PokemonUltimate.Tests/
 │   └── [Blueprint]Tests.cs
 │
 └── Data/                            # Tests de contenido específico
-    ├── Catalogs/                    # Tests de catálogos
-    │   ├── Pokemon/[Pokemon]Tests.cs  # Un archivo por Pokemon
-    │   ├── Moves/[Move]Tests.cs      # Un archivo por Move
-    │   ├── Items/[Item]Tests.cs      # Un archivo por Item
-    │   └── Abilities/[Ability]Tests.cs # Un archivo por Ability
+    ├── Pokemon/                     # Tests de Pokemon específicos
+    │   └── [Pokemon]Tests.cs         # Un archivo por Pokemon (PikachuTests.cs, etc.)
+    ├── Moves/                        # Tests de Moves específicos
+    │   └── [Move]Tests.cs            # Un archivo por Move (FlamethrowerTests.cs, etc.)
+    ├── Catalogs/                     # Tests generales de catálogos
+    │   ├── PokemonCatalogTests.cs    # Tests generales del catálogo de Pokemon
+    │   ├── MoveCatalogTests.cs       # Tests generales del catálogo de Moves
+    │   ├── Items/                    # Tests de Items (cuando se implementen)
+    │   └── Abilities/                 # Tests de Abilities (cuando se implementen)
     └── Validation/                  # Validación contra datos oficiales
 ```
 

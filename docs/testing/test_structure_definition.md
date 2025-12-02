@@ -219,54 +219,42 @@ PokemonUltimate.Tests/
     │   ├── StatCalculatorValidationTests.cs      # Valida cálculos contra juegos oficiales
     │   └── DamageCalculationValidationTests.cs   # Valida daño contra juegos oficiales
     │
-    ├── Catalogs/                    # Tests de contenido de catálogos
-    │   │                           # Un archivo por cada elemento del catálogo
-    │   │                           # Permite ver rápidamente los tests de cada elemento
+    ├── Pokemon/                     # Tests de Pokemon específicos
+    │   │                           # Un archivo por cada Pokemon del catálogo
+    │   │                           # Permite ver rápidamente los tests de cada Pokemon
     │   │
-    │   ├── Pokemon/                # Tests de Pokemon específicos
-    │   │   ├── PokemonCatalogTests.cs            # Tests generales del catálogo
-    │   │   ├── PokemonCatalogValidationTests.cs   # Validación de datos oficiales
-    │   │   │
-    │   │   ├── PikachuTests.cs                   # Tests específicos de Pikachu
-    │   │   ├── CharizardTests.cs                 # Tests específicos de Charizard
-    │   │   ├── BlastoiseTests.cs                 # Tests específicos de Blastoise
-    │   │   ├── VenusaurTests.cs                 # Tests específicos de Venusaur
-    │   │   ├── GengarTests.cs                    # Tests específicos de Gengar
-    │   │   ├── GolemTests.cs                     # Tests específicos de Golem
-    │   │   ├── GyaradosTests.cs                  # Tests específicos de Gyarados
-    │   │   ├── AlakazamTests.cs                  # Tests específicos de Alakazam
-    │   │   └── [un archivo por cada Pokemon]      # Un archivo por cada Pokemon del catálogo
+    │   ├── PikachuTests.cs                       # Tests específicos de Pikachu
+    │   ├── CharizardTests.cs                     # Tests específicos de Charizard
+    │   ├── BlastoiseTests.cs                     # Tests específicos de Blastoise
+    │   ├── VenusaurTests.cs                      # Tests específicos de Venusaur
+    │   ├── GengarTests.cs                        # Tests específicos de Gengar
+    │   ├── GolemTests.cs                         # Tests específicos de Golem
+    │   ├── GyaradosTests.cs                      # Tests específicos de Gyarados
+    │   ├── AlakazamTests.cs                      # Tests específicos de Alakazam
+    │   └── [un archivo por cada Pokemon]          # Un archivo por cada Pokemon del catálogo
+    │
+    ├── Moves/                       # Tests de Moves específicos
+    │   │                           # Un archivo por cada Move del catálogo
+    │   │                           # Permite ver rápidamente los tests de cada Move
     │   │
-    │   ├── Moves/                   # Tests de Moves específicos
-    │   │   ├── MoveCatalogTests.cs                # Tests generales del catálogo
-    │   │   │
-    │   │   ├── TackleTests.cs                    # Tests específicos de Tackle
-    │   │   ├── FlamethrowerTests.cs              # Tests específicos de Flamethrower
-    │   │   ├── ThunderboltTests.cs               # Tests específicos de Thunderbolt
-    │   │   ├── WaterGunTests.cs                  # Tests específicos de Water Gun
-    │   │   ├── DragonRageTests.cs                # Tests específicos de Dragon Rage
-    │   │   ├── ShadowBallTests.cs                # Tests específicos de Shadow Ball
-    │   │   └── [un archivo por cada Move]         # Un archivo por cada Move del catálogo
+    │   ├── TackleTests.cs                        # Tests específicos de Tackle
+    │   ├── FlamethrowerTests.cs                  # Tests específicos de Flamethrower
+    │   ├── ThunderboltTests.cs                   # Tests específicos de Thunderbolt
+    │   ├── WaterGunTests.cs                      # Tests específicos de Water Gun
+    │   ├── DragonRageTests.cs                    # Tests específicos de Dragon Rage
+    │   ├── ShadowBallTests.cs                    # Tests específicos de Shadow Ball
+    │   └── [un archivo por cada Move]             # Un archivo por cada Move del catálogo
+    │
+    ├── Catalogs/                    # Tests generales de catálogos
+    │   │                           # Tests que verifican el catálogo completo
     │   │
-    │   ├── Items/                   # Tests de Items específicos
-    │   │   ├── ItemCatalogTests.cs                # Tests generales del catálogo
-    │   │   │
-    │   │   ├── ChoiceBandTests.cs                # Tests específicos de Choice Band
-    │   │   ├── LifeOrbTests.cs                   # Tests específicos de Life Orb
-    │   │   ├── ChoiceSpecsTests.cs               # Tests específicos de Choice Specs
-    │   │   ├── AssaultVestTests.cs                # Tests específicos de Assault Vest
-    │   │   ├── ChoiceScarfTests.cs                # Tests específicos de Choice Scarf
-    │   │   ├── EvioliteTests.cs                  # Tests específicos de Eviolite
-    │   │   └── [un archivo por cada Item]         # Un archivo por cada Item del catálogo
-    │   │
-    │   └── Abilities/               # Tests de Abilities específicas
-    │       ├── AbilityCatalogTests.cs             # Tests generales del catálogo
-    │       │
-    │       ├── BlazeTests.cs                     # Tests específicos de Blaze
-    │       ├── TorrentTests.cs                   # Tests específicos de Torrent
-    │       ├── OvergrowTests.cs                  # Tests específicos de Overgrow
-    │       ├── SwarmTests.cs                     # Tests específicos de Swarm
-    │       └── [un archivo por cada Ability]      # Un archivo por cada Ability del catálogo
+    │   ├── PokemonCatalogTests.cs                # Tests generales del catálogo de Pokemon
+    │   ├── PokemonCatalogValidationTests.cs       # Validación de datos oficiales de Pokemon
+    │   ├── MoveCatalogTests.cs                   # Tests generales del catálogo de Moves
+    │   ├── Items/                                 # Tests de Items (cuando se implementen)
+    │   │   └── ItemCatalogTests.cs               # Tests generales del catálogo de Items
+    │   └── Abilities/                             # Tests de Abilities (cuando se implementen)
+    │       └── AbilityCatalogTests.cs             # Tests generales del catálogo de Abilities
     │
     ├── Builders/                    # Tests de contenido creado por builders
     │   │                           # Tests de QUÉ crean los builders
@@ -343,11 +331,10 @@ PokemonUltimate.Tests/
   - Edge cases cuando sea necesario
   - Validation tests separados
 - **Ejemplos**:
-  - `Catalogs/Pokemon/PikachuTests.cs` - Tests específicos de Pikachu
-  - `Catalogs/Moves/FlamethrowerTests.cs` - Tests específicos de Flamethrower
-  - `Catalogs/Items/ChoiceBandTests.cs` - Tests específicos de Choice Band
-  - `Catalogs/Abilities/BlazeTests.cs` - Tests específicos de Blaze
-  - `Validation/StatCalculatorValidationTests.cs` - Valida contra datos oficiales
+  - `Data/Pokemon/PikachuTests.cs` - Tests específicos de Pikachu
+  - `Data/Moves/FlamethrowerTests.cs` - Tests específicos de Flamethrower
+  - `Data/Catalogs/PokemonCatalogTests.cs` - Tests generales del catálogo de Pokemon
+  - `Data/Validation/StatCalculatorValidationTests.cs` - Valida contra datos oficiales
 
 ## Cuándo Usar Cada Tipo
 
