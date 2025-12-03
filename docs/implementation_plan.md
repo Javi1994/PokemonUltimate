@@ -256,7 +256,11 @@ Once Step 7 passes, you have a working game engine. Only THEN do you open Unity 
 |------|------|
 | Current state | `.ai/context.md` |
 | Coding rules | `docs/project_guidelines.md` |
-| **Combat phases** | `docs/combat_implementation_plan.md` |
+| **Combat phases** | `docs/roadmaps/combat_roadmap.md` |
+| **Content expansion** | `docs/roadmaps/content_expansion_roadmap.md` |
+| **Unity integration** | `docs/roadmaps/unity_integration_roadmap.md` |
+| **Game features** | `docs/roadmaps/game_features_roadmap.md` |
+| **Testing improvements** | `docs/roadmaps/testing_roadmap.md` |
 | **Use cases** | `docs/combat_use_cases.md` |
 | **Unity setup** | `docs/unity_integration.md` |
 | Combat design | `docs/architecture/combat_system_spec.md` |

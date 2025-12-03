@@ -103,7 +103,7 @@ PokemonUltimate/
 
 ## 🎯 Combat System Progress
 
-See `docs/combat_implementation_plan.md` for full details.
+See `docs/roadmaps/combat_roadmap.md` for full details.
 
 | Sub-Phase               | Status      | Description                                                                                                   |
 | ----------------------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
@@ -121,7 +121,7 @@ See `docs/combat_implementation_plan.md` for full details.
 
 Reference docs:
 
--   `docs/combat_implementation_plan.md` ← **Start here**
+-   `docs/roadmaps/combat_roadmap.md` ← **Start here**
 -   `docs/architecture/action_system_spec.md` ← **⭐ Action system**
 -   `docs/combat/action_use_cases.md` ← **📋 Use cases (207 cases)**
 -   `docs/combat/actions_bible.md` ← **📖 Actions reference**
@@ -201,26 +201,30 @@ Reference docs:
 
 ## 📚 Key Reference Documents
 
-| Document                                                  | Purpose                        |
-| --------------------------------------------------------- | ------------------------------ |
-| `docs/project_guidelines.md`                              | 24+ coding rules               |
-| `.cursorrules`                                            | **AI workflow rules**          |
-| `docs/implementation_plan.md`                             | Technical roadmap              |
-| `docs/combat_implementation_plan.md`                      | **Combat phases**              |
-| `docs/combat_use_cases.md`                                | **All battle cases**           |
-| `docs/architecture/action_system_spec.md`                 | **⭐ Action system**           |
-| `docs/architecture/effects_bible.md`                      | **📖 Effects guide**           |
-| `docs/unity_integration.md`                               | Unity setup guide              |
-| `CONTRIBUTING.md`                                         | Git workflow & rules           |
-| `docs/architecture/combat_system_spec.md`                 | Combat system design           |
-| `docs/checklists/pre_implementation.md`                   | **Before coding**              |
-| `docs/checklists/feature_complete.md`                     | After coding                   |
-| `docs/workflow/troubleshooting.md`                        | **Problem-solving guide**      |
-| `docs/workflow/refactoring_guide.md`                      | **Safe refactoring process**   |
-| `docs/testing/integration_testing_guide.md`               | **Integration test patterns**  |
-| `docs/testing/test_structure_definition.md`               | **⭐ Test structure standard** |
-| `docs/testing/test_reorganization_implementation_task.md` | **Test reorganization task**   |
-| `docs/anti-patterns.md`                                   | What NOT to do                 |
+| Document                                                  | Purpose                           |
+| --------------------------------------------------------- | --------------------------------- |
+| `docs/project_guidelines.md`                              | 24+ coding rules                  |
+| `.cursorrules`                                            | **AI workflow rules**             |
+| `docs/implementation_plan.md`                             | Technical roadmap                 |
+| `docs/roadmaps/combat_roadmap.md`                         | **Combat phases**                 |
+| `docs/roadmaps/content_expansion_roadmap.md`              | **📦 Content expansion phases**   |
+| `docs/roadmaps/unity_integration_roadmap.md`              | **🎮 Unity integration phases**   |
+| `docs/roadmaps/game_features_roadmap.md`                  | **🎯 Game features phases**       |
+| `docs/roadmaps/testing_roadmap.md`                        | **🧪 Testing improvement phases** |
+| `docs/combat_use_cases.md`                                | **All battle cases**              |
+| `docs/architecture/action_system_spec.md`                 | **⭐ Action system**              |
+| `docs/architecture/effects_bible.md`                      | **📖 Effects guide**              |
+| `docs/unity_integration.md`                               | Unity setup guide                 |
+| `CONTRIBUTING.md`                                         | Git workflow & rules              |
+| `docs/architecture/combat_system_spec.md`                 | Combat system design              |
+| `docs/checklists/pre_implementation.md`                   | **Before coding**                 |
+| `docs/checklists/feature_complete.md`                     | After coding                      |
+| `docs/workflow/troubleshooting.md`                        | **Problem-solving guide**         |
+| `docs/workflow/refactoring_guide.md`                      | **Safe refactoring process**      |
+| `docs/testing/integration_testing_guide.md`               | **Integration test patterns**     |
+| `docs/testing/test_structure_definition.md`               | **⭐ Test structure standard**    |
+| `docs/testing/test_reorganization_implementation_task.md` | **Test reorganization task**      |
+| `docs/anti-patterns.md`                                   | What NOT to do                    |
 
 ---
 

@@ -317,6 +317,7 @@ _Key constraints defining the game's scope._
 
 - Every major system must have a corresponding Specification Document in `docs/architecture/`.
 - Every major flow must have a Mermaid diagram.
+- Roadmaps and implementation plans must be maintained in `docs/roadmaps/`.
 - Workflow guides must be maintained in `docs/workflow/`.
 - Testing guides must be maintained in `docs/testing/`.
 
@@ -326,6 +327,11 @@ _Quick reference to workflow guides and processes._
 
 | Need | Document |
 |------|----------|
+| Combat Roadmap | `docs/roadmaps/combat_roadmap.md` |
+| Content Roadmap | `docs/roadmaps/content_expansion_roadmap.md` |
+| Unity Integration Roadmap | `docs/roadmaps/unity_integration_roadmap.md` |
+| Game Features Roadmap | `docs/roadmaps/game_features_roadmap.md` |
+| Testing Roadmap | `docs/roadmaps/testing_roadmap.md` |
 | Troubleshooting | `docs/workflow/troubleshooting.md` |
 | Refactoring | `docs/workflow/refactoring_guide.md` |
 | Integration Tests | `docs/testing/integration_testing_guide.md` |

@@ -14,6 +14,7 @@ Read the following before implementing:
 - `.ai/context.md` - Current project state
 - `docs/project_guidelines.md` - Coding standards
 - `docs/architecture/[relevant_spec].md` - Architecture reference
+- `docs/roadmaps/[relevant_roadmap].md` - Roadmap for feature area (if applicable)
 
 ### Requirements
 [Describe what the feature should do]
@@ -25,7 +26,9 @@ Read the following before implementing:
 - Follow TDD: Write tests first
 - Use existing patterns from the codebase
 - Centralize any new error messages in ErrorMessages.cs
+- Check relevant roadmap for phase status and dependencies
 - Update .ai/context.md when complete
+- Update roadmap if phase completed
 
 ### Acceptance Criteria
 - [ ] Functional tests pass

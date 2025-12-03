@@ -79,6 +79,23 @@ Before coding, write down:
 | Player/AI Input | `player_ai_spec.md` |
 | UI Presentation | `ui_presentation_system.md` |
 
+## Roadmaps Reference
+
+| Feature Area | Roadmap Document |
+|--------------|------------------|
+| **Combat System** | `docs/roadmaps/combat_roadmap.md` |
+| **Content Expansion** | `docs/roadmaps/content_expansion_roadmap.md` |
+| **Unity Integration** | `docs/roadmaps/unity_integration_roadmap.md` |
+| **Game Features** | `docs/roadmaps/game_features_roadmap.md` |
+| **Testing Improvements** | `docs/roadmaps/testing_roadmap.md` |
+
+**Before implementing a feature, check the relevant roadmap to understand:**
+- Current phase status
+- Dependencies
+- Implementation specifications
+- Test requirements
+- Completion criteria
+
 ## Additional Resources
 
 | Need | Document |
@@ -86,6 +103,7 @@ Before coding, write down:
 | Troubleshooting | `docs/workflow/troubleshooting.md` |
 | Refactoring | `docs/workflow/refactoring_guide.md` |
 | Integration Tests | `docs/testing/integration_testing_guide.md` |
+| All Roadmaps | `docs/roadmaps/README.md` |
 
 ---
 

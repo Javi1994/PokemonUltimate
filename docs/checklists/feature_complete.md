@@ -75,6 +75,22 @@ dotnet test -v q
 grep -r "TODO\|FIXME" --include="*.cs" PokemonUltimate.Core PokemonUltimate.Content
 ```
 
+## Roadmaps Reference
+
+| Feature Area | Roadmap Document |
+|--------------|------------------|
+| **Combat System** | `docs/roadmaps/combat_roadmap.md` |
+| **Content Expansion** | `docs/roadmaps/content_expansion_roadmap.md` |
+| **Unity Integration** | `docs/roadmaps/unity_integration_roadmap.md` |
+| **Game Features** | `docs/roadmaps/game_features_roadmap.md` |
+| **Testing Improvements** | `docs/roadmaps/testing_roadmap.md` |
+
+**After completing a feature, update the relevant roadmap:**
+- Mark phase as complete
+- Update test counts
+- Note any deviations from plan
+- Document lessons learned
+
 ## Additional Resources
 
 | Need | Document |
@@ -82,6 +98,7 @@ grep -r "TODO\|FIXME" --include="*.cs" PokemonUltimate.Core PokemonUltimate.Cont
 | Troubleshooting | `docs/workflow/troubleshooting.md` |
 | Refactoring | `docs/workflow/refactoring_guide.md` |
 | Integration Tests | `docs/testing/integration_testing_guide.md` |
+| All Roadmaps | `docs/roadmaps/README.md` |
 
 ---
 

@@ -287,7 +287,12 @@ git tag -a v0.1.0 -m "Description"
 | Anti-patterns | `docs/anti-patterns.md` |
 | Unity setup | `docs/unity_integration.md` |
 | Current state | `.ai/context.md` |
-| Roadmap | `docs/implementation_plan.md` |
+| Combat Roadmap | `docs/roadmaps/combat_roadmap.md` |
+| Content Roadmap | `docs/roadmaps/content_expansion_roadmap.md` |
+| Unity Integration Roadmap | `docs/roadmaps/unity_integration_roadmap.md` |
+| Game Features Roadmap | `docs/roadmaps/game_features_roadmap.md` |
+| Testing Roadmap | `docs/roadmaps/testing_roadmap.md` |
+| Implementation Plan | `docs/implementation_plan.md` |
 
 ---
 

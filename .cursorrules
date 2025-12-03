@@ -20,11 +20,13 @@
 
 1. **Read Context & Specs**
    - Read `.ai/context.md` to understand current state
+   - **CRITICAL: Check relevant roadmap in `docs/roadmaps/`** (if feature is part of a roadmap phase)
    - **CRITICAL: Read relevant architecture doc in `docs/architecture/`**
    - If spec is incomplete or missing details, **COMPLETE IT FIRST**
-   - Identify ALL requirements from the spec
+   - Identify ALL requirements from the spec and roadmap
    - Note any elements to defer to later phases
    - Understand the expected API (method names, parameters)
+   - Check roadmap for dependencies and phase status
 
 2. **Verify Spec Completeness**
    - List what will be implemented vs deferred
@@ -91,11 +93,13 @@
    - **Immediate Updates** (before moving on):
      - Update `.ai/context.md` with new state (phase, test count, completed systems)
      - Mark use cases as complete in `docs/combat_use_cases.md` (if applicable)
+     - **Update relevant roadmap** - Mark phase as complete, update test counts, note any deviations
      - Update test count in response
    
    - **If API Changed:**
      - Update relevant architecture doc in `docs/architecture/`
      - Note changes in spec document with rationale
+     - Update roadmap if API changes affect planned phases
    
    - **If New Pattern Introduced:**
      - Create new architecture doc OR update existing pattern doc
@@ -103,7 +107,7 @@
    
    - **Status Documents:**
      - Update phase-specific status docs (e.g., `player_input_status.md`) if they exist
-     - Update implementation plan if phase completed
+     - Update roadmap completion status
 
 ### When User Says "Review X" or "Check X"
 1. Read `docs/anti-patterns.md`

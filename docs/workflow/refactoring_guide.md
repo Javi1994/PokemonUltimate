@@ -249,3 +249,20 @@ public void ProcessEffect(IMoveEffect effect)
 - Code that will be replaced soon
 - Code where refactoring risk > benefit
 
+## Roadmaps Reference
+
+Before refactoring, check the relevant roadmap to understand:
+- Planned changes that might affect the code
+- Dependencies on other systems
+- Future phases that might require different approach
+
+| Feature Area | Roadmap Document |
+|--------------|------------------|
+| **Combat System** | `docs/roadmaps/combat_roadmap.md` |
+| **Content Expansion** | `docs/roadmaps/content_expansion_roadmap.md` |
+| **Unity Integration** | `docs/roadmaps/unity_integration_roadmap.md` |
+| **Game Features** | `docs/roadmaps/game_features_roadmap.md` |
+| **Testing Improvements** | `docs/roadmaps/testing_roadmap.md` |
+
+See `docs/roadmaps/README.md` for overview of all roadmaps.
+

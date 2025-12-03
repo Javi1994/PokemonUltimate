@@ -234,6 +234,25 @@ Issue Found?
 ├─ Architecture change needed? → Document and update architecture
 ├─ Integration test fails? → Fix root cause
 ├─ Use case missing? → Implement and mark complete
+├─ Phase unclear? → Check relevant roadmap
 └─ Other? → Document issue and resolve
 ```
+
+## Roadmaps Reference
+
+When troubleshooting, check the relevant roadmap to understand:
+- Current phase status
+- Dependencies that might affect the issue
+- Expected implementation approach
+- Test requirements
+
+| Feature Area | Roadmap Document |
+|--------------|------------------|
+| **Combat System** | `docs/roadmaps/combat_roadmap.md` |
+| **Content Expansion** | `docs/roadmaps/content_expansion_roadmap.md` |
+| **Unity Integration** | `docs/roadmaps/unity_integration_roadmap.md` |
+| **Game Features** | `docs/roadmaps/game_features_roadmap.md` |
+| **Testing Improvements** | `docs/roadmaps/testing_roadmap.md` |
+
+See `docs/roadmaps/README.md` for overview of all roadmaps.
 

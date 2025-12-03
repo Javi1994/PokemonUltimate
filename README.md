@@ -16,6 +16,8 @@ This project answers the question:
 
 **The answer: Yes, with the right methodology.**
 
+> **New to the project?** Start with [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) for a quick guide.
+
 | Role | Responsibility |
 |------|----------------|
 | **Human** | Direction, requirements, feedback, approval |
@@ -144,6 +146,18 @@ docs/
 | **Prompt Templates** | Reusable templates for common tasks |
 
 ---
+
+## 🗺️ Roadmaps
+
+| Roadmap | Purpose | Status |
+|---------|---------|--------|
+| **Combat System** | `docs/roadmaps/combat_roadmap.md` | Core combat phases (2.1-2.19) | ✅ Core Complete |
+| **Content Expansion** | `docs/roadmaps/content_expansion_roadmap.md` | Pokemon, Moves, Items expansion | ⏳ Planned |
+| **Unity Integration** | `docs/roadmaps/unity_integration_roadmap.md` | Unity UI and integration | ⏳ Planned |
+| **Game Features** | `docs/roadmaps/game_features_roadmap.md` | Progression, roguelike, meta-game | ⏳ Planned |
+| **Testing** | `docs/roadmaps/testing_roadmap.md` | Test coverage and quality improvements | ⏳ Planned |
+
+See `docs/roadmaps/README.md` for overview of all roadmaps.
 
 ## 📋 Workflow Guides
 
@@ -405,9 +419,12 @@ dotnet run --project PokemonUltimate.BattleDemo
 
 ### 🎯 Next Steps
 
-- Phase 4: Abilities & Items (Event-driven system)
-- Phase 5: Advanced Battle Mechanics (Weather, Terrain, Hazards)
-- Phase 6: Unity Integration
+See detailed roadmaps for implementation plans:
+- **Combat System**: `docs/roadmaps/combat_roadmap.md` (Phases 2.12-2.19: Extended features)
+- **Content Expansion**: `docs/roadmaps/content_expansion_roadmap.md` (Phases 3.1-3.6: More Pokemon, Moves, Items)
+- **Unity Integration**: `docs/roadmaps/unity_integration_roadmap.md` (Phases 4.1-4.8: UI and visual integration)
+- **Game Features**: `docs/roadmaps/game_features_roadmap.md` (Phases 5.1-5.6: Progression, roguelike, meta-game)
+- **Testing**: `docs/roadmaps/testing_roadmap.md` (Phases 6.1-6.6: Test coverage and quality)
 
 ---
 
