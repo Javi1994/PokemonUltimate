@@ -283,7 +283,7 @@ This document covers all use cases for expanding game content, including:
 - **[Roadmap](roadmap.md)** - Implementation status and phases
 - **[Testing](testing.md)** - Tests covering these use cases
 - **[Code Location](code_location.md)** - Where use cases are implemented
-- **[Feature 1: Pokemon Data](../1-pokemon-data/architecture.md)** - Data structure for new content
+- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Data structure for new content
 - **[Feature 2: Combat System](../2-combat-system/use_cases.md)** - How content is used in battles
 
 ---

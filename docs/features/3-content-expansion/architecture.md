@@ -598,7 +598,7 @@ Tests/Evolution/
 - **[Roadmap](roadmap.md)** - Content expansion phases and implementation status
 - **[Testing](testing.md)** - Testing strategy for content validation
 - **[Code Location](code_location.md)** - Where catalogs and builders are implemented
-- **[Feature 1: Pokemon Data](../1-pokemon-data/architecture.md)** - Data structure for Pokemon species
+- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Data structure for Pokemon species
 - **[Feature 2: Combat System](../2-combat-system/architecture.md)** - How moves and abilities are used in combat
 - **[Feature 2.5: Combat Actions - Move Effects Execution](../2-combat-system/2.5-combat-actions/effects/architecture.md)** - How move effects execute in combat
 

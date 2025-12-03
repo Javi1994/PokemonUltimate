@@ -1966,7 +1966,7 @@ PokemonUltimate.Combat/
 - **[Sub-Feature 2.4: Damage Pipeline](2.4-damage-calculation-pipeline/architecture.md)** - Damage formula specification
 - **[Sub-Feature 2.3: Turn Order](2.3-turn-order-resolution/architecture.md)** - Speed/priority rules
 - **[Sub-Feature 2.8: End-of-Turn Effects](2.8-end-of-turn-effects/architecture.md)** - Status effects specification
-- **[Feature 1: Pokemon Data](../1-pokemon-data/architecture.md)** - Pokemon instances used in battles
+- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Pokemon instances used in battles
 - **[Feature 3: Content Expansion](../3-content-expansion/roadmap.md)** - Moves, abilities, items
 - **[Pre-Combat Checklist](../../ai/checklists/pre_combat.md)** - Pre-implementation checklist
 

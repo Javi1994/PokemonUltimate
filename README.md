@@ -105,12 +105,12 @@ docs/
 │   └── refactoring_guide.md      # Safe refactoring process
 │
 ├── features/                     # Feature-specific documentation
-│   ├── pokemon-data/            # Pokemon data structure
-│   ├── combat-system/           # Battle engine
-│   ├── content-expansion/        # Adding content
-│   ├── unity-integration/        # Unity integration
-│   ├── game-features/           # Game systems
-│   └── testing/                 # Testing infrastructure
+│   ├── 1-game-data/             # Game data structure
+│   ├── 2-combat-system/         # Battle engine
+│   ├── 3-content-expansion/      # Adding content
+│   ├── 4-unity-integration/      # Unity integration
+│   ├── 5-game-features/         # Game systems
+│   └── features_master_list.md  # Master feature reference
 └── shared/                      # Shared documentation
     ├── architecture/            # Shared technical specs
     ├── workflow/                # Process guides
@@ -162,12 +162,11 @@ docs/
 
 | Roadmap | Purpose | Status |
 |---------|---------|--------|
-| **Combat System** | `docs/features/combat-system/roadmap.md` | Core combat phases (2.1-2.19) | ✅ Core Complete |
-| **Content Expansion** | `docs/features/content-expansion/roadmap.md` | Pokemon, Moves, Items expansion | ⏳ Planned |
-| **Pokemon Data** | `docs/features/pokemon-data/roadmap.md` | Complete data structure fields | ⏳ Planned |
-| **Variants System** | `docs/features/pokemon-data/variants_system.md` | Mega/Dinamax/Tera as separate species | ⏳ Planned |
-| **Unity Integration** | `docs/features/unity-integration/roadmap.md` | Unity UI and integration | ⏳ Planned |
-| **Game Features** | `docs/features/game-features/roadmap.md` | Progression, roguelike, meta-game | ⏳ Planned |
+| **Feature 1: Game Data** | `docs/features/1-game-data/roadmap.md` | Complete data structure fields | ✅ Core Complete |
+| **Feature 2: Combat System** | `docs/features/2-combat-system/roadmap.md` | Core combat phases (2.1-2.19) | ✅ Core Complete |
+| **Feature 3: Content Expansion** | `docs/features/3-content-expansion/roadmap.md` | Pokemon, Moves, Items expansion | 🎯 In Progress |
+| **Feature 4: Unity Integration** | `docs/features/4-unity-integration/roadmap.md` | Unity UI and integration | ⏳ Planned |
+| **Feature 5: Game Features** | `docs/features/5-game-features/roadmap.md` | Progression, roguelike, meta-game | ⏳ Planned |
 | **Testing** | `docs/features/testing/roadmap.md` | Test coverage and quality improvements | ⏳ Planned |
 
 See `docs/features/README.md` for overview of all features.
@@ -180,8 +179,8 @@ See `docs/features/README.md` for overview of all features.
 | **Feature Complete** | Checklist before marking done | [`docs/ai/checklists/feature_complete.md`](docs/ai/checklists/feature_complete.md) |
 | **Troubleshooting** | Common issues and solutions | [`docs/ai/workflow/troubleshooting.md`](docs/ai/workflow/troubleshooting.md) |
 | **Refactoring** | Safe code improvement process | [`docs/ai/workflow/refactoring_guide.md`](docs/ai/workflow/refactoring_guide.md) |
-| **Integration Testing** | System integration test patterns | [`docs/features/combat-system/testing/integration_guide.md`](docs/features/combat-system/testing/integration_guide.md) |
-| **Pokemon Data Testing** | Comprehensive Pokemon data testing strategy | [`docs/features/pokemon-data/testing.md`](docs/features/pokemon-data/testing.md) |
+| **Integration Testing** | System integration test patterns | [`docs/features/2-combat-system/testing/integration_guide.md`](docs/features/2-combat-system/testing/integration_guide.md) |
+| **Game Data Testing** | Comprehensive game data testing strategy | [`docs/features/1-game-data/testing.md`](docs/features/1-game-data/testing.md) |
 | **Project Guidelines** | 24+ mandatory coding rules | [`docs/ai/guidelines/project_guidelines.md`](docs/ai/guidelines/project_guidelines.md) |
 | **Anti-Patterns** | What NOT to do | [`docs/ai/anti-patterns.md`](docs/ai/anti-patterns.md) |
 
@@ -434,13 +433,12 @@ dotnet run --project PokemonUltimate.BattleDemo
 ### 🎯 Next Steps
 
 See detailed roadmaps for implementation plans:
-- **Combat System**: `docs/features/combat-system/roadmap.md` (Phases 2.12-2.19: Extended features)
-- **Content Expansion**: `docs/features/content-expansion/roadmap.md` (Phases 3.1-3.6: More Pokemon, Moves, Items)
-- **Pokemon Data**: `docs/features/pokemon-data/roadmap.md` (Complete data structure: EXP, Catch, Pokedex fields, Variants)
-- **Variants System**: `docs/features/pokemon-data/variants_system.md` (Mega/Dinamax/Tera as separate species)
-- **Unity Integration**: `docs/features/unity-integration/roadmap.md` (Phases 4.1-4.8: UI and visual integration)
-- **Game Features**: `docs/features/game-features/roadmap.md` (Phases 5.1-5.6: Progression, roguelike, meta-game)
-- **Testing**: Each feature has `testing.md`. Shared strategy: `docs/shared/testing_structure_definition.md`
+- **Feature 1: Game Data**: `docs/features/1-game-data/roadmap.md` (Sub-features 1.14-1.15: Variants, Pokedex fields)
+- **Feature 2: Combat System**: `docs/features/2-combat-system/roadmap.md` (Phases 2.12-2.19: Extended features)
+- **Feature 3: Content Expansion**: `docs/features/3-content-expansion/roadmap.md` (Phases 3.1-3.6: More Pokemon, Moves, Items)
+- **Feature 4: Unity Integration**: `docs/features/4-unity-integration/roadmap.md` (Phases 4.1-4.8: UI and visual integration)
+- **Feature 5: Game Features**: `docs/features/5-game-features/roadmap.md` (Phases 5.1-5.6: Progression, roguelike, meta-game)
+- **Testing**: Each feature has `testing.md`. Shared strategy: `docs/ai/testing_structure_definition.md`
 
 ---
 
@@ -517,12 +515,12 @@ dotnet test --filter "FullyQualifiedName~CombatEngineTests"
 
 | Document | Purpose |
 |----------|---------|
-| [`docs/features/combat-system/architecture.md`](docs/features/combat-system/architecture.md) | Battle system design |
-| [`docs/features/combat-system/actions/architecture.md`](docs/features/combat-system/actions/architecture.md) | BattleAction implementations |
-| [`docs/features/combat-system/damage/architecture.md`](docs/features/combat-system/damage/architecture.md) | Modular damage calculation |
-| [`docs/shared/architecture/player_ai_spec.md`](docs/shared/architecture/player_ai_spec.md) | Input provider system |
-| [`docs/features/combat-system/use_cases.md`](docs/features/combat-system/use_cases.md) | All battle mechanics |
-| [`docs/features/combat-system/actions_bible.md`](docs/features/combat-system/actions_bible.md) | Complete actions reference |
+| [`docs/features_master_list.md`](docs/features_master_list.md) | Master feature reference ⭐ |
+| [`docs/features/1-game-data/architecture.md`](docs/features/1-game-data/architecture.md) | Game data structure design |
+| [`docs/features/2-combat-system/architecture.md`](docs/features/2-combat-system/architecture.md) | Battle system design |
+| [`docs/features/2-combat-system/2.5-combat-actions/architecture.md`](docs/features/2-combat-system/2.5-combat-actions/architecture.md) | BattleAction implementations |
+| [`docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`](docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md) | Modular damage calculation |
+| [`docs/features/2-combat-system/use_cases.md`](docs/features/2-combat-system/use_cases.md) | All battle mechanics |
 
 ---
 

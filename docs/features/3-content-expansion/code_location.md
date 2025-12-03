@@ -255,7 +255,7 @@ See **[Testing](testing.md)** for complete test organization.
 - **[Use Cases](use_cases.md)** - Scenarios for adding content
 - **[Roadmap](roadmap.md)** - Content expansion phases
 - **[Testing](testing.md)** - Testing strategy and test locations
-- **[Feature 1: Pokemon Data](../1-pokemon-data/architecture.md)** - Data structure for content
+- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Data structure for content
 - **[Feature 2: Combat System](../2-combat-system/code_location.md)** - How content is used in combat
 
 ---

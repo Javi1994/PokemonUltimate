@@ -398,7 +398,7 @@ public class CombatEngine {
 - **[Roadmap](../../roadmap.md#phase-29-abilities--items)** - Implementation details
 - **[Testing](../../testing.md)** - Testing strategy
 - **[Code Location](../../code_location.md)** - Where this is implemented
-- **[Feature 1: Pokemon Data](../../../1-pokemon-data/architecture.md)** - Pokemon instances have abilities and items
+- **[Feature 1: Game Data](../../../1-game-data/architecture.md)** - Pokemon instances have abilities and items
 - **[Feature 3: Content Expansion](../../../3-content-expansion/roadmap.md)** - Adding more abilities and items
 - **[Sub-Feature 2.10: Pipeline Hooks](../2.10-pipeline-hooks/)** - Stat and damage modifiers
 

@@ -44,7 +44,7 @@ This feature covers the expansion of game content:
 
 ## Related Features
 
-- **[Feature 1: Pokemon Data](../1-pokemon-data/)** - Data structure for new Pokemon
+- **[Feature 1: Game Data](../1-game-data/)** - Data structure for new Pokemon
 - **[Feature 2: Combat System](../2-combat-system/)** - Using new moves and abilities in battles
 
 **⚠️ Always use numbered feature paths**: `../[N]-[feature-name]/` instead of `../feature-name/`

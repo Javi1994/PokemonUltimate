@@ -502,7 +502,7 @@ PokemonUltimate.Content/Catalogs/
 - **[Use Cases](use_cases.md)** - All scenarios for adding content
 - **[Testing](testing.md)** - Content testing strategy
 - **[Code Location](code_location.md)** - Where content code is located
-- **[Feature 1: Pokemon Data](../1-pokemon-data/architecture.md)** - Pokemon data structure
+- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Game data structure
 - **[Feature 2: Combat System](../2-combat-system/roadmap.md)** - Combat system phases
 - **[Feature 2.5: Combat Actions](../2-combat-system/2.5-combat-actions/architecture.md)** - Move system design
 - **[Feature 2.9: Abilities & Items](../2-combat-system/2.9-abilities-items/architecture.md)** - Abilities & Items design

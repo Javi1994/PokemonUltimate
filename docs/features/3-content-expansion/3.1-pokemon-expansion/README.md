@@ -35,7 +35,7 @@ Pokemon Expansion focuses on systematically adding Pokemon species to the game c
 
 ## Related Features
 
-- **[Feature 1: Pokemon Data](../../1-pokemon-data/)** - Uses Pokemon data structure
+- **[Feature 1: Game Data](../../1-game-data/)** - Uses game data structure
 
 **⚠️ Always use numbered feature paths**: `../../[N]-[feature-name]/` instead of `../../feature-name/`
 

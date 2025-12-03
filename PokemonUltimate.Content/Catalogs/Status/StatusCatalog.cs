@@ -9,9 +9,9 @@ namespace PokemonUltimate.Content.Catalogs.Status
     /// Central catalog of all status effect definitions.
     /// </summary>
     /// <remarks>
-    /// **Feature**: 1: Pokemon Data
-    /// **Sub-Feature**: 1.1: PokemonSpeciesData (Blueprint)
-    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.6: Content Organization
+    /// **Documentation**: See `docs/features/3-content-expansion/3.6-content-organization/README.md`
     /// </remarks>
     public static class StatusCatalog
     {

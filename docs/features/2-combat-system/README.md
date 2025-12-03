@@ -60,7 +60,7 @@ This feature implements the core Pokemon battle system, including:
 
 ## Related Features
 
-- **[Feature 1: Pokemon Data](../1-pokemon-data/)** - Pokemon instances used in battles
+- **[Feature 1: Game Data](../1-game-data/)** - Pokemon instances used in battles
 - **[Feature 3: Content Expansion](../3-content-expansion/)** - Moves, abilities, items
 - **[Feature 4: Unity Integration](../4-unity-integration/)** - Visual battle presentation
 

@@ -777,7 +777,7 @@ Most moves miss, except:
 - **[Roadmap](roadmap.md)** - Implementation status of use cases
 - **[Testing](testing.md)** - Tests covering these use cases
 - **[Code Location](code_location.md)** - Where use cases are implemented
-- **[Feature 1: Pokemon Data](../1-pokemon-data/use_cases.md)** - Pokemon data scenarios
+- **[Feature 1: Game Data](../1-game-data/use_cases.md)** - Game data scenarios
 - **[Sub-Feature 2.5: Combat Actions](2.5-combat-actions/use_cases.md)** - Detailed action use cases
 
 **⚠️ Always use numbered feature paths**: `../[N]-[feature-name]/` instead of `../feature-name/`

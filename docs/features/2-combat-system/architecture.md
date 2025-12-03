@@ -381,7 +381,7 @@ This section catalogs **all BattleActions, IMoveEffects, and Data Types** needed
 - **[Roadmap](roadmap.md)** - Implementation plan for all phases (2.1-2.19)
 - **[Testing](testing.md)** - How to test this architecture
 - **[Code Location](code_location.md)** - Where this is implemented
-- **[Feature 1: Pokemon Data](../1-pokemon-data/architecture.md)** - Pokemon instances used in battles
+- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Pokemon instances used in battles
 - **[Feature 3: Content Expansion](../3-content-expansion/roadmap.md)** - Moves, abilities, items
 - **[Feature 4: Unity Integration](../4-unity-integration/architecture.md)** - Visual battle presentation
 

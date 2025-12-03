@@ -11,9 +11,9 @@ namespace PokemonUltimate.Content.Catalogs.Terrain
     /// Terrains only affect "grounded" Pokemon.
     /// </summary>
     /// <remarks>
-    /// **Feature**: 2: Combat System
-    /// **Sub-Feature**: 2.13: Terrain System
-    /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/architecture.md`
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.6: Content Organization
+    /// **Documentation**: See `docs/features/3-content-expansion/3.6-content-organization/README.md`
     /// </remarks>
     public static class TerrainCatalog
     {

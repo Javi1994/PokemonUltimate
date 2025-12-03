@@ -55,12 +55,13 @@ The combat system is organized into several key areas:
 **Purpose**: Individual damage calculation steps
 **Key Classes**:
 - `BaseDamageStep` - Base damage calculation
+- `CriticalHitStep` - Critical hit detection and multiplier
+- `RandomFactorStep` - Random damage variation (0.85-1.0)
+- `StabStep` - STAB (Same Type Attack Bonus) multiplier
 - `AttackerAbilityStep` - Attacker ability effects
 - `AttackerItemStep` - Attacker item effects
-- `DefenderAbilityStep` - Defender ability effects
-- `DefenderItemStep` - Defender item effects
 - `TypeEffectivenessStep` - Type effectiveness calculation
-- `RandomStep` - Random damage variation
+- `BurnStep` - Burn status penalty for physical moves
 
 ### `PokemonUltimate.Combat.Field`
 **Purpose**: Battle field management
@@ -144,12 +145,13 @@ PokemonUltimate.Combat/
 │   ├── ItemStatModifier.cs             # Item stat modifier
 │   └── Steps/
 │       ├── BaseDamageStep.cs           # Base damage
+│       ├── CriticalHitStep.cs          # Critical hit detection
+│       ├── RandomFactorStep.cs         # Random variation (0.85-1.0)
+│       ├── StabStep.cs                 # STAB multiplier
 │       ├── AttackerAbilityStep.cs      # Attacker abilities
 │       ├── AttackerItemStep.cs         # Attacker items
-│       ├── DefenderAbilityStep.cs      # Defender abilities
-│       ├── DefenderItemStep.cs         # Defender items
 │       ├── TypeEffectivenessStep.cs    # Type effectiveness
-│       └── RandomStep.cs               # Random variation
+│       └── BurnStep.cs                 # Burn penalty
 │
 ├── Engine/
 │   ├── CombatEngine.cs                 # Main battle controller
@@ -233,13 +235,14 @@ PokemonUltimate.Combat/
 **Key Methods**:
 - `CalculateDamage(DamageContext)` - Calculate final damage
 **Pipeline Steps**:
-1. BaseDamageStep - Base damage
-2. AttackerAbilityStep - Attacker abilities
-3. AttackerItemStep - Attacker items
-4. DefenderAbilityStep - Defender abilities
-5. DefenderItemStep - Defender items
-6. TypeEffectivenessStep - Type effectiveness
-7. RandomStep - Random variation
+1. BaseDamageStep - Base damage calculation
+2. CriticalHitStep - Critical hit detection (1.5x multiplier)
+3. RandomFactorStep - Random damage variation (0.85-1.0)
+4. StabStep - STAB bonus (1.5x for same type)
+5. AttackerAbilityStep - Attacker ability multipliers
+6. AttackerItemStep - Attacker item multipliers
+7. TypeEffectivenessStep - Type effectiveness
+8. BurnStep - Burn penalty (0.5x for physical moves)
 
 ### BattleField
 **Namespace**: `PokemonUltimate.Combat.Field`
@@ -268,7 +271,7 @@ No factories/builders in combat system - uses direct instantiation and action pr
 
 ## Integration Points
 
-### With Pokemon Data
+### With Game Data
 - Uses `PokemonInstance` from `PokemonUltimate.Core.Instances`
 - Uses `PokemonSpeciesData` from `PokemonUltimate.Core.Blueprints`
 - Uses `MoveData` from `PokemonUltimate.Core.Blueprints`
@@ -299,7 +302,7 @@ See **[Testing](testing.md)** for complete test organization.
 - **[Testing](testing.md)** - Testing strategy and test locations
 - **[Roadmap](roadmap.md)** - Implementation phases
 - **[Use Cases](use_cases.md)** - Scenarios implemented in this code
-- **[Feature 1: Pokemon Data](../1-pokemon-data/code_location.md)** - Pokemon data code organization
+- **[Feature 1: Game Data](../1-game-data/code_location.md)** - Game data code organization
 
 ---
 

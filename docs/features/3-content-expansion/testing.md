@@ -301,7 +301,7 @@ dotnet test --filter "FullyQualifiedName~PikachuTests"
 - **[Use Cases](use_cases.md)** - Scenarios to verify
 - **[Roadmap](roadmap.md)** - Content expansion phases
 - **[Code Location](code_location.md)** - Where tests are located
-- **[Feature 1: Pokemon Data Testing](../1-pokemon-data/testing.md)** - Pokemon data testing strategy
+- **[Feature 1: Game Data Testing](../1-game-data/testing.md)** - Game data testing strategy
 - **[Test Structure Definition](../../ai/testing_structure_definition.md)** - Test organization standard
 
 ---
