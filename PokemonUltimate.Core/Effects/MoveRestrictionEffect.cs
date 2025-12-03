@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// Restricts the target's move usage.
     /// Used by Encore, Disable, Taunt, Torment, Imprison, Heal Block.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class MoveRestrictionEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.MoveRestriction;

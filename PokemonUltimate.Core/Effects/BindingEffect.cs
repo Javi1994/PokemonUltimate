@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// Traps and damages the target over multiple turns.
     /// Used by Wrap, Bind, Fire Spin, Whirlpool, Sand Tomb, Magma Storm.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class BindingEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.Binding;

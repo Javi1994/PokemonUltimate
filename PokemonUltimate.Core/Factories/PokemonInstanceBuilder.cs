@@ -18,6 +18,11 @@ namespace PokemonUltimate.Core.Factories
     ///       .Named("Sparky")
     ///       .Build();
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.12: Factories & Calculators
+    /// **Documentation**: See `docs/features/1-game-data/1.12-factories-calculators/README.md`
+    /// </remarks>
     public class PokemonInstanceBuilder
     {
         private static Random _random = new Random();

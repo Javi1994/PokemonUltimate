@@ -82,7 +82,7 @@ PokemonUltimate/
 -   [x] SideConditionData (10 conditions: screens, Tailwind, protections)
 -   [x] FieldEffectData (8 effects: rooms, Gravity, sports)
 -   [x] **Move Effects System** (21 effect types: damage, status, field, etc.)
-    -   See `docs/architecture/effects_bible.md` for complete reference
+    -   See `docs/features/2-combat-system/2.5-combat-actions/effects/architecture.md` for complete reference
 
 ### Phase 2: Instances
 
@@ -98,12 +98,22 @@ PokemonUltimate/
     -   Instance has assigned Ability (random or specified)
     -   Instance can hold ItemData
     -   All Gen1 Pokemon in catalog have abilities assigned
+-   [x] **Variants System Design** ← NEW
+    -   Mega Evolutions, Dinamax, and Terracristalización as separate Pokemon species
+    -   Each variant has own PokemonSpeciesData with different stats
+    -   See `docs/features/1-pokemon-data/1.3-variants-system/architecture.md` for specification
+-   [x] **Pokemon Data Roadmap** ← NEW
+    -   Complete field specification for PokemonSpeciesData and PokemonInstance
+    -   Missing critical fields identified (BaseExperienceYield, CatchRate, BaseFriendship, GrowthRate)
+    -   Pokedex fields specified (Description, Category, Height, Weight, Color, Shape, Habitat)
+    -   Variants system fields specified (BaseForm, VariantType, TeraType, Variants)
+    -   See `docs/features/1-pokemon-data/roadmap.md` for complete specification
 
 ---
 
 ## 🎯 Combat System Progress
 
-See `docs/roadmaps/combat_roadmap.md` for full details.
+See `docs/features/2-combat-system/roadmap.md` for full details.
 
 | Sub-Phase               | Status      | Description                                                                                                   |
 | ----------------------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
@@ -121,12 +131,12 @@ See `docs/roadmaps/combat_roadmap.md` for full details.
 
 Reference docs:
 
--   `docs/roadmaps/combat_roadmap.md` ← **Start here**
--   `docs/architecture/action_system_spec.md` ← **⭐ Action system**
--   `docs/combat/action_use_cases.md` ← **📋 Use cases (207 cases)**
--   `docs/combat/actions_bible.md` ← **📖 Actions reference**
--   `docs/architecture/combat_system_spec.md`
--   `docs/architecture/damage_and_effect_system.md`
+-   `docs/features/2-combat-system/roadmap.md` ← **Start here**
+-   `docs/features/2-combat-system/2.5-combat-actions/architecture.md` ← **⭐ Action system**
+-   `docs/features/2-combat-system/2.5-combat-actions/use_cases.md` ← **📋 Use cases (207 cases)**
+-   `docs/features/2-combat-system/actions_bible.md` ← **📖 Actions reference**
+-   `docs/features/2-combat-system/architecture.md`
+-   `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
 
 ---
 
@@ -166,7 +176,7 @@ Reference docs:
 
 ### Testing
 
--   **Test Structure**: All tests MUST follow structure in `docs/testing/test_structure_definition.md`
+-   **Test Structure**: All tests MUST follow structure in `docs/ai/testing_structure_definition.md`
 -   **Systems/** - Tests de sistemas (CÓMO funcionan los sistemas)
 -   **Blueprints/** - Tests de estructura de datos (CÓMO son los datos)
 -   **Data/** - Tests de contenido específico (QUÉ contienen los datos)
@@ -201,30 +211,33 @@ Reference docs:
 
 ## 📚 Key Reference Documents
 
-| Document                                                  | Purpose                           |
-| --------------------------------------------------------- | --------------------------------- |
-| `docs/project_guidelines.md`                              | 24+ coding rules                  |
-| `.cursorrules`                                            | **AI workflow rules**             |
-| `docs/implementation_plan.md`                             | Technical roadmap                 |
-| `docs/roadmaps/combat_roadmap.md`                         | **Combat phases**                 |
-| `docs/roadmaps/content_expansion_roadmap.md`              | **📦 Content expansion phases**   |
-| `docs/roadmaps/unity_integration_roadmap.md`              | **🎮 Unity integration phases**   |
-| `docs/roadmaps/game_features_roadmap.md`                  | **🎯 Game features phases**       |
-| `docs/roadmaps/testing_roadmap.md`                        | **🧪 Testing improvement phases** |
-| `docs/combat_use_cases.md`                                | **All battle cases**              |
-| `docs/architecture/action_system_spec.md`                 | **⭐ Action system**              |
-| `docs/architecture/effects_bible.md`                      | **📖 Effects guide**              |
-| `docs/unity_integration.md`                               | Unity setup guide                 |
-| `CONTRIBUTING.md`                                         | Git workflow & rules              |
-| `docs/architecture/combat_system_spec.md`                 | Combat system design              |
-| `docs/checklists/pre_implementation.md`                   | **Before coding**                 |
-| `docs/checklists/feature_complete.md`                     | After coding                      |
-| `docs/workflow/troubleshooting.md`                        | **Problem-solving guide**         |
-| `docs/workflow/refactoring_guide.md`                      | **Safe refactoring process**      |
-| `docs/testing/integration_testing_guide.md`               | **Integration test patterns**     |
-| `docs/testing/test_structure_definition.md`               | **⭐ Test structure standard**    |
-| `docs/testing/test_reorganization_implementation_task.md` | **Test reorganization task**      |
-| `docs/anti-patterns.md`                                   | What NOT to do                    |
+| Document                                                                   | Purpose                                    |
+| -------------------------------------------------------------------------- | ------------------------------------------ |
+| `docs/features_master_list.md`                                             | **📋 Feature numbering and naming**        |
+| `docs/ai/guidelines/project_guidelines.md`                                 | 24+ coding rules                           |
+| `.cursorrules`                                                             | **AI workflow rules**                      |
+| `docs/implementation_plan.md`                                              | Technical roadmap                          |
+| `docs/features/2-combat-system/roadmap.md`                                 | **Combat phases**                          |
+| `docs/features/3-content-expansion/roadmap.md`                             | **📦 Content expansion phases**            |
+| `docs/features/1-pokemon-data/roadmap.md`                                  | **📊 Pokemon data fields spec**            |
+| `docs/features/1-pokemon-data/1.3-variants-system/architecture.md`         | **🔀 Variants system (Mega/Dinamax/Tera)** |
+| `docs/features/4-unity-integration/roadmap.md`                             | **🎮 Unity integration phases**            |
+| `docs/features/5-game-features/roadmap.md`                                 | **🎯 Game features phases**                |
+| `docs/features/2-combat-system/use_cases.md`                               | **All battle cases**                       |
+| `docs/features/2-combat-system/2.5-combat-actions/architecture.md`         | **⭐ Action system**                       |
+| `docs/features/2-combat-system/2.5-combat-actions/effects/architecture.md` | **📖 Effects guide**                       |
+| `docs/features/4-unity-integration/architecture.md`                        | Unity setup guide                          |
+| `CONTRIBUTING.md`                                                          | Git workflow & rules                       |
+| `docs/features/2-combat-system/architecture.md`                            | Combat system design                       |
+| `docs/ai/checklists/pre_implementation.md`                                 | **Before coding**                          |
+| `docs/ai/checklists/feature_complete.md`                                   | After coding                               |
+| `docs/ai/workflow/troubleshooting.md`                                      | **Problem-solving guide**                  |
+| `docs/ai/workflow/refactoring_guide.md`                                    | **Safe refactoring process**               |
+| `docs/features/2-combat-system/testing/integration_guide.md`               | **Integration test patterns**              |
+| `docs/ai/testing_structure_definition.md`                                  | **⭐ Test structure standard**             |
+| `docs/features/1-pokemon-data/testing.md`                                  | **📊 Pokemon data testing strategy**       |
+| `docs/features/README.md`                                                  | **Features overview**                      |
+| `docs/ai/anti-patterns.md`                                                 | What NOT to do                             |
 
 ---
 

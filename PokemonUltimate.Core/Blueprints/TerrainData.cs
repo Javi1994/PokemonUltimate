@@ -7,6 +7,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// Immutable data defining a terrain condition's effects.
     /// Terrains only affect "grounded" Pokemon (not Flying, Levitate, or Air Balloon).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.6: Field Conditions Data
+    /// **Documentation**: See `docs/features/1-game-data/1.6-field-conditions-data/README.md`
+    /// </remarks>
     public sealed class TerrainData
     {
         #region Identity

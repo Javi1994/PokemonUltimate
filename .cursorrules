@@ -1,174 +1,88 @@
 # PokemonUltimate - Cursor AI Rules
 
-> These rules are automatically loaded by Cursor for every conversation.
+> **Quick reference for AI assistants. For detailed guidelines, see referenced documents.**
 
 ## 🚀 Automatic Context Loading
 
-**ALWAYS read these files at the start of any task:**
-1. `.ai/context.md` - Current project state, phase, completed systems
-2. `docs/project_guidelines.md` - 24+ mandatory coding rules
+**ALWAYS read at start:**
+1. `.ai/context.md` - Current project state
+2. `docs/ai/guidelines/project_guidelines.md` - Complete coding rules
 
-**Read on-demand based on task:**
-- New feature → `docs/architecture/[relevant].md`
-- Code quality → `docs/anti-patterns.md`
-- Examples needed → `docs/examples/good_code.md`
+**Read on-demand:**
+- Feature docs → `docs/features_master_list.md` → `docs/features/[N]-[feature-name]/`
+- Code quality → `docs/ai/anti-patterns.md`
+- Examples → `docs/ai/examples/good_code.md`
+- Feature naming → `docs/ai/guidelines/feature_naming_in_code.md`
 
 ## 📋 Development Workflow
 
 ### When User Says "Implement X" or "Add X"
-**MANDATORY WORKFLOW - Follow ALL steps in order:**
+
+**MANDATORY WORKFLOW:**
 
 1. **Read Context & Specs**
-   - Read `.ai/context.md` to understand current state
-   - **CRITICAL: Check relevant roadmap in `docs/roadmaps/`** (if feature is part of a roadmap phase)
-   - **CRITICAL: Read relevant architecture doc in `docs/architecture/`**
-   - If spec is incomplete or missing details, **COMPLETE IT FIRST**
-   - Identify ALL requirements from the spec and roadmap
-   - Note any elements to defer to later phases
-   - Understand the expected API (method names, parameters)
-   - Check roadmap for dependencies and phase status
+   - Read `.ai/context.md` and `docs/features_master_list.md`
+   - Read `docs/features/[N]-[feature-name]/architecture.md` (always use numbered format)
+   - **MANDATORY: Read existing code** - See `code_location.md`, read all related classes
+   - Understand existing patterns before writing
 
 2. **Verify Spec Completeness**
-   - List what will be implemented vs deferred
-   - Ensure spec has all necessary details (interfaces, classes, methods, examples)
-   - If spec is incomplete, update it before implementation
-   - Document any API changes from spec (with rationale)
+   - List what to implement vs defer
+   - Complete spec if incomplete
 
-3. **TDD: Write Functional Tests FIRST**
-   - **CRITICAL: Follow test structure in `docs/testing/test_structure_definition.md`**
-   - **Test Location**: 
-     - System tests → `Systems/[Module]/[Component]Tests.cs`
-     - Blueprint tests → `Blueprints/[Blueprint]Tests.cs`
-     - Data tests → `Data/Pokemon/[Pokemon]Tests.cs`, `Data/Moves/[Move]Tests.cs`, etc.
-     - Catalog tests → `Data/Catalogs/[Catalog]Tests.cs` (general catalog tests)
-   - Create test file following naming: `[Feature]Tests.cs`
-   - Write tests for ALL main scenarios from the spec
-   - Use naming: `MethodName_Scenario_ExpectedResult`
-   - Tests should compile but fail (red phase)
+3. **TDD: Write Tests FIRST**
+   - Follow `docs/ai/testing_structure_definition.md`
+   - Write functional tests (red phase)
 
 4. **Implement Feature**
-   - Follow the spec exactly
-   - Use existing patterns from codebase
-   - Follow all coding rules (no magic strings, fail-fast, etc.)
+   - **MANDATORY: Read existing code first** - Match style and patterns
+   - **MANDATORY: Add feature references** - ALL code must reference its feature (see `docs/ai/guidelines/feature_naming_in_code.md`)
+   - Follow spec and existing patterns
    - Make tests pass (green phase)
 
 5. **Write Edge Case Tests**
-   - Create `[Feature]EdgeCasesTests.cs` in same directory as functional tests
-   - Test null inputs, boundary conditions, invalid states
-   - Test real-world scenarios
-   - **If tests reveal missing functionality → implement it immediately** (Test-Driven Discovery)
+   - Test boundaries and invalid inputs
+   - Implement missing functionality if discovered
 
-6. **Write Integration Tests** (MANDATORY if feature interacts with multiple systems)
-   - **When Required:**
-     - Feature creates actions that interact with BattleQueue
-     - Feature modifies state that affects other systems
-     - Feature is a system boundary (e.g., Status → End-of-Turn → Damage)
-     - Feature coordinates multiple components (e.g., CombatEngine → TurnOrderResolver → BattleQueue)
-   - **What to Test:**
-     - System interactions (A → B → C)
-     - Cascading effects (Action → Reaction → Outcome)
-     - State consistency across systems
-   - **Where:** Create `[Feature]IntegrationTests.cs` in `Systems/[Module]/Integration/[Category]/`
-     - Actions integration → `Systems/Combat/Integration/Actions/`
-     - Damage integration → `Systems/Combat/Integration/Damage/`
-     - Engine integration → `Systems/Combat/Integration/Engine/`
-     - System integration → `Systems/Combat/Integration/System/`
-   - **Naming:** `[System1]_[System2]_[ExpectedBehavior]`
-   - **If Unsure:** Ask "Does this feature work with other systems?" If yes → Write integration tests
+6. **Write Integration Tests** (if feature interacts with multiple systems)
+   - Test system interactions
+   - Place in `Systems/[Module]/Integration/`
 
-7. **Validate Against Use Cases** (Combat features only)
-   - Read relevant sections of `docs/combat_use_cases.md`
-   - Verify implementation covers all listed behaviors
-   - Mark items as complete in the use cases document
-   - Document any deferred items with rationale
-   - **If use case reveals missing functionality → implement it immediately**
+7. **Validate Against Use Cases** (combat features only)
+   - Check `docs/combat_use_cases.md`
+   - Mark items complete
 
 8. **Verify Implementation**
-   - Run `dotnet build` - Verify no warnings
-   - Run `dotnet test` - Verify all tests pass
-   - Check `docs/checklists/feature_complete.md` for final verification
-   - Mention test count in response
+   - `dotnet build` - 0 warnings
+   - `dotnet test` - All pass
+   - Check `docs/ai/checklists/feature_complete.md`
 
 9. **Update Documentation**
-   - **Immediate Updates** (before moving on):
-     - Update `.ai/context.md` with new state (phase, test count, completed systems)
-     - Mark use cases as complete in `docs/combat_use_cases.md` (if applicable)
-     - **Update relevant roadmap** - Mark phase as complete, update test counts, note any deviations
-     - Update test count in response
-   
-   - **If API Changed:**
-     - Update relevant architecture doc in `docs/architecture/`
-     - Note changes in spec document with rationale
-     - Update roadmap if API changes affect planned phases
-   
-   - **If New Pattern Introduced:**
-     - Create new architecture doc OR update existing pattern doc
-     - Document rationale in `.ai/context.md` under "Key Architectural Decisions"
-   
-   - **Status Documents:**
-     - Update phase-specific status docs (e.g., `player_input_status.md`) if they exist
-     - Update roadmap completion status
+   - Update `.ai/context.md`
+   - Update roadmap if phase complete
+   - Mark use cases complete (if applicable)
 
 ### When User Says "Review X" or "Check X"
-1. Read `docs/anti-patterns.md`
-2. Verify against `docs/project_guidelines.md`
-3. Check `docs/checklists/feature_complete.md` for completeness
-4. List issues found
-5. Fix issues if requested
-
-### When User Says "Edge Cases" or "Test X"
-1. Read `docs/examples/good_tests.md` for patterns
-2. Apply boundary testing (min/max values)
-3. Test invalid inputs (null, negative, overflow)
-4. Add real-world verification if applicable
-5. If tests reveal missing functionality → implement it
+1. Read `docs/ai/anti-patterns.md`
+2. Verify against `docs/ai/guidelines/project_guidelines.md`
+3. Check `docs/ai/checklists/feature_complete.md`
+4. List issues and fix if requested
 
 ### When User Says "Refactor X" or "Improve X"
-1. **Identify Scope**
-   - Read current implementation
-   - Identify what needs improvement
-   - Check `docs/anti-patterns.md` for violations
-   - Verify tests exist (if not, write them first using TDD)
+1. **Read current implementation** - All related code files
+2. Identify improvements, check `docs/ai/anti-patterns.md`
+3. Make small incremental changes
+4. Run tests after each change
+5. **Ensure feature references exist** - All code must reference its feature
 
-2. **Refactor Safely**
-   - Make small, incremental changes
-   - Run tests after each change
-   - Maintain API compatibility (or document breaking changes)
-   - Follow existing patterns from codebase
+### When Issues Arise
 
-3. **Update Documentation**
-   - Update architecture docs if pattern changed
-   - Update `.ai/context.md` if significant
-   - Document rationale for changes
+**Spec incomplete** → Complete spec first  
+**Spec incorrect** → Document discrepancy, fix spec or implementation  
+**Test reveals missing functionality** → Implement immediately (Test-Driven Discovery)  
+**Architectural change needed** → Document discovery, evaluate impact, update architecture
 
-### When Issues Arise During Implementation
-
-**If Spec is Incomplete:**
-1. Stop implementation
-2. Complete the spec first in `docs/architecture/`
-3. Document what was missing
-4. Resume implementation
-
-**If Spec is Incorrect:**
-1. Document the discrepancy
-2. Decide: Fix spec or change implementation?
-3. If changing implementation, update spec to match
-4. Note decision in `.ai/context.md` under "Key Architectural Decisions"
-
-**If Discovery Requires Architectural Change:**
-1. Pause current work
-2. Document the discovery
-3. Evaluate impact on other systems
-4. Update architecture docs if needed
-5. Resume with updated understanding
-
-**If Test Reveals Missing Functionality:**
-1. **DO NOT** skip the test or mark it as "future work"
-2. Implement the missing functionality immediately (Test-Driven Discovery)
-3. Update spec/documentation if needed
-4. Continue until feature is complete
-
-## ✅ Mandatory Rules (Always Apply)
+## ✅ Mandatory Rules
 
 ### Code Quality
 - **NO magic strings** → Use `ErrorMessages.cs` or `GameMessages.cs`
@@ -180,64 +94,42 @@
 ### Architecture
 - **Core/** → Logic only, NO game data
 - **Content/** → Game data, catalogs, builders
-- **Tests/** → Organized by purpose: Systems/, Blueprints/, Data/
-  - **Systems/** → Tests de sistemas (CÓMO funcionan)
-  - **Blueprints/** → Tests de estructura de datos (CÓMO son)
-  - **Data/** → Tests de contenido específico (QUÉ contienen)
+- **Tests/** → Systems/, Blueprints/, Data/ (see `docs/ai/testing_structure_definition.md`)
 - **Blueprints** → Immutable (no setters)
 - **Instances** → Mutable runtime state
 
 ### Testing
-- **Test Structure** → MUST follow `docs/testing/test_structure_definition.md`
-  - **Systems/** → Tests de sistemas (CÓMO funcionan)
-  - **Blueprints/** → Tests de estructura de datos (CÓMO son)
-  - **Data/** → Tests de contenido específico (QUÉ contienen)
-- **Test Types**:
-  - Functional: `*Tests.cs` - Comportamiento normal
-  - Edge Cases: `*EdgeCasesTests.cs` - Casos límite
-  - Integration: `*IntegrationTests.cs` - Integración entre sistemas (en `Systems/*/Integration/`)
-- **Data Organization** → Un archivo por cada elemento en `Data/Pokemon/`, `Data/Moves/`, etc.
-  - Tests generales de catálogos en `Data/Catalogs/` (PokemonCatalogTests.cs, MoveCatalogTests.cs)
 - **TDD** → Tests before implementation
+- **Three-phase** → Functional → Edge Cases → Integration
 - **Naming** → `MethodName_Scenario_ExpectedResult`
-- **Three-phase** → Functional tests, then edge cases, then integration tests
-- **Real-world** → Verify against official game data when applicable
 - **Test-Driven Discovery** → If test reveals missing functionality, implement it
+- **Structure** → Follow `docs/ai/testing_structure_definition.md`
 
 ### Documentation
 - **XML docs** → All public APIs
+- **MANDATORY: Feature references** → ALL classes must reference their feature (see `docs/ai/guidelines/feature_naming_in_code.md`)
+- **MANDATORY: Read before write** → Never write code without reading existing code first
+- **MANDATORY: Match existing patterns** → Follow style, naming, structure of existing code
 - **Update context** → After major features
-- **Document decisions** → Architectural changes go in `.ai/context.md`
 
 ## 🔍 Quick Reference
 
 ### Exception Messages
 ```csharp
-// ✅ Correct
 throw new ArgumentException(ErrorMessages.AmountCannotBeNegative, nameof(amount));
-
-// ❌ Wrong
-throw new Exception("Amount cannot be negative");
 ```
 
 ### Test Pattern
 ```csharp
 [Test]
-public void MethodName_Scenario_ExpectedResult()
-{
-    // Arrange
-    // Act
-    // Assert
-}
+public void MethodName_Scenario_ExpectedResult() { /* Arrange, Act, Assert */ }
 ```
 
 ### Validation Pattern
 ```csharp
-public void Method(int value)
-{
+public void Method(int value) {
     if (value < 0)
         throw new ArgumentException(ErrorMessages.ValueCannotBeNegative, nameof(value));
-    
     // Main logic
 }
 ```
@@ -247,19 +139,18 @@ public void Method(int value)
 | Need | Read |
 |------|------|
 | Project state | `.ai/context.md` |
-| Coding rules | `docs/project_guidelines.md` |
-| What NOT to do | `docs/anti-patterns.md` |
-| Code examples | `docs/examples/good_code.md` |
-| Test examples | `docs/examples/good_tests.md` |
-| Pre-implementation | `docs/checklists/pre_implementation.md` |
-| Feature checklist | `docs/checklists/feature_complete.md` |
-| Combat specs | `docs/architecture/combat_system_spec.md` |
-| Damage formula | `docs/architecture/damage_and_effect_system.md` |
-| Integration tests | `docs/testing/integration_testing_guide.md` |
-| Test structure | `docs/testing/test_structure_definition.md` |
-| Test reorganization | `docs/testing/test_reorganization_implementation_task.md` |
-| Troubleshooting | `docs/workflow/troubleshooting.md` |
-| Refactoring | `docs/workflow/refactoring_guide.md` |
+| Feature numbers/names | `docs/features_master_list.md` ⭐ **MASTER REFERENCE** |
+| Feature documentation standard | `docs/feature_documentation_standard.md` |
+| Feature naming in code | `docs/ai/guidelines/feature_naming_in_code.md` ⭐ **MANDATORY** |
+| Coding rules | `docs/ai/guidelines/project_guidelines.md` |
+| What NOT to do | `docs/ai/anti-patterns.md` |
+| Code examples | `docs/ai/examples/good_code.md` |
+| Test examples | `docs/ai/examples/good_tests.md` |
+| Pre-implementation | `docs/ai/checklists/pre_implementation.md` |
+| Feature checklist | `docs/ai/checklists/feature_complete.md` |
+| Test structure | `docs/ai/testing_structure_definition.md` |
+
+**⚠️ Feature Documentation**: Always use numbered paths: `docs/features/[N]-[feature-name]/`
 
 ## 🔄 After Completing Work
 
@@ -268,18 +159,19 @@ Always:
 2. Run `dotnet test` - Verify all pass
 3. Update `.ai/context.md` if major changes
 4. Mention test count in response
-5. Verify against `docs/checklists/feature_complete.md`
+5. Verify against `docs/ai/checklists/feature_complete.md`
 
 ## ⚡ Quick Verification Checklist
 
-Before marking feature complete, verify:
+Before marking feature complete:
 - [ ] All tests pass (`dotnet test`)
 - [ ] No warnings (`dotnet build`)
 - [ ] `.ai/context.md` updated
 - [ ] Use cases validated (if combat-related)
 - [ ] Integration tests written (if applicable)
 - [ ] Documentation updated
-- [ ] Test count mentioned in response
+- [ ] **Feature references added** - All code references its feature
+- [ ] **Existing code reviewed** - All related code was read before implementation
 
 ## 🎮 Project-Specific Knowledge
 
@@ -297,6 +189,47 @@ Before marking feature complete, verify:
 - Blueprints in `Content/Catalogs/Pokemon/`
 - Moves in `Content/Catalogs/Moves/`
 - Effects implement `IMoveEffect`
+
+### Feature Documentation
+
+**⚠️ CRITICAL: Always use numbered feature format**
+
+- **Features**: `docs/features/[N]-[feature-name]/` (e.g., `docs/features/2-combat-system/`)
+- **Sub-Features**: `docs/features/[N]-[feature-name]/[N.M]-[sub-feature-name]/`
+- **Display Names**: `Feature [N]: [Feature Name]` or `[N]: [Feature Name]`
+- **Master Reference**: `docs/features_master_list.md`
+
+**See**: `docs/feature_documentation_standard.md` for complete guide
+
+### Feature Naming in Code
+
+**⚠️ MANDATORY: ALL code must reference its feature**
+
+- **When**: ALL classes and interfaces (no exceptions)
+- **Format**: Add `<remarks>` section with feature number and documentation path
+- **Example**:
+  ```csharp
+  /// <remarks>
+  /// **Feature**: 2: Combat System
+  /// **Sub-Feature**: 2.6: Combat Engine
+  /// **Documentation**: See `docs/features/2-combat-system/2.6-combat-engine/architecture.md`
+  /// </remarks>
+  ```
+
+**See**: `docs/ai/guidelines/feature_naming_in_code.md` for complete guidelines
+
+### Code Reading Before Writing
+
+**⚠️ MANDATORY: Never write code without reading existing code first**
+
+- Read `code_location.md` to find where code lives
+- Read all existing classes/interfaces in the feature's namespace
+- Understand existing patterns, naming conventions, and structure
+- Match existing code style and organization
+
+**Rule**: If you haven't read the existing code, you cannot write new code
+
+**See**: `docs/ai/guidelines/project_guidelines.md` Section 5.7 for complete guidelines
 
 ### Current Phase
 - ✅ Phase 1: Core Data (Complete)

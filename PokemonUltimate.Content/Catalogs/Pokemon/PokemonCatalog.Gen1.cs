@@ -8,6 +8,11 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
     /// Generation 1 Pokemon (Kanto region, #001-151).
     /// Defined in reverse evolution order so evolutions can reference targets.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.1: Pokemon Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.1-pokemon-expansion/architecture.md`
+    /// </remarks>
     public static partial class PokemonCatalog
     {
         // ===== GRASS STARTER LINE (Venusaur → Ivysaur → Bulbasaur) =====
@@ -168,8 +173,8 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
                 .StartsWith(Moves.MoveCatalog.Tackle, Moves.MoveCatalog.Growl)
                 .AtLevel(15, Moves.MoveCatalog.QuickAttack))
             .Build();
-            // Note: Eevee evolutions would reference Vaporeon, Jolteon, etc.
-            // which aren't defined yet. We'll add them when we have those Pokemon.
+        // Note: Eevee evolutions would reference Vaporeon, Jolteon, etc.
+        // which aren't defined yet. We'll add them when we have those Pokemon.
 
         public static readonly PokemonSpeciesData Snorlax = Builders.Pokemon.Define("Snorlax", 143)
             .Type(PokemonType.Normal)

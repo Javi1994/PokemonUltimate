@@ -13,6 +13,10 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
     /// Each generation file (PokemonCatalog.Gen1.cs, etc.) adds its Pokemon.
     /// </summary>
     /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.1: Pokemon Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.1-pokemon-expansion/architecture.md`
+    /// 
     /// Pokemon names are trademarks of Nintendo/Game Freak. Non-commercial fan project.
     /// </remarks>
     public static partial class PokemonCatalog

@@ -13,6 +13,11 @@ namespace PokemonUltimate.BattleDemo
     /// Console implementation of IBattleView for visual battle display.
     /// Shows battle state, messages, and animations in the console.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.7: Integration
+    /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
+    /// </remarks>
     public class ConsoleBattleView : IBattleView
     {
         private BattleField? _field;

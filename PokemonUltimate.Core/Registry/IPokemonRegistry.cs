@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Registry
     /// Contract for a registry that handles Pokemon-specific lookups.
     /// Supports lookup by Name (string) or PokedexNumber (int).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.13: Registry System
+    /// **Documentation**: See `docs/features/1-game-data/1.13-registry-system/architecture.md`
+    /// </remarks>
     public interface IPokemonRegistry : IDataRegistry<PokemonSpeciesData>
     {
         /// <summary>

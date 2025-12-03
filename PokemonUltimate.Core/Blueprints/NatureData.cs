@@ -8,18 +8,23 @@ namespace PokemonUltimate.Core.Blueprints
     /// Each nature gives +10% to one stat and -10% to another.
     /// Neutral natures have no effect.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.1: Pokemon Data
+    /// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/architecture.md`
+    /// </remarks>
     public static class NatureData
     {
         /// <summary>
         /// Stat modifier multiplier for boosted stat.
         /// </summary>
         public const float BoostMultiplier = 1.1f;
-        
+
         /// <summary>
         /// Stat modifier multiplier for reduced stat.
         /// </summary>
         public const float ReduceMultiplier = 0.9f;
-        
+
         /// <summary>
         /// No modification multiplier.
         /// </summary>
@@ -37,31 +42,31 @@ namespace PokemonUltimate.Core.Blueprints
                 { Nature.Serious, (null, null) },
                 { Nature.Bashful, (null, null) },
                 { Nature.Quirky, (null, null) },
-                
+
                 // Attack boosting
                 { Nature.Lonely, (Stat.Attack, Stat.Defense) },
                 { Nature.Brave, (Stat.Attack, Stat.Speed) },
                 { Nature.Adamant, (Stat.Attack, Stat.SpAttack) },
                 { Nature.Naughty, (Stat.Attack, Stat.SpDefense) },
-                
+
                 // Defense boosting
                 { Nature.Bold, (Stat.Defense, Stat.Attack) },
                 { Nature.Relaxed, (Stat.Defense, Stat.Speed) },
                 { Nature.Impish, (Stat.Defense, Stat.SpAttack) },
                 { Nature.Lax, (Stat.Defense, Stat.SpDefense) },
-                
+
                 // Speed boosting
                 { Nature.Timid, (Stat.Speed, Stat.Attack) },
                 { Nature.Hasty, (Stat.Speed, Stat.Defense) },
                 { Nature.Jolly, (Stat.Speed, Stat.SpAttack) },
                 { Nature.Naive, (Stat.Speed, Stat.SpDefense) },
-                
+
                 // Special Attack boosting
                 { Nature.Modest, (Stat.SpAttack, Stat.Attack) },
                 { Nature.Mild, (Stat.SpAttack, Stat.Defense) },
                 { Nature.Quiet, (Stat.SpAttack, Stat.Speed) },
                 { Nature.Rash, (Stat.SpAttack, Stat.SpDefense) },
-                
+
                 // Special Defense boosting
                 { Nature.Calm, (Stat.SpDefense, Stat.Attack) },
                 { Nature.Gentle, (Stat.SpDefense, Stat.Defense) },
@@ -101,12 +106,12 @@ namespace PokemonUltimate.Core.Blueprints
         public static float GetStatMultiplier(Nature nature, Stat stat)
         {
             var (increased, decreased) = _modifiers[nature];
-            
+
             if (increased == stat)
                 return BoostMultiplier;
             if (decreased == stat)
                 return ReduceMultiplier;
-            
+
             return NeutralMultiplier;
         }
     }

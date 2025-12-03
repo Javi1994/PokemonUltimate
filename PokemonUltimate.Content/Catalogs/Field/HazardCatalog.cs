@@ -8,6 +8,11 @@ namespace PokemonUltimate.Content.Catalogs.Field
     /// <summary>
     /// Central catalog of all entry hazard definitions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.14: Hazards System
+    /// **Documentation**: See `docs/features/2-combat-system/2.14-hazards-system/architecture.md`
+    /// </remarks>
     public static class HazardCatalog
     {
         private static readonly List<HazardData> _all = new List<HazardData>();

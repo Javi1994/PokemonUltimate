@@ -9,6 +9,11 @@ namespace PokemonUltimate.Combat.Actions
     /// A simple action that displays a message.
     /// Used for battle text like "Pikachu used Thunderbolt!" or "It's super effective!".
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public class MessageAction : BattleAction
     {
         /// <summary>

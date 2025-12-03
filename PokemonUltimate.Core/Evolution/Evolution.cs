@@ -9,6 +9,11 @@ namespace PokemonUltimate.Core.Evolution
     /// Represents a possible evolution for a Pokemon species.
     /// Contains the target species and the conditions required.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.7: Evolution System
+    /// **Documentation**: See `docs/features/1-game-data/1.7-evolution-system/architecture.md`
+    /// </remarks>
     public class Evolution
     {
         /// <summary>

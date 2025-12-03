@@ -9,6 +9,11 @@ namespace PokemonUltimate.Core.Factories
     /// Calculates type effectiveness for damage calculations.
     /// Implements the complete Gen6+ type chart.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.8: Type Effectiveness Table
+    /// **Documentation**: See `docs/features/1-game-data/1.8-type-effectiveness-table/README.md`
+    /// </remarks>
     public static class TypeEffectiveness
     {
         #region Constants

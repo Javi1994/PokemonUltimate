@@ -11,6 +11,11 @@ namespace PokemonUltimate.Combat.Events
     /// Adapts ItemData to IBattleListener interface.
     /// Converts item triggers to battle actions based on item configuration.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.9: Abilities & Items
+    /// **Documentation**: See `docs/features/2-combat-system/2.9-abilities-items/architecture.md`
+    /// </remarks>
     public class ItemListener : IBattleListener
     {
         private readonly ItemData _itemData;

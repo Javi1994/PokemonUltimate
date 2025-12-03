@@ -7,6 +7,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// Immutable data defining a field effect's behavior.
     /// Field effects affect the entire battlefield (both sides).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.6: Field Conditions Data
+    /// **Documentation**: See `docs/features/1-game-data/1.6-field-conditions-data/README.md`
+    /// </remarks>
     public sealed class FieldEffectData
     {
         #region Identity
@@ -219,8 +224,8 @@ namespace PokemonUltimate.Core.Blueprints
         /// </summary>
         public PokemonType GetEffectiveMoveType(PokemonType originalType)
         {
-            if (ChangesMovesFromType.HasValue && 
-                ChangesMovesToType.HasValue && 
+            if (ChangesMovesFromType.HasValue &&
+                ChangesMovesToType.HasValue &&
                 originalType == ChangesMovesFromType.Value)
             {
                 return ChangesMovesToType.Value;

@@ -13,6 +13,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Queue
     /// <summary>
     /// Edge case tests for BattleQueue - boundary conditions and error handling.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.2: Action Queue System
+    /// **Documentation**: See `docs/features/2-combat-system/2.2-action-queue-system/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class BattleQueueEdgeCasesTests
     {

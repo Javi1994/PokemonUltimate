@@ -7,6 +7,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// Immutable data defining a side condition's behavior.
     /// Side conditions affect all Pokemon on one side of the field.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.6: Field Conditions Data
+    /// **Documentation**: See `docs/features/1-game-data/1.6-field-conditions-data/README.md`
+    /// </remarks>
     public sealed class SideConditionData
     {
         #region Identity
@@ -77,7 +82,7 @@ namespace PokemonUltimate.Core.Blueprints
         /// <summary>
         /// Whether this condition reduces damage.
         /// </summary>
-        public bool ReducesDamage => ReducesDamageFrom.HasValue || 
+        public bool ReducesDamage => ReducesDamageFrom.HasValue ||
             (DamageMultiplierSingles < 1.0f && DamageMultiplierSingles > 0f);
 
         #endregion
@@ -238,7 +243,7 @@ namespace PokemonUltimate.Core.Blueprints
         /// </summary>
         public int GetDuration(string heldItem)
         {
-            if (!string.IsNullOrEmpty(ExtendingItem) && 
+            if (!string.IsNullOrEmpty(ExtendingItem) &&
                 !string.IsNullOrEmpty(heldItem) &&
                 heldItem.Equals(ExtendingItem, StringComparison.OrdinalIgnoreCase))
             {

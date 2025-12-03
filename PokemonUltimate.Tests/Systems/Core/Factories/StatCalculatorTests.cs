@@ -4,6 +4,14 @@ using PokemonUltimate.Core.Factories;
 
 namespace PokemonUltimate.Tests.Systems.Core.Factories
 {
+    /// <summary>
+    /// Tests for StatCalculator - Pokemon stat calculation using Gen3+ formula.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.1: PokemonSpeciesData (Blueprint)
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class StatCalculatorTests
     {

@@ -11,6 +11,11 @@ namespace PokemonUltimate.Combat
     /// Manages the sequential processing of battle actions.
     /// Actions are processed in order: Logic (instant) -> Visual (async) -> Reactions (inserted at front).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.2: Action Queue
+    /// **Documentation**: See `docs/features/2-combat-system/2.2-action-queue/architecture.md`
+    /// </remarks>
     public class BattleQueue
     {
         private const int MaxIterations = 1000;

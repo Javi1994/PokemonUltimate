@@ -3,6 +3,11 @@ namespace PokemonUltimate.Combat.Actions
     /// <summary>
     /// Types of actions a player can choose during battle.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public enum BattleActionType
     {
         /// <summary>

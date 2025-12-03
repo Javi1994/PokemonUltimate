@@ -3,6 +3,11 @@ namespace PokemonUltimate.Core.Enums
     /// <summary>
     /// Conditions that affect one side of the battlefield.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.10: Enums & Constants
+    /// **Documentation**: See `docs/features/1-game-data/1.10-enums-constants/README.md`
+    /// </remarks>
     public enum SideCondition
     {
         /// <summary>No condition.</summary>

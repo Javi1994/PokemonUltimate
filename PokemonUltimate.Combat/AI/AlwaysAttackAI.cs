@@ -12,6 +12,11 @@ namespace PokemonUltimate.Combat.AI
     /// Simple AI that always uses the first available move.
     /// Used for testing and predictable enemy behavior.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.7: Integration
+    /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
+    /// </remarks>
     public class AlwaysAttackAI : IActionProvider
     {
         /// <summary>

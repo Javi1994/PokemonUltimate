@@ -10,6 +10,11 @@ namespace PokemonUltimate.Content.Builders
     /// Fluent builder for creating PokemonSpeciesData instances.
     /// Usage: Pokemon.Define("Pikachu", 25).Type(Electric).Stats(...).Build()
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.11: Builders
+    /// **Documentation**: See `docs/features/1-game-data/1.11-builders/architecture.md`
+    /// </remarks>
     public class PokemonBuilder
     {
         private readonly PokemonSpeciesData _pokemon;

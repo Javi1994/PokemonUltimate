@@ -8,6 +8,11 @@ namespace PokemonUltimate.Content.Catalogs.Field
     /// <summary>
     /// Central catalog of all side condition definitions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.16: Field Conditions
+    /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/architecture.md`
+    /// </remarks>
     public static class SideConditionCatalog
     {
         private static readonly List<SideConditionData> _all = new List<SideConditionData>();

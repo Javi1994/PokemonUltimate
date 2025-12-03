@@ -13,6 +13,10 @@ namespace PokemonUltimate.Content.Catalogs.Moves
     /// Each type file (MoveCatalog.Fire.cs, etc.) adds its Moves.
     /// </summary>
     /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.2: Move Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.2-move-expansion/architecture.md`
+    /// 
     /// Move names are trademarks of Nintendo/Game Freak. Non-commercial fan project.
     /// </remarks>
     public static partial class MoveCatalog

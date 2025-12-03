@@ -7,6 +7,11 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
     /// <summary>
     /// Generation 3 abilities (Ruby/Sapphire - first abilities).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.4: Ability Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.4-ability-expansion/architecture.md`
+    /// </remarks>
     public static partial class AbilityCatalog
     {
         // ===== STAT MODIFICATION ABILITIES =====

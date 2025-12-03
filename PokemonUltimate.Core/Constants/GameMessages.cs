@@ -4,6 +4,11 @@ namespace PokemonUltimate.Core.Constants
     /// In-game messages for battle feedback and UI.
     /// These are the messages shown to players during gameplay.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.10: Enums & Constants
+    /// **Documentation**: See `docs/features/1-game-data/1.10-enums-constants/README.md`
+    /// </remarks>
     public static class GameMessages
     {
         #region Type Effectiveness

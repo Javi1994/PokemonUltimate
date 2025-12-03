@@ -6,6 +6,14 @@ using Evolution = PokemonUltimate.Core.Evolution.Evolution;
 
 namespace PokemonUltimate.Tests.Systems.Core.Evolution
 {
+    /// <summary>
+    /// Tests for Evolution system - Pokemon evolution conditions and execution.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.5: Evolution System
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class EvolutionTests
     {

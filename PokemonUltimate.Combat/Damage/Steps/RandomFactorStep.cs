@@ -6,6 +6,11 @@ namespace PokemonUltimate.Combat.Damage.Steps
     /// Applies the random damage factor (0.85 to 1.0).
     /// This creates natural variance in damage.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.4: Damage Calculation Pipeline
+    /// **Documentation**: See `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
+    /// </remarks>
     public class RandomFactorStep : IDamageStep
     {
         private const float MinFactor = 0.85f;

@@ -11,6 +11,11 @@ namespace PokemonUltimate.Combat.Helpers
     /// Sorts battle actions by priority and speed to determine turn order.
     /// Centralized turn order resolution system for combat engine.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.3: Turn Order Resolution
+    /// **Documentation**: See `docs/features/2-combat-system/2.3-turn-order-resolution/architecture.md`
+    /// </remarks>
     public static class TurnOrderResolver
     {
         private static readonly Random _random = new Random();

@@ -6,6 +6,11 @@ namespace PokemonUltimate.Combat.Damage.Steps
     /// Determines if the attack is a critical hit and applies the 1.5x multiplier.
     /// Critical hits ignore negative stat stages on the attacker and positive stages on defender.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.4: Damage Calculation Pipeline
+    /// **Documentation**: See `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
+    /// </remarks>
     public class CriticalHitStep : IDamageStep
     {
         private const float CriticalMultiplier = 1.5f;

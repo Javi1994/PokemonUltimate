@@ -12,6 +12,11 @@ namespace PokemonUltimate.Combat.Engine
     /// <summary>
     /// Constants for end-of-turn damage calculations.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.8: End-of-Turn Effects
+    /// **Documentation**: See `docs/features/2-combat-system/2.8-end-of-turn-effects/architecture.md`
+    /// </remarks>
     public static class EndOfTurnConstants
     {
         public const float BurnDamageFraction = 1f / 16f;      // 0.0625
@@ -24,6 +29,11 @@ namespace PokemonUltimate.Combat.Engine
     /// Processes all end-of-turn effects after action queue is empty.
     /// Generates actions for status damage, item effects, and other end-of-turn mechanics.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.8: End-of-Turn Effects
+    /// **Documentation**: See `docs/features/2-combat-system/2.8-end-of-turn-effects/architecture.md`
+    /// </remarks>
     public static class EndOfTurnProcessor
     {
         // Dummy move for status damage context (not used in calculation)

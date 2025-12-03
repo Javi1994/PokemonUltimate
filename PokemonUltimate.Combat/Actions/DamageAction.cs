@@ -12,6 +12,11 @@ namespace PokemonUltimate.Combat.Actions
     /// Uses DamageContext to determine the final damage amount.
     /// Automatically triggers FaintAction if HP reaches zero.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public class DamageAction : BattleAction
     {
         /// <summary>

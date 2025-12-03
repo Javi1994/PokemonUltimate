@@ -11,6 +11,11 @@ namespace PokemonUltimate.Combat
     /// All methods complete immediately without doing anything.
     /// Input methods return default values (first option or null).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.7: Integration
+    /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
+    /// </remarks>
     public class NullBattleView : IBattleView
     {
         /// <summary>

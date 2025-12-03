@@ -13,6 +13,11 @@ namespace PokemonUltimate.Tests.Systems.Core.Registry
     /// Edge case tests for Registry queries and filters.
     /// Tests complex filters, empty results, and boundary conditions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.4: Registry System
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class RegistryEdgeCasesTests
     {

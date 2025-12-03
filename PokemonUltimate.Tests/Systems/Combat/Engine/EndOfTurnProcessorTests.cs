@@ -14,6 +14,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
     /// <summary>
     /// Functional tests for EndOfTurnProcessor - processes end-of-turn effects.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.8: End-of-Turn Effects
+    /// **Documentation**: See `docs/features/2-combat-system/2.8-end-of-turn-effects/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class EndOfTurnProcessorTests
     {

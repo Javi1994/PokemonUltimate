@@ -7,6 +7,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// Immutable data defining an item.
     /// Contains all the information needed to determine how an item behaves.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.4: Item Data
+    /// **Documentation**: See `docs/features/1-game-data/1.4-item-data/README.md`
+    /// </remarks>
     public sealed class ItemData
     {
         #region Core Properties

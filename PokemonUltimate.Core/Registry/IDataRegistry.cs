@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Registry
     /// <summary>
     /// Contract for any system that stores and retrieves data by ID.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.13: Registry System
+    /// **Documentation**: See `docs/features/1-game-data/1.13-registry-system/architecture.md`
+    /// </remarks>
     public interface IDataRegistry<T> where T : IIdentifiable
     {
         /// <summary>

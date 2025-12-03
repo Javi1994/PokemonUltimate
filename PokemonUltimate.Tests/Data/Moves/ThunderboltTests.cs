@@ -8,6 +8,11 @@ namespace PokemonUltimate.Tests.Data.Moves
     /// Tests for Thunderbolt move in MoveCatalog.
     /// Verifies correct data, power, accuracy, category, and effects.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.2: Move Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.2-move-expansion/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class ThunderboltTests
     {

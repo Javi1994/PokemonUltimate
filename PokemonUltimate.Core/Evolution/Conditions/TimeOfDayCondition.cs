@@ -7,6 +7,11 @@ namespace PokemonUltimate.Core.Evolution.Conditions
     /// Evolution condition: Must be a specific time of day.
     /// This condition returns false by default - time context must be provided.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.7: Evolution System
+    /// **Documentation**: See `docs/features/1-game-data/1.7-evolution-system/architecture.md`
+    /// </remarks>
     public class TimeOfDayCondition : IEvolutionCondition
     {
         public EvolutionConditionType ConditionType => EvolutionConditionType.TimeOfDay;

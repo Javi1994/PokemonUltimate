@@ -10,6 +10,11 @@ namespace PokemonUltimate.Combat.Actions
     /// Restores HP to a target Pokemon.
     /// Prevents overhealing (HP cannot exceed MaxHP).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public class HealAction : BattleAction
     {
         /// <summary>

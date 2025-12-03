@@ -16,7 +16,7 @@ This project answers the question:
 
 **The answer: Yes, with the right methodology.**
 
-> **New to the project?** Start with [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) for a quick guide.
+> **New to the project?** Start with [`docs/ai/GETTING_STARTED.md`](docs/ai/GETTING_STARTED.md) for a quick guide.
 
 | Role | Responsibility |
 |------|----------------|
@@ -74,7 +74,7 @@ When issues arise during development:
 
 Safe code improvement follows this pattern:
 
-1. **Identify Scope** - What needs improvement? Check `docs/anti-patterns.md`
+1. **Identify Scope** - What needs improvement? Check `docs/ai/anti-patterns.md`
 2. **Verify Tests Exist** - If not, write tests first using TDD
 3. **Refactor Safely** - Small incremental changes, run tests after each
 4. **Maintain API Compatibility** - Or document breaking changes
@@ -104,8 +104,19 @@ docs/
 │   ├── troubleshooting.md        # Problem-solving guide
 │   └── refactoring_guide.md      # Safe refactoring process
 │
-├── testing/                      # Testing guides
-│   └── integration_testing_guide.md  # Integration test patterns
+├── features/                     # Feature-specific documentation
+│   ├── pokemon-data/            # Pokemon data structure
+│   ├── combat-system/           # Battle engine
+│   ├── content-expansion/        # Adding content
+│   ├── unity-integration/        # Unity integration
+│   ├── game-features/           # Game systems
+│   └── testing/                 # Testing infrastructure
+└── shared/                      # Shared documentation
+    ├── architecture/            # Shared technical specs
+    ├── workflow/                # Process guides
+    ├── checklists/              # Reusable checklists
+    ├── examples/                # Code examples
+    └── prompts/                 # Prompt templates
 │
 ├── examples/                     # Code reference
 │   ├── good_code.md              # Correct patterns to follow
@@ -128,7 +139,7 @@ docs/
 |------|---------|-------------|
 | `.cursorrules` | Rules for every AI conversation | ✅ Yes |
 | `.ai/context.md` | Current project state | ✅ AI reads first |
-| `docs/project_guidelines.md` | 24+ coding rules | ✅ AI reads first |
+| `docs/ai/guidelines/project_guidelines.md` | 24+ coding rules | ✅ AI reads first |
 
 ---
 
@@ -151,25 +162,28 @@ docs/
 
 | Roadmap | Purpose | Status |
 |---------|---------|--------|
-| **Combat System** | `docs/roadmaps/combat_roadmap.md` | Core combat phases (2.1-2.19) | ✅ Core Complete |
-| **Content Expansion** | `docs/roadmaps/content_expansion_roadmap.md` | Pokemon, Moves, Items expansion | ⏳ Planned |
-| **Unity Integration** | `docs/roadmaps/unity_integration_roadmap.md` | Unity UI and integration | ⏳ Planned |
-| **Game Features** | `docs/roadmaps/game_features_roadmap.md` | Progression, roguelike, meta-game | ⏳ Planned |
-| **Testing** | `docs/roadmaps/testing_roadmap.md` | Test coverage and quality improvements | ⏳ Planned |
+| **Combat System** | `docs/features/combat-system/roadmap.md` | Core combat phases (2.1-2.19) | ✅ Core Complete |
+| **Content Expansion** | `docs/features/content-expansion/roadmap.md` | Pokemon, Moves, Items expansion | ⏳ Planned |
+| **Pokemon Data** | `docs/features/pokemon-data/roadmap.md` | Complete data structure fields | ⏳ Planned |
+| **Variants System** | `docs/features/pokemon-data/variants_system.md` | Mega/Dinamax/Tera as separate species | ⏳ Planned |
+| **Unity Integration** | `docs/features/unity-integration/roadmap.md` | Unity UI and integration | ⏳ Planned |
+| **Game Features** | `docs/features/game-features/roadmap.md` | Progression, roguelike, meta-game | ⏳ Planned |
+| **Testing** | `docs/features/testing/roadmap.md` | Test coverage and quality improvements | ⏳ Planned |
 
-See `docs/roadmaps/README.md` for overview of all roadmaps.
+See `docs/features/README.md` for overview of all features.
 
 ## 📋 Workflow Guides
 
 | Guide | Purpose | Link |
 |-------|---------|------|
-| **Pre-Implementation** | Checklist before coding | [`docs/checklists/pre_implementation.md`](docs/checklists/pre_implementation.md) |
-| **Feature Complete** | Checklist before marking done | [`docs/checklists/feature_complete.md`](docs/checklists/feature_complete.md) |
-| **Troubleshooting** | Common issues and solutions | [`docs/workflow/troubleshooting.md`](docs/workflow/troubleshooting.md) |
-| **Refactoring** | Safe code improvement process | [`docs/workflow/refactoring_guide.md`](docs/workflow/refactoring_guide.md) |
-| **Integration Testing** | System integration test patterns | [`docs/testing/integration_testing_guide.md`](docs/testing/integration_testing_guide.md) |
-| **Project Guidelines** | 24+ mandatory coding rules | [`docs/project_guidelines.md`](docs/project_guidelines.md) |
-| **Anti-Patterns** | What NOT to do | [`docs/anti-patterns.md`](docs/anti-patterns.md) |
+| **Pre-Implementation** | Checklist before coding | [`docs/ai/checklists/pre_implementation.md`](docs/ai/checklists/pre_implementation.md) |
+| **Feature Complete** | Checklist before marking done | [`docs/ai/checklists/feature_complete.md`](docs/ai/checklists/feature_complete.md) |
+| **Troubleshooting** | Common issues and solutions | [`docs/ai/workflow/troubleshooting.md`](docs/ai/workflow/troubleshooting.md) |
+| **Refactoring** | Safe code improvement process | [`docs/ai/workflow/refactoring_guide.md`](docs/ai/workflow/refactoring_guide.md) |
+| **Integration Testing** | System integration test patterns | [`docs/features/combat-system/testing/integration_guide.md`](docs/features/combat-system/testing/integration_guide.md) |
+| **Pokemon Data Testing** | Comprehensive Pokemon data testing strategy | [`docs/features/pokemon-data/testing.md`](docs/features/pokemon-data/testing.md) |
+| **Project Guidelines** | 24+ mandatory coding rules | [`docs/ai/guidelines/project_guidelines.md`](docs/ai/guidelines/project_guidelines.md) |
+| **Anti-Patterns** | What NOT to do | [`docs/ai/anti-patterns.md`](docs/ai/anti-patterns.md) |
 
 ---
 
@@ -187,7 +201,7 @@ Create `.cursorrules` with your coding standards:
 ## Automatic Context Loading
 ALWAYS read these files at the start of any task:
 1. `.ai/context.md` - Current project state
-2. `docs/project_guidelines.md` - Coding rules
+2. `docs/ai/guidelines/project_guidelines.md` - Coding rules
 
 ## Development Workflow
 When implementing a feature:
@@ -229,7 +243,7 @@ Maintain `.ai/context.md` with project state:
 
 ### 3. Document Architecture
 
-Write specs before implementation in `docs/architecture/`:
+Write specs before implementation in `docs/features/[feature-name]/architecture.md` or `docs/shared/architecture/`:
 
 ```markdown
 # Feature Specification
@@ -279,7 +293,7 @@ Create verification checklists:
 
 ### 6. Provide Examples
 
-Show the AI what good code looks like in `docs/examples/`:
+Show the AI what good code looks like in `docs/ai/examples/`:
 
 ```markdown
 # Good Code Examples
@@ -420,11 +434,13 @@ dotnet run --project PokemonUltimate.BattleDemo
 ### 🎯 Next Steps
 
 See detailed roadmaps for implementation plans:
-- **Combat System**: `docs/roadmaps/combat_roadmap.md` (Phases 2.12-2.19: Extended features)
-- **Content Expansion**: `docs/roadmaps/content_expansion_roadmap.md` (Phases 3.1-3.6: More Pokemon, Moves, Items)
-- **Unity Integration**: `docs/roadmaps/unity_integration_roadmap.md` (Phases 4.1-4.8: UI and visual integration)
-- **Game Features**: `docs/roadmaps/game_features_roadmap.md` (Phases 5.1-5.6: Progression, roguelike, meta-game)
-- **Testing**: `docs/roadmaps/testing_roadmap.md` (Phases 6.1-6.6: Test coverage and quality)
+- **Combat System**: `docs/features/combat-system/roadmap.md` (Phases 2.12-2.19: Extended features)
+- **Content Expansion**: `docs/features/content-expansion/roadmap.md` (Phases 3.1-3.6: More Pokemon, Moves, Items)
+- **Pokemon Data**: `docs/features/pokemon-data/roadmap.md` (Complete data structure: EXP, Catch, Pokedex fields, Variants)
+- **Variants System**: `docs/features/pokemon-data/variants_system.md` (Mega/Dinamax/Tera as separate species)
+- **Unity Integration**: `docs/features/unity-integration/roadmap.md` (Phases 4.1-4.8: UI and visual integration)
+- **Game Features**: `docs/features/game-features/roadmap.md` (Phases 5.1-5.6: Progression, roguelike, meta-game)
+- **Testing**: Each feature has `testing.md`. Shared strategy: `docs/shared/testing_structure_definition.md`
 
 ---
 
@@ -501,12 +517,12 @@ dotnet test --filter "FullyQualifiedName~CombatEngineTests"
 
 | Document | Purpose |
 |----------|---------|
-| [`docs/architecture/combat_system_spec.md`](docs/architecture/combat_system_spec.md) | Battle system design |
-| [`docs/architecture/action_system_spec.md`](docs/architecture/action_system_spec.md) | BattleAction implementations |
-| [`docs/architecture/damage_and_effect_system.md`](docs/architecture/damage_and_effect_system.md) | Modular damage calculation |
-| [`docs/architecture/player_ai_spec.md`](docs/architecture/player_ai_spec.md) | Input provider system |
-| [`docs/combat_use_cases.md`](docs/combat_use_cases.md) | All battle mechanics |
-| [`docs/combat/actions_bible.md`](docs/combat/actions_bible.md) | Complete actions reference |
+| [`docs/features/combat-system/architecture.md`](docs/features/combat-system/architecture.md) | Battle system design |
+| [`docs/features/combat-system/actions/architecture.md`](docs/features/combat-system/actions/architecture.md) | BattleAction implementations |
+| [`docs/features/combat-system/damage/architecture.md`](docs/features/combat-system/damage/architecture.md) | Modular damage calculation |
+| [`docs/shared/architecture/player_ai_spec.md`](docs/shared/architecture/player_ai_spec.md) | Input provider system |
+| [`docs/features/combat-system/use_cases.md`](docs/features/combat-system/use_cases.md) | All battle mechanics |
+| [`docs/features/combat-system/actions_bible.md`](docs/features/combat-system/actions_bible.md) | Complete actions reference |
 
 ---
 

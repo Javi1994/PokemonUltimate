@@ -8,6 +8,11 @@ namespace PokemonUltimate.Core.Registry
     /// Contract for a registry that handles Move-specific lookups.
     /// Supports lookup by Name (string) and filtering by Type/Category.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.13: Registry System
+    /// **Documentation**: See `docs/features/1-game-data/1.13-registry-system/architecture.md`
+    /// </remarks>
     public interface IMoveRegistry : IDataRegistry<MoveData>
     {
         /// <summary>

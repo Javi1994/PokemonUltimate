@@ -4,7 +4,15 @@ using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Tests.Systems.Effects.Basic
 {
-    // Tests for composing moves with multiple effects
+    /// <summary>
+    /// Tests for composing moves with multiple effects.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.2: MoveData (Blueprint)
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
+    [TestFixture]
     public class MoveEffectCompositionTests
     {
         #region Single Effect Tests

@@ -17,6 +17,11 @@ namespace PokemonUltimate.Tests.Systems.Core.Evolution
     /// Edge case tests for evolution chains and complex evolution scenarios.
     /// Tests multi-stage evolutions, branching paths, and edge conditions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.5: Evolution System
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class EvolutionChainsEdgeCasesTests
     {

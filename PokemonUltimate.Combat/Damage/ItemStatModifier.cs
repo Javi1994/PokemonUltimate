@@ -8,6 +8,11 @@ namespace PokemonUltimate.Combat.Damage
     /// <summary>
     /// Adapter that converts ItemData to IStatModifier for passive stat/damage modifications.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.4: Damage Calculation Pipeline
+    /// **Documentation**: See `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
+    /// </remarks>
     public class ItemStatModifier : IStatModifier
     {
         private readonly ItemData _itemData;

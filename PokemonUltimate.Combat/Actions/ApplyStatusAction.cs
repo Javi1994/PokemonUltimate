@@ -11,6 +11,11 @@ namespace PokemonUltimate.Combat.Actions
     /// Applies a persistent status condition to a Pokemon.
     /// Can also clear status by applying PersistentStatus.None.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public class ApplyStatusAction : BattleAction
     {
         /// <summary>

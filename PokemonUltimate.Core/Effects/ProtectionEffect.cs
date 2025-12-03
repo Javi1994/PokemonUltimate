@@ -7,6 +7,11 @@ namespace PokemonUltimate.Core.Effects
     /// Success rate decreases with consecutive use.
     /// Used by Protect, Detect, King's Shield, Baneful Bunker, etc.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class ProtectionEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.Protection;

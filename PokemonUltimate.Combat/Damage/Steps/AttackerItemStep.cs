@@ -6,6 +6,11 @@ namespace PokemonUltimate.Combat.Damage.Steps
     /// Applies damage multipliers from the attacker's held item.
     /// Handles items like Life Orb that boost damage.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.4: Damage Calculation Pipeline
+    /// **Documentation**: See `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
+    /// </remarks>
     public class AttackerItemStep : IDamageStep
     {
         /// <summary>

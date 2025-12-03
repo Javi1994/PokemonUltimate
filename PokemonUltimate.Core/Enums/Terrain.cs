@@ -5,6 +5,11 @@ namespace PokemonUltimate.Core.Enums
     /// Terrains last 5 turns (8 with Terrain Extender).
     /// Only affects Pokemon that are "grounded" (not Flying, Levitate, or holding Air Balloon).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.10: Enums & Constants
+    /// **Documentation**: See `docs/features/1-game-data/1.10-enums-constants/README.md`
+    /// </remarks>
     public enum Terrain
     {
         /// <summary>No terrain effect.</summary>

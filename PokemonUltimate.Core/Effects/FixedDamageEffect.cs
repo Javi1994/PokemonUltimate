@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// Deals a fixed amount of damage, ignoring stats and type effectiveness.
     /// Used by moves like Dragon Rage (40), Sonic Boom (20), Seismic Toss (level-based).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class FixedDamageEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.FixedDamage;

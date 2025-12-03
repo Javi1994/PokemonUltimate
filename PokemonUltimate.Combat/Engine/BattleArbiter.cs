@@ -7,6 +7,11 @@ namespace PokemonUltimate.Combat
     /// Determines the outcome of a battle by inspecting the battlefield state.
     /// Stateless service that checks win/loss conditions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.6: Combat Engine
+    /// **Documentation**: See `docs/features/2-combat-system/2.6-combat-engine/architecture.md`
+    /// </remarks>
     public static class BattleArbiter
     {
         /// <summary>

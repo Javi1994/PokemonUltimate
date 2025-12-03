@@ -3,6 +3,11 @@ namespace PokemonUltimate.Combat
     /// <summary>
     /// Configuration for a battle, defining the number of slots and other rules.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.1: Battle Foundation
+    /// **Documentation**: See `docs/features/2-combat-system/2.1-battle-foundation/architecture.md`
+    /// </remarks>
     public class BattleRules
     {
         /// <summary>

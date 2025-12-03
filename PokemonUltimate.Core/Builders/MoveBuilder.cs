@@ -10,6 +10,11 @@ namespace PokemonUltimate.Content.Builders
     /// Fluent builder for creating MoveData instances.
     /// Usage: Move.Define("Flamethrower").Type(Fire).Special(90, 100, 15).Build()
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.11: Builders
+    /// **Documentation**: See `docs/features/1-game-data/1.11-builders/architecture.md`
+    /// </remarks>
     public class MoveBuilder
     {
         private readonly MoveData _move;

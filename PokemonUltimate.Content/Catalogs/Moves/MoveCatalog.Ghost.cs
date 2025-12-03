@@ -7,6 +7,11 @@ namespace PokemonUltimate.Content.Catalogs.Moves
     /// <summary>
     /// Ghost-type moves.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.2: Move Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.2-move-expansion/architecture.md`
+    /// </remarks>
     public static partial class MoveCatalog
     {
         public static readonly MoveData Lick = Move.Define("Lick")

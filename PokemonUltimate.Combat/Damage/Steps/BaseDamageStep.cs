@@ -9,6 +9,11 @@ namespace PokemonUltimate.Combat.Damage.Steps
     /// Calculates the base damage using the Gen 3+ formula:
     /// BaseDamage = ((2 * Level / 5 + 2) * Power * Attack / Defense) / 50 + 2
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.4: Damage Calculation Pipeline
+    /// **Documentation**: See `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
+    /// </remarks>
     public class BaseDamageStep : IDamageStep
     {
         public void Process(DamageContext context)

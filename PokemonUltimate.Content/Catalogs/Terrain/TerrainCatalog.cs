@@ -10,6 +10,11 @@ namespace PokemonUltimate.Content.Catalogs.Terrain
     /// All terrains last 5 turns by default (8 with Terrain Extender item).
     /// Terrains only affect "grounded" Pokemon.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.13: Terrain System
+    /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/architecture.md`
+    /// </remarks>
     public static class TerrainCatalog
     {
         private static readonly List<TerrainData> _all = new List<TerrainData>();

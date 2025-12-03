@@ -4,6 +4,11 @@ namespace PokemonUltimate.Combat.Events
     /// Defines key battle events that trigger abilities and items.
     /// These are the main phases where passive effects activate.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.9: Abilities & Items
+    /// **Documentation**: See `docs/features/2-combat-system/2.9-abilities-items/architecture.md`
+    /// </remarks>
     public enum BattleTrigger
     {
         /// <summary>When a Pokemon switches into battle.</summary>

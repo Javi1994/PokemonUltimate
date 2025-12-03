@@ -8,6 +8,11 @@ namespace PokemonUltimate.Core.Builders
     /// <summary>
     /// Fluent builder for creating StatusEffectData.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.11: Builders
+    /// **Documentation**: See `docs/features/1-game-data/1.11-builders/architecture.md`
+    /// </remarks>
     public class StatusEffectBuilder
     {
         private readonly string _id;

@@ -8,6 +8,11 @@ namespace PokemonUltimate.Core.Instances
     /// Created from a MoveData blueprint, tracks current PP for a specific Pokemon.
     /// Supports PP Ups (up to 3, increasing MaxPP by 20% each).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class MoveInstance
     {
         #region Constants

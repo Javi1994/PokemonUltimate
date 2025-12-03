@@ -11,6 +11,11 @@ namespace PokemonUltimate.Combat.Events
     /// Processes battle triggers and notifies all listeners (abilities, items).
     /// Collects actions from listeners and returns them for queue processing.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.9: Abilities & Items
+    /// **Documentation**: See `docs/features/2-combat-system/2.9-abilities-items/architecture.md`
+    /// </remarks>
     public static class BattleTriggerProcessor
     {
         /// <summary>

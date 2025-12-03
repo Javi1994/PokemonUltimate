@@ -7,6 +7,11 @@ namespace PokemonUltimate.Combat.Events
     /// Interface for objects that react to battle events (abilities, items, status effects).
     /// Returns actions to be enqueued when triggered.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.9: Abilities & Items
+    /// **Documentation**: See `docs/features/2-combat-system/2.9-abilities-items/architecture.md`
+    /// </remarks>
     public interface IBattleListener
     {
         /// <summary>

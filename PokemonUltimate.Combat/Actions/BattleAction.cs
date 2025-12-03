@@ -7,6 +7,11 @@ namespace PokemonUltimate.Combat.Actions
     /// Base class for all battle actions.
     /// Actions have two phases: Logic (instant, updates game state) and Visual (async, shows to player).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public abstract class BattleAction
     {
         /// <summary>

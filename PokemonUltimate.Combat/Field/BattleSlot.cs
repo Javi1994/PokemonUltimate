@@ -10,6 +10,11 @@ namespace PokemonUltimate.Combat
     /// Represents a slot on the battlefield that can hold an active Pokemon.
     /// Contains battle-specific state (stat stages, volatile status) that resets when Pokemon switches out.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.1: Battle Foundation
+    /// **Documentation**: See `docs/features/2-combat-system/2.1-battle-foundation/architecture.md`
+    /// </remarks>
     public class BattleSlot
     {
         private const int MinStatStage = -6;

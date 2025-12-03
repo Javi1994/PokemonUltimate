@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// Modifies a stat by a number of stages (-6 to +6).
     /// Used by moves like Swords Dance (+2 Atk), Growl (-1 Atk), etc.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class StatChangeEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.StatChange;

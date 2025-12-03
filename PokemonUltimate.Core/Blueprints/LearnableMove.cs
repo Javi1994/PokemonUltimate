@@ -8,6 +8,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// Represents a move that a Pokemon species can learn.
     /// Part of the species' Learnset.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.1: Pokemon Data
+    /// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/architecture.md`
+    /// </remarks>
     public class LearnableMove
     {
         /// <summary>

@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// Heals the user by a percentage of their max HP.
     /// Used by moves like Recover (50%), Roost (50%), Moonlight (varies by weather).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class HealEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.Heal;

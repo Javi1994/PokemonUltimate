@@ -6,6 +6,11 @@ namespace PokemonUltimate.Content.Catalogs.Items
     /// <summary>
     /// Central catalog of all items.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.3: Item Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.3-item-expansion/architecture.md`
+    /// </remarks>
     public static partial class ItemCatalog
     {
         private static readonly List<ItemData> _all = new List<ItemData>();

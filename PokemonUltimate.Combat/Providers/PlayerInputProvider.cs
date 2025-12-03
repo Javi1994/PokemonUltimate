@@ -13,6 +13,11 @@ namespace PokemonUltimate.Combat.Providers
     /// Provides actions from player input via IBattleView.
     /// Connects the battle logic to the UI/view layer for manual player control.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.7: Integration
+    /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
+    /// </remarks>
     public class PlayerInputProvider : IActionProvider
     {
         private readonly IBattleView _view;

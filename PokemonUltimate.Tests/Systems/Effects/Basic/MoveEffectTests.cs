@@ -3,7 +3,15 @@ using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Tests.Systems.Effects.Basic
 {
-    // Tests for individual move effects and their properties
+    /// <summary>
+    /// Tests for individual move effects and their properties.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.2: MoveData (Blueprint)
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
+    [TestFixture]
     public class MoveEffectTests
     {
         #region DamageEffect Tests

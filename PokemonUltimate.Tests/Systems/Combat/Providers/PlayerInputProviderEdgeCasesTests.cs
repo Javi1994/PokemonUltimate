@@ -16,6 +16,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Providers
     /// Edge case tests for PlayerInputProvider.
     /// Tests boundary conditions, invalid states, and error handling.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.7: Integration
+    /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class PlayerInputProviderEdgeCasesTests
     {

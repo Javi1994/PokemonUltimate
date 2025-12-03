@@ -8,6 +8,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// Immutable data defining a Pokemon ability.
     /// Contains all the information needed to determine when and how an ability activates.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.3: Ability Data
+    /// **Documentation**: See `docs/features/1-game-data/1.3-ability-data/README.md`
+    /// </remarks>
     public sealed class AbilityData
     {
         #region Core Properties

@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// <summary>
     /// Immutable data defining a weather condition's effects.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.6: Field Conditions Data
+    /// **Documentation**: See `docs/features/1-game-data/1.6-field-conditions-data/README.md`
+    /// </remarks>
     public sealed class WeatherData
     {
         #region Identity

@@ -8,6 +8,11 @@ namespace PokemonUltimate.Tests.Systems.Core.Registry
     /// <summary>
     /// Tests for PokemonRegistry Pokedex Number operations: GetByPokedexNumber, ExistsByPokedexNumber
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.4: Registry System
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class PokemonRegistryPokedexTests
     {

@@ -7,6 +7,11 @@ namespace PokemonUltimate.Tests.Systems.Effects.Advanced
     /// <summary>
     /// Tests for BindingEffect behavior.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.2: MoveData (Blueprint)
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class BindingEffectTests
     {

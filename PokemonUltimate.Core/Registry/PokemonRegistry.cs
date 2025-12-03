@@ -9,6 +9,11 @@ namespace PokemonUltimate.Core.Registry
     /// <summary>
     /// Specialized registry for Pokemon that supports lookup by Name, Pokedex Number, and Type.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.13: Registry System
+    /// **Documentation**: See `docs/features/1-game-data/1.13-registry-system/architecture.md`
+    /// </remarks>
     public class PokemonRegistry : GameDataRegistry<PokemonSpeciesData>, IPokemonRegistry
     {
         private readonly Dictionary<int, PokemonSpeciesData> _byPokedexNumber = new Dictionary<int, PokemonSpeciesData>();

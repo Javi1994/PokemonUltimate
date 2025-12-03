@@ -8,6 +8,11 @@ namespace PokemonUltimate.Content.Catalogs.Weather
     /// <summary>
     /// Central catalog of all weather condition definitions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.12: Weather System
+    /// **Documentation**: See `docs/features/2-combat-system/2.12-weather-system/architecture.md`
+    /// </remarks>
     public static class WeatherCatalog
     {
         private static readonly List<WeatherData> _all = new List<WeatherData>();

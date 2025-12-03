@@ -11,6 +11,11 @@ namespace PokemonUltimate.Tests.Systems.Effects.Basic
     /// Edge case tests for IMoveEffect implementations.
     /// Tests boundary values, effect combinations, and extreme scenarios.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.2: MoveData (Blueprint)
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class EffectsEdgeCasesTests
     {

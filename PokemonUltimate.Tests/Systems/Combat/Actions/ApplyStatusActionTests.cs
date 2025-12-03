@@ -12,6 +12,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
     /// <summary>
     /// Tests for ApplyStatusAction - applies a persistent status condition to a Pokemon.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class ApplyStatusActionTests
     {

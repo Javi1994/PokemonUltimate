@@ -9,6 +9,11 @@ namespace PokemonUltimate.Combat
     /// Interface for battle visualization/presentation and player input.
     /// Implementations handle animations, UI updates, player feedback, and input collection.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.7: Integration
+    /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
+    /// </remarks>
     public interface IBattleView
     {
         /// <summary>

@@ -3,6 +3,11 @@ namespace PokemonUltimate.Core.Enums
     /// <summary>
     /// Defines when a held item activates during battle.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.10: Enums & Constants
+    /// **Documentation**: See `docs/features/1-game-data/1.10-enums-constants/README.md`
+    /// </remarks>
     [System.Flags]
     public enum ItemTrigger
     {

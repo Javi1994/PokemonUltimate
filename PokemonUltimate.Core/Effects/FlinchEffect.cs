@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// Causes the target to flinch (skip their action) if they haven't acted yet.
     /// Used by moves like Fake Out (100%), Air Slash (30%), Iron Head (30%).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class FlinchEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.Flinch;

@@ -16,6 +16,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
     /// <summary>
     /// Functional tests for BattleTriggerProcessor - processes battle triggers.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.9: Abilities & Items
+    /// **Documentation**: See `docs/features/2-combat-system/2.9-abilities-items/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class BattleTriggerProcessorTests
     {

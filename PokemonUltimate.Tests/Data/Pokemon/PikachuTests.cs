@@ -10,6 +10,11 @@ namespace PokemonUltimate.Tests.Data.Pokemon
     /// Tests for Pikachu in PokemonCatalog.
     /// Verifies correct data, learnset, evolution, and abilities.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.1: Pokemon Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.1-pokemon-expansion/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class PikachuTests
     {

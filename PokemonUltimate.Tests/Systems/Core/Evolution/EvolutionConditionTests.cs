@@ -6,6 +6,14 @@ using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
 
 namespace PokemonUltimate.Tests.Systems.Core.Evolution
 {
+    /// <summary>
+    /// Tests for EvolutionCondition implementations - level, item, trade, etc.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.5: Evolution System
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class EvolutionConditionTests
     {

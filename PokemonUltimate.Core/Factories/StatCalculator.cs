@@ -9,6 +9,11 @@ namespace PokemonUltimate.Core.Factories
     /// Calculates Pokemon stats using the official Gen3+ formula.
     /// By default uses maximum IVs (31) and EVs (252) for a roguelike experience.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.12: Factories & Calculators
+    /// **Documentation**: See `docs/features/1-game-data/1.12-factories-calculators/README.md`
+    /// </remarks>
     public static class StatCalculator
     {
         #region Constants

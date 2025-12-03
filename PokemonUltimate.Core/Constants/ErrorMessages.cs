@@ -3,6 +3,11 @@ namespace PokemonUltimate.Core.Constants
     /// <summary>
     /// Centralized error messages for validation and exceptions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.10: Enums & Constants
+    /// **Documentation**: See `docs/features/1-game-data/1.10-enums-constants/README.md`
+    /// </remarks>
     public static class ErrorMessages
     {
         #region Numeric Validation

@@ -12,6 +12,11 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
     /// Tests for edge cases in Stats and Moves systems.
     /// These are critical systems that must be bulletproof.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.3: PokemonInstance
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class StatsAndMovesEdgeCasesTests
     {

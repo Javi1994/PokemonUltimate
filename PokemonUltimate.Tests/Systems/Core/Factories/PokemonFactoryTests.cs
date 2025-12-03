@@ -6,6 +6,14 @@ using PokemonUltimate.Core.Factories;
 
 namespace PokemonUltimate.Tests.Systems.Core.Factories
 {
+    /// <summary>
+    /// Tests for PokemonFactory - static factory for quick Pokemon creation.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.3: PokemonInstance
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class PokemonFactoryTests
     {

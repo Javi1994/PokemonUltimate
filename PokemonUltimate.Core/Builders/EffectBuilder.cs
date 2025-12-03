@@ -8,6 +8,11 @@ namespace PokemonUltimate.Content.Builders
     /// Fluent builder for composing move effects.
     /// Used within MoveBuilder.WithEffects().
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.11: Builders
+    /// **Documentation**: See `docs/features/1-game-data/1.11-builders/architecture.md`
+    /// </remarks>
     public class EffectBuilder
     {
         private readonly List<IMoveEffect> _effects = new List<IMoveEffect>();

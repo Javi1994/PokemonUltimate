@@ -1,0 +1,47 @@
+# Sub-Feature 2.4: Damage Calculation Pipeline
+
+> Modular damage calculation using pipeline pattern.
+
+**Sub-Feature Number**: 2.4  
+**Parent Feature**: Feature 2: Combat System  
+**See**: [`../../features_master_list.md`](../../features_master_list.md) for feature numbering standards.
+
+## Overview
+
+The Damage Calculation Pipeline uses a modular pipeline pattern to calculate damage, avoiding a single giant function. Damage passes through multiple steps, each modifying the damage context.
+
+**Key Components**:
+- **DamagePipeline**: Orchestrates damage calculation
+- **DamageContext**: Mutable snapshot of attack event
+- **IDamageStep**: Individual pipeline steps (ability, item, type effectiveness, etc.)
+
+## Current Status
+
+- ✅ **Implemented**: Complete pipeline with all core steps
+- ✅ **Tested**: Comprehensive test coverage
+
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| **[Architecture](architecture.md)** | Complete technical specification |
+| **[Use Cases](../../use_cases.md#damage-calculation)** | Damage calculation scenarios |
+| **[Roadmap](../../roadmap.md#phase-24-damage-calculation-pipeline)** | Implementation details |
+| **[Testing](../../testing.md)** | Testing strategy |
+| **[Code Location](../../code_location.md)** | Where the code lives |
+
+## Related Sub-Features
+
+- **[2.5: Combat Actions](../2.5-combat-actions/)** - Actions trigger damage calculation
+- **[2.9: Abilities & Items](../2.9-abilities-items/)** - Abilities and items modify damage
+- **[2.10: Pipeline Hooks](../2.10-pipeline-hooks/)** - Stat modifiers hook into pipeline
+
+## Quick Links
+
+- **Key Classes**: `DamagePipeline`, `DamageContext`, `IDamageStep`
+- **Status**: ✅ Complete (Phase 2.4)
+
+---
+
+**Last Updated**: 2025-01-XX
+

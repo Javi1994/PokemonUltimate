@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Evolution.Conditions
     /// Evolution condition: Use a specific evolution item (stone, etc.).
     /// This condition returns false by default - items must be used explicitly.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.7: Evolution System
+    /// **Documentation**: See `docs/features/1-game-data/1.7-evolution-system/architecture.md`
+    /// </remarks>
     public class ItemCondition : IEvolutionCondition
     {
         public EvolutionConditionType ConditionType => EvolutionConditionType.UseItem;

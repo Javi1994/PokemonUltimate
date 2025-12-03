@@ -17,6 +17,11 @@ namespace PokemonUltimate.Combat.Actions
     /// Handles PP checking, status checks, accuracy, damage calculation, and effect application.
     /// Generates child actions for the battle queue.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public class UseMoveAction : BattleAction
     {
         /// <summary>

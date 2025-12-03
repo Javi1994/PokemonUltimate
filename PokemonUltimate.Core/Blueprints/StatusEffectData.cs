@@ -7,6 +7,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// Immutable data defining a status effect's behavior.
     /// Covers both persistent and volatile status conditions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.5: Status Effect Data
+    /// **Documentation**: See `docs/features/1-game-data/1.5-status-effect-data/README.md`
+    /// </remarks>
     public sealed class StatusEffectData
     {
         #region Identity

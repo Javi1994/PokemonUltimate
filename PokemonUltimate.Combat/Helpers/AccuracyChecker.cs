@@ -9,6 +9,11 @@ namespace PokemonUltimate.Combat.Helpers
     /// Checks if a move hits its target based on accuracy and evasion stages.
     /// Centralized accuracy calculation system for combat actions.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public static class AccuracyChecker
     {
         private static readonly Random _random = new Random();

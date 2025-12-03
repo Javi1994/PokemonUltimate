@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// User takes a percentage of the damage dealt as recoil.
     /// Used by moves like Double-Edge (33%), Brave Bird (33%), Take Down (25%).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class RecoilEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.Recoil;

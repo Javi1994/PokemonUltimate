@@ -8,6 +8,11 @@ namespace PokemonUltimate.Core.Instances
     /// Battle-related methods for PokemonInstance.
     /// Handles stats, damage, healing, status effects, and friendship.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.1: Pokemon Data
+    /// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/architecture.md`
+    /// </remarks>
     public partial class PokemonInstance
     {
         #region Stat Calculation
@@ -83,9 +88,9 @@ namespace PokemonUltimate.Core.Instances
                 return 0;
 
             int oldStage = StatStages[stat];
-            int newStage = Math.Max(StatCalculator.MinStage, 
+            int newStage = Math.Max(StatCalculator.MinStage,
                 Math.Min(StatCalculator.MaxStage, oldStage + change));
-            
+
             StatStages[stat] = newStage;
             return newStage - oldStage;
         }

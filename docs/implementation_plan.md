@@ -54,7 +54,7 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 
 ### 1.2 Pokemon Blueprints ✅
 
-- `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats, GenderRatio, Learnset, Evolutions)
+- `PokemonSpeciesData` (Name, PokedexNumber, Types, BaseStats, GenderRatio, Learnset, Evolutions, Variants support)
 - `BaseStats` with validation, `GetStat()`, `HighestStat`, `LowestStat`
 - `LearnableMove` + `LearnMethod` enum
 - `Evolution` + `IEvolutionCondition` (6 condition types)
@@ -171,8 +171,8 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 - [x] `AccuracyChecker` - Accuracy calculation system
 
 ### Documentation
-- [x] `docs/combat/action_use_cases.md` - 207 use cases
-- [x] `docs/combat/actions_bible.md` - Complete technical reference
+- [x] `docs/features/2-combat-system/2.5-combat-actions/use_cases.md` - 207 use cases
+- [x] `docs/features/2-combat-system/2.5-combat-actions/architecture.md` - Complete technical reference
 
 ---
 
@@ -255,16 +255,25 @@ Once Step 7 passes, you have a working game engine. Only THEN do you open Unity 
 | Need | Read |
 |------|------|
 | Current state | `.ai/context.md` |
-| Coding rules | `docs/project_guidelines.md` |
-| **Combat phases** | `docs/roadmaps/combat_roadmap.md` |
-| **Content expansion** | `docs/roadmaps/content_expansion_roadmap.md` |
-| **Unity integration** | `docs/roadmaps/unity_integration_roadmap.md` |
-| **Game features** | `docs/roadmaps/game_features_roadmap.md` |
-| **Testing improvements** | `docs/roadmaps/testing_roadmap.md` |
-| **Use cases** | `docs/combat_use_cases.md` |
-| **Unity setup** | `docs/unity_integration.md` |
-| Combat design | `docs/architecture/combat_system_spec.md` |
-| Abilities/Items | `docs/architecture/abilities_items_system.md` |
-| Status effects | `docs/architecture/status_and_stat_system.md` |
-| Damage formulas | `docs/architecture/damage_and_effect_system.md` |
-| Turn order | `docs/architecture/turn_order_system.md` |
+| Coding rules | `docs/ai/guidelines/project_guidelines.md` |
+| **Feature master list** | `docs/features_master_list.md` ⭐ **MASTER REFERENCE** |
+| **Feature documentation standard** | `docs/feature_documentation_standard.md` |
+| **Combat phases** | `docs/features/2-combat-system/roadmap.md` |
+| **Content expansion** | `docs/features/3-content-expansion/roadmap.md` |
+| **Game data fields** | `docs/features/1-game-data/roadmap.md` |
+| **Variants system** | `docs/features/1-game-data/1.14-variants-system/architecture.md` |
+| **Unity integration** | `docs/features/4-unity-integration/roadmap.md` |
+| **Game features** | `docs/features/5-game-features/roadmap.md` |
+| **Test structure** | `docs/ai/testing_structure_definition.md` |
+| **Use cases** | `docs/features/2-combat-system/use_cases.md` |
+| **Unity setup** | `docs/features/4-unity-integration/architecture.md` |
+| Combat design | `docs/features/2-combat-system/architecture.md` |
+| Abilities/Items | `docs/features/2-combat-system/2.9-abilities-items/architecture.md` |
+| Status effects | `docs/features/2-combat-system/2.8-end-of-turn-effects/architecture.md` |
+| Damage formulas | `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md` |
+| Turn order | `docs/features/2-combat-system/2.3-turn-order-resolution/architecture.md` |
+| Game data structure | `docs/features/1-game-data/architecture.md` |
+
+**⚠️ Feature Documentation**: Always use numbered paths:
+- ✅ `docs/features/[N]-[feature-name]/` (e.g., `docs/features/2-combat-system/`)
+- ❌ `docs/features/feature-name/` (wrong - missing number)

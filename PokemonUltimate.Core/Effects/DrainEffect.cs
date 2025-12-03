@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// User heals a percentage of the damage dealt.
     /// Used by moves like Giga Drain (50%), Drain Punch (50%), Absorb (50%).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class DrainEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.Drain;

@@ -8,6 +8,11 @@ namespace PokemonUltimate.Core.Registry
     /// <summary>
     /// Generic storage for game data, accessible by ID.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.13: Registry System
+    /// **Documentation**: See `docs/features/1-game-data/1.13-registry-system/architecture.md`
+    /// </remarks>
     public class GameDataRegistry<T> : IDataRegistry<T> where T : class, IIdentifiable
     {
         private readonly Dictionary<string, T> _items = new Dictionary<string, T>();

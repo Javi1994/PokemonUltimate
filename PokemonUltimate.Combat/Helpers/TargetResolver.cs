@@ -10,6 +10,11 @@ namespace PokemonUltimate.Combat.Helpers
     /// <summary>
     /// Resolves valid targets for moves based on TargetScope and battlefield state.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public static class TargetResolver
     {
         /// <summary>

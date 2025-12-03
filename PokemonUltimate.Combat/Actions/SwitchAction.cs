@@ -13,6 +13,11 @@ namespace PokemonUltimate.Combat.Actions
     /// The current Pokemon is sent to the bench and a new Pokemon takes its place.
     /// Battle state (stat stages, volatile status) is reset for the new Pokemon.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public class SwitchAction : BattleAction
     {
         /// <summary>

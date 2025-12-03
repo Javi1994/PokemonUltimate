@@ -6,6 +6,11 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
     /// <summary>
     /// Central catalog of all Pokemon abilities.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.4: Ability Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.4-ability-expansion/architecture.md`
+    /// </remarks>
     public static partial class AbilityCatalog
     {
         private static readonly List<AbilityData> _all = new List<AbilityData>();

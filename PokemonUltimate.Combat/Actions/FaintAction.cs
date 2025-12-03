@@ -11,6 +11,11 @@ namespace PokemonUltimate.Combat.Actions
     /// Plays faint animation and marks the Pokemon as fainted.
     /// Battle end checking is handled by CombatEngine (Phase 2.6).
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public class FaintAction : BattleAction
     {
         /// <summary>

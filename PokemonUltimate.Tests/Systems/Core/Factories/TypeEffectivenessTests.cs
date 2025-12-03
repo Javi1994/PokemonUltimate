@@ -5,6 +5,14 @@ using PokemonUltimate.Core.Factories;
 
 namespace PokemonUltimate.Tests.Systems.Core.Factories
 {
+    /// <summary>
+    /// Tests for TypeEffectiveness - type matchup calculations.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.4: Damage Calculation Pipeline
+    /// **Documentation**: See `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class TypeEffectivenessTests
     {

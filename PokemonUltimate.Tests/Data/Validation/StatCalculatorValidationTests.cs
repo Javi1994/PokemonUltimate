@@ -11,6 +11,11 @@ namespace PokemonUltimate.Tests.Data.Validation
     /// HP Formula: floor((2 * Base + IV + floor(EV/4)) * Level / 100) + Level + 10
     /// Stat Formula: floor((floor((2 * Base + IV + floor(EV/4)) * Level / 100) + 5) * NatureModifier)
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.1: PokemonSpeciesData (Blueprint)
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class StatCalculatorValidationTests
     {

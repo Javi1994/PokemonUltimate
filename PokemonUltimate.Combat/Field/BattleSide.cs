@@ -10,6 +10,11 @@ namespace PokemonUltimate.Combat
     /// Represents one side of the battlefield (player or enemy).
     /// Contains slots for active Pokemon and a reference to the full party.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.1: Battle Foundation
+    /// **Documentation**: See `docs/features/2-combat-system/2.1-battle-foundation/architecture.md`
+    /// </remarks>
     public class BattleSide
     {
         private readonly List<BattleSlot> _slots;

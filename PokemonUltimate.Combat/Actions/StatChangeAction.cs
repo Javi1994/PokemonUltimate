@@ -11,6 +11,11 @@ namespace PokemonUltimate.Combat.Actions
     /// Modifies a stat stage of a Pokemon (-6 to +6).
     /// Stages are clamped to the valid range automatically.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     public class StatChangeAction : BattleAction
     {
         /// <summary>

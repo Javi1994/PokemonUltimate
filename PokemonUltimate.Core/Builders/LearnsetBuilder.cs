@@ -7,6 +7,11 @@ namespace PokemonUltimate.Content.Builders
     /// <summary>
     /// Fluent builder for creating a Pokemon's learnset.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.11: Builders
+    /// **Documentation**: See `docs/features/1-game-data/1.11-builders/architecture.md`
+    /// </remarks>
     public class LearnsetBuilder
     {
         private readonly List<LearnableMove> _moves = new List<LearnableMove>();

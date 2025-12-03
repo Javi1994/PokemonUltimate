@@ -8,6 +8,14 @@ using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Tests.Systems.Core.Factories
 {
+    /// <summary>
+    /// Tests for PokemonInstanceBuilder - fluent builder for creating PokemonInstance objects.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.3: PokemonInstance
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class PokemonInstanceBuilderTests
     {

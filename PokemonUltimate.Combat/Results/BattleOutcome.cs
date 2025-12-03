@@ -3,6 +3,11 @@ namespace PokemonUltimate.Combat
     /// <summary>
     /// Represents the possible outcomes of a battle.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.6: Combat Engine
+    /// **Documentation**: See `docs/features/2-combat-system/2.6-combat-engine/architecture.md`
+    /// </remarks>
     public enum BattleOutcome
     {
         /// <summary>

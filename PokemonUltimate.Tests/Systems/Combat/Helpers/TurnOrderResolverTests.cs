@@ -15,6 +15,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
     /// <summary>
     /// Tests for TurnOrderResolver - sorts battle actions by priority and speed.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.3: Turn Order Resolution
+    /// **Documentation**: See `docs/features/2-combat-system/2.3-turn-order-resolution/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class TurnOrderResolverTests
     {

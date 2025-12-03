@@ -14,6 +14,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
     /// <summary>
     /// Tests for DamageAction - applies damage to a target Pokemon.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.5: Combat Actions
+    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class DamageActionTests
     {

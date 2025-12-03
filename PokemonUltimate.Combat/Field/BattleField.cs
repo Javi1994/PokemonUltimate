@@ -9,6 +9,11 @@ namespace PokemonUltimate.Combat
     /// <summary>
     /// Represents the complete battlefield with both player and enemy sides.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.1: Battle Foundation
+    /// **Documentation**: See `docs/features/2-combat-system/2.1-battle-foundation/architecture.md`
+    /// </remarks>
     public class BattleField
     {
         private BattleSide _playerSide;

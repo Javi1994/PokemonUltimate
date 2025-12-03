@@ -7,6 +7,11 @@ namespace PokemonUltimate.Content.Catalogs.Items
     /// <summary>
     /// Held items that provide passive or triggered effects.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.3: Item Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.3-item-expansion/architecture.md`
+    /// </remarks>
     public static partial class ItemCatalog
     {
         // ===== RECOVERY ITEMS =====

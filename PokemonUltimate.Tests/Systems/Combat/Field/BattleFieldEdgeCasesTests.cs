@@ -11,6 +11,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
     /// <summary>
     /// Edge case tests for BattleField - asymmetric battles, edge scenarios.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.1: Battle Foundation
+    /// **Documentation**: See `docs/features/2-combat-system/2.1-battle-foundation/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class BattleFieldEdgeCasesTests
     {

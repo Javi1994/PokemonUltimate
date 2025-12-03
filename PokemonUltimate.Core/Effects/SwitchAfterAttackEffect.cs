@@ -6,6 +6,11 @@ namespace PokemonUltimate.Core.Effects
     /// User switches out after attacking.
     /// Used by U-turn, Volt Switch, Flip Turn, Parting Shot.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class SwitchAfterAttackEffect : IMoveEffect
     {
         public EffectType EffectType => EffectType.SwitchAfterAttack;

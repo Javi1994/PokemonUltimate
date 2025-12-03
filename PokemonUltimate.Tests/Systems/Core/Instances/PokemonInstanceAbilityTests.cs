@@ -9,6 +9,11 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
     /// <summary>
     /// Tests for Pokemon ability and held item functionality.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Pokemon Data
+    /// **Sub-Feature**: 1.3: PokemonInstance
+    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class PokemonInstanceAbilityTests
     {

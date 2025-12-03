@@ -9,6 +9,11 @@ namespace PokemonUltimate.Core.Blueprints
     /// Moves can be retrieved by Name (unique string).
     /// Following Composition Pattern: behavior is defined by Effects, not by subclasses.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.2: Move Data
+    /// **Documentation**: See `docs/features/1-game-data/1.2-move-data/architecture.md`
+    /// </remarks>
     public class MoveData : IIdentifiable
     {
         #region Basic Properties

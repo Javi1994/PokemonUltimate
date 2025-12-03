@@ -15,6 +15,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
     /// <summary>
     /// Functional tests for CombatEngine - battle orchestration.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.6: Combat Engine
+    /// **Documentation**: See `docs/features/2-combat-system/2.6-combat-engine/architecture.md`
+    /// </remarks>
     [TestFixture]
     public class CombatEngineTests
     {

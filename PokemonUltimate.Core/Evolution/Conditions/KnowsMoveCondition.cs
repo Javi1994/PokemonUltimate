@@ -9,6 +9,11 @@ namespace PokemonUltimate.Core.Evolution.Conditions
     /// <summary>
     /// Evolution condition: Pokemon must know a specific move.
     /// </summary>
+    /// <remarks>
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.7: Evolution System
+    /// **Documentation**: See `docs/features/1-game-data/1.7-evolution-system/architecture.md`
+    /// </remarks>
     public class KnowsMoveCondition : IEvolutionCondition
     {
         public EvolutionConditionType ConditionType => EvolutionConditionType.KnowsMove;
