@@ -18,7 +18,7 @@ Content expansion testing focuses on:
 
 ## Test Structure
 
-Following `docs/ai/testing_structure_definition.md`:
+Following TDD workflow from `ai_workflow/docs/TDD_GUIDE.md`:
 
 ```
 PokemonUltimate.Tests/
@@ -302,7 +302,7 @@ dotnet test --filter "FullyQualifiedName~PikachuTests"
 - **[Roadmap](roadmap.md)** - Content expansion phases
 - **[Code Location](code_location.md)** - Where tests are located
 - **[Feature 1: Game Data Testing](../1-game-data/testing.md)** - Game data testing strategy
-- **[Test Structure Definition](../../ai/testing_structure_definition.md)** - Test organization standard
+- **[TDD Guide](../../../ai_workflow/docs/TDD_GUIDE.md)** - Test-Driven Development guide
 
 ---
 

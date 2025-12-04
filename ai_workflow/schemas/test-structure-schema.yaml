@@ -1,0 +1,148 @@
+# Test Structure Schema
+
+> **Schema para validar estructura de tests**
+
+## Schema Definition
+
+```yaml
+test_structure:
+  version: "1.0.0"
+  description: "Validation schema for test file structure"
+  
+  file_naming:
+    pattern: "^[A-Z][a-zA-Z0-9]+Tests\\.[a-z]+$"
+    examples:
+      - "AuthenticationServiceTests.cs"
+      - "PaymentProcessorTests.js"
+      - "UserRepositoryTests.py"
+    invalid_examples:
+      - "authServiceTests.cs"  # Must start with uppercase
+      - "AuthenticationService.cs"  # Must end with Tests
+      
+  class_naming:
+    pattern: "^[A-Z][a-zA-Z0-9]+Tests$"
+    examples:
+      - "AuthenticationServiceTests"
+      - "PaymentProcessorEdgeCasesTests"
+      - "AuthService_UserRepository_IntegrationTests"
+      
+  test_method_naming:
+    pattern: "^[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+$"
+    description: "MethodName_Scenario_ExpectedResult"
+    examples:
+      - "Authenticate_ValidCredentials_ReturnsTrue"
+      - "GetUser_NullId_ThrowsArgumentNullException"
+      - "ProcessPayment_InvalidAmount_ThrowsArgumentException"
+    invalid_examples:
+      - "testAuthenticate"  # Missing scenario and expected result
+      - "authenticate_valid_credentials"  # Wrong format
+      
+  required_sections:
+    - name: "Arrange"
+      description: "Setup test data and dependencies"
+      required: true
+      
+    - name: "Act"
+      description: "Execute the method being tested"
+      required: true
+      
+    - name: "Assert"
+      description: "Verify the result"
+      required: true
+      
+  optional_sections:
+    - name: "SetUp"
+      description: "Common setup for all tests"
+      required: false
+      
+    - name: "TearDown"
+      description: "Cleanup after tests"
+      required: false
+      
+  location_rules:
+    functional:
+      pattern: "Tests/[Feature]/[Component]Tests.[ext]"
+      example: "Tests/Authentication/AuthenticationServiceTests.cs"
+      
+    edge_cases:
+      pattern: "Tests/[Feature]/[Component]EdgeCasesTests.[ext]"
+      example: "Tests/Authentication/AuthenticationServiceEdgeCasesTests.cs"
+      
+    integration:
+      pattern: "Tests/[Feature]/Integration/[Category]/[TestFile].[ext]"
+      example: "Tests/Authentication/Integration/AuthService_UserRepository_IntegrationTests.cs"
+      
+  feature_reference:
+    required: true
+    format: "XML comments or language-specific documentation"
+    pattern: "Feature: [N]: [Feature Name]"
+    example: "/// **Feature**: 1: User Authentication"
+    
+  validation_rules:
+    - test_must_have_arrange: true
+    - test_must_have_act: true
+    - test_must_have_assert: true
+    - test_must_follow_naming_convention: true
+    - test_must_be_in_correct_location: true
+    - test_must_have_feature_reference: true
+```
+
+---
+
+## Validation Checklist
+
+```yaml
+validation_checklist:
+  file_structure:
+    - file_name_follows_pattern: true
+    - file_in_correct_location: true
+    - file_has_correct_extension: true
+    
+  class_structure:
+    - class_name_follows_pattern: true
+    - class_has_feature_reference: true
+    - class_has_test_methods: true
+    
+  test_methods:
+    - method_name_follows_pattern: true
+    - method_has_arrange_section: true
+    - method_has_act_section: true
+    - method_has_assert_section: true
+    - method_is_public: true
+    - method_has_test_attribute: true
+```
+
+---
+
+## Error Messages
+
+```yaml
+error_messages:
+  invalid_file_name:
+    message: "File name must follow pattern: [Component]Tests.[ext]"
+    example: "Expected: AuthenticationServiceTests.cs, Got: authServiceTests.cs"
+    
+  invalid_location:
+    message: "Test file must be in correct location"
+    functional: "Expected: Tests/[Feature]/[Component]Tests.[ext]"
+    edge_cases: "Expected: Tests/[Feature]/[Component]EdgeCasesTests.[ext]"
+    integration: "Expected: Tests/[Feature]/Integration/[Category]/[TestFile].[ext]"
+    
+  invalid_method_name:
+    message: "Test method name must follow pattern: MethodName_Scenario_ExpectedResult"
+    example: "Expected: Authenticate_ValidCredentials_ReturnsTrue"
+    
+  missing_section:
+    message: "Test method must have [section] section"
+    sections: [Arrange, Act, Assert]
+    
+  missing_feature_reference:
+    message: "Test class must have feature reference in documentation"
+    format: "Feature: [N]: [Feature Name]"
+```
+
+---
+
+**Última Actualización**: 2025-01-XX  
+**Versión**: 1.0.0
+

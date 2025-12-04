@@ -1,0 +1,248 @@
+# Game Definition Template
+# Específico para: C# .NET SDKs integrados con Unity
+
+> **Template estructurado para definir juegos y generar features**
+
+## Game Definition Structure
+
+```yaml
+game_definition:
+  version: "1.0.0"
+  last_updated: "YYYY-MM-DD"
+  
+  # Basic Information
+  basics:
+    name: "[Game Name]"
+    type: "[Game Type]"
+    description: |
+      [1-2 paragraphs describing the game]
+    target_platform: "Unity"  # Default: Unity (SDK for Unity integration)
+    sdk_purpose: "Logic layer for Unity integration - provides game logic, Unity handles presentation"
+  
+  # Core Concepts
+  core_concepts:
+    entities:
+      - name: "[Entity Name]"
+        description: "[Description]"
+        properties:
+          - "[Property 1]"
+          - "[Property 2]"
+        behaviors:
+          - "[Behavior 1]"
+          - "[Behavior 2]"
+    
+    environment:
+      name: "[Environment Name]"
+      description: "[Description]"
+      components:
+        - "[Component 1]"
+        - "[Component 2]"
+      conditions:
+        - "[Condition 1]"
+        - "[Condition 2]"
+    
+    interactions:
+      - name: "[Interaction Name]"
+        description: "[Description]"
+        participants:
+          - "[Entity/System 1]"
+          - "[Entity/System 2]"
+        type: "[Interaction Type]"
+    
+    systems:
+      - name: "[System Name]"
+        description: "[Description]"
+        components:
+          - "[Component 1]"
+          - "[Component 2]"
+        dependencies:
+          - "[Dependency 1]"
+  
+  # Generated Features
+  features:
+    categories:
+      - name: "[Category Name]"
+        phase: "[Phase Number]"
+        features:
+          - number: "[N]"
+            name: "[Feature Name]"
+            folder: "[N]-[kebab-case]/"
+            description: "[Description]"
+            dependencies: []
+            sub_features:
+              - number: "[N.M]"
+                name: "[Sub-Feature Name]"
+                folder: "[N.M]-[kebab-case]/"
+                description: "[Description]"
+                dependencies: ["[Dependency]"]
+```
+
+---
+
+## Complete Example: EcosystemGame
+
+```yaml
+game_definition:
+  version: "1.0.0"
+  last_updated: "2025-01-XX"
+  
+  basics:
+    name: "EcosystemGame"
+    type: "Simulation"
+    description: |
+      A realistic ecosystem simulation game where players can observe
+      a complete ecosystem with animals that behave as realistically
+      as possible. Players can select animals and watch their behavior
+      in real-time. The game includes everything expected in a real
+      ecosystem: food chains, life cycles, interactions, etc.
+    target_platform: "Unity"
+    sdk_purpose: "Provides all game logic, separated from Unity graphics"
+  
+  core_concepts:
+    entities:
+      - name: "Animal"
+        description: "Animals in the ecosystem"
+        properties:
+          - "Species"
+          - "Age"
+          - "Health"
+          - "Position"
+        behaviors:
+          - "Eat"
+          - "Drink"
+          - "Rest"
+          - "Hunt"
+          - "Flee"
+          - "Reproduce"
+      
+      - name: "Plant"
+        description: "Plants in the ecosystem"
+        properties:
+          - "Type"
+          - "Size"
+          - "Growth stage"
+        behaviors:
+          - "Grow"
+          - "Reproduce"
+      
+      - name: "Resource"
+        description: "Resources in the ecosystem"
+        properties:
+          - "Type"
+          - "Amount"
+        behaviors:
+          - "Be consumed"
+    
+    environment:
+      name: "Ecosystem"
+      description: "The game environment"
+      components:
+        - "Zones/Areas"
+        - "Terrain"
+        - "Climate"
+      conditions:
+        - "Temperature"
+        - "Humidity"
+        - "Available resources"
+    
+    interactions:
+      - name: "Predation"
+        description: "Animals hunting and eating other animals"
+        participants:
+          - "Predator Animal"
+          - "Prey Animal"
+        type: "Entity-to-Entity"
+      
+      - name: "Resource Consumption"
+        description: "Animals consuming resources"
+        participants:
+          - "Animal"
+          - "Resource"
+        type: "Entity-to-Resource"
+      
+      - name: "Reproduction"
+        description: "Animals reproducing"
+        participants:
+          - "Animal"
+          - "Animal"
+        type: "Entity-to-Entity"
+    
+    systems:
+      - name: "Behavior System"
+        description: "AI system for animal behavior"
+        components:
+          - "State Machine"
+          - "Decision System"
+          - "Action System"
+        dependencies:
+          - "Entity System"
+      
+      - name: "Simulation System"
+        description: "Main simulation engine"
+        components:
+          - "Life Cycle"
+          - "Interactions"
+          - "Population Growth"
+        dependencies:
+          - "Entity System"
+          - "Environment System"
+      
+      - name: "Observation System"
+        description: "System for observing animals"
+        components:
+          - "Selection"
+          - "Tracking"
+          - "Information Display"
+        dependencies:
+          - "Entity System"
+          - "Behavior System"
+  
+  features:
+    categories:
+      - name: "Entity System"
+        phase: 1
+        features:
+          - number: "1"
+            name: "Sistema de Entidades"
+            folder: "1-entities/"
+            description: "Animales, plantas y recursos del ecosistema"
+            dependencies: []
+            sub_features:
+              - number: "1.1"
+                name: "Entidad Base"
+                folder: "1.1-entity-base/"
+                dependencies: []
+              - number: "1.2"
+                name: "Identificador Único"
+                folder: "1.2-unique-id/"
+                dependencies: ["1.1"]
+      
+      - name: "Environment System"
+        phase: 1
+        features:
+          - number: "2"
+            name: "Sistema de Entorno"
+            folder: "2-environment/"
+            description: "Ambiente, clima, terreno y condiciones"
+            dependencies: []
+            sub_features:
+              - number: "2.1"
+                name: "Zona/Área"
+                folder: "2.1-zone/"
+                dependencies: []
+```
+
+---
+
+## Usage
+
+1. **Copy this template** to `docs/GAME_DEFINITION.yaml`
+2. **Fill in game basics** (name, type, description, etc.)
+3. **Define core concepts** (entities, environment, interactions, systems)
+4. **Run feature generation** using `game-definition.yaml` decision tree
+5. **Review and refine** generated features
+
+---
+
+**Última Actualización**: 2025-01-XX
+

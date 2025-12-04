@@ -20,7 +20,7 @@ Game features testing focuses on:
 
 ## Test Structure
 
-Following `docs/ai/testing_structure_definition.md`:
+Following TDD workflow from `ai_workflow/docs/TDD_GUIDE.md`:
 
 ```
 PokemonUltimate.Tests/

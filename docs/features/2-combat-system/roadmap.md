@@ -2047,7 +2047,7 @@ PokemonUltimate.Combat/
 - **[Sub-Feature 2.8: End-of-Turn Effects](2.8-end-of-turn-effects/architecture.md)** - Status effects specification
 - **[Feature 1: Game Data](../1-game-data/architecture.md)** - Pokemon instances used in battles
 - **[Feature 3: Content Expansion](../3-content-expansion/roadmap.md)** - Moves, abilities, items
-- **[Pre-Combat Checklist](../../ai/checklists/pre_combat.md)** - Pre-implementation checklist
+- **[TDD Guide](../../../ai_workflow/docs/TDD_GUIDE.md)** - Test-Driven Development guide
 
 **⚠️ Always use numbered feature paths**: `../[N]-[feature-name]/` instead of `../feature-name/`
 

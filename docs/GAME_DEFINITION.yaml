@@ -1,0 +1,260 @@
+# Game Definition: Pokemon Ultimate
+# Específico para: C# .NET SDKs integrados con Unity
+
+game_definition:
+  version: "1.0.0"
+  last_updated: "2025-01-XX"
+  
+  # Basic Information
+  basics:
+    name: "Pokemon Ultimate"
+    type: "Turn-Based Strategy / Battle Simulator"
+    description: |
+      A complete Pokémon battle engine built as an SDK for Unity integration.
+      The engine provides all game logic (combat system, damage calculation, turn order,
+      status effects, abilities, items) while Unity handles presentation (UI, animations, audio).
+      The core logic is completely testable without Unity, making it perfect for both
+      game development and battle simulation. Built with clean architecture principles
+      and comprehensive test coverage (2,075+ tests).
+    target_platform: "Unity"
+    sdk_purpose: "Logic layer for Unity integration - provides game logic, Unity handles presentation"
+  
+  # Core Concepts
+  core_concepts:
+    entities:
+      - name: "Pokemon"
+        description: "Pokemon species and instances"
+        properties:
+          - "Species data (blueprint)"
+          - "Instance data (runtime state)"
+          - "Base stats"
+          - "Types"
+          - "Abilities"
+          - "Moves"
+          - "Level, Experience"
+          - "Status effects"
+        behaviors:
+          - "Battle"
+          - "Level up"
+          - "Evolve"
+          - "Learn moves"
+      
+      - name: "Move"
+        description: "Battle moves"
+        properties:
+          - "Move data (blueprint)"
+          - "Move instance (runtime)"
+          - "Type"
+          - "Category (Physical/Special/Status)"
+          - "Power, Accuracy, PP"
+          - "Effects"
+        behaviors:
+          - "Deal damage"
+          - "Apply status"
+          - "Modify stats"
+          - "Heal"
+      
+      - name: "Ability"
+        description: "Pokemon abilities"
+        properties:
+          - "Ability data"
+          - "Triggers"
+        behaviors:
+          - "Modify battle mechanics"
+          - "React to events"
+      
+      - name: "Item"
+        description: "Held items and consumables"
+        properties:
+          - "Item data"
+          - "Effects"
+        behaviors:
+          - "Modify battle mechanics"
+          - "Consume"
+    
+    environment:
+      name: "Battle Field"
+      description: "The battle environment"
+      components:
+        - "Battle sides"
+        - "Slots (positions)"
+        - "Weather"
+        - "Terrain"
+        - "Hazards"
+        - "Side conditions"
+        - "Field effects"
+      conditions:
+        - "Weather conditions"
+        - "Terrain type"
+        - "Entry hazards"
+        - "Screens and protections"
+    
+    interactions:
+      - name: "Combat"
+        description: "Turn-based Pokemon battles"
+        participants:
+          - "Pokemon (attacker)"
+          - "Pokemon (target)"
+          - "Move"
+        type: "Entity-to-Entity"
+      
+      - name: "Status Effects"
+        description: "Applying status conditions"
+        participants:
+          - "Move/Ability"
+          - "Pokemon"
+        type: "Effect-to-Entity"
+      
+      - name: "Ability Triggers"
+        description: "Abilities reacting to battle events"
+        participants:
+          - "Ability"
+          - "Battle event"
+        type: "System-to-System"
+    
+    systems:
+      - name: "Combat System"
+        description: "Complete battle engine"
+        components:
+          - "Battle field"
+          - "Action queue"
+          - "Turn order resolution"
+          - "Damage calculation pipeline"
+          - "Combat engine"
+          - "End-of-turn effects"
+        dependencies:
+          - "Game Data System"
+      
+      - name: "Game Data System"
+        description: "All game data structures"
+        components:
+          - "Pokemon data"
+          - "Move data"
+          - "Ability data"
+          - "Item data"
+          - "Field conditions"
+          - "Registries"
+        dependencies: []
+      
+      - name: "Content System"
+        description: "Adding game content"
+        components:
+          - "Content builders"
+          - "Catalogs"
+          - "Validation"
+        dependencies:
+          - "Game Data System"
+  
+  # Generated Features (from existing features_master_list.md)
+  features:
+    categories:
+      - name: "Game Data"
+        phase: 1
+        features:
+          - number: "1"
+            name: "Game Data"
+            folder: "1-game-data/"
+            description: "Complete game data structures (blueprints) and supporting systems"
+            dependencies: []
+            sub_features:
+              - number: "1.1"
+                name: "Pokemon Data"
+                folder: "1.1-pokemon-data/"
+                dependencies: []
+              - number: "1.2"
+                name: "Move Data"
+                folder: "1.2-move-data/"
+                dependencies: []
+              - number: "1.3"
+                name: "Ability Data"
+                folder: "1.3-ability-data/"
+                dependencies: []
+              - number: "1.4"
+                name: "Item Data"
+                folder: "1.4-item-data/"
+                dependencies: []
+      
+      - name: "Combat System"
+        phase: 2
+        features:
+          - number: "2"
+            name: "Combat System"
+            folder: "2-combat-system/"
+            description: "Complete Pokemon battle engine"
+            dependencies: ["1"]
+            sub_features:
+              - number: "2.1"
+                name: "Battle Foundation"
+                folder: "2.1-battle-foundation/"
+                dependencies: ["1"]
+              - number: "2.2"
+                name: "Action Queue System"
+                folder: "2.2-action-queue-system/"
+                dependencies: ["2.1"]
+              - number: "2.3"
+                name: "Turn Order Resolution"
+                folder: "2.3-turn-order-resolution/"
+                dependencies: ["2.1"]
+              - number: "2.4"
+                name: "Damage Calculation Pipeline"
+                folder: "2.4-damage-calculation-pipeline/"
+                dependencies: ["1", "2.1"]
+              - number: "2.5"
+                name: "Combat Actions"
+                folder: "2.5-combat-actions/"
+                dependencies: ["2.1"]
+              - number: "2.6"
+                name: "Combat Engine"
+                folder: "2.6-combat-engine/"
+                dependencies: ["2.1", "2.2", "2.3", "2.4", "2.5"]
+      
+      - name: "Content Expansion"
+        phase: 3
+        features:
+          - number: "3"
+            name: "Content Expansion"
+            folder: "3-content-expansion/"
+            description: "Adding all game content: Pokemon, Moves, Items, Abilities"
+            dependencies: ["1"]
+            sub_features:
+              - number: "3.1"
+                name: "Pokemon Expansion"
+                folder: "3.1-pokemon-expansion/"
+                dependencies: ["1.1"]
+              - number: "3.2"
+                name: "Move Expansion"
+                folder: "3.2-move-expansion/"
+                dependencies: ["1.2"]
+      
+      - name: "Unity Integration"
+        phase: 4
+        features:
+          - number: "4"
+            name: "Unity Integration"
+            folder: "4-unity-integration/"
+            description: "Integrating the battle engine with Unity"
+            dependencies: ["2"]
+            sub_features:
+              - number: "4.1"
+                name: "Unity Project Setup"
+                folder: "4.1-unity-project-setup/"
+                dependencies: ["2"]
+              - number: "4.2"
+                name: "UI Foundation"
+                folder: "4.2-ui-foundation/"
+                dependencies: ["4.1"]
+      
+      - name: "Game Features"
+        phase: 5
+        features:
+          - number: "5"
+            name: "Game Features"
+            folder: "5-game-features/"
+            description: "Game systems beyond combat"
+            dependencies: ["2", "3"]
+            sub_features:
+              - number: "5.1"
+                name: "Post-Battle Rewards"
+                folder: "5.1-post-battle-rewards/"
+                dependencies: ["2"]
+

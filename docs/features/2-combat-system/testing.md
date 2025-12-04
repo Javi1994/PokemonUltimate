@@ -17,7 +17,7 @@ The combat system uses a comprehensive three-phase testing approach:
 
 ## Test Structure
 
-Following `docs/ai/testing_structure_definition.md`:
+Following TDD workflow from `ai_workflow/docs/TDD_GUIDE.md`:
 
 ```
 PokemonUltimate.Tests/
@@ -290,7 +290,7 @@ dotnet test --filter "FullyQualifiedName~CombatEngineTests"
 - **[Use Cases](use_cases.md)** - Scenarios to verify
 - **[Code Location](code_location.md)** - Where tests live
 - **[Integration Guide](testing/integration_guide.md)** - Integration test patterns
-- **[Test Structure Standard](../../ai/testing_structure_definition.md)** - Standard test organization
+- **[TDD Guide](../../../ai_workflow/docs/TDD_GUIDE.md)** - Test-Driven Development guide
 
 ---
 

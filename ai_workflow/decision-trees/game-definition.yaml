@@ -1,0 +1,512 @@
+# Game Definition Decision Tree
+
+> **Decision tree estructurado para definir juegos y generar features automáticamente**
+
+## Workflow Overview
+
+```yaml
+game_definition:
+  name: "Game Definition & Feature Generation"
+  version: "1.0.0"
+  description: "Define game → Generate features → Create master list"
+  mandatory: true
+  step: -1  # Must be done BEFORE feature discovery (Step 0)
+  triggers:
+    - "Define game"
+    - "What is this game?"
+    - "Define [game name]"
+    - "Set up game definition"
+    - "Create game definition"
+    - "Redefine game definition"
+    - "Improve game definition"
+    - "Review game definition"
+    - "Update game definition"
+    - "Enhance game definition"
+```
+
+---
+
+## Step -1.1: Check if Game Already Defined
+
+```yaml
+check_game_defined:
+  step: -1.1
+  action: "read_file"
+  file: "docs/GAME_DEFINITION.yaml"
+  condition: "file_exists"
+  
+  if_exists:
+    action: "determine_intent"
+    check_user_intent:
+      - if_trigger_contains: ["redefine", "improve", "review", "update", "enhance"]
+        action: "review_and_improve"
+        next: review_existing_definition
+      - if_trigger_contains: ["define", "what is"]
+        action: "read_and_validate"
+        next: check_completeness
+    
+  if_not_exists:
+    action: "start_definition"
+    next: define_game_basics
+```
+
+**AI Action**:
+```markdown
+1. Check if `docs/GAME_DEFINITION.yaml` exists
+2. If exists:
+   - Check user intent from trigger keywords
+   - If trigger contains "redefine/improve/review/update/enhance" → Review and improve workflow (Step -1.8)
+   - If trigger contains "define/what is" → Read and validate completeness
+3. If not exists → Start definition process
+```
+
+---
+
+## Step -1.2: Define Game Basics
+
+```yaml
+define_game_basics:
+  step: -1.2
+  action: "extract_information"
+  required_fields:
+    - name: "Game name"
+      question: "What is the name of the game?"
+      example: "EcosystemGame"
+      
+    - type: "Game type"
+      question: "What type of game is it?"
+      options:
+        - "Simulation"
+        - "Strategy"
+        - "Action"
+        - "Puzzle"
+        - "Educational"
+        - "Other"
+      example: "Simulation"
+      
+    - description: "Game description"
+      question: "What is the game about? (1-2 paragraphs)"
+      example: "A realistic ecosystem simulation game..."
+      
+    - target_platform: "Target platform"
+      question: "What platform(s) will it run on?"
+      options:
+        - "Unity"
+        - "Unreal"
+        - "Web"
+        - "Mobile"
+        - "Desktop"
+        - "Console"
+      example: "Unity"
+      
+    - sdk_purpose: "SDK purpose"
+      question: "What does the SDK provide?"
+      example: "Logic layer for Unity integration"
+      
+  template: "templates/game-definition-template.yaml"
+  next: define_core_concepts
+```
+
+**AI Action**:
+```markdown
+1. Extract game basics from user input or ask questions
+2. Fill required fields:
+   - Game name
+   - Game type
+   - Description (1-2 paragraphs)
+   - Target platform
+   - SDK purpose
+3. Use template: `templates/game-definition-template.yaml`
+```
+
+---
+
+## Step -1.3: Define Core Concepts
+
+```yaml
+define_core_concepts:
+  step: -1.3
+  action: "identify_concepts"
+  required_concepts:
+    - entities: "What entities exist in the game?"
+      examples:
+        - "Animals"
+        - "Plants"
+        - "Resources"
+        - "Buildings"
+        - "Characters"
+      question: "What are the main entities/objects in the game?"
+      
+    - environment: "What is the environment?"
+      examples:
+        - "Ecosystem"
+        - "City"
+        - "Space"
+        - "Dungeon"
+      question: "What is the game environment/world?"
+      
+    - interactions: "What interactions exist?"
+      examples:
+        - "Predation"
+        - "Reproduction"
+        - "Resource gathering"
+        - "Combat"
+      question: "What are the main interactions between entities?"
+      
+    - systems: "What systems are needed?"
+      examples:
+        - "Behavior/AI"
+        - "Physics"
+        - "Economy"
+        - "Combat"
+      question: "What systems does the game need?"
+      
+  next: generate_feature_categories
+```
+
+**AI Action**:
+```markdown
+1. Identify core concepts from game description:
+   - Entities (what exists in the game)
+   - Environment (the world/space)
+   - Interactions (how things interact)
+   - Systems (what systems are needed)
+2. Extract from user input or ask clarifying questions
+```
+
+---
+
+## Step -1.4: Generate Feature Categories
+
+```yaml
+generate_feature_categories:
+  step: -1.4
+  action: "auto_generate_categories"
+  strategy: "map_concepts_to_features"
+  
+  mapping_rules:
+    entities:
+      - category: "Entity System"
+        features:
+          - "Entity Base"
+          - "Entity Properties"
+          - "Entity States"
+          - "[Entity Type] Entities"
+    
+    environment:
+      - category: "Environment System"
+        features:
+          - "Environment Base"
+          - "Zones/Areas"
+          - "Climate/Conditions"
+          - "Terrain"
+    
+    interactions:
+      - category: "Interaction System"
+        features:
+          - "Interaction Base"
+          - "[Interaction Type] Interactions"
+    
+    systems:
+      - category: "[System Name] System"
+        features:
+          - "[System] Base"
+          - "[System] Components"
+    
+  next: define_feature_details
+```
+
+**AI Action**:
+```markdown
+1. Map core concepts to feature categories:
+   - Entities → Entity System features
+   - Environment → Environment System features
+   - Interactions → Interaction System features
+   - Systems → System-specific features
+2. Generate initial feature list based on concepts
+3. Create feature categories
+```
+
+---
+
+## Step -1.5: Define Feature Details
+
+```yaml
+define_feature_details:
+  step: -1.5
+  action: "granularize_features"
+  strategy: "break_down_to_sub_features"
+  
+  granularity_rules:
+    - base_first: "Always start with base/abstract classes"
+    - properties_second: "Then add properties/attributes"
+    - behavior_third: "Then add behavior/actions"
+    - interactions_fourth: "Then add interactions"
+    - systems_last: "Finally add system integration"
+  
+  sub_feature_patterns:
+    - pattern: "[Feature] Base"
+      description: "Base class/interface for feature"
+      dependencies: []
+      
+    - pattern: "[Feature] Properties"
+      description: "Properties/attributes of feature"
+      dependencies: ["[Feature] Base"]
+      
+    - pattern: "[Feature] States"
+      description: "States/status of feature"
+      dependencies: ["[Feature] Base"]
+      
+    - pattern: "[Feature] Behavior"
+      description: "Behavior/actions of feature"
+      dependencies: ["[Feature] Base", "[Feature] Properties"]
+      
+    - pattern: "[Feature] Interactions"
+      description: "Interactions with other features"
+      dependencies: ["[Feature] Base", "[Other Feature] Base"]
+  
+  next: create_master_list
+```
+
+**AI Action**:
+```markdown
+1. Break down each feature category into granular sub-features:
+   - Base classes/interfaces first
+   - Properties/attributes second
+   - Behavior/actions third
+   - Interactions fourth
+   - System integration last
+2. Identify dependencies between sub-features
+3. Create granular feature list
+```
+
+---
+
+## Step -1.6: Create Master List
+
+```yaml
+create_master_list:
+  step: -1.6
+  action: "generate_master_list"
+  output_files:
+    - "docs/GAME_DEFINITION.yaml"
+    - "docs/features_master_list.md"
+    - "docs/features_master_list_detailed.md"
+  
+  master_list_structure:
+    - feature_number: "Sequential numbering (1, 2, 3...)"
+    - feature_name: "Descriptive name"
+    - folder: "[N]-[kebab-case-name]/"
+    - status: "⏳ Planned"
+    - description: "Brief description"
+    - dependencies: "List of dependencies"
+    - phase: "Development phase"
+  
+  next: create_code_organization
+```
+
+**AI Action**:
+```markdown
+1. Generate `docs/GAME_DEFINITION.yaml` with complete game definition
+2. Generate `docs/features_master_list.md` with main features
+3. Generate `docs/features_master_list_detailed.md` with all sub-features
+4. Number features sequentially
+5. Assign to development phases
+```
+
+---
+
+## Step -1.7.5: Create Code Organization Document
+
+```yaml
+create_code_organization:
+  step: -1.7.5
+  action: "create_code_organization_doc"
+  description: "Crear documento de estrategia de organización de código"
+  condition: "features_count > 5 OR sub_features_count > 20"
+  
+  create_file:
+    file: "docs/CODE_ORGANIZATION.md"
+    description: "Estrategia de organización de código para proyectos grandes"
+    required: false  # Recomendado pero no obligatorio
+  
+  content_guidelines:
+    - explain_principles: "Explicar principios de organización"
+    - show_structure: "Mostrar estructura propuesta"
+    - map_features_to_code: "Mapear features a ubicación de código"
+    - provide_examples: "Proporcionar ejemplos prácticos"
+  
+  next: validate_definition
+```
+
+**AI Action**:
+```markdown
+1. Check if project has many features (5+ features or 20+ sub-features)
+2. If yes, create CODE_ORGANIZATION.md with:
+   - Principles: Code by technical system, docs by feature
+   - Structure: Core/[System]/[SubFolder]/
+   - Mapping: Feature N → Code location
+   - Examples: How to add new features
+3. Reference in .cursorrules if exists
+```
+
+---
+
+## Step -1.7: Validate Definition
+
+```yaml
+validate_definition:
+  step: -1.7
+  action: "validate_completeness"
+  checks:
+    - game_basics_complete: "All basic fields filled"
+    - core_concepts_identified: "At least 3 core concepts"
+    - features_generated: "At least 5 features generated"
+    - dependencies_mapped: "Dependencies identified"
+    - phases_assigned: "Features assigned to phases"
+  
+  if_complete:
+    success: "Game definition complete"
+    next: proceed_to_feature_discovery
+    
+  if_incomplete:
+    action: "request_missing_info"
+    next: define_game_basics  # Loop back
+```
+
+**AI Action**:
+```markdown
+1. Validate game definition completeness:
+   - All basic fields filled ✓
+   - Core concepts identified ✓
+   - Features generated ✓
+   - Dependencies mapped ✓
+   - Phases assigned ✓
+2. If incomplete → Request missing information
+3. If complete → Proceed to feature discovery (Step 0)
+```
+
+---
+
+## Step -1.8: Review and Improve Existing Definition
+
+```yaml
+review_existing_definition:
+  step: -1.8
+  action: "review_and_improve"
+  trigger_keywords:
+    - "redefine"
+    - "improve"
+    - "review"
+    - "update"
+    - "enhance"
+  
+  review_process:
+    1. read_existing:
+       - file: "docs/GAME_DEFINITION.yaml"
+       - file: "docs/features_master_list.md"
+       - file: "docs/features_master_list_detailed.md"
+    
+    2. analyze_completeness:
+       - check_missing_entities: "Are all entity types covered?"
+       - check_missing_interactions: "Are all interactions defined?"
+       - check_missing_systems: "Are all systems identified?"
+       - check_granularity: "Are features granular enough?"
+       - check_dependencies: "Are all dependencies mapped?"
+    
+    3. compare_with_best_practices:
+       - entity_coverage: "Compare with typical ecosystem entities"
+       - interaction_coverage: "Compare with typical ecosystem interactions"
+       - system_coverage: "Compare with typical simulation systems"
+       - feature_granularity: "Ensure features are granular and modular"
+    
+    4. identify_improvements:
+       - missing_concepts: "What concepts are missing?"
+       - missing_features: "What features should be added?"
+       - granularity_improvements: "What can be broken down further?"
+       - dependency_improvements: "What dependencies are missing?"
+    
+    5. suggest_improvements:
+       - present_findings: "Show what's missing or could be improved"
+       - ask_user_confirmation: "Confirm improvements to apply"
+    
+    6. apply_improvements:
+       - update_game_definition: "Update GAME_DEFINITION.yaml"
+       - regenerate_features: "Regenerate feature lists"
+       - update_master_lists: "Update master lists"
+  
+  next: validate_definition
+```
+
+**AI Action**:
+```markdown
+1. Read existing game definition files
+2. Analyze completeness:
+   - Check for missing entities, interactions, systems
+   - Verify feature granularity
+   - Check dependency mapping
+3. Compare with best practices:
+   - Typical ecosystem simulation patterns
+   - Common features in similar games
+   - Best practices for granular features
+4. Identify improvements:
+   - Missing concepts
+   - Missing features
+   - Granularity improvements
+   - Dependency improvements
+5. Present findings to user:
+   - Show what's missing
+   - Suggest improvements
+   - Ask for confirmation
+6. Apply improvements:
+   - Update game definition
+   - Regenerate feature lists
+   - Update master lists
+7. Validate updated definition
+```
+
+---
+
+## Integration with Feature Discovery
+
+```yaml
+integration:
+  step_0_prerequisite: "Game definition must exist"
+  check_before_feature_discovery:
+    - file: "docs/GAME_DEFINITION.yaml"
+      must_exist: true
+      if_missing: "Run game definition workflow first"
+  
+  feature_discovery_uses:
+    - game_definition: "docs/GAME_DEFINITION.yaml"
+    - master_list: "docs/features_master_list.md"
+    - detailed_list: "docs/features_master_list_detailed.md"
+```
+
+---
+
+## Error Handling
+
+```yaml
+error_handling:
+  game_not_defined:
+    message: "Game definition not found"
+    action: "Run game definition workflow first"
+    next: define_game_basics
+    
+  incomplete_definition:
+    message: "Game definition incomplete"
+    action: "Complete missing fields"
+    next: define_game_basics
+    
+  no_features_generated:
+    message: "No features generated from definition"
+    action: "Review core concepts and regenerate"
+    next: generate_feature_categories
+```
+
+---
+
+**Última Actualización**: 2025-01-XX  
+**Versión**: 1.0.0
+

@@ -1,0 +1,493 @@
+# TDD Workflow Decision Tree
+
+> **Decision tree estructurado para flujo TDD paso a paso**
+
+## Workflow Overview
+
+```yaml
+tdd_workflow:
+  name: "Test-Driven Development Workflow"
+  version: "1.0.0"
+  description: "Flujo completo TDD: Red → Green → Refactor"
+  
+  steps:
+    - determine_test_type
+    - write_functional_test
+    - verify_test_fails
+    - implement_feature
+    - verify_test_passes
+    - write_edge_cases
+    - write_integration_tests
+    - refactor
+    - validate_implementation
+    - check_smoke_tests
+    - update_documentation
+```
+
+---
+
+## Step 1: Determine Test Type
+
+```yaml
+determine_test_type:
+  step: 1
+  question: "What are you testing?"
+  mandatory: true
+  
+  options:
+    - value: "new_functionality"
+      description: "New feature or component"
+      next: write_functional_test
+      template: "templates/tests/functional-template.[ext]"
+      
+    - value: "boundary_conditions"
+      description: "Edge cases, invalid inputs, boundaries"
+      next: write_edge_case_test
+      template: "templates/tests/edgecases-template.[ext]"
+      condition: "functional_tests_exist = true"
+      
+    - value: "system_interactions"
+      description: "Multiple components working together"
+      next: write_integration_test
+      template: "templates/tests/integration-template.[ext]"
+      condition: "functional_tests_exist = true"
+```
+
+**AI Action**:
+```markdown
+1. Read feature's `use_cases.md` to understand what to test
+2. Determine test type based on user request
+3. Use appropriate template
+```
+
+---
+
+## Step 2: Write Functional Test
+
+```yaml
+write_functional_test:
+  step: 2
+  action: "create_test_file"
+  template: "templates/tests/functional-template.[ext]"
+  
+  location_rules:
+    pattern: "Tests/[Feature]/[Component]Tests.[ext]"
+    example: "Tests/Authentication/AuthServiceTests.cs"
+    
+  naming_convention:
+    pattern: "MethodName_Scenario_ExpectedResult"
+    examples:
+      - "Authenticate_ValidCredentials_ReturnsTrue"
+      - "Authenticate_InvalidCredentials_ReturnsFalse"
+      - "GetUser_ExistingId_ReturnsUser"
+  
+  required_sections:
+    - arrange: "Setup test data"
+    - act: "Execute method"
+    - assert: "Verify result"
+  
+  next: verify_test_fails
+```
+
+**AI Action**:
+```markdown
+1. Read template from `templates/tests/functional-template.[ext]`
+2. Replace placeholders with actual values
+3. Follow naming convention: `MethodName_Scenario_ExpectedResult`
+4. Ensure test is in correct location: `Tests/[Feature]/[Component]Tests.[ext]`
+5. Write test that should FAIL (red phase)
+```
+
+---
+
+## Step 3: Verify Test Fails (Red Phase)
+
+```yaml
+verify_test_fails:
+  step: 3
+  phase: "red"
+  action: "run_tests"
+  
+  expected_result: "FAIL"
+  validation: "test_must_fail_in_red_phase"
+  
+  if_pass:
+    error: "ERROR: Test should fail in red phase"
+    message: "If test passes, you're not in red phase. Test should fail because implementation doesn't exist yet."
+    action: "review_test_or_implementation"
+    
+  if_fail:
+    success: "CORRECT: Test fails as expected (red phase)"
+    message: "Proceed to green phase - implement feature"
+    next: implement_feature
+```
+
+**AI Action**:
+```markdown
+1. Run tests: `[test_command] Tests/[Feature]/[Component]Tests.[ext]`
+2. Verify test FAILS (expected in red phase)
+3. If test PASSES → ERROR: Should fail, review test
+4. If test FAILS → CORRECT: Proceed to implementation
+```
+
+---
+
+## Step 4: Implement Feature (Green Phase)
+
+```yaml
+implement_feature:
+  step: 4
+  phase: "green"
+  action: "write_code"
+  
+  goal: "Make test pass"
+  principle: "Write minimal code to pass test"
+  
+  process:
+    - read_code_location: "Read feature's `code_location.md`"
+    - read_existing_code: "Read key files mentioned in `code_location.md`"
+    - match_patterns: "Follow existing patterns and style"
+    - add_feature_reference: "Add feature reference to code comments"
+    - write_minimal_code: "Write only what's needed to pass test"
+  
+  next: verify_test_passes
+```
+
+**AI Action**:
+```markdown
+1. Read `code_location.md` to find where code lives
+2. Read existing code files to understand patterns
+3. Write minimal implementation to make test pass
+4. Add feature reference: `/// <remarks>Feature: [N]: [Name]</remarks>`
+5. Follow existing code style and patterns
+```
+
+---
+
+## Step 5: Verify Test Passes (Green Phase)
+
+```yaml
+verify_test_passes:
+  step: 5
+  phase: "green"
+  action: "run_tests"
+  
+  expected_result: "PASS"
+  validation: "test_must_pass_in_green_phase"
+  
+  if_fail:
+    error: "ERROR: Test should pass after implementation"
+    message: "Implementation incomplete. Fix code to make test pass."
+    action: "fix_implementation"
+    next: verify_test_passes  # Retry
+    
+  if_pass:
+    success: "CORRECT: Test passes (green phase)"
+    message: "Proceed to edge cases"
+    next: write_edge_cases
+```
+
+**AI Action**:
+```markdown
+1. Run tests: `[test_command] Tests/[Feature]/[Component]Tests.[ext]`
+2. Verify test PASSES (expected in green phase)
+3. If test FAILS → Fix implementation, retry
+4. If test PASSES → CORRECT: Proceed to edge cases
+```
+
+---
+
+## Step 6: Write Edge Case Tests
+
+```yaml
+write_edge_cases:
+  step: 6
+  action: "create_edge_case_tests"
+  template: "templates/tests/edgecases-template.[ext]"
+  
+  test_categories:
+    - null_inputs: "Test null parameters"
+    - boundary_values: "Test min/max values"
+    - invalid_inputs: "Test invalid data"
+    - special_cases: "Test edge scenarios"
+  
+  source:
+    - use_cases: "Read feature's `use_cases.md`"
+    - architecture: "Check `architecture.md` for edge cases"
+    - existing_tests: "Review similar features"
+  
+  next: write_integration_tests
+```
+
+**AI Action**:
+```markdown
+1. Read `use_cases.md` for edge cases
+2. Read `architecture.md` for boundary conditions
+3. Use template: `templates/tests/edgecases-template.[ext]`
+4. Write tests for:
+   - Null inputs
+   - Boundary values (min/max)
+   - Invalid inputs
+   - Special cases
+5. Implement missing functionality if discovered (Test-Driven Discovery)
+```
+
+---
+
+## Step 7: Write Integration Tests
+
+```yaml
+write_integration_tests:
+  step: 7
+  action: "create_integration_tests"
+  template: "templates/tests/integration-template.[ext]"
+  condition: "feature_interacts_with_multiple_systems = true"
+  
+  location:
+    pattern: "Tests/[Feature]/Integration/[Category]/[TestFile].[ext]"
+    example: "Tests/Authentication/Integration/AuthService_UserRepository_WorksTogether.cs"
+  
+  test_scenarios:
+    - multiple_components: "Test component interactions"
+    - system_flows: "Test complete workflows"
+    - cascading_effects: "Test side effects"
+  
+  next: refactor
+```
+
+**AI Action**:
+```markdown
+1. Determine if feature interacts with multiple systems
+2. If yes → Use template: `templates/tests/integration-template.[ext]`
+3. Write tests for:
+   - Component interactions
+   - Complete workflows
+   - Cascading effects
+4. Place in: `Tests/[Feature]/Integration/[Category]/`
+```
+
+---
+
+## Step 8: Refactor
+
+```yaml
+refactor:
+  step: 8
+  phase: "refactor"
+  action: "improve_code"
+  
+  principle: "Improve code without changing behavior"
+  condition: "all_tests_pass = true"
+  
+  refactoring_checks:
+    - code_quality: "Follow project guidelines"
+    - remove_duplication: "DRY principle"
+    - improve_readability: "Clear naming, structure"
+    - optimize_performance: "If needed"
+  
+  validation:
+    - run_tests: "All tests must still pass"
+    - check_guidelines: "Follow `docs/ai/guidelines/project_guidelines.md`"
+    - check_anti_patterns: "Avoid `docs/ai/anti-patterns.md`"
+  
+  next: validate_implementation
+```
+
+**AI Action**:
+```markdown
+1. Ensure all tests pass
+2. Refactor code:
+   - Remove duplication
+   - Improve readability
+   - Follow project guidelines
+   - Avoid anti-patterns
+3. Run tests again → Must all pass
+4. Proceed to validation
+```
+
+---
+
+## Step 8.5: Validate Implementation
+
+```yaml
+validate_implementation:
+  step: 8.5
+  action: "validate_all"
+  mandatory: true
+  
+  validations:
+    - test_structure:
+        script: "ai_workflow/scripts/validate-test-structure.ps1"
+        command: "ai_workflow/scripts/validate-test-structure.ps1 -TestDir Tests"
+        expected: "exit_code = 0"
+        if_fails: "Fix test structure issues before proceeding"
+        
+    - fdd_compliance:
+        script: "ai_workflow/scripts/validate-fdd-compliance.ps1"
+        command: "ai_workflow/scripts/validate-fdd-compliance.ps1 -CodeDir EcosystemGameSdk -FeaturesDir docs/features -MasterList docs/features_master_list.md"
+        expected: "exit_code = 0"
+        if_fails: "Fix FDD compliance issues before proceeding"
+        
+    - build:
+        command: "dotnet build"
+        expected: "0 warnings, 0 errors"
+        
+    - tests:
+        command: "dotnet test"
+        expected: "all tests pass"
+  
+  next: check_smoke_tests
+```
+
+**AI Action**:
+```markdown
+1. Run validation scripts (MANDATORY - must exit with code 0):
+   a. validate-test-structure.ps1 -TestDir Tests
+      - If exit code != 0 → Fix test structure issues, retry
+   b. validate-fdd-compliance.ps1 -CodeDir EcosystemGameSdk -FeaturesDir docs/features -MasterList docs/features_master_list.md
+      - If exit code != 0 → Fix FDD compliance issues, retry
+2. Run dotnet build → Must have 0 warnings, 0 errors
+3. Run dotnet test → All tests must pass
+4. If any validation fails → Fix issues and retry
+5. Only proceed to next step when all validations pass
+```
+
+---
+
+## Step 9: Check for Smoke Tests Creation
+
+```yaml
+check_smoke_tests:
+  step: 9
+  action: "check_smoke_tests_needed"
+  condition: "features_completed >= 5 OR phase_completed = true"
+  
+  criteria:
+    - features_completed: "Count completed main features (not sub-features)"
+    - phase_completed: "Check if entire development phase is complete"
+  
+  if_criteria_met:
+    action: "create_or_update_smoke_tests"
+    steps:
+      - check_smoke_tests_project: "Verify if smoke tests project exists"
+      - create_project_if_needed: "Create Tests/EcosystemGameSdk.SmokeTests/ if not exists"
+      - create_smoke_tests: "Create smoke tests for completed features"
+      - verify_smoke_tests_pass: "Run smoke tests and verify they pass"
+    
+    template: "templates/tests/smoke-template.md"
+    location: "Tests/EcosystemGameSdk.SmokeTests/Core/[System]/[System]SystemSmokeTests.cs"
+  
+  if_criteria_not_met:
+    action: "skip_smoke_tests"
+    message: "Not enough features completed yet (need 5+ main features or completed phase)"
+  
+  next: update_documentation
+```
+
+**AI Action**:
+```markdown
+1. Count completed main features (not sub-features)
+2. Check if development phase is complete
+3. If criteria met (5+ features OR phase complete):
+   a. Check if smoke tests project exists
+   b. If not → Create `Tests/EcosystemGameSdk.SmokeTests/` project
+   c. Add to solution
+   d. Reference main SDK project
+   e. Create smoke tests using template
+   f. Test happy path of completed features
+   g. Verify smoke tests pass
+4. If criteria not met → Skip and proceed to documentation
+```
+
+---
+
+## Step 10: Update Documentation
+
+```yaml
+update_documentation:
+  step: 10
+  action: "update_all_documentation"
+  mandatory: true
+  
+  feature_documentation:
+    - roadmap: "Mark completed phases/sub-features as ✅"
+    - architecture: "Update if implementation differs from spec"
+    - use_cases: "Mark completed use cases"
+    - code_location: "Add new files/classes"
+    - testing: "Document new tests and test organization"
+  
+  master_documents:
+    - features_master_list: "Update feature status if changed"
+    - features_master_list_index: "Update index with new status and next available features"
+    - context: "Update current project state"
+  
+  smoke_tests_documentation:
+    - smoke_tests_guide: "Update if smoke tests were created/updated"
+    - smoke_tests_coverage: "Document which features are covered"
+  
+  next: end
+```
+
+**AI Action**:
+```markdown
+1. Update feature documentation (roadmap, architecture, etc.)
+2. Update master documents (features_master_list.md, context.md)
+3. If smoke tests were created → Update smoke tests documentation
+4. Ensure all documentation reflects actual implementation state
+```
+
+---
+
+## Validation Rules
+
+```yaml
+validation_rules:
+  test_naming:
+    pattern: "^[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+$"
+    example: "Authenticate_ValidCredentials_ReturnsTrue"
+    
+  test_structure:
+    required_sections: [arrange, act, assert]
+    optional_sections: [setup, teardown]
+    
+  test_location:
+    pattern: "Tests/[Feature]/[Component]Tests.[ext]"
+    integration_pattern: "Tests/[Feature]/Integration/[Category]/[TestFile].[ext]"
+    
+  red_phase:
+    test_must_fail: true
+    implementation_must_not_exist: true
+    
+  green_phase:
+    test_must_pass: true
+    implementation_must_exist: true
+```
+
+---
+
+## Error Handling
+
+```yaml
+error_handling:
+  test_passes_in_red_phase:
+    message: "Test should fail in red phase"
+    action: "Review test - implementation may already exist or test is incorrect"
+    
+  test_fails_in_green_phase:
+    message: "Test should pass after implementation"
+    action: "Fix implementation to make test pass"
+    
+  wrong_test_type:
+    message: "Test type doesn't match scenario"
+    action: "Use correct template and test type"
+    
+  wrong_location:
+    message: "Test in wrong location"
+    action: "Move to correct location following structure"
+```
+
+---
+
+**Última Actualización**: 2025-01-XX  
+**Versión**: 1.0.0
+

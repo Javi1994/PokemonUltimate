@@ -1,0 +1,362 @@
+# Feature Discovery Decision Tree
+
+> **Decision tree estructurado para Feature-Driven Development**
+
+## Workflow Overview
+
+```yaml
+feature_discovery:
+  name: "Feature Discovery & Assignment"
+  version: "1.0.0"
+  description: "Flujo completo FDD: Búsqueda → Asignación → Creación"
+  mandatory: true
+  step: 0  # Must be done FIRST before any code
+```
+
+---
+
+## Step 0.1: Read Master List
+
+```yaml
+read_master_list:
+  step: 0.1
+  action: "read_file"
+  file: "docs/features_master_list_index.md"
+  purpose: "Quick scan of all existing features"
+  
+  expected_content:
+    - feature_numbers: "List of all feature numbers"
+    - feature_names: "List of all feature names"
+    - feature_folders: "List of all feature folders"
+    - feature_status: "Status of each feature"
+  
+  next: semantic_search
+```
+
+**AI Action**:
+```markdown
+1. Read `docs/features_master_list_index.md`
+2. Extract all feature numbers, names, folders, status
+3. Store in memory for comparison
+```
+
+---
+
+## Step 0.2: Semantic Search
+
+```yaml
+semantic_search:
+  step: 0.2
+  action: "codebase_search"
+  query: "What features exist related to [user_request]?"
+  
+  search_targets:
+    - file: "docs/features_master_list_index.md"
+    - file: "docs/features_master_list.md"
+    - directory: "docs/features/"
+  
+  search_strategy:
+    - keyword_match: "Match keywords from user request"
+    - semantic_match: "Find semantically similar features"
+    - description_match: "Match feature descriptions"
+  
+  next: check_matches
+```
+
+**AI Action**:
+```markdown
+1. Extract keywords from user request
+2. Search in `features_master_list_index.md` for matches
+3. Search in feature README files for semantic matches
+4. Return list of potential matches
+```
+
+---
+
+## Step 0.3: Check Matches
+
+```yaml
+check_matches:
+  step: 0.3
+  condition: "matches_found > 0"
+  
+  if_yes:
+    action: "read_feature_docs"
+    files:
+      - "README.md"
+      - "architecture.md"
+      - "roadmap.md"
+    next: verify_fit
+    
+  if_no:
+    action: "determine_new_feature_number"
+    next: create_new_feature
+```
+
+**AI Action**:
+```markdown
+1. Count matches found
+2. If matches > 0 → Read feature docs
+3. If matches = 0 → Create new feature
+```
+
+---
+
+## Step 0.4: Verify Fit
+
+```yaml
+verify_fit:
+  step: 0.4
+  condition: "work_fits_existing_feature"
+  
+  verification_criteria:
+    - scope_match: "Work fits feature scope"
+    - purpose_match: "Work aligns with feature purpose"
+    - status_compatible: "Feature status allows new work"
+  
+  if_yes:
+    action: "assign_to_existing"
+    next: check_sub_feature
+    
+  if_no:
+    action: "determine_new_feature_number"
+    next: create_new_feature
+```
+
+**AI Action**:
+```markdown
+1. Read feature's README.md and architecture.md
+2. Compare user request with feature scope
+3. Determine if work fits existing feature:
+   - YES → Assign to existing feature
+   - NO → Create new feature
+```
+
+---
+
+## Step 0.5: Check Sub-Feature
+
+```yaml
+check_sub_feature:
+  step: 0.5
+  condition: "work_fits_existing_sub_feature"
+  
+  verification:
+    - read_sub_features: "Read feature's README.md for sub-features list"
+    - compare_scope: "Compare work with sub-feature scope"
+  
+  if_yes:
+    action: "assign_to_existing_sub_feature"
+    next: proceed_to_workflow
+    
+  if_no:
+    action: "create_new_sub_feature"
+    next: proceed_to_workflow
+```
+
+**AI Action**:
+```markdown
+1. Read feature's README.md → Find sub-features list
+2. Compare work with each sub-feature scope
+3. Determine if work fits existing sub-feature:
+   - YES → Use existing sub-feature
+   - NO → Create new sub-feature folder with README.md
+```
+
+---
+
+## Step 0.6: Create New Feature
+
+```yaml
+create_new_feature:
+  step: 0.6
+  action: "create_feature_structure"
+  
+  determine_number:
+    action: "read_master_list"
+    file: "docs/features_master_list.md"
+    find: "next_available_number"
+    rule: "Sequential numbering (1, 2, 3...)"
+  
+  create_structure:
+    folder: "docs/features/[N]-[feature-name]/"
+    naming: "kebab-case"
+    example: "docs/features/6-user-authentication/"
+    
+    required_documents:
+      - "README.md"
+      - "architecture.md"
+      - "roadmap.md"
+      - "use_cases.md"
+      - "testing.md"
+      - "code_location.md"
+    
+    templates:
+      - source: "setup/templates/feature-readme.md"
+      - source: "setup/templates/feature-architecture.md"
+      - source: "setup/templates/feature-roadmap.md"
+      - source: "setup/templates/feature-use-cases.md"
+      - source: "setup/templates/feature-testing.md"
+      - source: "setup/templates/feature-code-location.md"
+  
+  update_master_list:
+    file: "docs/features_master_list.md"
+    action: "add_entry"
+    fields:
+      - number: "[N]"
+      - name: "[Feature Name]"
+      - folder: "[N]-[feature-name]"
+      - status: "in_progress"
+      - description: "[Brief description]"
+  
+  next: proceed_to_workflow
+```
+
+**AI Action**:
+```markdown
+1. Read `features_master_list.md` → Find next available number
+2. Create folder: `docs/features/[N]-[feature-name]/`
+3. Create all 6 required documents from templates
+4. Update `features_master_list.md` with new entry
+5. Proceed to workflow Step 1
+```
+
+---
+
+## Step 0.7: Create New Sub-Feature
+
+```yaml
+create_new_sub_feature:
+  step: 0.7
+  action: "create_sub_feature_structure"
+  
+  determine_number:
+    action: "read_feature_readme"
+    file: "docs/features/[N]-[feature-name]/README.md"
+    find: "next_available_sub_feature_number"
+    rule: "Decimal notation ([N].[M])"
+  
+  create_structure:
+    folder: "docs/features/[N]-[feature-name]/[N.M]-[sub-feature-name]/"
+    naming: "kebab-case"
+    example: "docs/features/1-game-data/1.6-weather-data/"
+    
+    required_documents:
+      - "README.md"  # Minimum required
+      
+    optional_documents:
+      - "architecture.md"  # If complex sub-feature
+    
+    templates:
+      - source: "setup/templates/sub-feature-readme.md"
+  
+  update_feature_readme:
+    file: "docs/features/[N]-[feature-name]/README.md"
+    action: "add_sub_feature_entry"
+    fields:
+      - number: "[N.M]"
+      - name: "[Sub-Feature Name]"
+      - folder: "[N.M]-[sub-feature-name]"
+      - status: "in_progress"
+  
+  next: proceed_to_workflow
+```
+
+**AI Action**:
+```markdown
+1. Read feature's README.md → Find next available sub-feature number
+2. Create folder: `docs/features/[N]-[feature-name]/[N.M]-[sub-feature-name]/`
+3. Create README.md (minimum required)
+4. Create architecture.md if complex sub-feature
+5. Update feature's README.md with new sub-feature entry
+6. Proceed to workflow Step 1
+```
+
+---
+
+## Step 0.8: Proceed to Workflow
+
+```yaml
+proceed_to_workflow:
+  step: 0.8
+  action: "continue_to_step_1"
+  
+  assignment_complete: true
+  feature_assigned: true
+  
+  next_steps:
+    - step_1: "Read Context & Specs"
+    - step_2: "Verify Spec Completeness"
+    - step_3: "TDD - Write Tests FIRST"
+  
+  validation:
+    - feature_exists: true
+    - feature_docs_exist: true
+    - feature_in_master_list: true
+```
+
+**AI Action**:
+```markdown
+1. Verify feature assignment is complete
+2. Verify feature documentation exists
+3. Verify feature is in master list
+4. Proceed to Step 1: Read Context & Specs
+```
+
+---
+
+## Validation Rules
+
+```yaml
+validation_rules:
+  feature_numbering:
+    pattern: "^[0-9]+$"
+    rule: "Sequential, no gaps"
+    example: "1, 2, 3, 4..."
+    
+  sub_feature_numbering:
+    pattern: "^[0-9]+\\.[0-9]+$"
+    rule: "Decimal notation, sequential within feature"
+    example: "1.1, 1.2, 1.3..."
+    
+  folder_naming:
+    pattern: "^[0-9]+-[a-z0-9-]+$"
+    rule: "Number-kebab-case"
+    example: "1-game-data", "2-combat-system"
+    
+  required_documents:
+    feature: [README.md, architecture.md, roadmap.md, use_cases.md, testing.md, code_location.md]
+    sub_feature: [README.md]
+    
+  master_list_entry:
+    required_fields: [number, name, folder, status, description]
+```
+
+---
+
+## Error Handling
+
+```yaml
+error_handling:
+  feature_not_found:
+    message: "Feature not found in master list"
+    action: "Create new feature or verify feature number"
+    
+  duplicate_feature_number:
+    message: "Feature number already exists"
+    action: "Use next available number"
+    
+  missing_documents:
+    message: "Feature missing required documents"
+    action: "Create missing documents from templates"
+    
+  wrong_folder_name:
+    message: "Folder name doesn't match feature number"
+    action: "Rename folder to match feature number"
+```
+
+---
+
+**Última Actualización**: 2025-01-XX  
+**Versión**: 1.0.0
+

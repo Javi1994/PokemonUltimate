@@ -22,7 +22,7 @@ This document defines how to organize and create tests for **all game data struc
 
 ## Testing Philosophy
 
-Following the existing test structure (`docs/ai/testing_structure_definition.md`):
+Following TDD workflow from `ai_workflow/docs/TDD_GUIDE.md`:
 
 1. **Blueprints/** - Tests de estructura (CÓMO son los datos)
 2. **Data/** - Tests de contenido (QUÉ contienen los datos)
@@ -1918,7 +1918,7 @@ public void Habitats_AreValid()
 -   **[Use Cases](use_cases.md)** - Scenarios to verify
 -   **[Roadmap](roadmap.md)** - Fields to test as they're implemented
 -   **[Code Location](code_location.md)** - Where tests live
--   **[Test Structure Standard](../../ai/testing_structure_definition.md)** - Standard test organization
+-   **[TDD Guide](../../../ai_workflow/docs/TDD_GUIDE.md)** - Test-Driven Development guide
 
 ---
 
