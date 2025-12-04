@@ -36,10 +36,10 @@ The combat system is organized into several key areas:
 - `ApplyStatusAction` - Status effect application
 - `SetWeatherAction` - Weather condition changes (Sub-Feature 2.12)
 - `SetTerrainAction` - Terrain condition changes (Sub-Feature 2.13)
+- `SetSideConditionAction` - Side condition changes (Sub-Feature 2.16)
 - `HealAction` - HP restoration
 - `SwitchAction` - Pokemon switching (includes entry hazard processing, Sub-Feature 2.14)
-- `StatChangeAction` - Stat stage modifications
-- `SwitchAction` - Pokemon switching
+- `StatChangeAction` - Stat stage modifications (includes Mist protection, Sub-Feature 2.16)
 - `FaintAction` - Pokemon fainting
 - `MessageAction` - Text messages
 - `BattleActionType` - Action type enum
@@ -65,6 +65,7 @@ The combat system is organized into several key areas:
 - `AttackerItemStep` - Attacker item effects
 - `WeatherStep` - Weather damage modifiers (Sub-Feature 2.12)
 - `TerrainStep` - Terrain damage modifiers (Sub-Feature 2.13)
+- `ScreenStep` - Screen damage reduction (Reflect, Light Screen, Aurora Veil) (Sub-Feature 2.16)
 - `TypeEffectivenessStep` - Type effectiveness calculation
 - `BurnStep` - Burn status penalty for physical moves
 
@@ -72,7 +73,7 @@ The combat system is organized into several key areas:
 **Purpose**: Battle field management
 **Key Classes**:
 - `BattleField` - Main battlefield container (includes weather tracking - Sub-Feature 2.12, terrain tracking - Sub-Feature 2.13)
-- `BattleSide` - Player or enemy side (includes entry hazard tracking - Sub-Feature 2.14)
+- `BattleSide` - Player or enemy side (includes entry hazard tracking - Sub-Feature 2.14, side condition tracking - Sub-Feature 2.16)
 - `BattleSlot` - Individual Pokemon slot
 - `BattleRules` - Battle format rules
 
@@ -88,14 +89,14 @@ The combat system is organized into several key areas:
 ### `PokemonUltimate.Combat.Engine`
 **Purpose**: Engine components
 **Key Classes**:
-- `CombatEngine` - Main battle controller (includes weather duration decrement - Sub-Feature 2.12, terrain duration decrement - Sub-Feature 2.13)
+- `CombatEngine` - Main battle controller (includes weather duration decrement - Sub-Feature 2.12, terrain duration decrement - Sub-Feature 2.13, side condition duration decrement - Sub-Feature 2.16)
 - `EndOfTurnProcessor` - End-of-turn effects processor (includes weather damage - Sub-Feature 2.12, terrain healing - Sub-Feature 2.13)
 - `EntryHazardProcessor` - Entry hazard processing on switch-in (Sub-Feature 2.14)
 
 ### `PokemonUltimate.Combat.Helpers`
 **Purpose**: Utility classes
 **Key Classes**:
-- `TurnOrderResolver` - Turn order calculation
+- `TurnOrderResolver` - Turn order calculation (includes Tailwind speed multiplier - Sub-Feature 2.16)
 - `TargetResolver` - Target selection
 - `AccuracyChecker` - Accuracy calculation (includes weather perfect accuracy - Sub-Feature 2.12)
 

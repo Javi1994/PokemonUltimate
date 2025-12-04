@@ -16,7 +16,14 @@ Field Conditions implements side-specific conditions:
 
 ## Current Status
 
-- ⏳ **Planned**: Field conditions not yet implemented
+- ✅ **Core Complete**: Field conditions implemented
+  - Side condition tracking in BattleSide
+  - Screen damage reduction (Reflect, Light Screen, Aurora Veil)
+  - Tailwind speed multiplier
+  - Safeguard status protection
+  - Mist stat reduction protection
+  - Side condition duration management
+  - SetSideConditionAction for applying conditions
 - ✅ **Data Ready**: SideConditionData blueprint exists
 
 ## Documentation
@@ -36,7 +43,15 @@ Field Conditions implements side-specific conditions:
 
 ## Quick Links
 
-- **Status**: ⏳ Planned (Phase 2.16)
+- **Status**: ✅ Core Complete (Phase 2.16)
+- **Tests**: 40+ tests covering all side condition mechanics
+- **Key Classes**: 
+  - `BattleSide` - Side condition tracking
+  - `ScreenStep` - Screen damage reduction in DamagePipeline
+  - `TurnOrderResolver` - Tailwind speed multiplier
+  - `ApplyStatusAction` - Safeguard protection
+  - `StatChangeAction` - Mist protection
+  - `SetSideConditionAction` - Applying side conditions
 
 ---
 

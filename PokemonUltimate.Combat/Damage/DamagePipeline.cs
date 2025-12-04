@@ -38,8 +38,9 @@ namespace PokemonUltimate.Combat.Damage
                 new AttackerItemStep(),      // 6. Apply item damage multipliers (Life Orb, etc.)
                 new WeatherStep(),           // 7. Apply weather damage multipliers (Sun/Rain, etc.)
                 new TerrainStep(),           // 8. Apply terrain damage multipliers (Electric/Grassy/Psychic/Misty)
-                new TypeEffectivenessStep(), // 9. Apply type effectiveness
-                new BurnStep(),              // 10. Apply burn penalty (0.5x for physical)
+                new ScreenStep(),            // 9. Apply screen damage reduction (Reflect/Light Screen/Aurora Veil)
+                new TypeEffectivenessStep(), // 10. Apply type effectiveness
+                new BurnStep(),              // 11. Apply burn penalty (0.5x for physical)
             };
         }
 

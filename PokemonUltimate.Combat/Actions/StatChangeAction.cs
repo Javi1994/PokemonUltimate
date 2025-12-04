@@ -56,6 +56,7 @@ namespace PokemonUltimate.Combat.Actions
         /// <summary>
         /// Modifies the stat stage of the target Pokemon.
         /// Stages are automatically clamped to -6/+6.
+        /// Mist prevents stat reductions from opponents.
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
@@ -64,6 +65,22 @@ namespace PokemonUltimate.Combat.Actions
 
             if (Target.IsEmpty || Change == 0)
                 return Enumerable.Empty<BattleAction>();
+
+            // Mist prevents stat reductions from opponents (but allows stat increases)
+            if (Change < 0 && Target.Side.HasSideCondition(SideCondition.Mist))
+            {
+                var mistData = Target.Side.GetSideConditionData(SideCondition.Mist);
+                if (mistData != null && mistData.PreventsStatReduction)
+                {
+                    // Check if the stat reduction is from an opponent
+                    // If User is null or User.Side != Target.Side, it's from an opponent
+                    if (User == null || User.Side != Target.Side)
+                    {
+                        // Stat reduction is blocked by Mist
+                        return Enumerable.Empty<BattleAction>();
+                    }
+                }
+            }
 
             Target.ModifyStatStage(Stat, Change);
 

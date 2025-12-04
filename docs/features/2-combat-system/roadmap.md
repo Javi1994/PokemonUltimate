@@ -66,9 +66,10 @@ The Combat System is divided into **multiple phases**, each building on the prev
 | 2.12 Extended End-of-Turn | ⏳ Planned | ~30 | Leech Seed, Wish, Perish Song, Binding |
 | 2.13 Additional Triggers | ⏳ Planned | ~30 | OnBeforeMove, OnAfterMove, OnDamageTaken |
 | 2.14 Volatile Status | ⏳ Planned | ~30 | Confusion, Infatuation, Taunt, Encore, Disable |
-| 2.15 Weather System | ⏳ Planned | ~35 | Sun, Rain, Sandstorm, Hail |
-| 2.16 Terrain System | ⏳ Planned | ~35 | Electric, Grassy, Psychic, Misty |
-| 2.17 Entry Hazards | ⏳ Planned | ~35 | Spikes, Stealth Rock, Toxic Spikes, Sticky Web |
+| 2.12 Weather System | ✅ Complete | 35+ | Sun, Rain, Sandstorm, Hail |
+| 2.13 Terrain System | ✅ Complete | 35+ | Electric, Grassy, Psychic, Misty |
+| 2.14 Entry Hazards | ✅ Complete | 25+ | Spikes, Stealth Rock, Toxic Spikes, Sticky Web |
+| 2.16 Field Conditions | ✅ Complete | 40+ | Screens, Tailwind, Safeguard, Mist |
 | 2.18 Special Moves | ⏳ Planned | ~50 | Protect, Counter, Pursuit, Focus Punch |
 | 2.19 Multi-Hit/Turn | ⏳ Planned | ~35 | Multi-hit moves, Multi-turn moves |
 | **Future Total** | **8/8** | **~280** | Extended features |
@@ -1551,6 +1552,70 @@ Tests/Combat/Engine/EntryHazardProcessorEdgeCasesTests.cs
 **Tests Implemented**: 25+ new tests (12 EntryHazardsTests + 13 EntryHazardProcessorTests)
 
 **Status**: ✅ Core Hazards System Complete (hazard removal actions pending move-specific implementation)
+
+---
+
+## Phase 2.16: Field Conditions (Sub-Feature 2.16)
+
+**Goal**: Implement side-specific field conditions (Screens, Tailwind, Safeguard, Mist, etc.).
+
+**Depends on**: Phase 2.4 (Damage Calculation Pipeline), Phase 2.3 (Turn Order Resolution), Phase 2.5 (Combat Actions)
+
+### Components
+
+| Component | File | Description |
+|-----------|------|-------------|
+| `BattleSide` (extended) | `Combat/Field/BattleSide.cs` | Side condition tracking |
+| `ScreenStep` | `Combat/Damage/Steps/ScreenStep.cs` | Screen damage reduction |
+| `TurnOrderResolver` (extended) | `Combat/Helpers/TurnOrderResolver.cs` | Tailwind speed multiplier |
+| `ApplyStatusAction` (extended) | `Combat/Actions/ApplyStatusAction.cs` | Safeguard protection |
+| `StatChangeAction` (extended) | `Combat/Actions/StatChangeAction.cs` | Mist protection |
+| `SetSideConditionAction` | `Combat/Actions/SetSideConditionAction.cs` | Apply side conditions |
+| `CombatEngine` (extended) | `Combat/Engine/CombatEngine.cs` | Side condition duration decrement |
+
+### Screens Specification
+
+- **Reflect**: Reduces physical damage by 50% (Singles) or 33% (Doubles)
+- **Light Screen**: Reduces special damage by 50% (Singles) or 33% (Doubles)
+- **Aurora Veil**: Reduces all damage by 50% (Singles) or 33% (Doubles), requires Hail/Snow
+- **Duration**: 5 turns (8 with Light Clay)
+- **Removed by**: Brick Break, Psychic Fangs, Defog
+
+### Tailwind Specification
+
+- **Effect**: Doubles Speed for the side
+- **Duration**: 4 turns
+- **Applied to**: All Pokemon on the side
+
+### Safeguard Specification
+
+- **Effect**: Prevents status conditions
+- **Duration**: 5 turns
+- **Protection**: All status types (Poison, Burn, Paralysis, Sleep, Freeze)
+
+### Mist Specification
+
+- **Effect**: Prevents stat reductions from opponents
+- **Duration**: 5 turns
+- **Protection**: Only stat reductions from opponents (allows self-inflicted reductions)
+
+### Completion Checklist
+
+- [x] Side condition tracking in BattleSide
+- [x] Screen damage reduction in DamagePipeline (Reflect, Light Screen, Aurora Veil)
+- [x] Tailwind speed multiplier in TurnOrderResolver
+- [x] Safeguard status protection in ApplyStatusAction
+- [x] Mist stat reduction protection in StatChangeAction
+- [x] Side condition duration management in CombatEngine
+- [x] SetSideConditionAction for applying conditions
+- [x] Aurora Veil weather requirement check
+- [x] Functional tests passing (40+ tests)
+- [x] All existing tests still passing
+- [x] No compiler warnings
+
+**Tests Implemented**: 40+ new tests (16 SideConditionTrackingTests + 7 ScreenStepTests + 4 TailwindSpeedTests + 4 SafeguardProtectionTests + 6 SetSideConditionActionTests + 4 SideConditionDurationTests)
+
+**Status**: ✅ Core Field Conditions System Complete
 
 ---
 

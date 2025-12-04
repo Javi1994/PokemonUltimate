@@ -79,8 +79,11 @@ namespace PokemonUltimate.Combat.Helpers
             // Apply item modifiers (Choice Scarf, Iron Ball)
             speed *= GetItemSpeedMultiplier(slot, field);
 
+            // Apply side condition speed modifiers (Tailwind)
+            speed *= GetSideConditionSpeedMultiplier(slot.Side);
+
             // Future: Apply ability modifiers (Swift Swim, Sand Rush)
-            // Future: Apply field effects (Tailwind, Trick Room)
+            // Future: Apply field effects (Trick Room)
 
             return speed;
         }
@@ -134,6 +137,34 @@ namespace PokemonUltimate.Combat.Helpers
 
             var itemModifier = new ItemStatModifier(slot.Pokemon.HeldItem);
             return itemModifier.GetStatMultiplier(slot, Stat.Speed, field);
+        }
+
+        /// <summary>
+        /// Gets the speed multiplier from side conditions (Tailwind, etc.).
+        /// </summary>
+        /// <param name="side">The side to check.</param>
+        /// <returns>The speed multiplier (1.0f if no modification).</returns>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        private static float GetSideConditionSpeedMultiplier(BattleSide side)
+        {
+            if (side == null)
+                return 1.0f;
+
+            // Check for Tailwind
+            if (side.HasSideCondition(SideCondition.Tailwind))
+            {
+                var tailwindData = side.GetSideConditionData(SideCondition.Tailwind);
+                if (tailwindData != null && tailwindData.ModifiesSpeed)
+                {
+                    return tailwindData.SpeedMultiplier;
+                }
+            }
+
+            return 1.0f;
         }
     }
 }

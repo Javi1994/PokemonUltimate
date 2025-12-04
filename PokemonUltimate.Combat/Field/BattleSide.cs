@@ -22,6 +22,8 @@ namespace PokemonUltimate.Combat
         private readonly List<BattleSlot> _slots;
         private IReadOnlyList<PokemonInstance> _party;
         private readonly Dictionary<HazardType, int> _hazards;
+        private readonly Dictionary<SideCondition, int> _sideConditions;
+        private readonly Dictionary<SideCondition, SideConditionData> _sideConditionData;
 
         /// <summary>
         /// The slots on this side of the field.
@@ -52,6 +54,8 @@ namespace PokemonUltimate.Combat
             IsPlayer = isPlayer;
             _slots = new List<BattleSlot>(slotCount);
             _hazards = new Dictionary<HazardType, int>();
+            _sideConditions = new Dictionary<SideCondition, int>();
+            _sideConditionData = new Dictionary<SideCondition, SideConditionData>();
 
             for (int i = 0; i < slotCount; i++)
             {
@@ -232,6 +236,154 @@ namespace PokemonUltimate.Combat
             return _hazards.TryGetValue(hazardType, out int layers) ? layers : 0;
         }
 
+
+        #endregion
+
+        #region Side Conditions
+
+        /// <summary>
+        /// Adds a side condition to this side.
+        /// Replaces existing condition if already present.
+        /// </summary>
+        /// <param name="conditionData">The side condition data to add. Cannot be null.</param>
+        /// <param name="duration">Duration in turns.</param>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        public void AddSideCondition(SideConditionData conditionData, int duration)
+        {
+            if (conditionData == null)
+                throw new ArgumentNullException(nameof(conditionData));
+
+            var conditionType = conditionData.Type;
+            _sideConditions[conditionType] = duration;
+            _sideConditionData[conditionType] = conditionData;
+        }
+
+        /// <summary>
+        /// Removes a specific side condition from this side.
+        /// </summary>
+        /// <param name="conditionType">The type of side condition to remove.</param>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        public void RemoveSideCondition(SideCondition conditionType)
+        {
+            _sideConditions.Remove(conditionType);
+            _sideConditionData.Remove(conditionType);
+        }
+
+        /// <summary>
+        /// Removes all side conditions from this side.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        public void RemoveAllSideConditions()
+        {
+            _sideConditions.Clear();
+            _sideConditionData.Clear();
+        }
+
+        /// <summary>
+        /// Checks if this side has a specific side condition.
+        /// </summary>
+        /// <param name="conditionType">The type of side condition to check.</param>
+        /// <returns>True if the condition is present.</returns>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        public bool HasSideCondition(SideCondition conditionType)
+        {
+            return _sideConditions.ContainsKey(conditionType) && _sideConditions[conditionType] > 0;
+        }
+
+        /// <summary>
+        /// Gets the remaining duration for a specific side condition.
+        /// </summary>
+        /// <param name="conditionType">The type of side condition to check.</param>
+        /// <returns>The remaining duration in turns (0 if not present).</returns>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        public int GetSideConditionDuration(SideCondition conditionType)
+        {
+            return _sideConditions.TryGetValue(conditionType, out int duration) ? duration : 0;
+        }
+
+        /// <summary>
+        /// Decrements the duration of a specific side condition by one turn.
+        /// If duration reaches 0, removes the condition.
+        /// </summary>
+        /// <param name="conditionType">The type of side condition to decrement.</param>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        public void DecrementSideConditionDuration(SideCondition conditionType)
+        {
+            if (!_sideConditions.ContainsKey(conditionType))
+                return;
+
+            int currentDuration = _sideConditions[conditionType];
+            if (currentDuration <= 0)
+            {
+                RemoveSideCondition(conditionType);
+                return;
+            }
+
+            currentDuration--;
+            _sideConditions[conditionType] = currentDuration;
+
+            if (currentDuration <= 0)
+            {
+                RemoveSideCondition(conditionType);
+            }
+        }
+
+        /// <summary>
+        /// Gets the side condition data for a specific condition type if present.
+        /// </summary>
+        /// <param name="conditionType">The type of side condition to get.</param>
+        /// <returns>The side condition data, or null if not present.</returns>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        public SideConditionData GetSideConditionData(SideCondition conditionType)
+        {
+            return _sideConditionData.TryGetValue(conditionType, out var data) ? data : null;
+        }
+
+        /// <summary>
+        /// Decrements duration for all side conditions on this side.
+        /// Single-turn conditions are automatically removed.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.16: Field Conditions
+        /// **Documentation**: See `docs/features/2-combat-system/2.16-field-conditions/README.md`
+        /// </remarks>
+        public void DecrementAllSideConditionDurations()
+        {
+            var conditionsToDecrement = _sideConditions.Keys.ToList();
+            foreach (var conditionType in conditionsToDecrement)
+            {
+                DecrementSideConditionDuration(conditionType);
+            }
+        }
 
         #endregion
     }

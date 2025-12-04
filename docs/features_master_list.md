@@ -82,7 +82,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 - **2.13**: Terrain System - Terrain conditions and effects ✅ Core Complete (advanced features pending dependent systems)
 - **2.14**: Hazards System - Stealth Rock, Spikes, etc. ✅ Core Complete (hazard removal actions pending move-specific implementation)
 - **2.15**: Advanced Move Mechanics - Multi-hit, charging moves (Planned)
-- **2.16**: Field Conditions - Screens, Tailwind, protections (Planned)
+- **2.16**: Field Conditions - Screens, Tailwind, protections ✅ Core Complete
 - **2.17**: Advanced Abilities - Complex ability interactions (Planned)
 - **2.18**: Advanced Items - Complex item interactions (Planned)
 - **2.19**: Battle Formats - Doubles, Triples, Rotation (Planned)

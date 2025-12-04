@@ -13,7 +13,7 @@ The combat system uses a comprehensive three-phase testing approach:
 - **Edge Case Tests** - Boundary conditions, invalid inputs, special cases
 - **Integration Tests** - System interactions and cascading effects
 
-**Coverage**: 2,488+ passing tests covering all combat phases (2.1-2.14)
+**Coverage**: 2,528+ passing tests covering all combat phases (2.1-2.14, 2.16)
 
 ## Test Structure
 
@@ -169,6 +169,22 @@ PokemonUltimate.Tests/
   - Sticky Web speed reduction (Contrary support)
   - Multiple hazards processing
   - Immunity checks (Flying, Levitate)
+
+### ✅ Field Conditions Tests (Sub-Feature 2.16)
+**Location**: `Tests/Systems/Combat/`
+- `Field/SideConditionTrackingTests.cs` - Side condition tracking in BattleSide (16 tests)
+- `Damage/ScreenStepTests.cs` - Screen damage reduction in DamagePipeline (7 tests)
+- `Helpers/TailwindSpeedTests.cs` - Tailwind speed multiplier in TurnOrderResolver (4 tests)
+- `Actions/SafeguardProtectionTests.cs` - Safeguard status protection (4 tests)
+- `Actions/SetSideConditionActionTests.cs` - SetSideConditionAction (6 tests)
+- `Engine/SideConditionDurationTests.cs` - Side condition duration management (4 tests)
+  - Side condition tracking (add, remove, duration)
+  - Reflect/Light Screen/Aurora Veil damage reduction
+  - Tailwind speed multiplier (2.0x)
+  - Safeguard status protection (all status types)
+  - Mist stat reduction protection
+  - Side condition duration decrement
+  - Aurora Veil weather requirement (Hail/Snow)
 
 **Total**: 25+ hazards-related tests passing
 

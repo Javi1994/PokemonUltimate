@@ -44,6 +44,7 @@ namespace PokemonUltimate.Combat.Actions
         /// <summary>
         /// Applies the status condition to the target Pokemon.
         /// If status is None, clears any existing status.
+        /// Safeguard prevents status application (except for clearing status).
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
@@ -52,6 +53,17 @@ namespace PokemonUltimate.Combat.Actions
 
             if (Target.IsEmpty)
                 return Enumerable.Empty<BattleAction>();
+
+            // Safeguard prevents status application (but allows clearing status)
+            if (Status != PersistentStatus.None && Target.Side.HasSideCondition(SideCondition.Safeguard))
+            {
+                var safeguardData = Target.Side.GetSideConditionData(SideCondition.Safeguard);
+                if (safeguardData != null && safeguardData.PreventsStatus)
+                {
+                    // Status is blocked by Safeguard
+                    return Enumerable.Empty<BattleAction>();
+                }
+            }
 
             Target.Pokemon.Status = Status;
 
