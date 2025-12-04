@@ -82,6 +82,10 @@ namespace PokemonUltimate.Combat.Engine
             var weatherActions = ProcessWeatherDamage(field);
             actions.AddRange(weatherActions);
 
+            // Process terrain healing for all active slots
+            var terrainHealingActions = ProcessTerrainHealing(field);
+            actions.AddRange(terrainHealingActions);
+
             return actions;
         }
 
@@ -326,6 +330,75 @@ namespace PokemonUltimate.Combat.Engine
                 default:
                     return "{0} is hurt by the weather!";
             }
+        }
+
+        /// <summary>
+        /// Processes terrain healing for all active Pokemon on the field.
+        /// Only Grassy Terrain heals Pokemon (1/16 Max HP per turn for grounded Pokemon).
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.13: Terrain System
+        /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
+        /// </remarks>
+        private static List<BattleAction> ProcessTerrainHealing(BattleField field)
+        {
+            var actions = new List<BattleAction>();
+
+            // Check if there's active terrain that heals
+            if (field.TerrainData == null || !field.TerrainData.HealsEachTurn)
+                return actions;
+
+            var terrainData = field.TerrainData;
+
+            // Process all active slots
+            foreach (var slot in field.GetAllActiveSlots())
+            {
+                if (slot.IsEmpty || slot.HasFainted)
+                    continue;
+
+                var pokemon = slot.Pokemon;
+
+                // Check if Pokemon is grounded (terrain only affects grounded Pokemon)
+                if (!IsGrounded(pokemon))
+                    continue;
+
+                // Calculate healing amount
+                int healing = CalculateTerrainHealing(pokemon.MaxHP, terrainData.EndOfTurnHealing);
+
+                // Only heal if Pokemon is not at full HP and healing amount > 0
+                if (pokemon.CurrentHP < pokemon.MaxHP && healing > 0)
+                {
+                    actions.Add(new MessageAction(string.Format(GameMessages.TerrainHealing, pokemon.DisplayName, terrainData.Name)));
+                    actions.Add(new HealAction(null, slot, healing)); // null user = system action
+                }
+            }
+
+            return actions;
+        }
+
+        /// <summary>
+        /// Checks if a Pokemon is grounded (affected by terrain).
+        /// </summary>
+        private static bool IsGrounded(PokemonInstance pokemon)
+        {
+            if (pokemon == null)
+                return false;
+
+            return TerrainData.IsGrounded(
+                pokemon.Species.PrimaryType,
+                pokemon.Species.SecondaryType,
+                pokemon.Ability?.Id,
+                pokemon.HeldItem?.Id);
+        }
+
+        /// <summary>
+        /// Calculates terrain healing based on Max HP and healing fraction.
+        /// </summary>
+        private static int CalculateTerrainHealing(int maxHP, float healingFraction)
+        {
+            int healing = (int)(maxHP * healingFraction);
+            return System.Math.Max(0, healing); // Minimum 0 (no negative healing)
         }
     }
 }

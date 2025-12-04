@@ -54,6 +54,12 @@ namespace PokemonUltimate.Core.Constants
 
         #endregion
 
+        #region Terrain Effects
+
+        public const string TerrainHealing = "{0} is healed by the {1}!";
+
+        #endregion
+
         #region Abilities & Items
 
         public const string AbilityActivated = "{0}'s {1}!";

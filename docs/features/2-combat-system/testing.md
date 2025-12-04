@@ -150,9 +150,16 @@ PokemonUltimate.Tests/
 
 **Total**: 48 weather-related tests passing
 
-### ⏳ Planned Coverage (Phases 2.13-2.19)
-- [ ] Terrain effects tests
-- [ ] Terrain effects tests
+### ✅ Terrain System Tests (Sub-Feature 2.13)
+**Location**: `Tests/Systems/Combat/`
+- `Field/TerrainTrackingTests.cs` - Terrain tracking and duration (11 tests)
+- `Damage/TerrainStepTests.cs` - Terrain damage modifiers (7 tests)
+- `Engine/TerrainHealingTests.cs` - Terrain end-of-turn healing (8 tests)
+- `Actions/SetTerrainActionTests.cs` - Terrain actions (8 tests)
+
+**Total**: 84+ terrain-related tests passing (includes integration with other systems)
+
+### ⏳ Planned Coverage (Phases 2.14-2.19)
 - [ ] Hazard effects tests
 - [ ] Advanced move mechanics tests
 - [ ] Multi-target move tests

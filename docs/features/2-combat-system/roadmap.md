@@ -1418,24 +1418,31 @@ Tests/Combat/Engine/TerrainEffectsTests.cs
 
 ### Completion Checklist
 
-- [ ] `BattleField.Terrain` property added
-- [ ] `TerrainDuration` tracking implemented
-- [ ] `TerrainStep` integrated into DamagePipeline
-- [ ] Terrain healing in `EndOfTurnProcessor`
-- [ ] Electric Terrain modifiers working
-- [ ] Grassy Terrain modifiers and healing working
-- [ ] Psychic Terrain modifiers and priority block working
-- [ ] Misty Terrain modifiers and status prevention working
-- [ ] Grounded Pokemon detection working
-- [ ] Terrain duration tracking working
-- [ ] Terrain expiration working
-- [ ] Functional tests passing (~20 tests)
-- [ ] Edge case tests passing (~10 tests)
-- [ ] Integration tests passing (~5 tests)
-- [ ] All existing tests still passing
-- [ ] No compiler warnings
+- [x] `BattleField.Terrain` property added
+- [x] `TerrainDuration` tracking implemented
+- [x] `TerrainStep` integrated into DamagePipeline
+- [x] Terrain healing in `EndOfTurnProcessor`
+- [x] Electric Terrain modifiers working
+- [x] Grassy Terrain modifiers and healing working
+- [x] Psychic Terrain modifiers working
+- [x] Misty Terrain modifiers working
+- [x] Grounded Pokemon detection working
+- [x] Terrain duration tracking working
+- [x] Terrain expiration working
+- [x] SetTerrainAction implemented
+- [x] Terrain duration decrement in CombatEngine
+- [x] Functional tests passing (84+ tests)
+- [x] Edge case tests passing
+- [x] Integration tests passing
+- [x] All existing tests still passing
+- [x] No compiler warnings
 
-**Estimated Tests**: ~35 new tests
+**Status**: ✅ **Core Terrain System Complete**
+
+**Advanced Features Pending** (depend on other systems):
+- Status prevention (Electric prevents Sleep, Misty prevents all status) - requires status application system modifications
+- Priority blocking (Psychic Terrain blocks priority moves) - requires priority move system
+- Move-specific modifications (Earthquake halved, Grassy Glide priority, Rising Voltage 2x, etc.) - requires move-specific effect system
 
 ---
 

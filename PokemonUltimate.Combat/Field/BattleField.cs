@@ -24,6 +24,9 @@ namespace PokemonUltimate.Combat
         private Weather _weather;
         private int _weatherDuration;
         private WeatherData _weatherData;
+        private Terrain _terrain;
+        private int _terrainDuration;
+        private TerrainData _terrainData;
 
         /// <summary>
         /// The player's side of the field.
@@ -58,6 +61,38 @@ namespace PokemonUltimate.Combat
         public WeatherData WeatherData => _weatherData;
 
         /// <summary>
+        /// The current terrain condition on the battlefield.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.13: Terrain System
+        /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
+        /// </remarks>
+        public Terrain Terrain => _terrain;
+
+        /// <summary>
+        /// The remaining duration of the current terrain in turns.
+        /// 0 means infinite duration.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.13: Terrain System
+        /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
+        /// </remarks>
+        public int TerrainDuration => _terrainDuration;
+
+        /// <summary>
+        /// The terrain data for the current terrain condition.
+        /// Null if no terrain is active.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.13: Terrain System
+        /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
+        /// </remarks>
+        public TerrainData TerrainData => _terrainData;
+
+        /// <summary>
         /// Initializes the battlefield with the given rules and parties.
         /// </summary>
         /// <param name="rules">Battle configuration. Cannot be null.</param>
@@ -82,6 +117,11 @@ namespace PokemonUltimate.Combat
             _weather = Weather.None;
             _weatherDuration = 0;
             _weatherData = null;
+
+            // Initialize terrain to None
+            _terrain = Terrain.None;
+            _terrainDuration = 0;
+            _terrainData = null;
 
             // Create sides
             _playerSide = new BattleSide(rules.PlayerSlots, isPlayer: true);
@@ -212,6 +252,77 @@ namespace PokemonUltimate.Combat
             if (_weatherDuration <= 0)
             {
                 ClearWeather();
+            }
+        }
+
+        #endregion
+
+        #region Terrain Management
+
+        /// <summary>
+        /// Sets the terrain condition on the battlefield.
+        /// </summary>
+        /// <param name="terrain">The terrain to set. Use Terrain.None to clear.</param>
+        /// <param name="duration">Duration in turns. 0 means infinite duration.</param>
+        /// <param name="terrainData">The terrain data for this terrain condition. Can be null if not available.</param>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.13: Terrain System
+        /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
+        /// </remarks>
+        public void SetTerrain(Terrain terrain, int duration, TerrainData terrainData = null)
+        {
+            // Clear terrain if None is specified
+            if (terrain == Terrain.None)
+            {
+                ClearTerrain();
+                return;
+            }
+
+            _terrain = terrain;
+            _terrainDuration = duration;
+            _terrainData = terrainData;
+        }
+
+        /// <summary>
+        /// Clears the terrain condition from the battlefield.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.13: Terrain System
+        /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
+        /// </remarks>
+        public void ClearTerrain()
+        {
+            _terrain = Terrain.None;
+            _terrainDuration = 0;
+            _terrainData = null;
+        }
+
+        /// <summary>
+        /// Decrements the terrain duration by one turn.
+        /// If duration reaches 0 and terrain is not infinite, clears the terrain.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.13: Terrain System
+        /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
+        /// </remarks>
+        public void DecrementTerrainDuration()
+        {
+            if (_terrain == Terrain.None)
+                return;
+
+            // Infinite duration (0) does not decrement
+            if (_terrainDuration == 0)
+                return;
+
+            _terrainDuration--;
+
+            // If duration reached 0, clear terrain
+            if (_terrainDuration <= 0)
+            {
+                ClearTerrain();
             }
         }
 

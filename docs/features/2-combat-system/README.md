@@ -47,11 +47,11 @@ This feature implements the core Pokemon battle system, including:
 - **[2.9: Abilities & Items](2.9-abilities-items/)** - Event-driven system, triggers ✅
 - **[2.11: Recoil & Drain](2.11-recoil-drain/)** - Recoil damage, HP drain effects ✅
 
-### Implemented (2.12)
+### Implemented (2.12-2.13)
 - **[2.12: Weather System](2.12-weather-system/)** - Weather conditions and effects ✅
+- **[2.13: Terrain System](2.13-terrain-system/)** - Terrain conditions and effects ✅
 
-### Planned (2.13-2.19)
-- **[2.13: Terrain System](2.13-terrain-system/)** - Terrain conditions and effects ⏳
+### Planned (2.14-2.19)
 - **[2.14: Hazards System](2.14-hazards-system/)** - Stealth Rock, Spikes, etc. ⏳
 - **[2.15: Advanced Move Mechanics](2.15-advanced-move-mechanics/)** - Multi-hit, charging moves ⏳
 - **[2.16: Field Conditions](2.16-field-conditions/)** - Screens, Tailwind, protections ⏳
@@ -69,7 +69,7 @@ This feature implements the core Pokemon battle system, including:
 
 ## Quick Links
 
-- **Phases Complete**: 2.1-2.9, 2.11, 2.12 (Core combat + Weather System - note: 2.10 consolidated into 2.4)
+- **Phases Complete**: 2.1-2.9, 2.11, 2.12, 2.13 (Core combat + Weather System + Terrain System - note: 2.10 consolidated into 2.4)
 - **Phases Planned**: 2.13-2.19 (Extended features)
 - **Tests**: 2,500+ passing tests (see [testing](testing.md))
 - **Key Classes**: See [code location](code_location.md) for implementation details

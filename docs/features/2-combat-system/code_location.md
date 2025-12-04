@@ -35,6 +35,7 @@ The combat system is organized into several key areas:
 - `DamageAction` - Damage application
 - `ApplyStatusAction` - Status effect application
 - `SetWeatherAction` - Weather condition changes (Sub-Feature 2.12)
+- `SetTerrainAction` - Terrain condition changes (Sub-Feature 2.13)
 - `HealAction` - HP restoration
 - `StatChangeAction` - Stat stage modifications
 - `SwitchAction` - Pokemon switching
@@ -62,13 +63,14 @@ The combat system is organized into several key areas:
 - `AttackerAbilityStep` - Attacker ability effects
 - `AttackerItemStep` - Attacker item effects
 - `WeatherStep` - Weather damage modifiers (Sub-Feature 2.12)
+- `TerrainStep` - Terrain damage modifiers (Sub-Feature 2.13)
 - `TypeEffectivenessStep` - Type effectiveness calculation
 - `BurnStep` - Burn status penalty for physical moves
 
 ### `PokemonUltimate.Combat.Field`
 **Purpose**: Battle field management
 **Key Classes**:
-- `BattleField` - Main battlefield container (includes weather tracking - Sub-Feature 2.12)
+- `BattleField` - Main battlefield container (includes weather tracking - Sub-Feature 2.12, terrain tracking - Sub-Feature 2.13)
 - `BattleSide` - Player or enemy side
 - `BattleSlot` - Individual Pokemon slot
 - `BattleRules` - Battle format rules
@@ -85,8 +87,8 @@ The combat system is organized into several key areas:
 ### `PokemonUltimate.Combat.Engine`
 **Purpose**: Engine components
 **Key Classes**:
-- `CombatEngine` - Main battle controller (includes weather duration decrement - Sub-Feature 2.12)
-- `EndOfTurnProcessor` - End-of-turn effects processor (includes weather damage - Sub-Feature 2.12)
+- `CombatEngine` - Main battle controller (includes weather duration decrement - Sub-Feature 2.12, terrain duration decrement - Sub-Feature 2.13)
+- `EndOfTurnProcessor` - End-of-turn effects processor (includes weather damage - Sub-Feature 2.12, terrain healing - Sub-Feature 2.13)
 
 ### `PokemonUltimate.Combat.Helpers`
 **Purpose**: Utility classes

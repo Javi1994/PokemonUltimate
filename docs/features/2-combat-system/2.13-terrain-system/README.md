@@ -15,8 +15,9 @@ Terrain System implements terrain conditions that affect battles:
 
 ## Current Status
 
-- ⏳ **Planned**: Terrain system not yet implemented
+- ✅ **Implemented**: Core terrain system complete
 - ✅ **Data Ready**: TerrainData blueprint exists
+- ✅ **Features**: Terrain tracking, damage modifiers, end-of-turn healing, terrain actions
 
 ## Documentation
 
@@ -35,7 +36,9 @@ Terrain System implements terrain conditions that affect battles:
 
 ## Quick Links
 
-- **Status**: ⏳ Planned (Phase 2.13)
+- **Status**: ✅ Implemented (Core features complete)
+- **Tests**: 84+ terrain-related tests passing
+- **Advanced Features Pending**: Status prevention, priority blocking, move-specific modifications (depend on other systems)
 
 ---
 

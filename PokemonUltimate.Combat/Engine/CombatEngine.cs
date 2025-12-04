@@ -169,7 +169,10 @@ namespace PokemonUltimate.Combat
             // 6. Decrement weather duration
             Field.DecrementWeatherDuration();
 
-            // 7. End-of-turn triggers (abilities and items)
+            // 7. Decrement terrain duration
+            Field.DecrementTerrainDuration();
+
+            // 8. End-of-turn triggers (abilities and items)
             var triggerActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, Field);
             if (triggerActions.Count > 0)
             {

@@ -79,7 +79,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 - **2.9**: Abilities & Items - Event-driven system, triggers
 - **2.11**: Recoil & Drain - Recoil damage, HP drain effects
 - **2.12**: Weather System - Weather conditions and effects ✅ Core Complete (advanced features pending dependent systems)
-- **2.13**: Terrain System - Terrain conditions and effects (Planned)
+- **2.13**: Terrain System - Terrain conditions and effects ✅ Core Complete (advanced features pending dependent systems)
 - **2.14**: Hazards System - Stealth Rock, Spikes, etc. (Planned)
 - **2.15**: Advanced Move Mechanics - Multi-hit, charging moves (Planned)
 - **2.16**: Field Conditions - Screens, Tailwind, protections (Planned)
