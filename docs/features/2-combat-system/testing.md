@@ -140,8 +140,18 @@ PokemonUltimate.Tests/
 - [x] Integration scenarios tested (83+ integration tests)
 - [x] Full battle end-to-end scenarios tested
 
-### ⏳ Planned Coverage (Phases 2.12-2.19)
-- [ ] Weather effects tests
+### ✅ Weather System Tests (Sub-Feature 2.12)
+**Location**: `Tests/Systems/Combat/`
+- `Field/WeatherTrackingTests.cs` - Weather tracking and duration (16 tests)
+- `Damage/WeatherStepTests.cs` - Weather damage modifiers (8 tests)
+- `Engine/WeatherDamageTests.cs` - Weather end-of-turn damage (9 tests)
+- `Actions/SetWeatherActionTests.cs` - Weather actions (9 tests)
+- `Helpers/WeatherAccuracyTests.cs` - Weather perfect accuracy (6 tests)
+
+**Total**: 48 weather-related tests passing
+
+### ⏳ Planned Coverage (Phases 2.13-2.19)
+- [ ] Terrain effects tests
 - [ ] Terrain effects tests
 - [ ] Hazard effects tests
 - [ ] Advanced move mechanics tests

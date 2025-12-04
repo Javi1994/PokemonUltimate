@@ -548,9 +548,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
         [Test]
         public void Pipeline_HasExpectedStepCount()
         {
-            // Pipeline now has 8 steps: BaseDamage, CriticalHit, RandomFactor, STAB, 
-            // AttackerAbility, AttackerItem, TypeEffectiveness, Burn
-            Assert.That(_pipeline.StepCount, Is.EqualTo(8));
+            // Pipeline now has 9 steps: BaseDamage, CriticalHit, RandomFactor, STAB, 
+            // AttackerAbility, AttackerItem, WeatherStep, TypeEffectiveness, Burn
+            Assert.That(_pipeline.StepCount, Is.EqualTo(9));
         }
 
         [Test]

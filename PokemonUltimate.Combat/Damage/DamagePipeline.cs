@@ -36,8 +36,9 @@ namespace PokemonUltimate.Combat.Damage
                 new StabStep(),              // 4. Apply STAB bonus (1.5x)
                 new AttackerAbilityStep(),   // 5. Apply ability damage multipliers (Blaze, etc.)
                 new AttackerItemStep(),      // 6. Apply item damage multipliers (Life Orb, etc.)
-                new TypeEffectivenessStep(), // 7. Apply type effectiveness
-                new BurnStep(),              // 8. Apply burn penalty (0.5x for physical)
+                new WeatherStep(),           // 7. Apply weather damage multipliers (Sun/Rain, etc.)
+                new TypeEffectivenessStep(), // 8. Apply type effectiveness
+                new BurnStep(),              // 9. Apply burn penalty (0.5x for physical)
             };
         }
 

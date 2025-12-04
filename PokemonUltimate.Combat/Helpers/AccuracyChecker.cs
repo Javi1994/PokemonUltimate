@@ -29,6 +29,26 @@ namespace PokemonUltimate.Combat.Helpers
         /// <exception cref="ArgumentNullException">If user, target, or move is null.</exception>
         public static bool CheckHit(BattleSlot user, BattleSlot target, MoveData move, float? fixedRandomValue = null)
         {
+            return CheckHit(user, target, move, field: null, fixedRandomValue);
+        }
+
+        /// <summary>
+        /// Checks if a move hits its target, considering weather accuracy modifiers.
+        /// </summary>
+        /// <param name="user">The slot using the move.</param>
+        /// <param name="target">The target slot.</param>
+        /// <param name="move">The move being used.</param>
+        /// <param name="field">The battlefield. Used for weather accuracy modifiers.</param>
+        /// <param name="fixedRandomValue">Fixed random value for testing (0.0 to 1.0).</param>
+        /// <returns>True if the move hits, false if it misses.</returns>
+        /// <exception cref="ArgumentNullException">If user, target, or move is null.</exception>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.12: Weather System (Perfect Accuracy)
+        /// **Documentation**: See `docs/features/2-combat-system/2.12-weather-system/README.md`
+        /// </remarks>
+        public static bool CheckHit(BattleSlot user, BattleSlot target, MoveData move, BattleField field, float? fixedRandomValue = null)
+        {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
             if (target == null)
@@ -43,6 +63,16 @@ namespace PokemonUltimate.Combat.Helpers
             // Status moves with 0 accuracy always hit (like status moves)
             if (move.Accuracy == 0)
                 return true;
+
+            // Check weather perfect accuracy (Thunder/Hurricane in Rain, Blizzard in Hail)
+            if (field != null && field.WeatherData != null)
+            {
+                if (field.WeatherData.HasPerfectAccuracy(move.Name))
+                {
+                    // Weather grants perfect accuracy - always hit
+                    return true;
+                }
+            }
 
             // Calculate effective accuracy
             float accuracyMultiplier = StatCalculator.GetAccuracyStageMultiplier(user.GetStatStage(Stat.Accuracy));

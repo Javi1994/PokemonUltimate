@@ -9,14 +9,17 @@
 ## Overview
 
 Weather System implements weather conditions that affect battles:
-- **Weather Types**: Sun, Rain, Hail, Sandstorm, Fog, etc.
-- **Weather Effects**: Type effectiveness changes, damage modifications
-- **Weather Duration**: Turn-based weather persistence
+- **Weather Types**: Sun, Rain, Hail, Sandstorm, Fog, Primal weathers
+- **Weather Effects**: Type effectiveness changes, damage modifications, perfect accuracy moves
+- **Weather Duration**: Turn-based weather persistence with automatic expiration
+- **Weather Damage**: End-of-turn damage for Sandstorm and Hail
+- **Weather Actions**: SetWeatherAction for changing weather conditions
 
 ## Current Status
 
-- ⏳ **Planned**: Weather system not yet implemented
+- ✅ **Implemented**: Core weather system complete
 - ✅ **Data Ready**: WeatherData blueprint exists
+- ✅ **Features**: Weather tracking, damage modifiers, end-of-turn damage, weather actions, perfect accuracy moves
 
 ## Documentation
 
@@ -30,12 +33,15 @@ Weather System implements weather conditions that affect battles:
 
 ## Related Sub-Features
 
-- **[2.4: Damage Calculation Pipeline](../2.4-damage-calculation-pipeline/)** - Weather modifies damage
+- **[2.4: Damage Calculation Pipeline](../2.4-damage-calculation-pipeline/)** - Weather modifies damage via WeatherStep
+- **[2.5: Combat Actions](../2.5-combat-actions/)** - Weather perfect accuracy in AccuracyChecker
 - **[2.8: End-of-Turn Effects](../2.8-end-of-turn-effects/)** - Weather damage at end of turn
 
 ## Quick Links
 
-- **Status**: ⏳ Planned (Phase 2.12)
+- **Status**: ✅ Implemented (Core features complete)
+- **Tests**: 48 weather-related tests passing
+- **Advanced Features Pending**: Stat boosts, instant charge moves, speed boost abilities (depend on other systems)
 
 ---
 

@@ -6,6 +6,7 @@ using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Combat.Engine
 {
@@ -76,6 +77,10 @@ namespace PokemonUltimate.Combat.Engine
                 var statusActions = ProcessStatusEffects(slot, field);
                 actions.AddRange(statusActions);
             }
+
+            // Process weather damage for all active slots
+            var weatherActions = ProcessWeatherDamage(field);
+            actions.AddRange(weatherActions);
 
             return actions;
         }
@@ -205,6 +210,122 @@ namespace PokemonUltimate.Combat.Engine
             context.TypeEffectiveness = 1.0f; // Status damage is always effective
 
             return new DamageAction(slot, slot, context);
+        }
+
+        /// <summary>
+        /// Processes weather damage for all active Pokemon on the field.
+        /// Weather like Sandstorm and Hail deal damage to non-immune types.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.12: Weather System
+        /// **Documentation**: See `docs/features/2-combat-system/2.12-weather-system/README.md`
+        /// </remarks>
+        private static List<BattleAction> ProcessWeatherDamage(BattleField field)
+        {
+            var actions = new List<BattleAction>();
+
+            // Check if there's active weather that deals damage
+            if (field.WeatherData == null || !field.WeatherData.DealsDamage)
+                return actions;
+
+            var weatherData = field.WeatherData;
+
+            // Process all active slots
+            foreach (var slot in field.GetAllActiveSlots())
+            {
+                if (slot.IsEmpty || slot.HasFainted)
+                    continue;
+
+                var pokemon = slot.Pokemon;
+
+                // Check if Pokemon is immune to weather damage by type
+                bool isTypeImmune = IsTypeImmuneToWeatherDamage(pokemon, weatherData);
+
+                // Check if Pokemon has ability that grants immunity
+                bool hasImmunityAbility = HasWeatherImmunityAbility(pokemon, weatherData);
+
+                // Skip if immune
+                if (isTypeImmune || hasImmunityAbility)
+                    continue;
+
+                // Calculate and apply weather damage
+                int damage = CalculateWeatherDamage(pokemon.MaxHP, weatherData.EndOfTurnDamage);
+                string message = GetWeatherDamageMessage(field.Weather);
+
+                actions.Add(new MessageAction(string.Format(message, pokemon.DisplayName)));
+                actions.Add(CreateStatusDamageAction(slot, field, damage));
+            }
+
+            return actions;
+        }
+
+        /// <summary>
+        /// Checks if a Pokemon's type makes it immune to weather damage.
+        /// </summary>
+        private static bool IsTypeImmuneToWeatherDamage(PokemonInstance pokemon, WeatherData weatherData)
+        {
+            if (weatherData.DamageImmuneTypes == null || weatherData.DamageImmuneTypes.Length == 0)
+                return false;
+
+            // Check primary type
+            if (weatherData.IsTypeImmuneToDamage(pokemon.Species.PrimaryType))
+                return true;
+
+            // Check secondary type (if exists)
+            if (pokemon.Species.SecondaryType.HasValue)
+            {
+                if (weatherData.IsTypeImmuneToDamage(pokemon.Species.SecondaryType.Value))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if a Pokemon has an ability that grants immunity to weather damage.
+        /// </summary>
+        private static bool HasWeatherImmunityAbility(PokemonInstance pokemon, WeatherData weatherData)
+        {
+            if (pokemon.Ability == null)
+                return false;
+
+            if (weatherData.DamageImmunityAbilities == null || weatherData.DamageImmunityAbilities.Length == 0)
+                return false;
+
+            string abilityName = pokemon.Ability.Name;
+            foreach (var immuneAbility in weatherData.DamageImmunityAbilities)
+            {
+                if (abilityName.Equals(immuneAbility, System.StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Calculates weather damage based on Max HP and damage fraction.
+        /// </summary>
+        private static int CalculateWeatherDamage(int maxHP, float damageFraction)
+        {
+            int damage = (int)(maxHP * damageFraction);
+            return System.Math.Max(EndOfTurnConstants.MinimumDamage, damage);
+        }
+
+        /// <summary>
+        /// Gets the appropriate message for weather damage.
+        /// </summary>
+        private static string GetWeatherDamageMessage(Weather weather)
+        {
+            switch (weather)
+            {
+                case Weather.Sandstorm:
+                    return GameMessages.WeatherSandstormDamage;
+                case Weather.Hail:
+                    return GameMessages.WeatherHailDamage;
+                default:
+                    return "{0} is hurt by the weather!";
+            }
         }
     }
 }

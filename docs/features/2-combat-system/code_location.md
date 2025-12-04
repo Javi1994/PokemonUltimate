@@ -34,6 +34,7 @@ The combat system is organized into several key areas:
 - `UseMoveAction` - Move execution
 - `DamageAction` - Damage application
 - `ApplyStatusAction` - Status effect application
+- `SetWeatherAction` - Weather condition changes (Sub-Feature 2.12)
 - `HealAction` - HP restoration
 - `StatChangeAction` - Stat stage modifications
 - `SwitchAction` - Pokemon switching
@@ -60,13 +61,14 @@ The combat system is organized into several key areas:
 - `StabStep` - STAB (Same Type Attack Bonus) multiplier
 - `AttackerAbilityStep` - Attacker ability effects
 - `AttackerItemStep` - Attacker item effects
+- `WeatherStep` - Weather damage modifiers (Sub-Feature 2.12)
 - `TypeEffectivenessStep` - Type effectiveness calculation
 - `BurnStep` - Burn status penalty for physical moves
 
 ### `PokemonUltimate.Combat.Field`
 **Purpose**: Battle field management
 **Key Classes**:
-- `BattleField` - Main battlefield container
+- `BattleField` - Main battlefield container (includes weather tracking - Sub-Feature 2.12)
 - `BattleSide` - Player or enemy side
 - `BattleSlot` - Individual Pokemon slot
 - `BattleRules` - Battle format rules
@@ -83,14 +85,15 @@ The combat system is organized into several key areas:
 ### `PokemonUltimate.Combat.Engine`
 **Purpose**: Engine components
 **Key Classes**:
-- `EndOfTurnProcessor` - End-of-turn effects processor
+- `CombatEngine` - Main battle controller (includes weather duration decrement - Sub-Feature 2.12)
+- `EndOfTurnProcessor` - End-of-turn effects processor (includes weather damage - Sub-Feature 2.12)
 
 ### `PokemonUltimate.Combat.Helpers`
 **Purpose**: Utility classes
 **Key Classes**:
 - `TurnOrderResolver` - Turn order calculation
 - `TargetResolver` - Target selection
-- `AccuracyChecker` - Accuracy calculation
+- `AccuracyChecker` - Accuracy calculation (includes weather perfect accuracy - Sub-Feature 2.12)
 
 ### `PokemonUltimate.Combat.AI`
 **Purpose**: AI action providers
@@ -150,14 +153,15 @@ PokemonUltimate.Combat/
 │       ├── StabStep.cs                 # STAB multiplier
 │       ├── AttackerAbilityStep.cs      # Attacker abilities
 │       ├── AttackerItemStep.cs         # Attacker items
+│       ├── WeatherStep.cs              # Weather damage modifiers (Sub-Feature 2.12)
 │       ├── TypeEffectivenessStep.cs    # Type effectiveness
 │       └── BurnStep.cs                 # Burn penalty
 │
 ├── Engine/
-│   ├── CombatEngine.cs                 # Main battle controller
+│   ├── CombatEngine.cs                 # Main battle controller (weather duration - Sub-Feature 2.12)
 │   ├── BattleQueue.cs                  # Action queue
 │   ├── BattleArbiter.cs                # Victory/defeat detection
-│   └── EndOfTurnProcessor.cs          # End-of-turn effects
+│   └── EndOfTurnProcessor.cs          # End-of-turn effects (weather damage - Sub-Feature 2.12)
 │
 ├── Events/
 │   ├── BattleTrigger.cs                # Trigger enum
@@ -167,7 +171,7 @@ PokemonUltimate.Combat/
 │   └── BattleTriggerProcessor.cs       # Trigger processor
 │
 ├── Field/
-│   ├── BattleField.cs                  # Main battlefield
+│   ├── BattleField.cs                  # Main battlefield (weather tracking - Sub-Feature 2.12)
 │   ├── BattleSide.cs                   # Player/enemy side
 │   ├── BattleSlot.cs                   # Pokemon slot
 │   └── BattleRules.cs                 # Battle rules
@@ -175,7 +179,7 @@ PokemonUltimate.Combat/
 ├── Helpers/
 │   ├── TurnOrderResolver.cs           # Turn order calculation
 │   ├── TargetResolver.cs              # Target selection
-│   └── AccuracyChecker.cs             # Accuracy calculation
+│   └── AccuracyChecker.cs             # Accuracy calculation (weather perfect accuracy - Sub-Feature 2.12)
 │
 ├── Providers/
 │   ├── IActionProvider.cs              # Action provider interface
@@ -241,8 +245,9 @@ PokemonUltimate.Combat/
 4. StabStep - STAB bonus (1.5x for same type)
 5. AttackerAbilityStep - Attacker ability multipliers
 6. AttackerItemStep - Attacker item multipliers
-7. TypeEffectivenessStep - Type effectiveness
-8. BurnStep - Burn penalty (0.5x for physical moves)
+7. WeatherStep - Weather damage modifiers (Sub-Feature 2.12)
+8. TypeEffectivenessStep - Type effectiveness
+9. BurnStep - Burn penalty (0.5x for physical moves)
 
 ### BattleField
 **Namespace**: `PokemonUltimate.Combat.Field`
@@ -252,9 +257,15 @@ PokemonUltimate.Combat/
 - `PlayerSide` - Player's side
 - `EnemySide` - Enemy's side
 - `Rules` - Battle rules
+- `Weather` - Current weather condition (Sub-Feature 2.12)
+- `WeatherDuration` - Weather turn counter (Sub-Feature 2.12)
+- `WeatherData` - Weather data blueprint (Sub-Feature 2.12)
 
 **Key Methods**:
 - `Initialize(BattleRules, parties...)` - Set up battlefield
+- `SetWeather(Weather, duration, WeatherData)` - Set weather condition (Sub-Feature 2.12)
+- `ClearWeather()` - Clear weather (Sub-Feature 2.12)
+- `DecrementWeatherDuration()` - Decrement weather duration (Sub-Feature 2.12)
 
 ### BattleSlot
 **Namespace**: `PokemonUltimate.Combat.Field`

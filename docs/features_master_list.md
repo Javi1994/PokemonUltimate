@@ -64,7 +64,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 ### Feature 2: Combat System
 **Folder**: `docs/features/2-combat-system/`  
-**Status**: ✅ Core Complete (Phases 2.1-2.11)  
+**Status**: ✅ Core Complete (Phases 2.1-2.11, 2.12)  
 **Description**: Complete Pokemon battle engine implementation
 
 **Sub-Features**:
@@ -78,7 +78,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 - **2.8**: End-of-Turn Effects - Status damage, effects processing
 - **2.9**: Abilities & Items - Event-driven system, triggers
 - **2.11**: Recoil & Drain - Recoil damage, HP drain effects
-- **2.12**: Weather System - Weather conditions and effects (Planned)
+- **2.12**: Weather System - Weather conditions and effects ✅ Core Complete (advanced features pending dependent systems)
 - **2.13**: Terrain System - Terrain conditions and effects (Planned)
 - **2.14**: Hazards System - Stealth Rock, Spikes, etc. (Planned)
 - **2.15**: Advanced Move Mechanics - Multi-hit, charging moves (Planned)

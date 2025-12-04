@@ -47,6 +47,13 @@ namespace PokemonUltimate.Core.Constants
 
         #endregion
 
+        #region Weather Effects
+
+        public const string WeatherSandstormDamage = "{0} is buffeted by the sandstorm!";
+        public const string WeatherHailDamage = "{0} is pelted by hail!";
+
+        #endregion
+
         #region Abilities & Items
 
         public const string AbilityActivated = "{0}'s {1}!";

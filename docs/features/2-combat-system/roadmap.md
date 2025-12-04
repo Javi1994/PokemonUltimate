@@ -1313,23 +1313,33 @@ Tests/Combat/Engine/WeatherDamageTests.cs
 
 ### Completion Checklist
 
-- [ ] `BattleField.Weather` property added
-- [ ] `WeatherDuration` tracking implemented
-- [ ] `WeatherStep` integrated into DamagePipeline
-- [ ] Weather damage in `EndOfTurnProcessor`
-- [ ] Sun modifiers working
-- [ ] Rain modifiers working
-- [ ] Sandstorm damage working
-- [ ] Hail damage working
-- [ ] Weather duration tracking working
-- [ ] Weather expiration working
-- [ ] Functional tests passing (~20 tests)
-- [ ] Edge case tests passing (~10 tests)
-- [ ] Integration tests passing (~5 tests)
-- [ ] All existing tests still passing
-- [ ] No compiler warnings
+- [x] `BattleField.Weather` property added
+- [x] `WeatherDuration` tracking implemented
+- [x] `WeatherStep` integrated into DamagePipeline
+- [x] Weather damage in `EndOfTurnProcessor`
+- [x] Sun modifiers working
+- [x] Rain modifiers working
+- [x] Sandstorm damage working
+- [x] Hail damage working
+- [x] Weather duration tracking working
+- [x] Weather expiration working
+- [x] Perfect accuracy moves (Thunder/Hurricane in Rain, Blizzard in Hail)
+- [x] Functional tests passing (48+ tests)
+- [x] Edge case tests passing
+- [x] Integration tests passing
+- [x] All existing tests still passing
+- [x] No compiler warnings
 
-**Estimated Tests**: ~35 new tests
+**Status**: ✅ **Core Weather System Complete**
+
+**Advanced Features Pending** (depend on other systems):
+- Solar Beam: No charge turn (requires charging moves system)
+- Moonlight/Morning Sun/Synthesis: Heal modifiers (requires healing moves system)
+- Growth: +2 instead of +1 (requires stat boost moves system)
+- Chlorophyll/Swift Swim/Sand Rush/Slush Rush: 2x Speed (requires ability stat modifiers)
+- Rock types: +50% SpDefense in Sandstorm (requires type-based stat modifiers)
+- Ice types: +50% Defense in Snow (requires type-based stat modifiers)
+- Sand Veil/Snow Cloak: +20% Evasion (requires ability evasion modifiers)
 
 ---
 

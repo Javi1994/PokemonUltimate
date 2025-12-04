@@ -158,7 +158,7 @@ namespace PokemonUltimate.Combat
             // 4. Process the queue
             await Queue.ProcessQueue(Field, _view);
 
-            // 5. End-of-turn effects (status damage)
+            // 5. End-of-turn effects (status damage, weather damage)
             var endOfTurnActions = EndOfTurnProcessor.ProcessEffects(Field);
             if (endOfTurnActions.Count > 0)
             {
@@ -166,7 +166,10 @@ namespace PokemonUltimate.Combat
                 await Queue.ProcessQueue(Field, _view);
             }
 
-            // 6. End-of-turn triggers (abilities and items)
+            // 6. Decrement weather duration
+            Field.DecrementWeatherDuration();
+
+            // 7. End-of-turn triggers (abilities and items)
             var triggerActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, Field);
             if (triggerActions.Count > 0)
             {

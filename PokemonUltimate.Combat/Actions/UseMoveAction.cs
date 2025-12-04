@@ -108,7 +108,7 @@ namespace PokemonUltimate.Combat.Actions
             actions.Add(new MessageAction($"{User.Pokemon.DisplayName} used {Move.Name}!"));
 
             // 6. Accuracy check
-            if (!AccuracyChecker.CheckHit(User, Target, Move))
+            if (!AccuracyChecker.CheckHit(User, Target, Move, field))
             {
                 actions.Add(new MessageAction(GameMessages.MoveMissed));
                 return actions;
