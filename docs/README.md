@@ -2,39 +2,48 @@
 
 > Complete documentation for Pokemon Ultimate project.
 
-## Structure
+## 🚀 AI Workflow System
 
-Documentation is organized by **feature/area** for easy navigation:
+**⭐ IMPORTANT: This project uses the AI Workflow system from `ai_workflow/`**
+
+The `ai_workflow/` directory contains the complete workflow system optimized for AI-assisted development. This includes:
+
+- **Game Definition** - Define the game and generate features automatically
+- **TDD Workflow** - Test-Driven Development with decision trees
+- **FDD Workflow** - Feature-Driven Development with automatic assignment
+- **Validation Scripts** - Automatic compliance checking
+- **Templates** - Complete templates for tests, features, and documentation
+
+**Start Here**: Read [`ai_workflow/START_HERE.md`](../ai_workflow/START_HERE.md) for complete setup and workflow.
+
+**Quick Reference**: See [`ai_workflow/AI_QUICK_REFERENCE.md`](../ai_workflow/AI_QUICK_REFERENCE.md) for AI execution patterns.
+
+## Structure
 
 ```
 docs/
-├── features/              # 📦 Feature-specific documentation
-│   ├── 1-game-data/          # Game data structure
-│   ├── 2-combat-system/     # Battle engine
-│   ├── 3-content-expansion/ # Adding content
-│   ├── 4-unity-integration/ # Unity integration
-│   └── 5-game-features/     # Game systems
+├── features/                      # 📦 Feature-specific documentation
+│   ├── 1-game-data/              # Game data structure
+│   ├── 2-combat-system/          # Battle engine
+│   ├── 3-content-expansion/      # Adding content
+│   ├── 4-unity-integration/       # Unity integration
+│   └── 5-game-features/           # Game systems
 │
-├── ai/                    # 🤖 AI-specific documentation
-│   ├── guidelines/        # Coding rules and standards
-│   ├── prompts/           # AI prompt templates
-│   └── [standards]        # Feature standards, master list
-│
-│
-└── [root files]           # Project-wide documentation
+├── features_master_list.md        # ⭐ Master reference for all features
+├── features_master_list_detailed.md  # Detailed list with all sub-features
+├── GAME_DEFINITION.yaml          # Game definition
+└── README.md                      # This file
 ```
 
 ## Quick Start
 
-**New to the project?** → Start with [`ai/GETTING_STARTED.md`](ai/GETTING_STARTED.md)
+**New to the project?** → Start with [`ai_workflow/START_HERE.md`](../ai_workflow/START_HERE.md)
 
 **Starting development?** → **MUST read [`features_master_list.md`](features_master_list.md) first** - All work must be assigned to a feature
 
 **Working on a feature?** → Go to [`features/`](features/) and find your feature
 
-**AI assistant?** → Start with [`ai/GETTING_STARTED.md`](ai/GETTING_STARTED.md) and [`features_master_list.md`](features_master_list.md)
-
-**Need shared resources?** → Check [`ai/`](ai/)
+**AI assistant?** → Start with [`ai_workflow/AI_QUICK_REFERENCE.md`](../ai_workflow/AI_QUICK_REFERENCE.md) and [`features_master_list.md`](features_master_list.md)
 
 ## Development Process ⭐ **MANDATORY**
 
@@ -46,7 +55,7 @@ Before starting ANY development work:
 2. **Assign to Feature** - Determine if work fits existing feature or needs new one
 3. **Read Feature Documentation** - If existing feature, read its complete documentation
 4. **Create Feature Documentation** - If new feature, create complete documentation structure
-5. **Proceed with Development** - Follow standard workflow after feature assignment
+5. **Proceed with Development** - Follow TDD workflow from `ai_workflow/`
 
 **After completing work:**
 
@@ -57,7 +66,7 @@ Before starting ANY development work:
 - Update feature's `testing.md` - Document tests
 - Update `features_master_list.md` - Update status
 
-**See**: [`ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) for complete process
+**See**: [`ai_workflow/docs/FDD_GUIDE.md`](../ai_workflow/docs/FDD_GUIDE.md) for complete Feature-Driven Development process
 
 ## Features
 
@@ -72,44 +81,34 @@ See [`features/README.md`](features/README.md) for complete feature list.
 - **[Unity Integration](features/4-unity-integration/)** - Unity UI and integration
 - **[Game Features](features/5-game-features/)** - Progression, roguelike systems
 
-**Testing**: Each feature has its own `testing.md` file. Shared testing strategy: [`ai/testing_structure_definition.md`](ai/testing_structure_definition.md)
+**Testing**: Each feature has its own `testing.md` file. See feature documentation for testing strategy.
 
-## Shared Resources
+## AI Workflow Documentation
 
-- **[Testing Strategy](ai/testing_structure_definition.md)** - Test structure standard
+**Main Workflow System**: [`ai_workflow/`](../ai_workflow/) - Complete AI workflow system
 
-**AI Resources** (workflow, checklists, examples, prompts): See [`ai/`](ai/)
+**Key Documents**:
+- [`ai_workflow/START_HERE.md`](../ai_workflow/START_HERE.md) ⭐ **For new projects - Read first**
+- [`ai_workflow/AI_QUICK_REFERENCE.md`](../ai_workflow/AI_QUICK_REFERENCE.md) ⭐ **For AI assistants - Quick reference**
+- [`ai_workflow/docs/FDD_GUIDE.md`](../ai_workflow/docs/FDD_GUIDE.md) - Feature-Driven Development
+- [`ai_workflow/docs/TDD_GUIDE.md`](../ai_workflow/docs/TDD_GUIDE.md) - Test-Driven Development
+- [`ai_workflow/docs/GAME_DEFINITION_GUIDE.md`](../ai_workflow/docs/GAME_DEFINITION_GUIDE.md) - Game Definition workflow
 
-## AI Documentation
+## Key Documents Reference
 
-| Document | Purpose |
-|----------|---------|
-| [`ai/GETTING_STARTED.md`](ai/GETTING_STARTED.md) | Quick start guide |
-| [`features_master_list.md`](features_master_list.md) | Feature numbering and naming ⭐ **START HERE** |
-| [`ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) | Feature-driven development process ⭐ **MANDATORY** |
-| [`ai/guidelines/project_guidelines.md`](ai/guidelines/project_guidelines.md) | Coding rules and standards |
-| [`ai/anti-patterns.md`](ai/anti-patterns.md) | What NOT to do |
-| [`implementation_plan.md`](implementation_plan.md) | Overall technical roadmap |
-| [`feature_documentation_standard.md`](feature_documentation_standard.md) | Documentation structure standard |
-
-## Roadmaps
-
-Roadmaps are now organized within each feature. See:
-- [`features/1-game-data/roadmap.md`](features/1-game-data/roadmap.md)
-- [`features/2-combat-system/roadmap.md`](features/2-combat-system/roadmap.md)
-- [`features/3-content-expansion/roadmap.md`](features/3-content-expansion/roadmap.md)
-- [`features/4-unity-integration/roadmap.md`](features/4-unity-integration/roadmap.md)
-- [`features/5-game-features/roadmap.md`](features/5-game-features/roadmap.md)
+| Need | Document |
+|------|----------|
+| **Project state** | `.ai/context.md` |
+| **Feature numbers/names** | `features_master_list.md` ⭐ **MASTER REFERENCE** |
+| **Workflow system** | `ai_workflow/` ⭐ **COMPLETE WORKFLOW** |
 
 ## Navigation Tips
 
-1. **Feature documentation** → Go to `features/[feature-name]/`
-2. **AI documentation** → Go to `ai/` (standards, guidelines, prompts)
-3. **Shared technical docs** → Go to `shared/` (architecture, workflow, examples)
-4. **Quick start** → Read `ai/GETTING_STARTED.md`
-5. **Coding rules** → Read `ai/guidelines/project_guidelines.md`
+1. **Feature documentation** → Go to `features/[N]-[feature-name]/`
+2. **AI workflow** → Go to `ai_workflow/` (complete workflow system)
+3. **Quick start** → Read `ai_workflow/START_HERE.md`
+4. **Feature reference** → Read `features_master_list.md`
 
 ---
 
 **Last Updated**: 2025-01-XX
-

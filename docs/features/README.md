@@ -49,13 +49,7 @@ feature-name/
 
 **Feature Numbering**: All features are numbered (1, 2, 3, 4, 5) and sub-features use decimal notation (1.1, 1.2, 2.1, 2.2...). See [`../features_master_list.md`](../features_master_list.md) for complete reference.
 
-**Testing**: Each feature has its own `testing.md` file. Shared testing strategy: [`../ai/testing_structure_definition.md`](../ai/testing_structure_definition.md)
-
-## Shared Documentation
-
-Documentation shared across features:
-- **Testing strategy**: [`../ai/testing_structure_definition.md`](../ai/testing_structure_definition.md) - Test structure standard
-- **AI resources**: [`../ai/`](../ai/) - Workflow, checklists, examples, prompts, guidelines
+**Testing**: Each feature has its own `testing.md` file.
 
 ## Development Process ⭐ **MANDATORY**
 
@@ -66,8 +60,8 @@ Before starting ANY development work:
 1. **Review Existing Features** - Read [`../features_master_list.md`](../features_master_list.md) ⭐ **START HERE**
 2. **Assign to Feature** - Determine if work fits existing feature or needs new one
 3. **Read Feature Documentation** - If existing feature, read its complete documentation
-4. **Create Feature Documentation** - If new feature, create complete documentation structure (see [`../feature_documentation_standard.md`](../feature_documentation_standard.md))
-5. **Proceed with Development** - Follow standard workflow after feature assignment
+4. **Create Feature Documentation** - If new feature, create complete documentation structure (README.md, architecture.md, roadmap.md, use_cases.md, testing.md, code_location.md)
+5. **Proceed with Development** - Follow TDD workflow from `ai_workflow/`
 
 **After completing work:**
 
@@ -78,7 +72,7 @@ Before starting ANY development work:
 - Update feature's `testing.md` - Document tests
 - Update `features_master_list.md` - Update status
 
-**See**: [`../ai/guidelines/feature_driven_development.md`](../ai/guidelines/feature_driven_development.md) for complete process.
+**See**: [`../ai_workflow/docs/FDD_GUIDE.md`](../../ai_workflow/docs/FDD_GUIDE.md) for complete Feature-Driven Development process
 
 ## Quick Navigation
 
@@ -86,9 +80,8 @@ Before starting ANY development work:
 - **Starting a new feature?** → Read feature's README.md
 - **Implementing?** → Check roadmap.md and architecture.md
 - **Testing?** → See testing.md (each feature has its own)
-- **Need shared resources?** → See [`../ai/`](../ai/)
+- **Workflow system?** → See [`../ai_workflow/`](../../ai_workflow/)
 
 ---
 
 **Last Updated**: 2025-01-XX
-

@@ -1,0 +1,169 @@
+# Feature Schema
+
+> **Schema para validar estructura de features**
+
+## Schema Definition
+
+```yaml
+feature:
+  version: "1.0.0"
+  description: "Validation schema for feature structure"
+  
+  required_fields:
+    number:
+      type: integer
+      pattern: "^[0-9]+$"
+      rule: "Sequential numbering, no gaps"
+      example: 1, 2, 3, 4
+      
+    name:
+      type: string
+      pattern: "^[A-Z][a-zA-Z0-9 ]+$"
+      rule: "PascalCase or Title Case"
+      example: "User Authentication", "Game Data"
+      
+    folder:
+      type: string
+      pattern: "^[0-9]+-[a-z0-9-]+$"
+      rule: "Number-kebab-case"
+      example: "1-user-authentication", "2-combat-system"
+      must_match_number: true
+      
+    status:
+      type: enum
+      values: [complete, in_progress, planned]
+      required: true
+      
+  required_documents:
+    - README.md
+    - architecture.md
+    - roadmap.md
+    - use_cases.md
+    - testing.md
+    - code_location.md
+      
+  folder_structure:
+    pattern: "docs/features/[N]-[feature-name]/"
+    example: "docs/features/1-user-authentication/"
+    required_files:
+      - "README.md"
+      - "architecture.md"
+      - "roadmap.md"
+      - "use_cases.md"
+      - "testing.md"
+      - "code_location.md"
+      
+  master_list_entry:
+    file: "docs/features_master_list.md"
+    required_fields:
+      - number
+      - name
+      - folder
+      - status
+      - description
+    format: "| [N] | [Name] | `[folder]/` | [Status] | [Description] |"
+```
+
+---
+
+## Sub-Feature Schema
+
+```yaml
+sub_feature:
+  version: "1.0.0"
+  description: "Validation schema for sub-feature structure"
+  
+  required_fields:
+    number:
+      type: string
+      pattern: "^[0-9]+\\.[0-9]+$"
+      rule: "Decimal notation, sequential within feature"
+      example: "1.1", "1.2", "2.1", "2.2"
+      
+    name:
+      type: string
+      pattern: "^[A-Z][a-zA-Z0-9 ]+$"
+      rule: "PascalCase or Title Case"
+      example: "Authentication Service", "Weather System"
+      
+    folder:
+      type: string
+      pattern: "^[0-9]+\\.[0-9]+-[a-z0-9-]+$"
+      rule: "Number.Number-kebab-case"
+      example: "1.1-authentication-service", "2.12-weather-system"
+      must_match_number: true
+      
+  required_documents:
+    - README.md  # Minimum required
+    
+  optional_documents:
+    - architecture.md  # If complex sub-feature
+    
+  folder_structure:
+    pattern: "docs/features/[N]-[feature-name]/[N.M]-[sub-feature-name]/"
+    example: "docs/features/1-user-authentication/1.1-authentication-service/"
+    required_files:
+      - "README.md"
+    optional_files:
+      - "architecture.md"
+```
+
+---
+
+## Validation Rules
+
+```yaml
+validation_rules:
+  feature_numbering:
+    - numbers_must_be_sequential: true
+    - no_gaps_allowed: true
+    - must_start_at_1: true
+    
+  folder_naming:
+    - folder_must_match_number: true
+    - folder_must_be_kebab_case: true
+    - folder_must_be_unique: true
+    
+  documents:
+    - all_required_documents_must_exist: true
+    - documents_must_be_in_correct_location: true
+    - documents_must_follow_template: true
+    
+  master_list:
+    - feature_must_be_in_master_list: true
+    - master_list_entry_must_be_complete: true
+    - master_list_numbers_must_match_folders: true
+```
+
+---
+
+## Error Messages
+
+```yaml
+error_messages:
+  invalid_number:
+    message: "Feature number must be sequential integer"
+    example: "Expected: 1, 2, 3... Got: 5 (gap detected)"
+    
+  invalid_folder_name:
+    message: "Folder name must match feature number and be kebab-case"
+    example: "Expected: 1-user-authentication, Got: 1-userAuth"
+    
+  missing_documents:
+    message: "Feature missing required documents"
+    required: [README.md, architecture.md, roadmap.md, use_cases.md, testing.md, code_location.md]
+    
+  not_in_master_list:
+    message: "Feature not found in master list"
+    action: "Add feature to docs/features_master_list.md"
+    
+  duplicate_number:
+    message: "Feature number already exists"
+    action: "Use next available number"
+```
+
+---
+
+**Última Actualización**: 2025-01-XX  
+**Versión**: 1.0.0
+

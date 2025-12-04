@@ -4,9 +4,9 @@
 
 This document serves as the single source of truth for all features in the Pokemon Ultimate project. All documentation should reference features using these numbers and names.
 
-**⚠️ MANDATORY: Feature-Driven Development** - Before starting ANY development work, review this document to determine if work fits an existing feature or needs a new one. See [`docs/ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) for complete process.
+**⚠️ MANDATORY: Feature-Driven Development** - Before starting ANY development work, review this document to determine if work fits an existing feature or needs a new one. See [`ai_workflow/docs/FDD_GUIDE.md`](../../ai_workflow/docs/FDD_GUIDE.md) for complete process.
 
-**⚠️ MANDATORY: Feature Naming in Code** - All public classes MUST include feature references in XML documentation comments. See [`docs/ai/guidelines/feature_naming_in_code.md`](ai/guidelines/feature_naming_in_code.md) for complete guidelines.
+**⚠️ MANDATORY: Feature Naming in Code** - All public classes MUST include feature references in XML documentation comments. See feature documentation for guidelines.
 
 ---
 
@@ -210,9 +210,7 @@ Use cases should reference feature numbers:
 
 ## Testing Documentation
 
-**Testing is NOT a feature** - Each feature has its own `testing.md` file documenting its testing strategy. The shared testing strategy document is:
-
-- **Test Structure Standard**: `docs/ai/testing_structure_definition.md` - Standard test organization (Systems/, Blueprints/, Data/)
+**Testing is NOT a feature** - Each feature has its own `testing.md` file documenting its testing strategy.
 
 **Feature Testing Documents** (each feature has its own):
 - `docs/features/1-game-data/testing.md` - Game data testing strategy
@@ -223,7 +221,7 @@ Use cases should reference feature numbers:
 
 **Additional Testing Resources**:
 - `docs/features/2-combat-system/testing/integration_guide.md` - Integration test patterns
-- `docs/ai/examples/good_tests.md` - Test code examples
+- `ai_workflow/docs/TDD_GUIDE.md` - Test-Driven Development guide
 
 ---
 
@@ -272,13 +270,13 @@ Use cases should reference feature numbers:
 2. **Determine Number**: Check this document for next available number (currently: 5)
 3. **Choose Name**: Use kebab-case, check for duplicates
 4. **Create Folder**: `docs/features/[N]-[feature-name]/`
-5. **Create Complete Documentation Structure**: Use templates from `docs/feature_documentation_standard.md`
+5. **Create Complete Documentation Structure**: Follow standard structure (README.md, architecture.md, roadmap.md, use_cases.md, testing.md, code_location.md)
    - All 6 required documents: README.md, architecture.md, roadmap.md, use_cases.md, testing.md, code_location.md
 6. **Update This Document**: Add feature entry with number, name, folder, status, description
 7. **Update Features Overview**: Add to `docs/features/README.md`
 8. **Use Numbered Format**: Always reference as `Feature [N]: [Name]` or `[N]: [Name]`
 
-**See**: [`docs/ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) for complete process.
+**See**: [`ai_workflow/docs/FDD_GUIDE.md`](../../ai_workflow/docs/FDD_GUIDE.md) for complete process.
 
 ### Required Information
 
@@ -324,7 +322,7 @@ When adding a new feature, provide:
 8. **Update Parent Documentation**: Update parent's `roadmap.md` and `code_location.md` if needed
 9. **Use Numbered Format**: Always reference as `Sub-Feature [N.M]: [Name]` or `[N.M]: [Name]`
 
-**See**: [`docs/ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) for complete process.
+**See**: [`ai_workflow/docs/FDD_GUIDE.md`](../../ai_workflow/docs/FDD_GUIDE.md) for complete process.
 
 ### Required Information
 
@@ -379,9 +377,8 @@ When adding a new sub-feature, provide:
 ## Related Documents
 
 - **[Features Overview](../features/README.md)** - Overview of all features
-- **[Feature-Driven Development](../ai/guidelines/feature_driven_development.md)** ⭐ **MANDATORY** - Complete process for feature-driven development
-- **[Feature Documentation Standard](feature_documentation_standard.md)** - Standard structure for feature documentation
-- **[Project Guidelines](../ai/guidelines/project_guidelines.md)** - Coding rules and standards
+- **[Feature-Driven Development](../../ai_workflow/docs/FDD_GUIDE.md)** ⭐ **MANDATORY** - Complete process for feature-driven development
+- **[TDD Guide](../../ai_workflow/docs/TDD_GUIDE.md)** - Test-Driven Development guide
 
 ---
 
