@@ -9,8 +9,8 @@ namespace PokemonUltimate.Core.Blueprints
     /// </summary>
     /// <remarks>
     /// **Feature**: 1: Game Data
-    /// **Sub-Feature**: 1.6: Field Conditions Data
-    /// **Documentation**: See `docs/features/1-game-data/1.6-field-conditions-data/README.md`
+    /// **Sub-Feature**: 1.7: Terrain Data
+    /// **Documentation**: See `docs/features/1-game-data/1.7-terrain-data/README.md`
     /// </remarks>
     public sealed class TerrainData
     {
@@ -234,7 +234,7 @@ namespace PokemonUltimate.Core.Blueprints
 
         /// <summary>
         /// Checks if a Pokemon is affected by terrain (grounded check).
-        /// Pokemon is grounded if it doesn't have Flying type, Levitate ability, 
+        /// Pokemon is grounded if it doesn't have Flying type, Levitate ability,
         /// or is holding Air Balloon, and isn't under Magnet Rise/Telekinesis.
         /// </summary>
         public static bool IsGrounded(PokemonType primaryType, PokemonType? secondaryType, string abilityName, string heldItemName)
@@ -242,17 +242,17 @@ namespace PokemonUltimate.Core.Blueprints
             // Flying types are not grounded
             if (primaryType == PokemonType.Flying || secondaryType == PokemonType.Flying)
                 return false;
-            
+
             // Levitate ability makes Pokemon not grounded
-            if (!string.IsNullOrEmpty(abilityName) && 
+            if (!string.IsNullOrEmpty(abilityName) &&
                 abilityName.Equals("Levitate", StringComparison.OrdinalIgnoreCase))
                 return false;
-            
+
             // Air Balloon makes Pokemon not grounded
-            if (!string.IsNullOrEmpty(heldItemName) && 
+            if (!string.IsNullOrEmpty(heldItemName) &&
                 heldItemName.Equals("Air Balloon", StringComparison.OrdinalIgnoreCase))
                 return false;
-            
+
             return true;
         }
 

@@ -26,32 +26,36 @@ It follows the **Testability First** guideline by separating the Data (POCO) fro
 - **1.3: Ability Data** - AbilityData (Blueprint)
 - **1.4: Item Data** - ItemData (Blueprint)
 
-### Grupo B: Field & Status Data (1.5-1.6)
+### Grupo B: Field & Status Data (1.5-1.10)
 **Condiciones de campo y estado**
 
 - **1.5: Status Effect Data** - StatusEffectData (Blueprint)
-- **1.6: Field Conditions Data** - WeatherData, TerrainData, HazardData, SideConditionData, FieldEffectData
+- **1.6: Weather Data** - WeatherData (Blueprint)
+- **1.7: Terrain Data** - TerrainData (Blueprint)
+- **1.8: Hazard Data** - HazardData (Blueprint)
+- **1.9: Side Condition Data** - SideConditionData (Blueprint)
+- **1.10: Field Effect Data** - FieldEffectData (Blueprint)
 
-### Grupo C: Supporting Systems (1.7-1.8)
+### Grupo C: Supporting Systems (1.11-1.12)
 **Sistemas que soportan los datos**
 
-- **1.7: Evolution System** - Evolution, IEvolutionCondition, EvolutionConditions (6 classes)
-- **1.8: Type Effectiveness Table** - TypeEffectiveness (data table)
+- **1.11: Evolution System** - Evolution, IEvolutionCondition, EvolutionConditions (6 classes)
+- **1.12: Type Effectiveness Table** - TypeEffectiveness (data table)
 
-### Grupo D: Infrastructure (1.9-1.13)
+### Grupo D: Infrastructure (1.13-1.16)
 **Infraestructura para crear y gestionar datos**
 
-- **1.9: Interfaces Base** - IIdentifiable
-- **1.10: Enums & Constants** - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages
-- **1.11: Builders** - 13 builder classes + 10 static helper classes
-- **1.12: Factories & Calculators** - StatCalculator, PokemonFactory, PokemonInstanceBuilder, NatureData
-- **1.13: Registry System** - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
+- **1.13: Interfaces Base** - IIdentifiable
+- **1.14: Enums & Constants** - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages, NatureData
+- ⚠️ **Builders**: Moved to **[Feature 3.9: Builders](../3-content-expansion/3.9-builders/)** - Used primarily for content creation
+- **1.16: Factories & Calculators** - StatCalculator, PokemonFactory, PokemonInstanceBuilder
+- **1.16: Registry System** - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
 
-### Grupo E: Planned Features (1.14-1.15)
+### Grupo E: Planned Features (1.18-1.19)
 **Features futuras**
 
-- **1.14: Variants System** - Mega/Dinamax/Terracristalización (Planned)
-- **1.15: Pokedex Fields** - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
+- **1.18: Variants System** - Mega/Dinamax/Terracristalización (Planned)
+- **1.19: Pokedex Fields** - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
 
 ---
 
@@ -133,38 +137,6 @@ public enum Gender {
 - `0.0f` = female only (Chansey)
 - `-1.0f` = genderless (Magnemite, Ditto)
 
-### Nature System ✅ IMPLEMENTED
-*Namespace: `PokemonUltimate.Core.Enums` and `PokemonUltimate.Core.Blueprints`*
-
-Natures affect stat calculation: +10% to one stat, -10% to another.
-
-```csharp
-public enum Nature {
-    // Neutral (5): Hardy, Docile, Serious, Bashful, Quirky
-    // Attack+: Lonely, Brave, Adamant, Naughty
-    // Defense+: Bold, Relaxed, Impish, Lax
-    // Speed+: Timid, Hasty, Jolly, Naive
-    // SpAttack+: Modest, Mild, Quiet, Rash
-    // SpDefense+: Calm, Gentle, Sassy, Careful
-}
-
-public static class NatureData {
-    const float BoostMultiplier = 1.1f;
-    const float ReduceMultiplier = 0.9f;
-    
-    Stat? GetIncreasedStat(Nature nature);
-    Stat? GetDecreasedStat(Nature nature);
-    bool IsNeutral(Nature nature);
-    float GetStatMultiplier(Nature nature, Stat stat);
-}
-```
-
-**Usage in stat calculation:**
-```csharp
-int baseStat = species.BaseStats.Attack;
-float natureMultiplier = NatureData.GetStatMultiplier(nature, Stat.Attack);
-int finalStat = (int)(calculatedStat * natureMultiplier);
-```
 
 ### Learnset System ✅ IMPLEMENTED
 *Namespace: `PokemonUltimate.Core.Blueprints`*
@@ -422,6 +394,48 @@ public class PokemonInstance {
 
 Formula: `(2 + stage) / 2` for positive, `2 / (2 + |stage|)` for negative
 
+## 4.5. Enums, Constants & Data Tables ✅ IMPLEMENTED
+*Namespace: `PokemonUltimate.Core.Enums`, `PokemonUltimate.Core.Constants`, `PokemonUltimate.Core.Blueprints`*
+
+### NatureData (Nature Modifier Tables) ✅ IMPLEMENTED
+*Namespace: `PokemonUltimate.Core.Blueprints`*
+
+Static class providing nature modifier tables for stat calculations. Natures affect stat calculation: +10% to one stat, -10% to another.
+
+```csharp
+public static class NatureData {
+    const float BoostMultiplier = 1.1f;      // +10% for boosted stat
+    const float ReduceMultiplier = 0.9f;     // -10% for reduced stat
+    const float NeutralMultiplier = 1.0f;     // No change
+    
+    Stat? GetIncreasedStat(Nature nature);   // Which stat is boosted
+    Stat? GetDecreasedStat(Nature nature);   // Which stat is reduced
+    bool IsNeutral(Nature nature);           // True if no stat changes
+    float GetStatMultiplier(Nature nature, Stat stat);  // Get multiplier for stat
+}
+```
+
+**Nature Enum** (from Sub-Feature 1.14: Enums & Constants):
+```csharp
+public enum Nature {
+    // Neutral (5): Hardy, Docile, Serious, Bashful, Quirky
+    // Attack+: Lonely, Brave, Adamant, Naughty
+    // Defense+: Bold, Relaxed, Impish, Lax
+    // Speed+: Timid, Hasty, Jolly, Naive
+    // SpAttack+: Modest, Mild, Quiet, Rash
+    // SpDefense+: Calm, Gentle, Sassy, Careful
+}
+```
+
+**Usage in stat calculation:**
+```csharp
+int baseStat = species.BaseStats.Attack;
+float natureMultiplier = NatureData.GetStatMultiplier(nature, Stat.Attack);
+int finalStat = (int)(calculatedStat * natureMultiplier);
+```
+
+---
+
 ## 5. The Factory (Fluent Builder) ✅ IMPLEMENTED
 *Namespace: `PokemonUltimate.Core.Factories`*
 
@@ -463,6 +477,8 @@ public static class StatCalculator {
 |--------------------|----------------------|--------------------------|
 | HP | 160 | 207 |
 | Other Stat | 105 | 152 |
+
+**Note**: StatCalculator uses `NatureData` (from Sub-Feature 1.14: Enums & Constants) to apply nature modifiers.
 
 ### PokemonInstanceBuilder (Fluent API)
 ```csharp
@@ -737,7 +753,7 @@ var CharizardTeraFire = Pokemon.Define("Charizard Tera Fire", 6)
     .Build();
 ```
 
-**Status**: ⏳ **PLANNED** - See [`1.14-variants-system/architecture.md`](1.14-variants-system/architecture.md) for full specification.
+**Status**: ⏳ **PLANNED** - See [`1.18-variants-system/architecture.md`](1.18-variants-system/architecture.md) for full specification.
 
 ---
 
@@ -807,7 +823,7 @@ public interface IDataRegistry<T> where T : IIdentifiable {
 }
 ```
 
-### 5.2 Extended Registries
+### 5.5.2 Extended Registries
 
 #### PokemonRegistry
 ```csharp
@@ -830,7 +846,7 @@ public class MoveRegistry : GameDataRegistry<MoveData> {
 }
 ```
 
-### 5.3 Testability
+### 5.5.3 Testability
 
 For Unit Tests, we use direct Catalog access:
 
@@ -856,7 +872,7 @@ public void Test_Combat_Start() {
 
 ---
 
-## 6. Data Layer Compatibility
+## 5.6. Data Layer Compatibility
 
 ### Overall Status: ✅ COMPATIBLE
 

@@ -10,6 +10,7 @@
 
 **Read on-demand:**
 - Feature docs → `docs/features_master_list.md` → `docs/features/[N]-[feature-name]/`
+- Feature-driven development → `docs/ai/guidelines/feature_driven_development.md` ⭐ **MANDATORY**
 - Code quality → `docs/ai/anti-patterns.md`
 - Examples → `docs/ai/examples/good_code.md`
 - Feature naming → `docs/ai/guidelines/feature_naming_in_code.md`
@@ -18,11 +19,33 @@
 
 ### When User Says "Implement X" or "Add X"
 
+**⚠️ CRITICAL: Feature-Driven Development - ALWAYS start here**
+
 **MANDATORY WORKFLOW:**
+
+0. **Feature Discovery & Assignment** ⭐ **MUST DO FIRST**
+   - **MANDATORY: Review existing features** - Read `docs/features_master_list.md` to see all features and sub-features
+   - **Check if work fits existing feature:**
+     - If YES → Read that feature's documentation (`README.md`, `architecture.md`, `roadmap.md`)
+     - If NO → Create new feature or sub-feature (see below)
+   - **For new features/sub-features:**
+     - Determine feature number (check `features_master_list.md` for next available)
+     - Create feature folder: `docs/features/[N]-[feature-name]/`
+     - Create complete documentation structure:
+       - `README.md` - Feature overview
+       - `architecture.md` - Technical specification
+       - `roadmap.md` - Implementation plan
+       - `use_cases.md` - All scenarios
+       - `testing.md` - Testing strategy
+       - `code_location.md` - Where code lives
+     - For sub-features: Create `[N.M]-[sub-feature-name]/` folder with `README.md` (and `architecture.md` if complex)
+     - Update `docs/features_master_list.md` with new feature/sub-feature entry
+     - Follow `docs/feature_documentation_standard.md` for structure
+   - **Once feature assigned:** Proceed with standard workflow below
 
 1. **Read Context & Specs**
    - Read `.ai/context.md` and `docs/features_master_list.md`
-   - Read `docs/features/[N]-[feature-name]/architecture.md` (always use numbered format)
+   - Read assigned feature's documentation (`README.md`, `architecture.md`, `roadmap.md`)
    - **MANDATORY: Read existing code** - See `code_location.md`, read all related classes
    - Understand existing patterns before writing
 
@@ -57,10 +80,15 @@
    - `dotnet test` - All pass
    - Check `docs/ai/checklists/feature_complete.md`
 
-9. **Update Documentation**
-   - Update `.ai/context.md`
-   - Update roadmap if phase complete
-   - Mark use cases complete (if applicable)
+9. **Update Documentation** ⭐ **MANDATORY AFTER EVERY FEATURE**
+   - Update `.ai/context.md` with current state
+   - Update feature's `roadmap.md` - Mark completed phases/sub-features
+   - Update feature's `architecture.md` if implementation differs from spec
+   - Update feature's `use_cases.md` - Mark completed use cases
+   - Update feature's `code_location.md` - Add new files/classes
+   - Update feature's `testing.md` - Document new tests
+   - Update `docs/features_master_list.md` if feature status changed
+   - **CRITICAL**: Documentation must reflect actual implementation state
 
 ### When User Says "Review X" or "Check X"
 1. Read `docs/ai/anti-patterns.md`

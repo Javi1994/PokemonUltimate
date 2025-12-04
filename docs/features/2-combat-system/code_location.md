@@ -28,9 +28,9 @@ The combat system is organized into several key areas:
 - `BattleArbiter` - Victory/defeat detection
 
 ### `PokemonUltimate.Combat.Actions`
-**Purpose**: BattleAction implementations
+**Purpose**: BattleAction implementations (base class from Sub-Feature 2.2)
 **Key Classes**:
-- `BattleAction` - Base action class
+- `BattleAction` - Base action class (Sub-Feature 2.2)
 - `UseMoveAction` - Move execution
 - `DamageAction` - Damage application
 - `ApplyStatusAction` - Status effect application
@@ -42,14 +42,14 @@ The combat system is organized into several key areas:
 - `BattleActionType` - Action type enum
 
 ### `PokemonUltimate.Combat.Damage`
-**Purpose**: Damage calculation pipeline
+**Purpose**: Damage calculation pipeline (includes stat and damage modifiers)
 **Key Classes**:
 - `DamagePipeline` - Main damage calculator
 - `DamageContext` - Damage calculation context
 - `IDamageStep` - Pipeline step interface
-- `IStatModifier` - Stat modifier interface (abilities, items)
-- `AbilityStatModifier` - Ability-based stat modifier
-- `ItemStatModifier` - Item-based stat modifier
+- `IStatModifier` - Stat and damage modifier interface (abilities, items)
+- `AbilityStatModifier` - Ability-based stat/damage modifier adapter
+- `ItemStatModifier` - Item-based stat/damage modifier adapter
 
 ### `PokemonUltimate.Combat.Damage.Steps`
 **Purpose**: Individual damage calculation steps

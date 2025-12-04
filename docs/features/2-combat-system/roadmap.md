@@ -29,19 +29,19 @@ The Combat System is divided into **multiple phases**, each building on the prev
 │  Phase 2.8: End-of-Turn Effects ══════════════════════╣    │
 │  Phase 2.9: Abilities & Items   ══════════════════════╝    │
 │                        ↓                                    │
-│  Phase 2.10: Pipeline Hooks     ══════════════════════╗    │
-│  Phase 2.11: Recoil & Drain    ══════════════════════╝    │
+│  Phase 2.11: Recoil & Drain    ══════════════════════╗    │
+│  (Note: 2.10 consolidated into 2.4)                 ══════════════════════╝    │
 │                        ↓                                    │
-│  Phase 2.12: Extended End-of-Turn ════════════════════╗    │
-│  Phase 2.13: Additional Triggers ═══════════════════╣    │
-│  Phase 2.14: Volatile Status     ═════════════════════╝    │
+│  Phase 2.12: Weather System     ══════════════════════╗    │
+│  Phase 2.13: Terrain System     ══════════════════════╣    │
+│  Phase 2.14: Hazards System      ══════════════════════╝    │
 │                        ↓                                    │
-│  Phase 2.15: Weather System     ══════════════════════╗    │
-│  Phase 2.16: Terrain System     ══════════════════════╣    │
-│  Phase 2.17: Entry Hazards      ══════════════════════╝    │
+│  Phase 2.15: Advanced Moves     ══════════════════════╗    │
+│  Phase 2.16: Field Conditions   ══════════════════════╣    │
+│  Phase 2.17: Advanced Abilities ══════════════════════╝    │
 │                        ↓                                    │
-│  Phase 2.18: Special Moves      ══════════════════════╗    │
-│  Phase 2.19: Multi-Hit/Turn     ══════════════════════╝    │
+│  Phase 2.18: Advanced Items     ══════════════════════╗    │
+│  Phase 2.19: Battle Formats     ══════════════════════╝    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -61,9 +61,8 @@ The Combat System is divided into **multiple phases**, each building on the prev
 | 2.7 Integration | ✅ Complete | 38 | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
 | 2.8 End-of-Turn Effects | ✅ Complete | 25 | EndOfTurnProcessor, Status damage |
 | 2.9 Abilities & Items | ✅ Complete | 12 | BattleTrigger system, AbilityListener, ItemListener |
-| 2.10 Pipeline Hooks | ✅ Complete | - | Stat modifiers, Choice items, Life Orb, Blaze |
 | 2.11 Recoil & Drain | ✅ Complete | - | RecoilEffect, DrainEffect |
-| **Core Total** | **11/11** | **645+** | Combat module only |
+| **Core Total** | **10/10** | **645+** | Combat module only (Note: 2.10 consolidated into 2.4) |
 | 2.12 Extended End-of-Turn | ⏳ Planned | ~30 | Leech Seed, Wish, Perish Song, Binding |
 | 2.13 Additional Triggers | ⏳ Planned | ~30 | OnBeforeMove, OnAfterMove, OnDamageTaken |
 | 2.14 Volatile Status | ⏳ Planned | ~30 | Confusion, Infatuation, Taunt, Encore, Disable |
@@ -232,9 +231,10 @@ Tests/Combat/BattleFieldTests.cs
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `BattleQueue` | `Combat/BattleQueue.cs` | Action processor |
+| `BattleQueue` | `Combat/Engine/BattleQueue.cs` | Action processor |
+| `BattleAction` | `Combat/Actions/BattleAction.cs` | Base action class (all actions inherit from this) |
 | `MessageAction` | `Combat/Actions/MessageAction.cs` | Simple message (for testing) |
-| `NullBattleView` | `Combat/NullBattleView.cs` | No-op view for tests |
+| `NullBattleView` | `Combat/View/NullBattleView.cs` | No-op view for tests |
 
 ### BattleQueue Specification
 
@@ -515,12 +515,16 @@ Tests/Combat/Damage/Steps/TypeEffectivenessStepTests.cs
 - Minimum 1 damage (unless immune or status)
 - Fixed random support for deterministic testing
 
+**Implemented in This Phase:**
+- Stat modifiers (Choice Band, Choice Specs, Assault Vest, Eviolite) via `IStatModifier`
+- Ability damage multipliers (Blaze, Torrent, Overgrow, Swarm) via `AttackerAbilityStep`
+- Item damage multipliers (Life Orb) via `AttackerItemStep`
+- Speed modifiers (Choice Scarf) via `TurnOrderResolver`
+
 **Deferred to Later Phases:**
 - Multi-target penalty (0.75x)
 - Weather modifiers
 - Screen modifiers (Reflect/Light Screen)
-- Ability modifiers
-- Item modifiers (Life Orb, etc.)
 - Critical hit stage increases (Focus Energy)
 
 ---
@@ -870,38 +874,13 @@ public interface IBattleListener
 
 ---
 
-## Phase 2.10: Pipeline Hooks (Stat Modifiers) ✅ COMPLETE
+## Phase 2.10: Pipeline Hooks (Stat Modifiers) ✅ CONSOLIDATED INTO 2.4
 
-**Goal**: Implement passive stat and damage modifiers via pipeline hooks.
+**Note**: This phase has been consolidated into **Phase 2.4: Damage Calculation Pipeline**. The stat and damage modifier system (`IStatModifier`, `AbilityStatModifier`, `ItemStatModifier`) is an integral part of the damage pipeline and is implemented within Sub-Feature 2.4.
 
-**Depends on**: Phase 2.4 (Damage Pipeline), Phase 2.9 (Abilities & Items)
+**Status**: ✅ **Complete** - Stat modifier system fully implemented as part of 2.4
 
-### Components
-
-| Component | File | Description |
-|-----------|------|-------------|
-| `IStatModifier` | `Combat/Damage/IStatModifier.cs` | Interface for stat modifiers |
-| `AbilityStatModifier` | `Combat/Damage/AbilityStatModifier.cs` | Adapts AbilityData to IStatModifier |
-| `ItemStatModifier` | `Combat/Damage/ItemStatModifier.cs` | Adapts ItemData to IStatModifier |
-| Stat modifier steps | `Combat/Damage/Steps/` | AttackerAbilityStep, AttackerItemStep, etc. |
-
-### Completion Checklist
-
-- [x] `IStatModifier` interface defined
-- [x] `AbilityStatModifier` implemented
-- [x] `ItemStatModifier` implemented
-- [x] Stat modifier steps integrated into DamagePipeline
-- [x] Choice Band (+50% Attack) working
-- [x] Choice Specs (+50% SpAttack) working
-- [x] Choice Scarf (+50% Speed) working (integrated in TurnOrderResolver)
-- [x] Life Orb (+30% damage) working
-- [x] Assault Vest (+50% SpDefense) working
-- [x] Eviolite (+50% Def/SpDef if can evolve) working
-- [x] Blaze/Torrent/Overgrow/Swarm (HP threshold damage multipliers) working
-- [x] All tests passing
-- [x] No compiler warnings
-
-**Status**: ✅ **Complete** - Stat modifier system fully implemented
+See **[Phase 2.4: Damage Calculation Pipeline](#phase-24-damage-calculation-pipeline)** for complete implementation details.
 
 ---
 
@@ -935,9 +914,21 @@ public interface IBattleListener
 
 The following phases extend the combat system with advanced features. Each phase builds on previous phases and must pass all tests before moving to the next.
 
+**⚠️ Note**: The roadmap below contains detailed implementation phases. These phases are organized into Sub-Features 2.12-2.19 as defined in `features_master_list.md`:
+- **2.12**: Weather System
+- **2.13**: Terrain System  
+- **2.14**: Hazards System
+- **2.15**: Advanced Move Mechanics
+- **2.16**: Field Conditions
+- **2.17**: Advanced Abilities
+- **2.18**: Advanced Items
+- **2.19**: Battle Formats
+
+The detailed phases below may include intermediate implementation steps that are part of these sub-features.
+
 ---
 
-## Phase 2.12: Extended End-of-Turn Effects
+## Phase 2.12: Extended End-of-Turn Effects (Part of 2.15: Advanced Move Mechanics)
 
 **Goal**: Implement additional end-of-turn effects (Leech Seed, Wish, Perish Song, Binding damage).
 
@@ -1030,7 +1021,9 @@ Tests/Combat/Engine/EndOfTurnProcessorExtendedEdgeCasesTests.cs
 
 ---
 
-## Phase 2.13: Additional Ability Triggers
+## Phase 2.13a: Additional Ability Triggers (Implementation Detail)
+
+**Note**: This is a detailed implementation phase that is part of **Sub-Feature 2.17: Advanced Abilities**. The official Sub-Feature 2.13 is Terrain System (see below).
 
 **Goal**: Implement remaining ability triggers (OnBeforeMove, OnAfterMove, OnDamageTaken, OnWeatherChange).
 
@@ -1129,7 +1122,9 @@ Tests/Combat/Events/BattleTriggerExtendedEdgeCasesTests.cs
 
 ---
 
-## Phase 2.14: Volatile Status Effects
+## Phase 2.14a: Volatile Status Effects (Implementation Detail)
+
+**Note**: This is a detailed implementation phase that is part of **Sub-Feature 2.15: Advanced Move Mechanics**. The official Sub-Feature 2.14 is Hazards System (see below).
 
 **Goal**: Implement remaining volatile status effects (Confusion, Infatuation, Taunt, Encore, Disable).
 
@@ -1234,7 +1229,7 @@ Tests/Combat/Actions/VolatileStatusEdgeCasesTests.cs
 
 ---
 
-## Phase 2.15: Weather System
+## Phase 2.12: Weather System (Sub-Feature 2.12)
 
 **Goal**: Implement weather effects (Sun, Rain, Sandstorm, Hail) with damage, modifiers, and ability interactions.
 
@@ -1338,7 +1333,7 @@ Tests/Combat/Engine/WeatherDamageTests.cs
 
 ---
 
-## Phase 2.16: Terrain System
+## Phase 2.13: Terrain System (Sub-Feature 2.13)
 
 **Goal**: Implement terrain effects (Electric, Grassy, Psychic, Misty) with modifiers and interactions.
 
@@ -1434,7 +1429,7 @@ Tests/Combat/Engine/TerrainEffectsTests.cs
 
 ---
 
-## Phase 2.17: Entry Hazards
+## Phase 2.14: Hazards System (Sub-Feature 2.14)
 
 **Goal**: Implement entry hazards (Spikes, Stealth Rock, Toxic Spikes, Sticky Web) that activate when Pokemon switch in.
 
@@ -1540,7 +1535,7 @@ Tests/Combat/Engine/EntryHazardProcessorEdgeCasesTests.cs
 
 ---
 
-## Phase 2.18: Special Move Mechanics
+## Phase 2.15: Advanced Move Mechanics (Sub-Feature 2.15)
 
 **Goal**: Implement special move mechanics (Protect, Counter, Pursuit, Focus Punch, Semi-Invulnerable moves).
 
@@ -1655,7 +1650,7 @@ Tests/Combat/Actions/SemiInvulnerableTests.cs
 
 ---
 
-## Phase 2.19: Multi-Hit and Multi-Turn Moves
+## Phase 2.15b: Multi-Hit and Multi-Turn Moves (Part of Sub-Feature 2.15)
 
 **Goal**: Implement multi-hit moves (Double Slap, Bullet Seed) and multi-turn moves (Solar Beam, Hyper Beam, Outrage).
 

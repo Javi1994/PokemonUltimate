@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Content.Catalogs.Abilities;
 

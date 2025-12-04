@@ -96,22 +96,28 @@ PokemonUltimate.Content/Catalogs/Terrain/
 └── TerrainCatalog.cs           # All terrain conditions (4 terrains)
 ```
 
-### Builders
+### Builders (Sub-Feature 3.9)
+**Namespace**: `PokemonUltimate.Content.Builders`  
+**Files**: `PokemonUltimate.Core/Builders/*.cs` (Note: Files are physically in Core but namespace is Content.Builders)
+
 ```
-PokemonUltimate.Content/Builders/
+PokemonUltimate.Core/Builders/ (all use namespace PokemonUltimate.Content.Builders)
 ├── PokemonBuilder.cs           # Pokemon.Define("Pikachu", 25)
 ├── MoveBuilder.cs              # Move.Define("Ember")
-├── EffectBuilder.cs            # e => e.Damage().MayBurn(10)
-├── LearnsetBuilder.cs          # m => m.StartsWith(...)
-└── EvolutionBuilder.cs         # e => e.AtLevel(16)
-
-PokemonUltimate.Core/Builders/
 ├── AbilityBuilder.cs           # Ability.Define("Intimidate")
 ├── ItemBuilder.cs              # Item.Define("Leftovers")
 ├── StatusEffectBuilder.cs      # Status.Define("Burn")
+├── SideConditionBuilder.cs     # Screen.Define("Reflect")
+├── FieldEffectBuilder.cs       # Room.Define("Trick Room")
+├── HazardBuilder.cs            # Hazard.Define("Stealth Rock")
 ├── WeatherBuilder.cs           # WeatherEffect.Define("Rain")
-└── TerrainBuilder.cs           # TerrainEffect.Define("Grassy Terrain")
+├── TerrainBuilder.cs           # TerrainEffect.Define("Grassy Terrain")
+├── EffectBuilder.cs            # e => e.Damage().MayBurn(10)
+├── LearnsetBuilder.cs          # m => m.StartsWith(...)
+└── EvolutionBuilder.cs         # e => e.AtLevel(16)
 ```
+
+**See**: [Sub-Feature 3.9: Builders](3.9-builders/) for complete documentation.
 
 ## 4. Pokemon Builder System ✅ NEW
 
@@ -267,20 +273,30 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 | Held Items | Leftovers, Choice Band, Choice Specs, Choice Scarf, Life Orb, Focus Sash, Expert Belt, Muscle Band, Wise Glasses, Assault Vest, Rocky Helmet, Eviolite, Black Sludge, Toxic Orb, Flame Orb |
 | Berries | Oran Berry, Sitrus Berry, Cheri Berry, Chesto Berry, Pecha Berry, Rawst Berry, Aspear Berry, Lum Berry |
 
-### StatusCatalog (15 Statuses) ✅ NEW
+### StatusCatalog (15 Statuses) ✅ COMPLETE
+**Location**: `PokemonUltimate.Content/Catalogs/Status/StatusCatalog.cs`
+
 | Type | Statuses |
 |------|----------|
-| Persistent | Burn, Paralysis, Sleep, Poison, BadlyPoisoned, Freeze |
-| Volatile | Confusion, Attract, Flinch, LeechSeed, Curse, Encore, Taunt, Torment, Disable |
+| **Persistent** (6) | Burn, Paralysis, Sleep, Poison, BadlyPoisoned, Freeze |
+| **Volatile** (9) | Confusion, Attract, Flinch, LeechSeed, Curse, Encore, Taunt, Torment, Disable |
 
-### WeatherCatalog (9 Weathers) ✅ NEW
+**Status**: ✅ Complete - All status effects implemented
+
+### WeatherCatalog (9 Weathers) ✅ COMPLETE
+**Location**: `PokemonUltimate.Content/Catalogs/Weather/WeatherCatalog.cs`
+
 | Category | Weather |
 |----------|---------|
-| Standard (5 turns) | Rain, Sun (Harsh Sunlight), Sandstorm, Hail, Snow |
-| Primal (indefinite) | Heavy Rain, Extremely Harsh Sunlight, Strong Winds |
-| Special | Fog |
+| **Standard** (5 turns) | Rain, Sun (Harsh Sunlight), Sandstorm, Hail, Snow |
+| **Primal** (indefinite) | Heavy Rain, Extremely Harsh Sunlight, Strong Winds |
+| **Special** | Fog |
 
-### TerrainCatalog (4 Terrains) ✅ NEW
+**Status**: ✅ Complete - All weather conditions implemented
+
+### TerrainCatalog (4 Terrains) ✅ COMPLETE
+**Location**: `PokemonUltimate.Content/Catalogs/Terrain/TerrainCatalog.cs`
+
 | Terrain | Boost | Special Effect |
 |---------|-------|----------------|
 | Grassy | Grass 1.3x | Heals 1/16 HP, halves Earthquake |
@@ -288,7 +304,11 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 | Psychic | Psychic 1.3x | Blocks Priority |
 | Misty | - | Dragon 0.5x, prevents all status |
 
-### HazardCatalog (4 Hazards) ✅ NEW
+**Status**: ✅ Complete - All terrain conditions implemented
+
+### HazardCatalog (4 Hazards) ✅ COMPLETE
+**Location**: `PokemonUltimate.Content/Catalogs/Field/HazardCatalog.cs`
+
 | Hazard | Layers | Effect |
 |--------|--------|--------|
 | Stealth Rock | 1 | Type-based damage (Rock effectiveness) |
@@ -296,19 +316,29 @@ public static readonly PokemonSpeciesData Bulbasaur = ...
 | Toxic Spikes | 1-2 | Poison / Badly Poisoned |
 | Sticky Web | 1 | -1 Speed |
 
-### SideConditionCatalog (10 Conditions) ✅ NEW
+**Status**: ✅ Complete - All hazard types implemented
+
+### SideConditionCatalog (10 Conditions) ✅ COMPLETE
+**Location**: `PokemonUltimate.Content/Catalogs/Field/SideConditionCatalog.cs`
+
 | Category | Conditions |
 |----------|------------|
-| Screens | Reflect, Light Screen, Aurora Veil |
-| Speed/Status | Tailwind, Safeguard, Mist, Lucky Chant |
-| Protection | Wide Guard, Quick Guard, Mat Block |
+| **Screens** | Reflect, Light Screen, Aurora Veil |
+| **Speed/Status** | Tailwind, Safeguard, Mist, Lucky Chant |
+| **Protection** | Wide Guard, Quick Guard, Mat Block |
 
-### FieldEffectCatalog (8 Effects) ✅ NEW
+**Status**: ✅ Complete - All side conditions implemented
+
+### FieldEffectCatalog (8 Effects) ✅ COMPLETE
+**Location**: `PokemonUltimate.Content/Catalogs/Field/FieldEffectCatalog.cs`
+
 | Category | Effects |
 |----------|---------|
-| Rooms | Trick Room, Magic Room, Wonder Room |
-| Field | Gravity, Ion Deluge, Fairy Lock |
-| Sports | Mud Sport, Water Sport |
+| **Rooms** | Trick Room, Magic Room, Wonder Room |
+| **Field** | Gravity, Ion Deluge, Fairy Lock |
+| **Sports** | Mud Sport, Water Sport |
+
+**Status**: ✅ Complete - All field effects implemented
 
 ## 6. Adding New Content
 

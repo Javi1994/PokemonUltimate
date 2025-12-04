@@ -21,7 +21,8 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 | **Feature 5: Game Features** | ⏳ Planned | - | [roadmap.md](features/5-game-features/roadmap.md) |
 
 **⚠️ Feature Documentation**: Always use numbered paths: `docs/features/[N]-[feature-name]/`  
-**📋 Master Reference**: See [`features_master_list.md`](features_master_list.md) for complete feature list
+**📋 Master Reference**: See [`features_master_list.md`](features_master_list.md) for complete feature list  
+**🚀 Feature-Driven Development**: See [`docs/ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) ⭐ **MANDATORY** - All development must start with feature assignment
 
 ---
 
@@ -67,42 +68,59 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 - `StatusEffectBuilder` fluent API
 - Damage per turn, stat modifiers, duration, immunities
 
-#### 1.6: Field Conditions Data ✅
-- `WeatherData`, `TerrainData`, `HazardData`, `SideConditionData`, `FieldEffectData`
-- Builders for all field condition types
+#### 1.6: Weather Data ✅
+- `WeatherData` blueprint
+- `WeatherBuilder`
 
-#### 1.7: Evolution System ✅
+#### 1.7: Terrain Data ✅
+- `TerrainData` blueprint
+- `TerrainBuilder`
+
+#### 1.8: Hazard Data ✅
+- `HazardData` blueprint
+- `HazardBuilder`
+
+#### 1.9: Side Condition Data ✅
+- `SideConditionData` blueprint
+- `SideConditionBuilder`
+
+#### 1.10: Field Effect Data ✅
+- `FieldEffectData` blueprint
+- `FieldEffectBuilder`
+
+#### 1.11: Evolution System ✅
 - `Evolution` + `IEvolutionCondition` (6 condition types)
 - `EvolutionBuilder`
 - `Gender` enum + `GenderRatio`
 
-#### 1.8: Type Effectiveness Table ✅
+#### 1.12: Type Effectiveness Table ✅
 - Gen 6+ chart (18 types, Fairy included)
 - Single/dual type effectiveness
 - STAB calculation (1.5x)
 - Immunity handling
 
-#### 1.9: Interfaces Base ✅
+#### 1.13: Interfaces Base ✅
 - `IIdentifiable` interface
 
-#### 1.10: Enums & Constants ✅
+#### 1.14: Enums & Constants ✅
 - Enums (20 main + 7 in Effects)
 - `ErrorMessages.cs` - Centralized error strings
 - `GameMessages.cs` - Centralized game strings
 - `Nature` enum (25) + `NatureData` (stat modifiers ±10%)
 
-#### 1.11: Builders ✅
+#### Builders ✅ (Moved to Feature 3.9)
 - 13 builder classes + 10 static helper classes
 - `PokemonBuilder`, `MoveBuilder`, `AbilityBuilder`, `ItemBuilder`, `StatusEffectBuilder`, etc.
+- See Feature 3.9: Builders for details
 
-#### 1.12: Factories & Calculators ✅
+#### 1.15: Factories & Calculators ✅
 - **StatCalculator**: Gen 3+ formulas with IVs, EVs, Nature
   - HP: `floor((2*Base + IV + floor(EV/4)) * Level / 100) + Level + 10`
   - Other: `floor((floor((2*Base + IV + floor(EV/4)) * Level / 100) + 5) * Nature)`
   - Verified against real Pokemon data
 - `PokemonFactory`: Quick creation
 
-#### 1.13: Registry System ✅
+#### 1.16: Registry System ✅
 - `IDataRegistry<T>` interface  
 - `GameDataRegistry<T>` with `Get`, `GetById`, `TryGet`, `Contains`, `All`, `Count`
 - `PokemonRegistry` with type/pokedex queries
@@ -110,10 +128,10 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 
 ### Planned Sub-Features
 
-#### 1.14: Variants System ⏳
+#### 1.18: Variants System ⏳
 - Mega/Dinamax/Terracristalización as separate species
 
-#### 1.15: Pokedex Fields ⏳
+#### 1.19: Pokedex Fields ⏳
 - Description, Category, Height, Weight, Color, Shape, Habitat
 
 ---
@@ -185,10 +203,11 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 - `ItemListener` - Item event handler
 - `BattleTriggerProcessor` - Trigger processor
 
-#### 2.10: Pipeline Hooks ✅
+#### Stat & Damage Modifiers ✅ (Consolidated into 2.4)
 - `IStatModifier` - Stat modifier interface
 - `AbilityStatModifier` - Ability-based stat modifier
 - `ItemStatModifier` - Item-based stat modifier
+- Note: These are part of Sub-Feature 2.4: Damage Calculation Pipeline
 
 #### 2.11: Recoil & Drain ✅
 - Recoil damage effects
@@ -232,10 +251,16 @@ Build a functional **Combat Simulator** (1v1, 2v2, 1v3, etc.) running in a Conso
 #### 3.4: Ability Expansion ⏳
 - Adding more abilities
 
-#### 3.5: Content Validation ⏳
+#### 3.5: Status Effect Expansion ✅
+- Status effects catalog (15 statuses complete)
+
+#### 3.6: Field Conditions Expansion ✅
+- Weather, Terrain, Hazards, Side Conditions, Field Effects (35 total complete)
+
+#### 3.7: Content Validation ⏳
 - Quality standards and validation
 
-#### 3.6: Content Organization ✅
+#### 3.8: Content Organization ✅
 - Catalog organization and maintenance
 
 ---

@@ -400,7 +400,7 @@ public class CombatEngine {
 - **[Code Location](../../code_location.md)** - Where this is implemented
 - **[Feature 1: Game Data](../../../1-game-data/architecture.md)** - Pokemon instances have abilities and items
 - **[Feature 3: Content Expansion](../../../3-content-expansion/roadmap.md)** - Adding more abilities and items
-- **[Sub-Feature 2.10: Pipeline Hooks](../2.10-pipeline-hooks/)** - Stat and damage modifiers
+- **[Sub-Feature 2.4: Damage Calculation Pipeline](../2.4-damage-calculation-pipeline/)** - Stat and damage modifiers (consolidated from 2.10)
 
 **⚠️ Always use numbered feature paths**: `../../../[N]-[feature-name]/` instead of `../../../feature-name/`
 

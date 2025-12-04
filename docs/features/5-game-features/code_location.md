@@ -175,7 +175,7 @@ Tests/Systems/Game/
 - **[Roadmap](roadmap.md)** - Implementation phases (5.1-5.6)
 - **[Testing](testing.md)** - Testing strategy for game features
 - **[Feature 2: Combat System](../2-combat-system/code_location.md)** - Battle engine code location
-- **[Feature 1: Pokemon Data](../1-pokemon-data/code_location.md)** - Pokemon data code location
+- **[Feature 1: Game Data](../1-game-data/code_location.md)** - Game data code location
 - **[Feature 3: Content Expansion](../3-content-expansion/code_location.md)** - Content system code location
 
 ---

@@ -1,5 +1,5 @@
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Abilities
@@ -10,7 +10,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
     /// <remarks>
     /// **Feature**: 3: Content Expansion
     /// **Sub-Feature**: 3.4: Ability Expansion
-    /// **Documentation**: See `docs/features/3-content-expansion/3.4-ability-expansion/architecture.md`
+    /// **Documentation**: See `docs/features/3-content-expansion/3.4-ability-expansion/README.md`
     /// </remarks>
     public static partial class AbilityCatalog
     {

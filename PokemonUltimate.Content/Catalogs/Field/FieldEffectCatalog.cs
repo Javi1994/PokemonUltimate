@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Field
@@ -10,8 +10,8 @@ namespace PokemonUltimate.Content.Catalogs.Field
     /// </summary>
     /// <remarks>
     /// **Feature**: 3: Content Expansion
-    /// **Sub-Feature**: 3.6: Content Organization
-    /// **Documentation**: See `docs/features/3-content-expansion/3.6-content-organization/README.md`
+    /// **Sub-Feature**: 3.6: Field Conditions Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.6-field-conditions-expansion/README.md`
     /// </remarks>
     public static class FieldEffectCatalog
     {

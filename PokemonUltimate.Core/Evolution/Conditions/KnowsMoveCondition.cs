@@ -11,8 +11,8 @@ namespace PokemonUltimate.Core.Evolution.Conditions
     /// </summary>
     /// <remarks>
     /// **Feature**: 1: Game Data
-    /// **Sub-Feature**: 1.7: Evolution System
-    /// **Documentation**: See `docs/features/1-game-data/1.7-evolution-system/architecture.md`
+    /// **Sub-Feature**: 1.11: Evolution System
+    /// **Documentation**: See `docs/features/1-game-data/1.11-evolution-system/README.md`
     /// </remarks>
     public class KnowsMoveCondition : IEvolutionCondition
     {

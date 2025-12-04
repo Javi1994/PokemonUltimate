@@ -15,12 +15,12 @@ This feature implements the core Pokemon battle system, including:
 - End-of-turn effects processing
 - Abilities and items integration
 
-**Status**: Core phases complete (2.1-2.11), extended phases planned (2.12-2.19)
+**Status**: Core phases complete (2.1-2.9, 2.11), extended phases planned (2.12-2.19)
 
 ## Current Status
 
 - ✅ **Core Complete**: Battle foundation, actions, turn order, damage, engine
-- ✅ **Integration**: Abilities, items, pipeline hooks, recoil/drain
+- ✅ **Integration**: Abilities, items, stat/damage modifiers, recoil/drain
 - ⏳ **Planned**: Weather, terrain, hazards, advanced mechanics
 
 ## Documentation
@@ -45,7 +45,6 @@ This feature implements the core Pokemon battle system, including:
 - **[2.7: Integration](2.7-integration/)** - AI providers, Player input, Full battles ✅
 - **[2.8: End-of-Turn Effects](2.8-end-of-turn-effects/)** - Status damage, effects processing ✅
 - **[2.9: Abilities & Items](2.9-abilities-items/)** - Event-driven system, triggers ✅
-- **[2.10: Pipeline Hooks](2.10-pipeline-hooks/)** - Stat modifiers, damage modifiers ✅
 - **[2.11: Recoil & Drain](2.11-recoil-drain/)** - Recoil damage, HP drain effects ✅
 
 ### Planned (2.12-2.19)
@@ -68,7 +67,7 @@ This feature implements the core Pokemon battle system, including:
 
 ## Quick Links
 
-- **Phases Complete**: 2.1-2.11 (Core combat)
+- **Phases Complete**: 2.1-2.9, 2.11 (Core combat - note: 2.10 consolidated into 2.4)
 - **Phases Planned**: 2.12-2.19 (Extended features)
 - **Tests**: 2,460+ passing tests (see [testing](testing.md))
 - **Key Classes**: See [code location](code_location.md) for implementation details

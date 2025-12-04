@@ -8,8 +8,8 @@ namespace PokemonUltimate.Core.Blueprints
     /// </summary>
     /// <remarks>
     /// **Feature**: 1: Game Data
-    /// **Sub-Feature**: 1.6: Field Conditions Data
-    /// **Documentation**: See `docs/features/1-game-data/1.6-field-conditions-data/README.md`
+    /// **Sub-Feature**: 1.6: Weather Data
+    /// **Documentation**: See `docs/features/1-game-data/1.6-weather-data/README.md`
     /// </remarks>
     public sealed class WeatherData
     {

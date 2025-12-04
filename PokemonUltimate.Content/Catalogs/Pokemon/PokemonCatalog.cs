@@ -15,7 +15,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
     /// <remarks>
     /// **Feature**: 3: Content Expansion
     /// **Sub-Feature**: 3.1: Pokemon Expansion
-    /// **Documentation**: See `docs/features/3-content-expansion/3.1-pokemon-expansion/architecture.md`
+    /// **Documentation**: See `docs/features/3-content-expansion/3.1-pokemon-expansion/README.md`
     /// 
     /// Pokemon names are trademarks of Nintendo/Game Freak. Non-commercial fan project.
     /// </remarks>

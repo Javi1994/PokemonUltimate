@@ -138,10 +138,61 @@ public class ApplyStatusAction : BattleAction {
 }
 ```
 
-## 5. Modularity & Extensibility
+## 5. Stat and Damage Modifiers
+
+The pipeline includes a comprehensive system for passive stat and damage modifications from abilities and items.
+
+### `IStatModifier` Interface
+
+Provides a unified interface for stat and damage modifications:
+
+```csharp
+public interface IStatModifier {
+    float GetStatMultiplier(BattleSlot holder, Stat stat, BattleField field);
+    float GetDamageMultiplier(DamageContext context);
+}
+```
+
+### Adapters
+
+- **`AbilityStatModifier`**: Adapts `AbilityData` to `IStatModifier` for ability-based modifiers
+- **`ItemStatModifier`**: Adapts `ItemData` to `IStatModifier` for item-based modifiers
+
+### Integration Points
+
+1. **Stat Modifiers** (in `BaseDamageStep`):
+   - Choice Band (+50% Attack)
+   - Choice Specs (+50% SpAttack)
+   - Assault Vest (+50% SpDefense)
+   - Eviolite (+50% Def/SpDef if can evolve)
+   - Choice Scarf (+50% Speed, applied in `TurnOrderResolver`)
+
+2. **Damage Modifiers** (in pipeline steps):
+   - `AttackerAbilityStep`: Blaze, Torrent, Overgrow, Swarm (HP threshold multipliers)
+   - `AttackerItemStep`: Life Orb (+30% damage)
+
+### Example Usage
+
+```csharp
+// In BaseDamageStep.Process()
+if (slot.Pokemon.HeldItem != null) {
+    var itemModifier = new ItemStatModifier(slot.Pokemon.HeldItem);
+    float multiplier = itemModifier.GetStatMultiplier(slot, stat, field);
+    effectiveStat *= multiplier;
+}
+
+// In AttackerAbilityStep.Process()
+if (attacker.Ability != null) {
+    var abilityModifier = new AbilityStatModifier(attacker.Ability);
+    float multiplier = abilityModifier.GetDamageMultiplier(context);
+    context.Multiplier *= multiplier;
+}
+```
+
+## 6. Modularity & Extensibility
 How do we handle **Items** (Choice Band) or **Abilities** (Blaze)?
 
-We use an **Observer/Event** system within the Pipeline steps.
+We use the **IStatModifier** system integrated directly into pipeline steps.
 
 ```csharp
 public class StatRatioStep : IDamageStep {
@@ -167,7 +218,7 @@ public class StatRatioStep : IDamageStep {
 }
 ```
 
-## 6. Testability
+## 7. Testability
 This system is extremely testable.
 
 ```csharp
@@ -200,7 +251,7 @@ public void Test_Damage_Pipeline_Fire_Vs_Water() {
 - **[Code Location](../../code_location.md)** - Where this is implemented
 - **[Sub-Feature 2.5: Combat Actions](../2.5-combat-actions/architecture.md)** - Actions use damage pipeline
 - **[Sub-Feature 2.9: Abilities & Items](../2.9-abilities-items/architecture.md)** - Abilities/items modify damage
-- **[Sub-Feature 2.10: Pipeline Hooks](../2.10-pipeline-hooks/)** - Stat and damage modifiers
+- **[Sub-Feature 2.9: Abilities & Items](../2.9-abilities-items/)** - Abilities and items provide data for modifiers
 
 ---
 

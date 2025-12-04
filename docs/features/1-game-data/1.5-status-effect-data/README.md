@@ -29,7 +29,7 @@ Contains:
 ## Related Sub-Features
 
 - **[1.2: Move Data](../1.2-move-data/)** - Moves that apply status effects
-- **[1.11: Builders](../1.11-builders/)** - StatusEffectBuilder for creating status effects
+- **[3.9: Builders](../../3-content-expansion/3.9-builders/)** - StatusEffectBuilder for creating status effects
 
 ## Documentation
 

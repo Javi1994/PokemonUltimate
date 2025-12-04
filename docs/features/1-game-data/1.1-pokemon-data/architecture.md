@@ -293,7 +293,7 @@ Where:
 - **Level**: Pokemon's level (1-100)
 - **Nature**: Multiplier (0.9, 1.0, or 1.1)
 
-See **[Sub-Feature 1.12: Factories & Calculators](../1.12-factories-calculators/)** for `StatCalculator` implementation.
+See **[Sub-Feature 1.15: Factories & Calculators](../1.15-factories-calculators/)** for `StatCalculator` implementation.
 
 ---
 
@@ -342,9 +342,9 @@ var pikachu = new PokemonInstanceBuilder(pikachuSpecies, 50)
 
 - **[1.2: Move Data](../1.2-move-data/)** - Moves referenced in Learnset
 - **[1.3: Ability Data](../1.3-ability-data/)** - Abilities assigned to species
-- **[1.7: Evolution System](../1.7-evolution-system/)** - Evolution paths
-- **[1.12: Factories & Calculators](../1.12-factories-calculators/)** - StatCalculator, PokemonFactory, PokemonInstanceBuilder
-- **[1.13: Registry System](../1.13-registry-system/)** - PokemonRegistry for storing/retrieving species
+- **[1.11: Evolution System](../1.11-evolution-system/)** - Evolution paths
+- **[1.16: Factories & Calculators](../1.16-factories-calculators/)** - StatCalculator, PokemonFactory, PokemonInstanceBuilder
+- **[1.16: Registry System](../1.16-registry-system/)** - PokemonRegistry for storing/retrieving species
 
 ---
 

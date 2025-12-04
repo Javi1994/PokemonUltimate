@@ -290,7 +290,7 @@ This document covers all use cases for game features beyond the battle engine, i
 - **[Testing](testing.md)** - Testing strategy for game features
 - **[Code Location](code_location.md)** - Where game feature code will be located
 - **[Feature 2: Combat System](../2-combat-system/architecture.md)** - Battle system used in encounters
-- **[Feature 1: Pokemon Data](../1-pokemon-data/architecture.md)** - Pokemon data for catching and management
+- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Game data for catching and management
 - **[Feature 3: Content Expansion](../3-content-expansion/architecture.md)** - Items and Pokemon for encounters
 
 ---

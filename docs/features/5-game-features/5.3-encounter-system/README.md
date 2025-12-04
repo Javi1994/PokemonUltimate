@@ -25,7 +25,7 @@ Encounter System generates and manages different types of battles:
 ## Related Features
 
 - **[Feature 2: Combat System](../../2-combat-system/architecture.md)** - Battle system used by encounters
-- **[Feature 1: Pokemon Data](../../1-pokemon-data/architecture.md)** - Pokemon data for encounter generation
+- **[Feature 1: Game Data](../../1-game-data/architecture.md)** - Game data for encounter generation
 - **[Feature 3: Content Expansion](../../3-content-expansion/architecture.md)** - Pokemon catalog for encounters
 
 **⚠️ Always use numbered feature paths**: `../../[N]-[feature-name]/` instead of `../../feature-name/`

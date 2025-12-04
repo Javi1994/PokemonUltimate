@@ -8,9 +8,9 @@ namespace PokemonUltimate.Content.Builders
     /// Fluent builder for creating Evolution instances.
     /// </summary>
     /// <remarks>
-    /// **Feature**: 1: Game Data
-    /// **Sub-Feature**: 1.11: Builders
-    /// **Documentation**: See `docs/features/1-game-data/1.11-builders/architecture.md`
+    /// **Feature**: 3: Content Expansion
+    /// **Sub-Feature**: 3.9: Builders
+    /// **Documentation**: See `docs/features/3-content-expansion/3.9-builders/README.md`
     /// </remarks>
     public class EvolutionBuilder
     {

@@ -1,45 +1,48 @@
-# Sub-Feature 2.10: Pipeline Hooks
+# Sub-Feature 2.10: Pipeline Hooks (CONSOLIDATED)
 
-> Stat modifiers, damage modifiers - Hooks into damage pipeline.
+> ⚠️ **CONSOLIDATED INTO 2.4** - This sub-feature has been consolidated into Sub-Feature 2.4: Damage Calculation Pipeline.
 
-**Sub-Feature Number**: 2.10  
+**Sub-Feature Number**: 2.10 (Historical - now part of 2.4)  
 **Parent Feature**: Feature 2: Combat System  
-**See**: [`../../features_master_list.md`](../../features_master_list.md) for feature numbering standards.
+**Status**: ✅ Consolidated into 2.4
 
-## Overview
+## Consolidation Notice
 
-Pipeline Hooks allow abilities and items to modify damage and stats through the damage pipeline:
-- **IStatModifier**: Interface for stat modifications
-- **AbilityStatModifier**: Ability-based stat modifiers
-- **ItemStatModifier**: Item-based stat modifiers
-- **Damage Modifiers**: Modify damage through pipeline steps
+The stat and damage modifier system (`IStatModifier`, `AbilityStatModifier`, `ItemStatModifier`) has been consolidated into **Sub-Feature 2.4: Damage Calculation Pipeline** because:
 
-## Current Status
+1. The modifiers are an **integral part** of the damage pipeline, not external hooks
+2. They are implemented directly within the pipeline steps (`BaseDamageStep`, `AttackerAbilityStep`, `AttackerItemStep`)
+3. This consolidation eliminates confusion about where the system is implemented
 
-- ✅ **Implemented**: Stat modifier system integrated with damage pipeline
-- ✅ **Tested**: Comprehensive test coverage
+## Current Location
 
-## Documentation
+All stat and damage modifier functionality is now documented and implemented in:
 
-| Document | Purpose |
-|----------|---------|
-| **[Architecture](../../architecture.md#pipeline-hooks)** | Technical specification |
-| **[Use Cases](../../use_cases.md)** | Modifier scenarios |
-| **[Roadmap](../../roadmap.md#phase-210-pipeline-hooks)** | Implementation details |
-| **[Testing](../../testing.md)** | Testing strategy |
-| **[Code Location](../../code_location.md)** | Where the code lives |
+- **[Sub-Feature 2.4: Damage Calculation Pipeline](../2.4-damage-calculation-pipeline/)** - Complete implementation and documentation
 
-## Related Sub-Features
+## What Was Consolidated
 
-- **[2.4: Damage Calculation Pipeline](../2.4-damage-calculation-pipeline/)** - Hooks integrate with pipeline
-- **[2.9: Abilities & Items](../2.9-abilities-items/)** - Abilities/items use modifiers
+The following components are part of Sub-Feature 2.4:
 
-## Quick Links
+- `IStatModifier` - Interface for stat and damage modifications
+- `AbilityStatModifier` - Adapter for ability-based modifiers
+- `ItemStatModifier` - Adapter for item-based modifiers
+- Stat modifier integration in `BaseDamageStep`
+- Damage modifier integration in `AttackerAbilityStep` and `AttackerItemStep`
+- Speed modifier integration in `TurnOrderResolver`
 
-- **Key Classes**: `IStatModifier`, `AbilityStatModifier`, `ItemStatModifier`
-- **Status**: ✅ Complete (Phase 2.10)
+## Implemented Features
+
+✅ Choice Band (+50% Attack)  
+✅ Choice Specs (+50% SpAttack)  
+✅ Choice Scarf (+50% Speed)  
+✅ Life Orb (+30% damage)  
+✅ Assault Vest (+50% SpDefense)  
+✅ Eviolite (+50% Def/SpDef if can evolve)  
+✅ Blaze/Torrent/Overgrow/Swarm (HP threshold damage multipliers)
 
 ---
 
-**Last Updated**: 2025-01-XX
+**See**: **[Sub-Feature 2.4: Damage Calculation Pipeline](../2.4-damage-calculation-pipeline/)** for complete documentation.
 
+**Last Updated**: 2025-01-XX (Consolidated)

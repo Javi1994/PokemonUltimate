@@ -45,7 +45,7 @@ This feature covers game systems beyond the battle engine:
 ## Related Features
 
 - **[Feature 2: Combat System](../2-combat-system/)** - Battle system used in encounters
-- **[Feature 1: Pokemon Data](../1-pokemon-data/)** - Pokemon data for catching and management
+- **[Feature 1: Game Data](../1-game-data/)** - Game data for catching and management
 - **[Feature 3: Content Expansion](../3-content-expansion/)** - Items and Pokemon for encounters
 - **[Feature 4: Unity Integration](../4-unity-integration/)** - Post-battle UI and game UI
 

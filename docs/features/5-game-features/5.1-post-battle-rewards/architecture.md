@@ -170,7 +170,7 @@ This system is designed to be extended:
 - **[Parent Code Location](../code_location.md)** - Where post-battle code will be located
 - **[Feature 2: Combat System](../../2-combat-system/architecture.md)** - Battle engine providing battle results
 - **[Feature 2.7: Integration](../../2-combat-system/2.7-integration/architecture.md)** - IBattleView interface for post-battle UI
-- **[Feature 1: Pokemon Data](../../1-pokemon-data/architecture.md)** - Pokemon data structure for EXP and level ups
+- **[Feature 1: Game Data](../../1-game-data/architecture.md)** - Game data structure for EXP and level ups
 - **[Feature 5.6: Progression System](../5.6-progression-system/README.md)** - Roguelike progression system
 
 ---

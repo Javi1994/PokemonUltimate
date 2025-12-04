@@ -14,6 +14,9 @@ The Damage Calculation Pipeline uses a modular pipeline pattern to calculate dam
 - **DamagePipeline**: Orchestrates damage calculation
 - **DamageContext**: Mutable snapshot of attack event
 - **IDamageStep**: Individual pipeline steps (ability, item, type effectiveness, etc.)
+- **IStatModifier**: Interface for stat and damage modifications from abilities/items
+- **AbilityStatModifier**: Adapter for ability-based stat/damage modifiers
+- **ItemStatModifier**: Adapter for item-based stat/damage modifiers
 
 ## Current Status
 
@@ -33,12 +36,12 @@ The Damage Calculation Pipeline uses a modular pipeline pattern to calculate dam
 ## Related Sub-Features
 
 - **[2.5: Combat Actions](../2.5-combat-actions/)** - Actions trigger damage calculation
-- **[2.9: Abilities & Items](../2.9-abilities-items/)** - Abilities and items modify damage
-- **[2.10: Pipeline Hooks](../2.10-pipeline-hooks/)** - Stat modifiers hook into pipeline
+- **[2.9: Abilities & Items](../2.9-abilities-items/)** - Abilities and items provide data for modifiers
+- **[2.3: Turn Order Resolution](../2.3-turn-order-resolution/)** - Uses stat modifiers for speed calculation
 
 ## Quick Links
 
-- **Key Classes**: `DamagePipeline`, `DamageContext`, `IDamageStep`
+- **Key Classes**: `DamagePipeline`, `DamageContext`, `IDamageStep`, `IStatModifier`, `AbilityStatModifier`, `ItemStatModifier`
 - **Status**: ✅ Complete (Phase 2.4)
 
 ---

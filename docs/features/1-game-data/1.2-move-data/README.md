@@ -69,8 +69,12 @@ var thunderbolt = Move.Define("Thunderbolt")
 
 - **[1.1: Pokemon Data](../1.1-pokemon-data/)** - Moves referenced in Learnset
 - **[1.5: Status Effect Data](../1.5-status-effect-data/)** - Status effects applied by moves
-- **[1.6: Field Conditions Data](../1.6-field-conditions-data/)** - Field conditions set by moves
-- **[1.11: Builders](../1.11-builders/)** - MoveBuilder for creating moves
+- **[1.6: Weather Data](../1.6-weather-data/)** - Weather conditions set by moves
+- **[1.7: Terrain Data](../1.7-terrain-data/)** - Terrain conditions set by moves
+- **[1.8: Hazard Data](../1.8-hazard-data/)** - Entry hazards set by moves
+- **[1.9: Side Condition Data](../1.9-side-condition-data/)** - Side conditions set by moves
+- **[1.10: Field Effect Data](../1.10-field-effect-data/)** - Field effects set by moves
+- **[3.9: Builders](../../3-content-expansion/3.9-builders/)** - MoveBuilder for creating moves
 
 ## Documentation
 

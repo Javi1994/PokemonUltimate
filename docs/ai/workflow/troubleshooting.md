@@ -2,6 +2,23 @@
 
 > Common issues during implementation and how to resolve them.
 
+## Issue: Feature Not Assigned
+
+**Symptoms:**
+- Starting implementation without checking existing features
+- Creating code without feature documentation
+- Not knowing which feature/sub-feature the work belongs to
+
+**Solution:**
+1. **Stop implementation immediately**
+2. **Read `docs/features_master_list.md`** - Review all existing features
+3. **Determine feature assignment:**
+   - If fits existing feature → Read that feature's documentation
+   - If needs new feature → Create feature folder and complete documentation structure
+4. **Follow `docs/feature_documentation_standard.md`** for new features
+5. **Update `docs/features_master_list.md`** if creating new feature
+6. **Resume implementation** only after feature is assigned and documented
+
 ## Issue: Spec is Incomplete
 
 **Symptoms:**
@@ -11,14 +28,15 @@
 
 **Solution:**
 1. **Stop implementation immediately**
-2. Read similar specs in `docs/features/[N]-[feature-name]/` or sub-feature `architecture.md` for patterns (always use numbered format)
-3. Complete the spec with:
+2. **Ensure feature is assigned** (see above)
+3. Read similar specs in `docs/features/[N]-[feature-name]/` or sub-feature `architecture.md` for patterns (always use numbered format)
+4. Complete the spec with:
    - Method signatures (parameters, return types)
    - Behavior descriptions
    - Examples
    - Edge cases
-4. Document what was missing
-5. Resume implementation
+5. Document what was missing
+6. Resume implementation
 
 **Example:**
 ```markdown

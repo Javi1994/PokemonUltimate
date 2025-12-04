@@ -120,7 +120,7 @@ PokemonUltimate.Tests/
 - ✅ `ItemListenerTests.cs` - Item triggers
 - ✅ `Integration/System/AbilitiesItemsTests.cs` - Ability/item interactions
 
-### Pipeline Hooks (Phase 2.10)
+### Stat & Damage Modifiers (Phase 2.4 - consolidated from 2.10)
 - ✅ `IStatModifierTests.cs` - Stat modifier system
 - ✅ `AbilityStatModifierTests.cs` - Ability modifiers
 - ✅ `ItemStatModifierTests.cs` - Item modifiers

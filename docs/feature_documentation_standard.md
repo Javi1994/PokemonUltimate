@@ -17,7 +17,26 @@ Every feature in `docs/features/[N]-[feature-name]/` MUST follow this consistent
 
 **⚠️ MANDATORY: Feature Naming in Code** - All public classes MUST include feature references in XML documentation comments. See [`docs/ai/guidelines/feature_naming_in_code.md`](../ai/guidelines/feature_naming_in_code.md) for complete guidelines.
 
+**⚠️ MANDATORY: Feature-Driven Development** - Before creating a new feature, review existing features in [`features_master_list.md`](features_master_list.md). Only create new features if work doesn't fit existing ones. See [`docs/ai/guidelines/feature_driven_development.md`](../ai/guidelines/feature_driven_development.md) for complete process.
+
 ---
+
+## When to Create a New Feature
+
+**Before creating a new feature:**
+
+1. **Review Existing Features** - Read [`features_master_list.md`](features_master_list.md) ⭐ **MUST DO FIRST**
+2. **Check if work fits existing feature** - Review feature descriptions and sub-features
+3. **If fits existing feature:**
+   - Use that feature (create sub-feature if needed)
+   - Read feature's complete documentation
+   - Proceed with development
+4. **If doesn't fit any feature:**
+   - Create new feature following this standard
+   - Update `features_master_list.md` with new entry
+   - Create all required documents below
+
+**See**: [`docs/ai/guidelines/feature_driven_development.md`](../ai/guidelines/feature_driven_development.md) for complete process.
 
 ## Required Documents
 

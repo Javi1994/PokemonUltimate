@@ -10,7 +10,7 @@
 | Aspect                  | Status                                                                                                                            |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Current Phase**       | Phase 3: Combat System ✅                                                                                                         |
-| **Sub-Phase**           | 2.10 Pipeline Hooks ✅ Extended                                                                                                   |
+| **Sub-Phase**           | 2.4 Damage Calculation Pipeline ✅ Extended (2.10 consolidated into 2.4)                                                          |
 | **Tests**               | 2,460 passing                                                                                                                     |
 | **Integration Tests**   | 83+ tests (system interactions)                                                                                                   |
 | **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed. |
@@ -101,13 +101,13 @@ PokemonUltimate/
 -   [x] **Variants System Design** ← NEW
     -   Mega Evolutions, Dinamax, and Terracristalización as separate Pokemon species
     -   Each variant has own PokemonSpeciesData with different stats
-    -   See `docs/features/1-pokemon-data/1.3-variants-system/architecture.md` for specification
--   [x] **Pokemon Data Roadmap** ← NEW
+    -   See `docs/features/1-game-data/1.18-variants-system/README.md` for specification
+-   [x] **Game Data Roadmap** ← NEW
     -   Complete field specification for PokemonSpeciesData and PokemonInstance
     -   Missing critical fields identified (BaseExperienceYield, CatchRate, BaseFriendship, GrowthRate)
     -   Pokedex fields specified (Description, Category, Height, Weight, Color, Shape, Habitat)
     -   Variants system fields specified (BaseForm, VariantType, TeraType, Variants)
-    -   See `docs/features/1-pokemon-data/roadmap.md` for complete specification
+    -   See `docs/features/1-game-data/roadmap.md` for complete specification
 
 ---
 
@@ -137,6 +137,27 @@ Reference docs:
 -   `docs/features/2-combat-system/actions_bible.md` ← **📖 Actions reference**
 -   `docs/features/2-combat-system/architecture.md`
 -   `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
+
+---
+
+## 📦 Content Expansion Progress
+
+See `docs/features/3-content-expansion/roadmap.md` for full details.
+
+| Sub-Feature | Status | Description |
+|-------------|--------|-------------|
+| 3.1 Pokemon Expansion | 🎯 In Progress | 26/151 Gen 1 Pokemon |
+| 3.2 Move Expansion | 🎯 In Progress | 36 moves (12 types) |
+| 3.3 Item Expansion | 🎯 In Progress | 23 items (15 held + 8 berries) |
+| 3.4 Ability Expansion | 🎯 In Progress | 35 abilities |
+| 3.5 Status Effect Expansion | ✅ Complete | 15 statuses (6 persistent + 9 volatile) |
+| 3.6 Field Conditions Expansion | ✅ Complete | 35 field conditions (9 weather, 4 terrain, 4 hazards, 10 side, 8 field) |
+| 3.7 Content Validation | ⏳ Planned | Quality standards and validation |
+| 3.8 Content Organization | ✅ Complete | Catalog organization and maintenance |
+
+**Current Content**:
+- **Core**: 26 Pokemon, 36 Moves, 35 Abilities, 23 Items
+- **Supporting**: 15 Status Effects, 9 Weather, 4 Terrain, 4 Hazards, 10 Side Conditions, 8 Field Effects
 
 ---
 
@@ -219,8 +240,8 @@ Reference docs:
 | `docs/implementation_plan.md`                                              | Technical roadmap                          |
 | `docs/features/2-combat-system/roadmap.md`                                 | **Combat phases**                          |
 | `docs/features/3-content-expansion/roadmap.md`                             | **📦 Content expansion phases**            |
-| `docs/features/1-pokemon-data/roadmap.md`                                  | **📊 Pokemon data fields spec**            |
-| `docs/features/1-pokemon-data/1.3-variants-system/architecture.md`         | **🔀 Variants system (Mega/Dinamax/Tera)** |
+| `docs/features/1-game-data/roadmap.md`                                  | **📊 Game data fields spec**            |
+| `docs/features/1-game-data/1.18-variants-system/README.md`         | **🔀 Variants system (Mega/Dinamax/Tera)** |
 | `docs/features/4-unity-integration/roadmap.md`                             | **🎮 Unity integration phases**            |
 | `docs/features/5-game-features/roadmap.md`                                 | **🎯 Game features phases**                |
 | `docs/features/2-combat-system/use_cases.md`                               | **All battle cases**                       |
@@ -235,7 +256,7 @@ Reference docs:
 | `docs/ai/workflow/refactoring_guide.md`                                    | **Safe refactoring process**               |
 | `docs/features/2-combat-system/testing/integration_guide.md`               | **Integration test patterns**              |
 | `docs/ai/testing_structure_definition.md`                                  | **⭐ Test structure standard**             |
-| `docs/features/1-pokemon-data/testing.md`                                  | **📊 Pokemon data testing strategy**       |
+| `docs/features/1-game-data/testing.md`                                  | **📊 Game data testing strategy**       |
 | `docs/features/README.md`                                                  | **Features overview**                      |
 | `docs/ai/anti-patterns.md`                                                 | What NOT to do                             |
 

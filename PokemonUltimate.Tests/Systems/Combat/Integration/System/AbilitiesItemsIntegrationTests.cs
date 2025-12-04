@@ -5,7 +5,7 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;

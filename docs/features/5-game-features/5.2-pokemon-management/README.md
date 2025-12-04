@@ -25,7 +25,7 @@ Pokemon Management handles all Pokemon storage and organization:
 
 ## Related Features
 
-- **[Feature 1: Pokemon Data](../../1-pokemon-data/architecture.md)** - Pokemon data structure for management
+- **[Feature 1: Game Data](../../1-game-data/architecture.md)** - Game data structure for management
 - **[Feature 2: Combat System](../../2-combat-system/architecture.md)** - Battle system for catching
 
 **⚠️ Always use numbered feature paths**: `../../[N]-[feature-name]/` instead of `../../feature-name/`

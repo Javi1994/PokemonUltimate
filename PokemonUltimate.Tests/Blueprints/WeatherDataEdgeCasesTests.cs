@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using PokemonUltimate.Content.Catalogs.Weather;
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Tests.Blueprints

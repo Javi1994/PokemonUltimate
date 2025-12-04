@@ -45,16 +45,23 @@
 -   [ ] **Interface segregation** - No god interfaces, single responsibility
 -   [ ] **Dependencies** - No circular dependencies, proper direction
 
-## 📚 Documentation
+## 📚 Documentation ⭐ **MANDATORY: Feature Documentation Updates**
 
 -   [ ] **XML docs** - Public APIs have `<summary>` comments
 -   [ ] **MANDATORY: Feature references in code** - ALL classes have `<remarks>` sections with feature numbers (see `docs/ai/guidelines/feature_naming_in_code.md`)
 -   [ ] **MANDATORY: No code without feature reference** - Every class/interface references its feature
 -   [ ] **MANDATORY: Existing code reviewed** - All related code files were read before implementation
--   [ ] **Architecture docs** - Updated if new patterns introduced or API changed
--   [ ] **Context updated** - `.ai/context.md` reflects current state (phase, test count, completed systems)
+-   [ ] **Feature Documentation Updated** ⭐ **MANDATORY AFTER EVERY FEATURE:**
+  -   [ ] **`roadmap.md`** - Mark completed phases/sub-features as ✅
+  -   [ ] **`architecture.md`** - Update if implementation differs from spec
+  -   [ ] **`use_cases.md`** - Mark completed use cases
+  -   [ ] **`code_location.md`** - Add new files/classes
+  -   [ ] **`testing.md`** - Document new tests and test organization
+-   [ ] **Master Documents Updated:**
+  -   [ ] **`docs/features_master_list.md`** - Update feature status if changed
+  -   [ ] **`.ai/context.md`** - Update current project state (phase, test count, completed systems)
 -   [ ] **Decisions documented** - Architectural decisions added to `.ai/context.md` if significant
--   [ ] **Use cases updated** - Combat use cases marked complete (if applicable)
+-   [ ] **CRITICAL**: Documentation must reflect actual implementation state
 
 ## 🔒 Error Handling
 
@@ -84,8 +91,8 @@ grep -r "TODO\|FIXME" --include="*.cs" PokemonUltimate.Core PokemonUltimate.Cont
 |--------------|------------------|
 | **Combat System** | `docs/features/2-combat-system/roadmap.md` |
 | **Content Expansion** | `docs/features/3-content-expansion/roadmap.md` |
-| **Pokemon Data Structure** | `docs/features/1-pokemon-data/roadmap.md` |
-| **Variants System** | `docs/features/1-pokemon-data/1.3-variants-system/architecture.md` |
+| **Game Data Structure** | `docs/features/1-game-data/roadmap.md` |
+| **Variants System** | `docs/features/1-game-data/1.18-variants-system/README.md` |
 | **Unity Integration** | `docs/features/4-unity-integration/roadmap.md` |
 | **Game Features** | `docs/features/5-game-features/roadmap.md` |
 | **Test Structure** | `docs/ai/testing_structure_definition.md` |

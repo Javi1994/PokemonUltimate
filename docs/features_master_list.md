@@ -4,6 +4,8 @@
 
 This document serves as the single source of truth for all features in the Pokemon Ultimate project. All documentation should reference features using these numbers and names.
 
+**⚠️ MANDATORY: Feature-Driven Development** - Before starting ANY development work, review this document to determine if work fits an existing feature or needs a new one. See [`docs/ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) for complete process.
+
 **⚠️ MANDATORY: Feature Naming in Code** - All public classes MUST include feature references in XML documentation comments. See [`docs/ai/guidelines/feature_naming_in_code.md`](ai/guidelines/feature_naming_in_code.md) for complete guidelines.
 
 ---
@@ -35,22 +37,26 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 #### Grupo B: Field & Status Data (Condiciones de Campo)
 - **1.5**: Status Effect Data - StatusEffectData (Blueprint)
-- **1.6**: Field Conditions Data - WeatherData, TerrainData, HazardData, SideConditionData, FieldEffectData
+- **1.6**: Weather Data - WeatherData (Blueprint)
+- **1.7**: Terrain Data - TerrainData (Blueprint)
+- **1.8**: Hazard Data - HazardData (Blueprint)
+- **1.9**: Side Condition Data - SideConditionData (Blueprint)
+- **1.10**: Field Effect Data - FieldEffectData (Blueprint)
 
 #### Grupo C: Supporting Systems (Sistemas de Soporte)
-- **1.7**: Evolution System - Evolution, IEvolutionCondition, EvolutionConditions (6 classes)
-- **1.8**: Type Effectiveness Table - TypeEffectiveness (data table)
+- **1.11**: Evolution System - Evolution, IEvolutionCondition, EvolutionConditions (6 classes)
+- **1.12**: Type Effectiveness Table - TypeEffectiveness (data table)
 
 #### Grupo D: Infrastructure (Infraestructura)
-- **1.9**: Interfaces Base - IIdentifiable
-- **1.10**: Enums & Constants - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages
-- **1.11**: Builders - 13 builder classes + 10 static helper classes
-- **1.12**: Factories & Calculators - StatCalculator, PokemonFactory, PokemonInstanceBuilder, NatureData
-- **1.13**: Registry System - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
+- **1.13**: Interfaces Base - IIdentifiable
+- **1.14**: Enums & Constants - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages, NatureData
+- ⚠️ **Builders**: Moved to Feature 3.9 (see Feature 3 below)
+- **1.15**: Factories & Calculators - StatCalculator, PokemonFactory, PokemonInstanceBuilder
+- **1.16**: Registry System - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
 
 #### Grupo E: Planned Features
-- **1.14**: Variants System - Mega/Dinamax/Terracristalización as separate species (Planned)
-- **1.15**: Pokedex Fields - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
+- **1.18**: Variants System - Mega/Dinamax/Terracristalización as separate species (Planned)
+- **1.19**: Pokedex Fields - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
 
 **Related Roadmap**: `docs/features/1-game-data/roadmap.md`
 
@@ -65,13 +71,12 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 - **2.1**: Battle Foundation - BattleField, Slots, Sides, Rules
 - **2.2**: Action Queue System - BattleQueue, BattleAction
 - **2.3**: Turn Order Resolution - Priority, Speed, Random sorting
-- **2.4**: Damage Calculation Pipeline - Modular damage calculation
+- **2.4**: Damage Calculation Pipeline - Modular damage calculation (includes stat/damage modifiers)
 - **2.5**: Combat Actions - UseMove, Damage, Status, Heal, Switch, Faint
 - **2.6**: Combat Engine - Battle loop, turn execution, outcome detection
 - **2.7**: Integration - AI providers, Player input, Full battles
 - **2.8**: End-of-Turn Effects - Status damage, effects processing
 - **2.9**: Abilities & Items - Event-driven system, triggers
-- **2.10**: Pipeline Hooks - Stat modifiers, damage modifiers
 - **2.11**: Recoil & Drain - Recoil damage, HP drain effects
 - **2.12**: Weather System - Weather conditions and effects (Planned)
 - **2.13**: Terrain System - Terrain conditions and effects (Planned)
@@ -88,16 +93,19 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 ### Feature 3: Content Expansion
 **Folder**: `docs/features/3-content-expansion/`  
-**Status**: 🎯 In Progress (26 Pokemon, 36 Moves)  
-**Description**: Adding Pokemon, Moves, Items, and Abilities to the game
+**Status**: 🎯 In Progress  
+**Description**: Adding all game content: Pokemon, Moves, Items, Abilities, Status Effects, Field Conditions, and supporting catalogs
 
 **Sub-Features**:
-- **3.1**: Pokemon Expansion - Adding more Pokemon species
-- **3.2**: Move Expansion - Adding more moves across all types
-- **3.3**: Item Expansion - Adding more held items and consumables
-- **3.4**: Ability Expansion - Adding more abilities
-- **3.5**: Content Validation - Quality standards and validation
-- **3.6**: Content Organization - Catalog organization and maintenance
+- **3.1**: Pokemon Expansion - Adding more Pokemon species (26/151 Gen 1)
+- **3.2**: Move Expansion - Adding more moves across all types (36 moves, 12 types)
+- **3.3**: Item Expansion - Adding more held items and consumables (23 items)
+- **3.4**: Ability Expansion - Adding more abilities (35 abilities)
+- **3.5**: Status Effect Expansion - Status effects catalog (15 statuses) ✅ Complete
+- **3.6**: Field Conditions Expansion - Weather, Terrain, Hazards, Side Conditions, Field Effects (35 total) ✅ Complete
+- **3.7**: Content Validation - Quality standards and validation
+- **3.8**: Content Organization - Catalog organization and maintenance ✅ Complete
+- **3.9**: Builders - Fluent builder APIs for creating game content ✅ Complete
 
 **Related Roadmap**: `docs/features/3-content-expansion/roadmap.md`
 
@@ -251,15 +259,26 @@ Use cases should reference feature numbers:
 
 ## ➕ Creating New Features
 
+**⚠️ CRITICAL: Before creating a new feature, review existing features in this document to ensure work doesn't fit an existing feature.**
+
 ### Process
 
-1. **Determine Number**: Check this document for next available number (currently: 5)
-2. **Choose Name**: Use kebab-case, check for duplicates
-3. **Create Folder**: `docs/features/[N]-[feature-name]/`
-4. **Create Documents**: Use templates from `docs/feature_documentation_standard.md`
-5. **Update This Document**: Add feature entry with number, name, folder, status, description
-6. **Update Features Overview**: Add to `docs/features/README.md`
-7. **Use Numbered Format**: Always reference as `Feature [N]: [Name]` or `[N]: [Name]`
+1. **Review Existing Features** ⭐ **MUST DO FIRST**
+   - Read this document (`features_master_list.md`) completely
+   - Check if work fits any existing feature or sub-feature
+   - If fits existing → Use that feature (create sub-feature if needed)
+   - If doesn't fit → Proceed with creating new feature
+
+2. **Determine Number**: Check this document for next available number (currently: 5)
+3. **Choose Name**: Use kebab-case, check for duplicates
+4. **Create Folder**: `docs/features/[N]-[feature-name]/`
+5. **Create Complete Documentation Structure**: Use templates from `docs/feature_documentation_standard.md`
+   - All 6 required documents: README.md, architecture.md, roadmap.md, use_cases.md, testing.md, code_location.md
+6. **Update This Document**: Add feature entry with number, name, folder, status, description
+7. **Update Features Overview**: Add to `docs/features/README.md`
+8. **Use Numbered Format**: Always reference as `Feature [N]: [Name]` or `[N]: [Name]`
+
+**See**: [`docs/ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) for complete process.
 
 ### Required Information
 
@@ -290,13 +309,22 @@ When adding a new feature, provide:
 
 ### Process
 
-1. **Determine Number**: Check parent feature's sub-features for next number
-2. **Choose Name**: Use kebab-case, descriptive name
-3. **Create Folder**: `docs/features/[N]-[feature-name]/[N.M]-[sub-feature-name]/`
-4. **Create Documents**: Minimum `README.md`, add others if needed
-5. **Update This Document**: Add sub-feature entry under parent feature
-6. **Update Parent README**: Add sub-feature link to parent's `README.md`
-7. **Use Numbered Format**: Always reference as `Sub-Feature [N.M]: [Name]` or `[N.M]: [Name]`
+1. **Review Parent Feature's Sub-Features** ⭐ **MUST DO FIRST**
+   - Read parent feature's documentation
+   - Check if work fits any existing sub-feature
+   - If fits existing → Use that sub-feature
+   - If doesn't fit → Proceed with creating new sub-feature
+
+2. **Determine Number**: Check parent feature's sub-features for next number
+3. **Choose Name**: Use kebab-case, descriptive name
+4. **Create Folder**: `docs/features/[N]-[feature-name]/[N.M]-[sub-feature-name]/`
+5. **Create Documents**: Minimum `README.md`, add `architecture.md` if complex sub-feature
+6. **Update This Document**: Add sub-feature entry under parent feature
+7. **Update Parent README**: Add sub-feature link to parent's `README.md`
+8. **Update Parent Documentation**: Update parent's `roadmap.md` and `code_location.md` if needed
+9. **Use Numbered Format**: Always reference as `Sub-Feature [N.M]: [Name]` or `[N.M]: [Name]`
+
+**See**: [`docs/ai/guidelines/feature_driven_development.md`](ai/guidelines/feature_driven_development.md) for complete process.
 
 ### Required Information
 
@@ -351,6 +379,7 @@ When adding a new sub-feature, provide:
 ## Related Documents
 
 - **[Features Overview](../features/README.md)** - Overview of all features
+- **[Feature-Driven Development](../ai/guidelines/feature_driven_development.md)** ⭐ **MANDATORY** - Complete process for feature-driven development
 - **[Feature Documentation Standard](feature_documentation_standard.md)** - Standard structure for feature documentation
 - **[Project Guidelines](../ai/guidelines/project_guidelines.md)** - Coding rules and standards
 

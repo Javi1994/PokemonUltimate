@@ -10,10 +10,10 @@
 
 This document defines the implementation roadmap for **all game data structures** and supporting systems, organized into logical groups:
 - **Core Entity Data** (1.1-1.4): Pokemon, Moves, Abilities, Items
-- **Field & Status Data** (1.5-1.6): Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
-- **Supporting Systems** (1.7-1.8): Evolution System, Type Effectiveness Table
-- **Infrastructure** (1.9-1.13): Interfaces, Enums, Constants, Builders, Factories, Registries
-- **Planned Features** (1.14-1.15): Variants System, Pokedex Fields
+- **Field & Status Data** (1.5-1.10): Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
+- **Supporting Systems** (1.11-1.12): Evolution System, Type Effectiveness Table
+- **Infrastructure** (1.13-1.14, 1.16-1.17): Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
+- **Planned Features** (1.18-1.19): Variants System, Pokedex Fields
 
 **Goal**: Ensure all data structures are complete and well-organized before expanding content, preventing future refactoring.
 
@@ -24,10 +24,10 @@ This document defines the implementation roadmap for **all game data structures*
 | Group | Sub-Features | Status | Completion |
 |-------|--------------|--------|------------|
 | **Grupo A: Core Entity Data** | 1.1-1.4 | ✅ Core Complete | 100% |
-| **Grupo B: Field & Status Data** | 1.5-1.6 | ✅ Core Complete | 100% |
-| **Grupo C: Supporting Systems** | 1.7-1.8 | ✅ Core Complete | 100% |
-| **Grupo D: Infrastructure** | 1.9-1.13 | ✅ Core Complete | 100% |
-| **Grupo E: Planned Features** | 1.14-1.15 | ⏳ Planned | 0% |
+| **Grupo B: Field & Status Data** | 1.5-1.10 | ✅ Core Complete | 100% |
+| **Grupo C: Supporting Systems** | 1.11-1.12 | ✅ Core Complete | 100% |
+| **Grupo D: Infrastructure** | 1.13-1.17 | ✅ Core Complete | 100% |
+| **Grupo E: Planned Features** | 1.18-1.19 | ⏳ Planned | 0% |
 
 ---
 
@@ -110,25 +110,69 @@ This document defines the implementation roadmap for **all game data structures*
 
 ---
 
-#### 1.6: Field Conditions Data ✅ CORE COMPLETE
+#### 1.6: Weather Data ✅ CORE COMPLETE
 **Status**: Core structure complete  
-**Components**: WeatherData, TerrainData, HazardData, SideConditionData, FieldEffectData
+**Components**: WeatherData
 
 **✅ Implemented**:
-- WeatherData blueprint (Weather conditions)
-- TerrainData blueprint (Terrain conditions)
-- HazardData blueprint (Entry hazards)
-- SideConditionData blueprint (Screens, Tailwind, etc.)
-- FieldEffectData blueprint (Rooms, Gravity, etc.)
-- Builders for all field condition types
+- WeatherData blueprint (Weather conditions: Rain, Sun, Hail, Sandstorm, Fog, Primal weathers)
+- WeatherBuilder fluent API
 
-**Related**: [Sub-Feature 1.6 Documentation](1.6-field-conditions-data/)
+**Related**: [Sub-Feature 1.6 Documentation](1.6-weather-data/)
+
+---
+
+#### 1.7: Terrain Data ✅ CORE COMPLETE
+**Status**: Core structure complete  
+**Components**: TerrainData
+
+**✅ Implemented**:
+- TerrainData blueprint (Terrain conditions: Grassy, Electric, Psychic, Misty)
+- TerrainBuilder fluent API
+
+**Related**: [Sub-Feature 1.7 Documentation](1.7-terrain-data/)
+
+---
+
+#### 1.8: Hazard Data ✅ CORE COMPLETE
+**Status**: Core structure complete  
+**Components**: HazardData
+
+**✅ Implemented**:
+- HazardData blueprint (Entry hazards: Stealth Rock, Spikes, Toxic Spikes, Sticky Web)
+- HazardBuilder fluent API
+
+**Related**: [Sub-Feature 1.8 Documentation](1.8-hazard-data/)
+
+---
+
+#### 1.9: Side Condition Data ✅ CORE COMPLETE
+**Status**: Core structure complete  
+**Components**: SideConditionData
+
+**✅ Implemented**:
+- SideConditionData blueprint (Screens, Tailwind, Aurora Veil, etc.)
+- SideConditionBuilder fluent API
+
+**Related**: [Sub-Feature 1.9 Documentation](1.9-side-condition-data/)
+
+---
+
+#### 1.10: Field Effect Data ✅ CORE COMPLETE
+**Status**: Core structure complete  
+**Components**: FieldEffectData
+
+**✅ Implemented**:
+- FieldEffectData blueprint (Rooms, Gravity, etc.)
+- FieldEffectBuilder fluent API
+
+**Related**: [Sub-Feature 1.10 Documentation](1.10-field-effect-data/)
 
 ---
 
 ### Grupo C: Supporting Systems (Sistemas de Soporte)
 
-#### 1.7: Evolution System ✅ CORE COMPLETE
+#### 1.11: Evolution System ✅ CORE COMPLETE
 **Status**: Core structure complete  
 **Components**: Evolution, IEvolutionCondition, EvolutionConditions (6 classes)
 
@@ -138,11 +182,11 @@ This document defines the implementation roadmap for **all game data structures*
 - 6 Evolution Condition classes (Level, Item, Trade, Friendship, TimeOfDay, KnowsMove)
 - EvolutionBuilder fluent API
 
-**Related**: [Sub-Feature 1.7 Documentation](1.7-evolution-system/)
+**Related**: [Sub-Feature 1.11 Documentation](1.11-evolution-system/)
 
 ---
 
-#### 1.8: Type Effectiveness Table ✅ CORE COMPLETE
+#### 1.12: Type Effectiveness Table ✅ CORE COMPLETE
 **Status**: Core structure complete  
 **Components**: TypeEffectiveness
 
@@ -153,24 +197,24 @@ This document defines the implementation roadmap for **all game data structures*
 - STAB calculation (1.5x multiplier)
 - Immunity handling
 
-**Related**: [Sub-Feature 1.8 Documentation](1.8-type-effectiveness-table/)
+**Related**: [Sub-Feature 1.12 Documentation](1.12-type-effectiveness-table/)
 
 ---
 
 ### Grupo D: Infrastructure (Infraestructura)
 
-#### 1.9: Interfaces Base ✅ CORE COMPLETE
+#### 1.13: Interfaces Base ✅ CORE COMPLETE
 **Status**: Core structure complete  
 **Components**: IIdentifiable
 
 **✅ Implemented**:
 - IIdentifiable interface (Id property)
 
-**Related**: [Sub-Feature 1.9 Documentation](1.9-interfaces-base/)
+**Related**: [Sub-Feature 1.13 Documentation](1.13-interfaces-base/)
 
 ---
 
-#### 1.10: Enums & Constants ✅ CORE COMPLETE
+#### 1.14: Enums & Constants ✅ CORE COMPLETE
 **Status**: Core structure complete  
 **Components**: Enums (20 main + 7 in Effects), ErrorMessages, GameMessages
 
@@ -180,38 +224,30 @@ This document defines the implementation roadmap for **all game data structures*
 - ErrorMessages static class
 - GameMessages static class
 
-**Related**: [Sub-Feature 1.10 Documentation](1.10-enums-constants/)
+**Related**: [Sub-Feature 1.14 Documentation](1.14-enums-constants/)
 
 ---
 
-#### 1.11: Builders ✅ CORE COMPLETE
-**Status**: Core structure complete  
-**Components**: 13 builder classes + 10 static helper classes
-
-**✅ Implemented**:
-- 13 Builder classes (PokemonBuilder, MoveBuilder, AbilityBuilder, ItemBuilder, etc.)
-- 10 Static helper classes (Pokemon, Move, Ability, Item, Status, Screen, Room, Hazard, WeatherEffect, TerrainEffect)
-- EffectBuilder, EvolutionBuilder, LearnsetBuilder
-
-**Related**: [Sub-Feature 1.11 Documentation](1.11-builders/)
+#### Builders (Moved to Feature 3.9)
+**Status**: ✅ Moved to **[Feature 3.9: Builders](../3-content-expansion/3.9-builders/)**  
+**Note**: Builders are primarily used for content creation, so they belong in Feature 3
 
 ---
 
-#### 1.12: Factories & Calculators ✅ CORE COMPLETE
+#### 1.15: Factories & Calculators ✅ CORE COMPLETE
 **Status**: Core structure complete  
-**Components**: StatCalculator, PokemonFactory, PokemonInstanceBuilder, NatureData
+**Components**: StatCalculator, PokemonFactory, PokemonInstanceBuilder
 
 **✅ Implemented**:
 - StatCalculator (Gen 3+ formulas with IVs, EVs, Nature)
 - PokemonFactory (Quick instance creation)
 - PokemonInstanceBuilder (Fluent API for instances)
-- NatureData (Nature modifier tables)
 
-**Related**: [Sub-Feature 1.12 Documentation](1.12-factories-calculators/)
+**Related**: [Sub-Feature 1.15 Documentation](1.15-factories-calculators/)
 
 ---
 
-#### 1.13: Registry System ✅ CORE COMPLETE
+#### 1.16: Registry System ✅ CORE COMPLETE
 **Status**: Core structure complete  
 **Components**: IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
 
@@ -221,13 +257,13 @@ This document defines the implementation roadmap for **all game data structures*
 - PokemonRegistry (specialized with Pokedex queries)
 - MoveRegistry (specialized with type/power queries)
 
-**Related**: [Sub-Feature 1.13 Documentation](1.13-registry-system/)
+**Related**: [Sub-Feature 1.17 Documentation](1.17-registry-system/)
 
 ---
 
 ### Grupo E: Planned Features
 
-#### 1.14: Variants System ⏳ PLANNED
+#### 1.18: Variants System ⏳ PLANNED
 **Status**: Planned  
 **Components**: Mega/Dinamax/Terracristalización as separate species
 
@@ -236,11 +272,11 @@ This document defines the implementation roadmap for **all game data structures*
 - Variant relationship validation
 - Variant species definitions
 
-**Related**: [Sub-Feature 1.14 Documentation](1.14-variants-system/) | [Architecture](1.14-variants-system/architecture.md)
+**Related**: [Sub-Feature 1.18 Documentation](1.18-variants-system/) | [Architecture](1.18-variants-system/architecture.md)
 
 ---
 
-#### 1.15: Pokedex Fields ⏳ PLANNED
+#### 1.19: Pokedex Fields ⏳ PLANNED
 **Status**: Planned  
 **Components**: Description, Category, Height, Weight, Color, Shape, Habitat
 
@@ -250,7 +286,7 @@ This document defines the implementation roadmap for **all game data structures*
 - Height and Weight fields (Physical measurements)
 - Color, Shape, Habitat enums and fields
 
-**Related**: [Sub-Feature 1.15 Documentation](1.15-pokedex-fields/)
+**Related**: [Sub-Feature 1.19 Documentation](1.19-pokedex-fields/)
 
 ---
 
@@ -323,7 +359,7 @@ public int CatchRate { get; set; } = 45;
 public int BaseFriendship { get; set; } = 70;
 ```
 
-**Builder Support**: Add `.BaseFriendship(int)` method to PokemonBuilder  
+**Builder Support**: Add `.BaseFriendship(int)` method to PokemonBuilder (Sub-Feature 1.15)  
 **Update PokemonInstance**: Use `Species.BaseFriendship` instead of hardcoded `70`  
 **Default Values**: Most = 70, Starters/Hatched = 120, Some legendaries = 0  
 **Tests**: Verify PokemonInstance uses BaseFriendship correctly  
@@ -353,7 +389,7 @@ public GrowthRate GrowthRate { get; set; } = GrowthRate.MediumFast;
 ```
 
 **Builder Support**: Add `.GrowthRate(GrowthRate)` method to PokemonBuilder  
-**Update StatCalculator**: Add methods for each growth rate formula  
+**Update StatCalculator**: Add methods for each growth rate formula (Sub-Feature 1.16)  
 **Default Values**: Most Pokemon use `MediumFast`  
 **Tests**: Verify EXP calculation uses correct growth rate  
 **Required For**: Different EXP curves per Pokemon
@@ -364,7 +400,7 @@ public GrowthRate GrowthRate { get; set; } = GrowthRate.MediumFast;
 
 **Goal**: Add fields required for Pokedex display.
 
-**Sub-Feature**: 1.15: Pokedex Fields  
+**Sub-Feature**: 1.19: Pokedex Fields  
 **Status**: ⏳ Planned
 
 #### 2.1 Description and Category
@@ -378,7 +414,7 @@ public string Description { get; set; } = string.Empty;  // Pokedex entry text
 public string Category { get; set; } = string.Empty;     // Classification (e.g., "Flame Pokemon")
 ```
 
-**Builder Support**: Add `.Description(string)` and `.Category(string)` methods  
+**Builder Support**: Add `.Description(string)` and `.Category(string)` methods (Sub-Feature 1.15)  
 **Default Values**: Use official Pokemon data from Bulbapedia
 
 ---
@@ -394,7 +430,7 @@ public float Height { get; set; } = 0f;   // Height in meters
 public float Weight { get; set; } = 0f;   // Weight in kilograms
 ```
 
-**Builder Support**: Add `.Height(float)` and `.Weight(float)` methods  
+**Builder Support**: Add `.Height(float)` and `.Weight(float)` methods (Sub-Feature 1.15)  
 **Default Values**: Use official Pokemon data
 
 ---
@@ -416,7 +452,7 @@ public PokemonShape Shape { get; set; } = PokemonShape.Unknown;
 public PokemonHabitat Habitat { get; set; } = PokemonHabitat.Unknown;
 ```
 
-**Builder Support**: Add `.Color()`, `.Shape()`, `.Habitat()` methods  
+**Builder Support**: Add `.Color()`, `.Shape()`, `.Habitat()` methods (Sub-Feature 1.15)  
 **Default Values**: Use official Pokemon data
 
 ---
@@ -425,10 +461,10 @@ public PokemonHabitat Habitat { get; set; } = PokemonHabitat.Unknown;
 
 **Goal**: Implement Mega Evolutions, Dinamax, and Terracristalización as separate species.
 
-**Sub-Feature**: 1.14: Variants System  
+**Sub-Feature**: 1.18: Variants System  
 **Status**: ⏳ Planned
 
-**See**: [`1.14-variants-system/architecture.md`](1.14-variants-system/architecture.md) for complete specification.
+**See**: [`1.18-variants-system/architecture.md`](1.18-variants-system/architecture.md) for complete specification.
 
 #### 3.1 Variant Fields
 
@@ -447,9 +483,9 @@ public bool IsVariant => VariantType != PokemonVariantType.None;
 public bool IsBaseForm => VariantType == PokemonVariantType.None;
 ```
 
-**Builder Support**: Add `.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()` methods  
+**Builder Support**: Add `.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()` methods (Sub-Feature 1.15)  
 **Tests**: Verify variant relationships and validation  
-**Related**: [Sub-Feature 1.14 Architecture](1.14-variants-system/architecture.md)
+**Related**: [Sub-Feature 1.18 Architecture](1.18-variants-system/architecture.md)
 
 ---
 
@@ -507,7 +543,7 @@ public bool IsBaseForm => VariantType == PokemonVariantType.None;
 
 ### Phase 2: Pokedex Fields (MEDIUM Priority)
 
-**Sub-Feature 1.15: Pokedex Fields**
+**Sub-Feature 1.19: Pokedex Fields**
 
 - [ ] **2.1**: `Description` and `Category` added to `PokemonSpeciesData`
 - [ ] **2.2**: `Height` and `Weight` added to `PokemonSpeciesData`
@@ -521,14 +557,14 @@ public bool IsBaseForm => VariantType == PokemonVariantType.None;
 
 ### Phase 3: Variants System (MEDIUM Priority)
 
-**Sub-Feature 1.14: Variants System**
+**Sub-Feature 1.18: Variants System**
 
 - [ ] **3.1**: `BaseForm`, `VariantType`, `TeraType`, `Variants` fields added to `PokemonSpeciesData`
 - [ ] `PokemonVariantType` enum created
 - [ ] Builder methods added (`.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()`)
 - [ ] Variant relationship validation implemented
 - [ ] Tests written for variants system
-- [ ] Documentation updated (see [1.14-variants-system/architecture.md](1.14-variants-system/architecture.md))
+- [ ] Documentation updated (see [1.18-variants-system/architecture.md](1.18-variants-system/architecture.md))
 
 ---
 
@@ -629,8 +665,8 @@ public bool IsBaseForm => VariantType == PokemonVariantType.None;
 | **[Testing](testing.md)** | Comprehensive testing strategy |
 | **[Code Location](code_location.md)** | Where the code lives |
 | **[Sub-Feature 1.1: Pokemon Data](1.1-pokemon-data/)** | Pokemon data structure |
-| **[Sub-Feature 1.14: Variants System](1.14-variants-system/)** | Variants system specification |
-| **[Sub-Feature 1.15: Pokedex Fields](1.15-pokedex-fields/)** | Pokedex fields specification |
+| **[Sub-Feature 1.18: Variants System](1.18-variants-system/)** | Variants system specification |
+| **[Sub-Feature 1.19: Pokedex Fields](1.19-pokedex-fields/)** | Pokedex fields specification |
 | **[Feature 3: Content Expansion](../3-content-expansion/roadmap.md)** | Content expansion phases |
 | **[Feature 5: Game Features](../5-game-features/roadmap.md)** | Game features (EXP, catching) |
 
@@ -641,7 +677,7 @@ public bool IsBaseForm => VariantType == PokemonVariantType.None;
 | Date | Phase | Notes |
 |------|-------|-------|
 | 2025-01-XX | Initial | Roadmap created with new Feature 1: Game Data structure |
-| 2025-01-XX | Updated | Reorganized to reflect all 15 sub-features by groups |
+| 2025-01-XX | Updated | Reorganized to reflect all 19 sub-features by groups |
 
 ---
 
@@ -650,7 +686,7 @@ public bool IsBaseForm => VariantType == PokemonVariantType.None;
 1. **Review this roadmap** and confirm which fields are needed
 2. **Implement Phase 1** (Critical fields: BaseExperienceYield, CatchRate, BaseFriendship, GrowthRate)
 3. **Implement Phase 2** (Pokedex fields: Description, Category, Height, Weight, Color, Shape, Habitat)
-4. **Implement Phase 3** (Variants System: BaseForm, VariantType, TeraType, Variants) - See [1.14-variants-system/architecture.md](1.14-variants-system/architecture.md)
+4. **Implement Phase 3** (Variants System: BaseForm, VariantType, TeraType, Variants) - See [1.18-variants-system/architecture.md](1.18-variants-system/architecture.md)
 5. **Update existing 26 Pokemon** with new field values
 6. **Write tests** for new fields (see [testing.md](testing.md) for comprehensive testing strategy)
 7. **Update documentation**

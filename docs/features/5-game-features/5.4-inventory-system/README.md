@@ -25,7 +25,7 @@ Inventory System manages all items in the game:
 ## Related Features
 
 - **[Feature 3: Content Expansion](../../3-content-expansion/architecture.md)** - Item data structure
-- **[Feature 1: Pokemon Data](../../1-pokemon-data/architecture.md)** - Pokemon data for item usage
+- **[Feature 1: Game Data](../../1-game-data/architecture.md)** - Game data for item usage
 
 **⚠️ Always use numbered feature paths**: `../../[N]-[feature-name]/` instead of `../../feature-name/`
 

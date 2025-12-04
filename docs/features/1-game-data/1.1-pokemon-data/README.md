@@ -60,8 +60,8 @@ Structure defining how a Pokemon learns a move (Move reference, LearnMethod, Lev
 
 - **[1.2: Move Data](../1.2-move-data/)** - Moves referenced in Learnset
 - **[1.3: Ability Data](../1.3-ability-data/)** - Abilities assigned to species
-- **[1.7: Evolution System](../1.7-evolution-system/)** - Evolution paths
-- **[1.12: Factories & Calculators](../1.12-factories-calculators/)** - StatCalculator, PokemonInstanceBuilder
+- **[1.11: Evolution System](../1.11-evolution-system/)** - Evolution paths
+- **[1.16: Factories & Calculators](../1.16-factories-calculators/)** - StatCalculator, PokemonInstanceBuilder
 
 ## Documentation
 

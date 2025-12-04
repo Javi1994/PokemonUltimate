@@ -39,7 +39,9 @@ Turn Flow:
 
 ## 2. BattleAction Anatomy
 
-### Base Class
+**Note**: The `BattleAction` base class is defined in Sub-Feature 2.2: Action Queue System. This section documents the concrete implementations.
+
+### Base Class (from Sub-Feature 2.2)
 
 ```csharp
 public abstract class BattleAction

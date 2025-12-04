@@ -66,23 +66,41 @@ PokemonUltimate/
 **Then read based on what you want to work on:**
 - **Combat features** → `docs/features/2-combat-system/`
 - **Content (Pokemon/Moves)** → `docs/features/3-content-expansion/`
-- **Pokemon data structure** → `docs/features/1-pokemon-data/`
-- **Variants system (Mega/Dinamax/Tera)** → `docs/features/1-pokemon-data/1.3-variants-system/architecture.md`
+- **Game data structure** → `docs/features/1-game-data/`
+- **Variants system (Mega/Dinamax/Tera)** → `docs/features/1-game-data/1.18-variants-system/README.md`
 - **Unity integration** → `docs/features/4-unity-integration/`
 - **Game features** → `docs/features/5-game-features/`
 - **Testing** → Each feature has `testing.md`. Shared strategy: `docs/ai/testing_structure_definition.md`
-- **Pokemon data testing** → `docs/features/1-pokemon-data/testing.md`
+- **Game data testing** → `docs/features/1-game-data/testing.md`
 
 ### 3. Understand the Development Workflow
 
+**⚠️ CRITICAL: Feature-Driven Development - ALWAYS start here**
+
 **Before implementing ANY feature:**
+0. ✅ **Feature Discovery & Assignment** ⭐ **MUST DO FIRST**
+   - Read `docs/features_master_list.md` - Review all existing features
+   - Determine if work fits existing feature or needs new one
+   - If existing → Read feature's complete documentation
+   - If new → Create feature folder and complete documentation structure
+   - Update `docs/features_master_list.md` if creating new feature
 1. ✅ Read `docs/ai/checklists/pre_implementation.md`
 2. ✅ Check relevant roadmap for phase status and dependencies
-3. ✅ Read relevant architecture spec in `docs/features/[N]-[feature-name]/architecture.md` or sub-feature `architecture.md` (always use numbered format)
+3. ✅ Read relevant architecture spec in `docs/features/[N]-[feature-name]/architecture.md` or sub-feature `README.md` (always use numbered format)
 4. ✅ **MANDATORY: Read existing code** - Review all related code files before writing (see `code_location.md`)
 5. ✅ **MANDATORY: Understand existing patterns** - Match style, naming, structure of existing code
 6. ✅ Follow TDD: Write tests first
 7. ✅ **MANDATORY: Add feature references to XML docs** - ALL code must reference its feature (see `docs/ai/guidelines/feature_naming_in_code.md`)
+
+**After implementing ANY feature:**
+8. ✅ **Update Feature Documentation** ⭐ **MANDATORY**
+   - Update `roadmap.md` - Mark completed phases
+   - Update `architecture.md` - Reflect actual implementation
+   - Update `use_cases.md` - Mark completed cases
+   - Update `code_location.md` - Add new files
+   - Update `testing.md` - Document tests
+   - Update `docs/features_master_list.md` - Update status
+   - Update `.ai/context.md` - Current state
 
 **After implementing:**
 1. ✅ Run `dotnet build` (must have 0 warnings)
@@ -160,7 +178,7 @@ dotnet test --collect:"XPlat Code Coverage"
 | **Refactoring** | `docs/ai/workflow/refactoring_guide.md` |
 | **Test structure** | `docs/ai/testing_structure_definition.md` |
 | **Integration tests** | `docs/features/2-combat-system/testing/integration_guide.md` |
-| **Pokemon data testing** | `docs/features/1-pokemon-data/testing.md` |
+| **Game data testing** | `docs/features/1-game-data/testing.md` |
 
 ### Architecture Specs
 

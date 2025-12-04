@@ -435,7 +435,7 @@ dotnet run --project PokemonUltimate.BattleDemo
 See detailed roadmaps for implementation plans:
 - **Feature 1: Game Data**: `docs/features/1-game-data/roadmap.md` (Sub-features 1.14-1.15: Variants, Pokedex fields)
 - **Feature 2: Combat System**: `docs/features/2-combat-system/roadmap.md` (Phases 2.12-2.19: Extended features)
-- **Feature 3: Content Expansion**: `docs/features/3-content-expansion/roadmap.md` (Phases 3.1-3.6: More Pokemon, Moves, Items)
+- **Feature 3: Content Expansion**: `docs/features/3-content-expansion/roadmap.md` (Phases 3.1-3.8: Pokemon, Moves, Items, Status Effects, Field Conditions)
 - **Feature 4: Unity Integration**: `docs/features/4-unity-integration/roadmap.md` (Phases 4.1-4.8: UI and visual integration)
 - **Feature 5: Game Features**: `docs/features/5-game-features/roadmap.md` (Phases 5.1-5.6: Progression, roguelike, meta-game)
 - **Testing**: Each feature has `testing.md`. Shared strategy: `docs/ai/testing_structure_definition.md`

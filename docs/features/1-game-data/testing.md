@@ -11,10 +11,10 @@
 This document defines how to organize and create tests for **all game data structures** organized by sub-features:
 
 -   **Grupo A: Core Entity Data** (1.1-1.4) - Pokemon, Moves, Abilities, Items
--   **Grupo B: Field & Status Data** (1.5-1.6) - Status Effects, Field Conditions
--   **Grupo C: Supporting Systems** (1.7-1.8) - Evolution System, Type Effectiveness
--   **Grupo D: Infrastructure** (1.9-1.13) - Interfaces, Enums, Constants, Builders, Factories, Registries
--   **Grupo E: Planned Features** (1.14-1.15) - Variants System, Pokedex Fields
+-   **Grupo B: Field & Status Data** (1.5-1.10) - Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
+-   **Grupo C: Supporting Systems** (1.11-1.12) - Evolution System, Type Effectiveness
+-   **Grupo D: Infrastructure** (1.13-1.14, 1.16-1.17) - Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
+-   **Grupo E: Planned Features** (1.18-1.19) - Variants System, Pokedex Fields
 
 **See**: [Sub-Features Overview](README.md) for complete sub-feature list.
 
@@ -39,18 +39,18 @@ Following the existing test structure (`docs/ai/testing_structure_definition.md`
 ```
 PokemonUltimate.Tests/
 │
-├── Blueprints/                              # Tests de estructura de datos (Sub-Features 1.1-1.6)
+├── Blueprints/                              # Tests de estructura de datos (Sub-Features 1.1-1.10)
 │   │
 │   ├── PokemonSpeciesDataTests.cs          # 1.1: Pokemon Data - ✅ EXTEND
 │   ├── MoveDataTests.cs                     # 1.2: Move Data
 │   ├── AbilityDataTests.cs                  # 1.3: Ability Data
 │   ├── ItemDataTests.cs                     # 1.4: Item Data
 │   ├── StatusEffectDataTests.cs             # 1.5: Status Effect Data
-│   ├── WeatherDataTests.cs                  # 1.6: Field Conditions Data
-│   ├── TerrainDataTests.cs                  # 1.6: Field Conditions Data
-│   ├── HazardDataTests.cs                   # 1.6: Field Conditions Data
-│   ├── SideConditionDataTests.cs            # 1.6: Field Conditions Data
-│   └── FieldEffectDataTests.cs               # 1.6: Field Conditions Data
+│   ├── WeatherDataTests.cs                  # 1.6: Weather Data
+│   ├── TerrainDataTests.cs                  # 1.7: Terrain Data
+│   ├── HazardDataTests.cs                   # 1.8: Hazard Data
+│   ├── SideConditionDataTests.cs            # 1.9: Side Condition Data
+│   └── FieldEffectDataTests.cs              # 1.10: Field Effect Data
 │
 ├── Data/                                    # Tests de contenido específico
 │   │
@@ -75,17 +75,17 @@ PokemonUltimate.Tests/
 │   │   ├── AbilityCatalogTests.cs           # 1.3: Ability Data
 │   │   └── ItemCatalogTests.cs              # 1.4: Item Data
 │   │
-│   ├── Builders/                            # Tests de builders (Sub-Feature 1.11)
-│   │   ├── PokemonBuilderTests.cs           # 1.1 + 1.11: ✅ EXTEND
-│   │   ├── MoveBuilderTests.cs              # 1.2 + 1.11
-│   │   ├── AbilityBuilderTests.cs           # 1.3 + 1.11
-│   │   ├── ItemBuilderTests.cs              # 1.4 + 1.11
-│   │   └── BuilderEdgeCasesTests.cs         # 1.11: General builder tests
+│   ├── Builders/                            # Tests de builders (Moved to Feature 3.9)
+│   │   ├── PokemonBuilderTests.cs           # 1.1 + 1.15: ✅ EXTEND
+│   │   ├── MoveBuilderTests.cs              # 1.2 + 1.15
+│   │   ├── AbilityBuilderTests.cs           # 1.3 + 1.15
+│   │   ├── ItemBuilderTests.cs              # 1.4 + 1.15
+│   │   └── BuilderEdgeCasesTests.cs         # Moved to Feature 3.9: Builders
 │   │
-│   ├── Enums/                               # 1.10: Enums & Constants
+│   ├── Enums/                               # 1.14: Enums & Constants
 │   │   └── [Enum]Tests.cs                   # Enum validation tests
 │   │
-│   └── Constants/                           # 1.10: Enums & Constants
+│   └── Constants/                           # 1.14: Enums & Constants
 │       └── [Constants]Tests.cs              # Constants validation tests
 │
 └── Systems/                                 # Tests de comportamiento
@@ -96,7 +96,7 @@ PokemonUltimate.Tests/
         │   ├── PokemonInstanceTests.cs      # 1.1: ✅ EXTEND
         │   └── MoveInstanceTests.cs         # 1.2: Move instances
         │
-        ├── Evolution/                       # 1.7: Evolution System
+        ├── Evolution/                       # 1.11: Evolution System
         │   ├── EvolutionTests.cs
         │   ├── LevelConditionTests.cs
         │   ├── ItemConditionTests.cs
@@ -107,16 +107,18 @@ PokemonUltimate.Tests/
         │   ├── StatusEffectTests.cs
         │   └── [Other effect tests...]
         │
-        ├── Factories/                       # 1.12: Factories & Calculators
-        │   ├── StatCalculatorTests.cs        # 1.12: Stat calculation
-        │   ├── PokemonFactoryTests.cs        # 1.1 + 1.12: ✅ EXTEND
-        │   ├── TypeEffectivenessTests.cs     # 1.8: Type Effectiveness
-        │   └── NatureDataTests.cs            # 1.12: Nature modifiers
+        ├── Factories/                       # 1.16: Factories & Calculators
+        │   ├── StatCalculatorTests.cs        # 1.16: Stat calculation
+        │   ├── PokemonFactoryTests.cs        # 1.1 + 1.16: ✅ EXTEND
+        │   ├── TypeEffectivenessTests.cs     # 1.12: Type Effectiveness
         │
-        └── Registry/                        # 1.13: Registry System
-            ├── GameDataRegistryTests.cs      # 1.13: Generic registry
-            ├── PokemonRegistryTests.cs        # 1.1 + 1.13: Pokemon registry
-            └── MoveRegistryTests.cs          # 1.2 + 1.13: Move registry
+        └── Blueprints/                      # 1.14: Enums & Constants (NatureData)
+            └── NatureDataTests.cs            # 1.14: Nature modifier tables
+        │
+        └── Registry/                        # 1.17: Registry System
+            ├── GameDataRegistryTests.cs      # 1.17: Generic registry
+            ├── PokemonRegistryTests.cs        # 1.1 + 1.17: Pokemon registry
+            └── MoveRegistryTests.cs          # 1.2 + 1.17: Move registry
 ```
 
 ---
@@ -1835,47 +1837,47 @@ public void Habitats_AreValid()
 
 ### Grupo C: Supporting Systems (1.7-1.8)
 
-7. **1.7: Evolution System**
+7. **1.11: Evolution System**
 
     - `Systems/Core/Evolution/EvolutionTests.cs` - Evolution path tests
     - `Systems/Core/Evolution/[Condition]Tests.cs` - All 6 evolution condition tests
 
-8. **1.8: Type Effectiveness Table**
+8. **1.12: Type Effectiveness Table**
     - `Systems/Core/Factories/TypeEffectivenessTests.cs` - Type effectiveness calculation tests
 
-### Grupo D: Infrastructure (1.9-1.13)
+### Grupo D: Infrastructure (1.13-1.17)
 
-9. **1.9: Interfaces Base**
+9. **1.13: Interfaces Base**
 
     - `Blueprints/IIdentifiableTests.cs` - Interface tests
 
-10. **1.10: Enums & Constants**
+10. **1.14: Enums & Constants**
 
     - `Data/Enums/[Enum]Tests.cs` - Enum validation tests
     - `Data/Constants/[Constants]Tests.cs` - Constants validation tests
+    - `Blueprints/NatureDataTests.cs` - Nature modifier table tests
 
-11. **1.11: Builders**
+11. **Builders** (Moved to Feature 3.9)
 
-    - `Data/Builders/[Builder]Tests.cs` - All 13 builder tests + 10 static helper tests
+    - See **[Feature 3.9: Builders](../3-content-expansion/3.9-builders/)** for builder tests
 
-12. **1.12: Factories & Calculators**
+12. **1.15: Factories & Calculators**
 
     - `Systems/Core/Factories/StatCalculatorTests.cs` - Stat calculation tests
     - `Systems/Core/Factories/PokemonFactoryTests.cs` - Factory tests
-    - `Systems/Core/Factories/NatureDataTests.cs` - Nature modifier tests
 
-13. **1.13: Registry System**
+13. **1.16: Registry System**
     - `Systems/Core/Registry/GameDataRegistryTests.cs` - Generic registry tests
     - `Systems/Core/Registry/PokemonRegistryTests.cs` - Pokemon registry tests
     - `Systems/Core/Registry/MoveRegistryTests.cs` - Move registry tests
 
-### Grupo E: Planned Features (1.14-1.15)
+### Grupo E: Planned Features (1.18-1.19)
 
-14. **1.14: Variants System** ⏳ Planned
+14. **1.18: Variants System** ⏳ Planned
 
     -   Variants validation tests (when implemented)
 
-15. **1.15: Pokedex Fields** ⏳ Planned
+15. **1.19: Pokedex Fields** ⏳ Planned
     -   Pokedex fields validation tests (when implemented)
 
 **Additional Test Categories** (Sub-Feature 1.1):
@@ -1901,8 +1903,8 @@ public void Habitats_AreValid()
 **Priority**:
 
 1. Critical fields (Sub-Feature 1.1: EXP, Catch, Friendship, GrowthRate)
-2. Pokedex fields (Sub-Feature 1.15: Description, Category, Height, Weight, Color, Shape, Habitat)
-3. Variants system (Sub-Feature 1.14: BaseForm, VariantType, TeraType, Variants)
+2. Pokedex fields (Sub-Feature 1.19: Description, Category, Height, Weight, Color, Shape, Habitat)
+3. Variants system (Sub-Feature 1.18: BaseForm, VariantType, TeraType, Variants)
 4. Instance tests (Sub-Feature 1.1: field usage)
 5. **Additional validation** (Sub-Feature 1.1: Learnset, Abilities, Consistency, Quality)
 

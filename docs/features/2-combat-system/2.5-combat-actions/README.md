@@ -8,7 +8,7 @@
 
 ## Overview
 
-Combat Actions are the concrete implementations of BattleAction, including:
+Combat Actions are the concrete implementations of `BattleAction` (base class from Sub-Feature 2.2), including:
 - **UseMoveAction**: Execute a move
 - **DamageAction**: Apply damage
 - **ApplyStatusAction**: Apply status conditions

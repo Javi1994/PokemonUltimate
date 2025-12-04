@@ -29,10 +29,19 @@ Content expansion code is organized in the `PokemonUltimate.Content` project:
 - `FieldEffectCatalog` - Field effect catalog
 
 ### `PokemonUltimate.Content.Builders`
-**Purpose**: Fluent builders for creating content
+**Purpose**: Fluent builders for creating content  
+**Sub-Feature**: [3.9: Builders](3.9-builders/)  
 **Key Classes**:
 - `PokemonBuilder` - Builder for `PokemonSpeciesData`
 - `MoveBuilder` - Builder for `MoveData`
+- `AbilityBuilder` - Builder for `AbilityData`
+- `ItemBuilder` - Builder for `ItemData`
+- `StatusEffectBuilder` - Builder for `StatusEffectData`
+- `SideConditionBuilder` - Builder for `SideConditionData`
+- `FieldEffectBuilder` - Builder for `FieldEffectData`
+- `HazardBuilder` - Builder for `HazardData`
+- `WeatherBuilder` - Builder for `WeatherData`
+- `TerrainBuilder` - Builder for `TerrainData`
 - `EffectBuilder` - Builder for move effects
 - `LearnsetBuilder` - Builder for Pokemon learnsets
 - `EvolutionBuilder` - Builder for evolution conditions
@@ -85,9 +94,17 @@ PokemonUltimate.Content/
 │   │   ├── SideConditionCatalog.cs     # Side conditions (10)
 │   │   └── FieldEffectCatalog.cs       # Field effects (8)
 │   │
-└── Builders/
+└── Builders/ (Sub-Feature 3.9)
     ├── PokemonBuilder.cs               # Pokemon.Define(...)
     ├── MoveBuilder.cs                  # Move.Define(...)
+    ├── AbilityBuilder.cs               # Ability.Define(...)
+    ├── ItemBuilder.cs                  # Item.Define(...)
+    ├── StatusEffectBuilder.cs          # Status.Define(...)
+    ├── SideConditionBuilder.cs         # Screen.Define(...)
+    ├── FieldEffectBuilder.cs           # Room.Define(...)
+    ├── HazardBuilder.cs                # Hazard.Define(...)
+    ├── WeatherBuilder.cs               # WeatherEffect.Define(...)
+    ├── TerrainBuilder.cs               # TerrainEffect.Define(...)
     ├── EffectBuilder.cs                # Effect builder
     ├── LearnsetBuilder.cs              # Learnset builder
     └── EvolutionBuilder.cs             # Evolution builder
@@ -233,10 +250,36 @@ public static readonly MoveData Flamethrower = Move.Define("Flamethrower")
 - **Location**: `Catalogs/Abilities/AbilityCatalog.[Category].cs`
 
 ### Items
-- **Total**: ~23 items
+- **Total**: 23 items
 - **Held Items**: 15 items
 - **Berries**: 8 items
 - **Location**: `Catalogs/Items/ItemCatalog.[Category].cs`
+
+### Status Effects
+- **Total**: 15 statuses
+- **Persistent**: 6 statuses
+- **Volatile**: 9 statuses
+- **Location**: `Catalogs/Status/StatusCatalog.cs`
+
+### Weather
+- **Total**: 9 weather conditions
+- **Location**: `Catalogs/Weather/WeatherCatalog.cs`
+
+### Terrain
+- **Total**: 4 terrain conditions
+- **Location**: `Catalogs/Terrain/TerrainCatalog.cs`
+
+### Hazards
+- **Total**: 4 hazard types
+- **Location**: `Catalogs/Field/HazardCatalog.cs`
+
+### Side Conditions
+- **Total**: 10 side conditions
+- **Location**: `Catalogs/Field/SideConditionCatalog.cs`
+
+### Field Effects
+- **Total**: 8 field effects
+- **Location**: `Catalogs/Field/FieldEffectCatalog.cs`
 
 ## Test Location
 

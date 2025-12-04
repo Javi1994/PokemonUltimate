@@ -11,10 +11,10 @@
 Game data is organized into logical groups matching the sub-feature structure:
 
 -   **Grupo A: Core Entity Data** (1.1-1.4) - Pokemon, Moves, Abilities, Items (blueprints and instances)
--   **Grupo B: Field & Status Data** (1.5-1.6) - Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
--   **Grupo C: Supporting Systems** (1.7-1.8) - Evolution System, Type Effectiveness Table
--   **Grupo D: Infrastructure** (1.9-1.13) - Interfaces, Enums, Constants, Builders, Factories, Registries
--   **Grupo E: Planned Features** (1.14-1.15) - Variants System, Pokedex Fields
+-   **Grupo B: Field & Status Data** (1.5-1.10) - Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
+-   **Grupo C: Supporting Systems** (1.11-1.12) - Evolution System, Type Effectiveness Table
+-   **Grupo D: Infrastructure** (1.13-1.14, 1.16-1.17) - Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
+-   **Grupo E: Planned Features** (1.18-1.19) - Variants System, Pokedex Fields
 -   **Content** - Data definitions in `PokemonUltimate.Content` (Feature 3: Content Expansion)
 
 **See**: [Sub-Features Overview](../1-game-data/README.md) for complete sub-feature list.
@@ -72,7 +72,7 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `PokemonInstance.LevelUp.cs` - Level-up and evolution logic (partial class)
 -   `PokemonInstance.Evolution.cs` - Evolution tracking (partial class)
 
-### Grupo B: Field & Status Data (Sub-Features 1.5-1.6)
+### Grupo B: Field & Status Data (Sub-Features 1.5-1.10)
 
 #### 1.5: Status Effect Data
 
@@ -83,24 +83,56 @@ Game data is organized into logical groups matching the sub-feature structure:
 
 -   `StatusEffectData` - Status effect blueprint (persistent and volatile)
 
-#### 1.6: Field Conditions Data
+#### 1.6: Weather Data
 
-**Sub-Feature**: [1.6: Field Conditions Data](1.6-field-conditions-data/)  
+**Sub-Feature**: [1.6: Weather Data](1.6-weather-data/)  
 **Namespace**: `PokemonUltimate.Core.Blueprints`
 
 **Key Classes**:
 
 -   `WeatherData` - Weather condition blueprint
+
+#### 1.7: Terrain Data
+
+**Sub-Feature**: [1.7: Terrain Data](1.7-terrain-data/)  
+**Namespace**: `PokemonUltimate.Core.Blueprints`
+
+**Key Classes**:
+
 -   `TerrainData` - Terrain condition blueprint
+
+#### 1.8: Hazard Data
+
+**Sub-Feature**: [1.8: Hazard Data](1.8-hazard-data/)  
+**Namespace**: `PokemonUltimate.Core.Blueprints`
+
+**Key Classes**:
+
 -   `HazardData` - Entry hazard blueprint
+
+#### 1.9: Side Condition Data
+
+**Sub-Feature**: [1.9: Side Condition Data](1.9-side-condition-data/)  
+**Namespace**: `PokemonUltimate.Core.Blueprints`
+
+**Key Classes**:
+
 -   `SideConditionData` - Side condition blueprint (screens, Tailwind, etc.)
+
+#### 1.10: Field Effect Data
+
+**Sub-Feature**: [1.10: Field Effect Data](1.10-field-effect-data/)  
+**Namespace**: `PokemonUltimate.Core.Blueprints`
+
+**Key Classes**:
+
 -   `FieldEffectData` - Field effect blueprint (rooms, Gravity, etc.)
 
-### Grupo C: Supporting Systems (Sub-Features 1.7-1.8)
+### Grupo C: Supporting Systems (Sub-Features 1.11-1.12)
 
-#### 1.7: Evolution System
+#### 1.11: Evolution System
 
-**Sub-Feature**: [1.7: Evolution System](1.7-evolution-system/)  
+**Sub-Feature**: [1.11: Evolution System](1.11-evolution-system/)  
 **Namespace**: `PokemonUltimate.Core.Evolution`
 
 **Key Classes**:
@@ -111,29 +143,29 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `LevelCondition`, `ItemCondition`, `FriendshipCondition`
 -   `TradeCondition`, `TimeOfDayCondition`, `KnowsMoveCondition`
 
-#### 1.8: Type Effectiveness Table
+#### 1.12: Type Effectiveness Table
 
-**Sub-Feature**: [1.8: Type Effectiveness Table](1.8-type-effectiveness-table/)  
+**Sub-Feature**: [1.12: Type Effectiveness Table](1.12-type-effectiveness-table/)  
 **Namespace**: `PokemonUltimate.Core.Factories`
 
 **Key Classes**:
 
 -   `TypeEffectiveness` - Type effectiveness table (Gen 6+ chart)
 
-### Grupo D: Infrastructure (Sub-Features 1.9-1.13)
+### Grupo D: Infrastructure (Sub-Features 1.13-1.17)
 
-#### 1.9: Interfaces Base
+#### 1.13: Interfaces Base
 
-**Sub-Feature**: [1.9: Interfaces Base](1.9-interfaces-base/)  
+**Sub-Feature**: [1.13: Interfaces Base](1.13-interfaces-base/)  
 **Namespace**: `PokemonUltimate.Core.Blueprints`
 
 **Key Classes**:
 
 -   `IIdentifiable` - Base interface for identifiable data
 
-#### 1.10: Enums & Constants
+#### 1.14: Enums & Constants
 
-**Sub-Feature**: [1.10: Enums & Constants](1.10-enums-constants/)  
+**Sub-Feature**: [1.14: Enums & Constants](1.14-enums-constants/)  
 **Namespace**: `PokemonUltimate.Core.Enums`, `PokemonUltimate.Core.Constants`
 
 **Key Enums** (20 main + 7 in Effects):
@@ -144,6 +176,12 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `LearnMethod`, `TimeOfDay`, `TargetScope`
 -   `Weather`, `Terrain`, `HazardType`, `SideCondition`, `FieldEffect`
 -   `EvolutionConditionType`
+
+**Key Constants & Data Tables**:
+
+-   `ErrorMessages` - Centralized error message strings
+-   `GameMessages` - In-game message strings for UI
+-   `NatureData` - Nature modifier tables (complements Nature enum)
 -   **Enums in Effects**: `SemiInvulnerableState`, `FieldConditionType`, `MoveRestrictionType`, `ProtectionType`, `ContactPenalty`, `PriorityCondition`, `SelfDestructType`
 
 **Key Classes**:
@@ -151,22 +189,15 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `ErrorMessages` - Error message constants
 -   `GameMessages` - In-game message constants
 
-#### 1.11: Builders
+#### Builders (Moved to Feature 3.9)
 
-**Sub-Feature**: [1.11: Builders](1.11-builders/)  
-**Namespace**: `PokemonUltimate.Core.Builders`
+**Sub-Feature**: **[3.9: Builders](../3-content-expansion/3.9-builders/)**  
+**Namespace**: `PokemonUltimate.Content.Builders`  
+**Note**: Builders moved to Feature 3 as they are primarily used for content creation
 
-**Key Classes** (13 builders + 10 static helpers):
+#### 1.15: Factories & Calculators
 
--   `PokemonBuilder`, `MoveBuilder`, `AbilityBuilder`, `ItemBuilder`
--   `StatusEffectBuilder`, `SideConditionBuilder`, `FieldEffectBuilder`
--   `HazardBuilder`, `WeatherBuilder`, `TerrainBuilder`
--   `EffectBuilder`, `EvolutionBuilder`, `LearnsetBuilder`
--   **Static Helper Classes**: `Pokemon`, `Move`, `Ability`, `Item`, `Status`, `Screen`, `Room`, `Hazard`, `WeatherEffect`, `TerrainEffect`
-
-#### 1.12: Factories & Calculators
-
-**Sub-Feature**: [1.12: Factories & Calculators](1.12-factories-calculators/)  
+**Sub-Feature**: [1.15: Factories & Calculators](1.15-factories-calculators/)  
 **Namespace**: `PokemonUltimate.Core.Factories`
 
 **Key Classes**:
@@ -174,11 +205,10 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `StatCalculator` - Stat calculation formulas (Gen 3+)
 -   `PokemonFactory` - Static factory for Pokemon creation
 -   `PokemonInstanceBuilder` - Fluent builder for Pokemon instances
--   `NatureData` - Nature modifier tables
 
-#### 1.13: Registry System
+#### 1.16: Registry System
 
-**Sub-Feature**: [1.13: Registry System](1.13-registry-system/)  
+**Sub-Feature**: [1.16: Registry System](1.16-registry-system/)  
 **Namespace**: `PokemonUltimate.Core.Registry`
 
 **Key Classes**:
@@ -188,11 +218,11 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `IPokemonRegistry`, `IMoveRegistry` - Specialized interfaces
 -   `PokemonRegistry`, `MoveRegistry` - Specialized implementations
 
-### Grupo E: Planned Features (Sub-Features 1.14-1.15)
+### Grupo E: Planned Features (Sub-Features 1.18-1.19)
 
-#### 1.14: Variants System
+#### 1.18: Variants System
 
-**Sub-Feature**: [1.14: Variants System](1.14-variants-system/) ⏳ Planned  
+**Sub-Feature**: [1.18: Variants System](1.18-variants-system/) ⏳ Planned  
 **Namespace**: `PokemonUltimate.Core.Blueprints` (extensions to PokemonSpeciesData)
 
 **Planned Fields**:
@@ -202,9 +232,9 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `TeraType` - Tera type for Terracristalización variants
 -   `Variants` - List of all variant forms
 
-#### 1.15: Pokedex Fields
+#### 1.19: Pokedex Fields
 
-**Sub-Feature**: [1.15: Pokedex Fields](1.15-pokedex-fields/) ⏳ Planned  
+**Sub-Feature**: [1.19: Pokedex Fields](1.19-pokedex-fields/) ⏳ Planned  
 **Namespace**: `PokemonUltimate.Core.Blueprints` (extensions to PokemonSpeciesData), `PokemonUltimate.Core.Enums`
 
 **Planned Fields**:
@@ -406,21 +436,21 @@ var allGen1 = PokemonCatalog.GetAllGen1();  // Returns all Gen 1 Pokemon
 -   **Blueprints**: `Tests/Blueprints/[Ability/Item]DataTests.cs`
 -   **Builders**: `Tests/Data/Builders/[Ability/Item]BuilderTests.cs`
 
-**1.5-1.6: Field & Status Data**:
+**1.5-1.10: Field & Status Data**:
 
 -   **Blueprints**: `Tests/Blueprints/[Status/Weather/Terrain/etc]DataTests.cs`
 -   **Builders**: `Tests/Data/Builders/[Status/Weather/etc]BuilderTests.cs`
 
-**1.7: Evolution System**:
+**1.11: Evolution System**:
 
 -   **Evolution**: `Tests/Systems/Core/Evolution/EvolutionTests.cs`
 -   **Conditions**: `Tests/Systems/Core/Evolution/[Condition]Tests.cs`
 
-**1.8: Type Effectiveness**:
+**1.12: Type Effectiveness**:
 
 -   **Type Effectiveness**: `Tests/Systems/Core/Factories/TypeEffectivenessTests.cs`
 
-**1.9-1.13: Infrastructure**:
+**1.13-1.17: Infrastructure**:
 
 -   **Interfaces**: `Tests/Blueprints/IIdentifiableTests.cs`
 -   **Enums**: `Tests/Data/Enums/[Enum]Tests.cs`
@@ -437,7 +467,7 @@ See **[Testing Strategy](testing.md)** for complete test organization by sub-fea
 -   **[Testing](testing.md)** - Comprehensive testing strategy for all sub-features
 -   **[Roadmap](roadmap.md)** - Implementation plan organized by sub-features
 -   **[Use Cases](use_cases.md)** - All scenarios and behaviors for game data
--   **[Sub-Features Overview](README.md)** - Complete list of all 15 sub-features organized by groups
+-   **[Sub-Features Overview](README.md)** - Complete list of all 19 sub-features organized by groups
 
 ---
 

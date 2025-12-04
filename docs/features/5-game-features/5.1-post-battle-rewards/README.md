@@ -37,7 +37,7 @@ Post-Battle Rewards handles all rewards and progression after battles:
 ## Related Features
 
 - **[Feature 2: Combat System](../../2-combat-system/architecture.md)** - Battle system providing battle results
-- **[Feature 1: Pokemon Data](../../1-pokemon-data/architecture.md)** - Pokemon data for EXP and level ups
+- **[Feature 1: Game Data](../../1-game-data/architecture.md)** - Game data for EXP and level ups
 
 **⚠️ Always use numbered feature paths**: `../../[N]-[feature-name]/` instead of `../../feature-name/`
 

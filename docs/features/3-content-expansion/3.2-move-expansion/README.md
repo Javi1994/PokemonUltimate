@@ -30,8 +30,10 @@ Move Expansion focuses on systematically adding moves to the game catalog, ensur
 
 ## Related Sub-Features
 
-- **[3.5: Content Validation](../3.5-content-validation/)** - Validates new move data
-- **[3.6: Content Organization](../3.6-content-organization/)** - Organizes moves in catalog
+- **[3.5: Status Effect Expansion](../3.5-status-effect-expansion/)** - Status effects catalog
+- **[3.6: Field Conditions Expansion](../3.6-field-conditions-expansion/)** - Field conditions catalogs
+- **[3.7: Content Validation](../3.7-content-validation/)** - Validates new move data
+- **[3.8: Content Organization](../3.8-content-organization/)** - Organizes moves in catalog
 
 ## Related Features
 

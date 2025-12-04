@@ -19,7 +19,7 @@ namespace PokemonUltimate.Core.Instances
     /// <remarks>
     /// **Feature**: 1: Game Data
     /// **Sub-Feature**: 1.1: Pokemon Data
-    /// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/architecture.md`
+    /// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/README.md`
     /// </remarks>
     public partial class PokemonInstance
     {

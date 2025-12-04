@@ -26,7 +26,7 @@ Immutable blueprint for a Pokemon ability. Contains:
 ## Related Sub-Features
 
 - **[1.1: Pokemon Data](../1.1-pokemon-data/)** - Abilities assigned to Pokemon species
-- **[1.11: Builders](../1.11-builders/)** - AbilityBuilder for creating abilities
+- **[3.9: Builders](../../3-content-expansion/3.9-builders/)** - AbilityBuilder for creating abilities
 
 ## Documentation
 

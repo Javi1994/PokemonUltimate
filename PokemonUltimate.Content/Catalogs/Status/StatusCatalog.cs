@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Enums;
+using StatusBuilder = PokemonUltimate.Content.Builders.Status;
 
 namespace PokemonUltimate.Content.Catalogs.Status
 {
@@ -10,8 +11,8 @@ namespace PokemonUltimate.Content.Catalogs.Status
     /// </summary>
     /// <remarks>
     /// **Feature**: 3: Content Expansion
-    /// **Sub-Feature**: 3.6: Content Organization
-    /// **Documentation**: See `docs/features/3-content-expansion/3.6-content-organization/README.md`
+    /// **Sub-Feature**: 3.5: Status Effect Expansion
+    /// **Documentation**: See `docs/features/3-content-expansion/3.5-status-effect-expansion/README.md`
     /// </remarks>
     public static class StatusCatalog
     {
@@ -28,7 +29,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Burn: 1/16 HP damage per turn, halves physical attack.
         /// Fire types are immune.
         /// </summary>
-        public static readonly StatusEffectData Burn = Core.Builders.Status.Define("Burn")
+        public static readonly StatusEffectData Burn = StatusBuilder.Define("Burn")
             .Description("The Pokémon is burned. It takes damage each turn and its Attack is halved.")
             .Persistent(PersistentStatus.Burn)
             .Indefinite()
@@ -41,7 +42,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Paralysis: 25% chance can't move, Speed halved.
         /// Electric types are immune (Gen 6+), Ground types were never immune.
         /// </summary>
-        public static readonly StatusEffectData Paralysis = Core.Builders.Status.Define("Paralysis")
+        public static readonly StatusEffectData Paralysis = StatusBuilder.Define("Paralysis")
             .Description("The Pokémon is paralyzed. It may be unable to move and its Speed is halved.")
             .Persistent(PersistentStatus.Paralysis)
             .Indefinite()
@@ -53,7 +54,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// <summary>
         /// Sleep: Cannot move for 1-3 turns.
         /// </summary>
-        public static readonly StatusEffectData Sleep = Core.Builders.Status.Define("Sleep")
+        public static readonly StatusEffectData Sleep = StatusBuilder.Define("Sleep")
             .Description("The Pokémon is asleep and cannot move.")
             .Persistent(PersistentStatus.Sleep)
             .LastsTurns(1, 3)
@@ -64,7 +65,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Poison: 1/8 HP damage per turn.
         /// Poison and Steel types are immune.
         /// </summary>
-        public static readonly StatusEffectData Poison = Core.Builders.Status.Define("Poison")
+        public static readonly StatusEffectData Poison = StatusBuilder.Define("Poison")
             .Description("The Pokémon is poisoned and takes damage each turn.")
             .Persistent(PersistentStatus.Poison)
             .Indefinite()
@@ -76,7 +77,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Badly Poisoned (Toxic): Escalating damage (1/16, 2/16, 3/16...).
         /// Poison and Steel types are immune.
         /// </summary>
-        public static readonly StatusEffectData BadlyPoisoned = Core.Builders.Status.Define("Badly Poisoned")
+        public static readonly StatusEffectData BadlyPoisoned = StatusBuilder.Define("Badly Poisoned")
             .Description("The Pokémon is badly poisoned. Damage increases each turn.")
             .Persistent(PersistentStatus.BadlyPoisoned)
             .Indefinite()
@@ -88,7 +89,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Freeze: Cannot move, 20% chance to thaw each turn.
         /// Fire moves thaw the frozen Pokémon. Ice types are immune.
         /// </summary>
-        public static readonly StatusEffectData Freeze = Core.Builders.Status.Define("Freeze")
+        public static readonly StatusEffectData Freeze = StatusBuilder.Define("Freeze")
             .Description("The Pokémon is frozen solid and cannot move.")
             .Persistent(PersistentStatus.Freeze)
             .Indefinite()
@@ -106,7 +107,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Confusion: 33% chance to hit self for 40 power typeless damage.
         /// Lasts 2-5 turns.
         /// </summary>
-        public static readonly StatusEffectData Confusion = Core.Builders.Status.Define("Confusion")
+        public static readonly StatusEffectData Confusion = StatusBuilder.Define("Confusion")
             .Description("The Pokémon is confused and may hurt itself.")
             .Volatile(VolatileStatus.Confusion)
             .LastsTurns(2, 5)
@@ -117,7 +118,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Attract/Infatuation: 50% chance can't move due to love.
         /// Only works on opposite gender.
         /// </summary>
-        public static readonly StatusEffectData Attract = Core.Builders.Status.Define("Attract")
+        public static readonly StatusEffectData Attract = StatusBuilder.Define("Attract")
             .Description("The Pokémon is infatuated and may be unable to attack.")
             .Volatile(VolatileStatus.Attract)
             .Indefinite() // Until target switches out
@@ -128,7 +129,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Flinch: Cannot move this turn.
         /// Only lasts 1 turn, applied by certain moves.
         /// </summary>
-        public static readonly StatusEffectData Flinch = Core.Builders.Status.Define("Flinch")
+        public static readonly StatusEffectData Flinch = StatusBuilder.Define("Flinch")
             .Description("The Pokémon flinched and couldn't move.")
             .Volatile(VolatileStatus.Flinch)
             .LastsTurns(1)
@@ -139,7 +140,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Leech Seed: Drains 1/8 HP to opponent each turn.
         /// Grass types are immune.
         /// </summary>
-        public static readonly StatusEffectData LeechSeed = Core.Builders.Status.Define("Leech Seed")
+        public static readonly StatusEffectData LeechSeed = StatusBuilder.Define("Leech Seed")
             .Description("The Pokémon's HP is drained to the opponent each turn.")
             .Volatile(VolatileStatus.LeechSeed)
             .Indefinite()
@@ -151,7 +152,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// Curse (Ghost): Loses 1/4 HP each turn.
         /// Applied by Ghost-type Curse.
         /// </summary>
-        public static readonly StatusEffectData Curse = Core.Builders.Status.Define("Curse")
+        public static readonly StatusEffectData Curse = StatusBuilder.Define("Curse")
             .Description("The Pokémon is cursed and loses HP each turn.")
             .Volatile(VolatileStatus.Curse)
             .Indefinite()
@@ -161,7 +162,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// <summary>
         /// Encore: Forced to repeat the last move for 3 turns.
         /// </summary>
-        public static readonly StatusEffectData Encore = Core.Builders.Status.Define("Encore")
+        public static readonly StatusEffectData Encore = StatusBuilder.Define("Encore")
             .Description("The Pokémon is forced to repeat its last move.")
             .Volatile(VolatileStatus.Encore)
             .LastsTurns(3)
@@ -171,7 +172,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// <summary>
         /// Taunt: Cannot use status moves for 3 turns.
         /// </summary>
-        public static readonly StatusEffectData Taunt = Core.Builders.Status.Define("Taunt")
+        public static readonly StatusEffectData Taunt = StatusBuilder.Define("Taunt")
             .Description("The Pokémon cannot use status moves.")
             .Volatile(VolatileStatus.Taunt)
             .LastsTurns(3)
@@ -181,7 +182,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// <summary>
         /// Torment: Cannot use the same move twice in a row.
         /// </summary>
-        public static readonly StatusEffectData Torment = Core.Builders.Status.Define("Torment")
+        public static readonly StatusEffectData Torment = StatusBuilder.Define("Torment")
             .Description("The Pokémon cannot use the same move consecutively.")
             .Volatile(VolatileStatus.Torment)
             .Indefinite()
@@ -190,7 +191,7 @@ namespace PokemonUltimate.Content.Catalogs.Status
         /// <summary>
         /// Disable: One move is disabled for 4 turns.
         /// </summary>
-        public static readonly StatusEffectData Disable = Core.Builders.Status.Define("Disable")
+        public static readonly StatusEffectData Disable = StatusBuilder.Define("Disable")
             .Description("One of the Pokémon's moves is disabled.")
             .Volatile(VolatileStatus.Disable)
             .LastsTurns(4)

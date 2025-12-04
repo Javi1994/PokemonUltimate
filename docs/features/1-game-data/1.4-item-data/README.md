@@ -28,7 +28,7 @@ Immutable blueprint for an item. Contains:
 ## Related Sub-Features
 
 - **[1.1: Pokemon Data](../1.1-pokemon-data/)** - Items held by Pokemon instances
-- **[1.11: Builders](../1.11-builders/)** - ItemBuilder for creating items
+- **[3.9: Builders](../../3-content-expansion/3.9-builders/)** - ItemBuilder for creating items
 
 ## Documentation
 

@@ -10,8 +10,8 @@ namespace PokemonUltimate.Core.Registry
     /// </summary>
     /// <remarks>
     /// **Feature**: 1: Game Data
-    /// **Sub-Feature**: 1.13: Registry System
-    /// **Documentation**: See `docs/features/1-game-data/1.13-registry-system/architecture.md`
+    /// **Sub-Feature**: 1.17: Registry System
+    /// **Documentation**: See `docs/features/1-game-data/1.17-registry-system/README.md`
     /// </remarks>
     public class MoveRegistry : GameDataRegistry<MoveData>, IMoveRegistry
     {

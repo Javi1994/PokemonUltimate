@@ -49,7 +49,7 @@ public class ClassName
 
 ### Examples
 
-#### Feature 1: Pokemon Data
+#### Feature 1: Game Data
 
 ```csharp
 namespace PokemonUltimate.Core.Blueprints
@@ -60,9 +60,9 @@ namespace PokemonUltimate.Core.Blueprints
     /// This is the "Species" data - shared by all Pokemon of the same kind.
     /// </summary>
     /// <remarks>
-    /// **Feature**: 1: Pokemon Data
-    /// **Sub-Feature**: 1.1: PokemonSpeciesData (Blueprint)
-    /// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+    /// **Feature**: 1: Game Data
+    /// **Sub-Feature**: 1.1: Pokemon Data
+    /// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/README.md`
     /// </remarks>
     public class PokemonSpeciesData : IIdentifiable
     {
@@ -287,16 +287,16 @@ using System;
 
 ## Examples by Feature
 
-### Feature 1: Pokemon Data
+### Feature 1: Game Data
 
 ```csharp
 /// <summary>
 /// Blueprint for a Pokemon species (immutable data).
 /// </summary>
 /// <remarks>
-/// **Feature**: 1: Pokemon Data
-/// **Sub-Feature**: 1.1: PokemonSpeciesData (Blueprint)
-/// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+/// **Feature**: 1: Game Data
+/// **Sub-Feature**: 1.1: Pokemon Data
+/// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/README.md`
 /// </remarks>
 public class PokemonSpeciesData : IIdentifiable { }
 
@@ -304,9 +304,9 @@ public class PokemonSpeciesData : IIdentifiable { }
 /// Mutable runtime instance of a Pokemon.
 /// </summary>
 /// <remarks>
-/// **Feature**: 1: Pokemon Data
-/// **Sub-Feature**: 1.2: PokemonInstance (Runtime)
-/// **Documentation**: See `docs/features/1-pokemon-data/architecture.md`
+/// **Feature**: 1: Game Data
+/// **Sub-Feature**: 1.1: Pokemon Data
+/// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/README.md`
 /// </remarks>
 public class PokemonInstance { }
 ```

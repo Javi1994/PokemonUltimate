@@ -11,14 +11,16 @@
 This roadmap defines phases for expanding game content. Each phase adds new data while maintaining quality and consistency with existing patterns.
 
 **Current Status**:
-- **Pokemon**: 26 (Gen 1 only)
-- **Moves**: 36 (12 types)
-- **Items**: ~23 (Held items + Berries)
-- **Abilities**: 35 (Gen 3 + Additional)
-- **Status Effects**: 15 (Complete)
-- **Weather**: 9 (Complete)
-- **Terrain**: 4 (Complete)
-- **Hazards**: 4 (Complete)
+- **Pokemon**: 26/151 (Gen 1 only) 🎯
+- **Moves**: 36 (12 types) 🎯
+- **Items**: 23 (15 Held items + 8 Berries) 🎯
+- **Abilities**: 35 (25 Gen 3 + 10 Additional) 🎯
+- **Status Effects**: 15 (6 Persistent + 9 Volatile) ✅ Complete
+- **Weather**: 9 ✅ Complete
+- **Terrain**: 4 ✅ Complete
+- **Hazards**: 4 ✅ Complete
+- **Side Conditions**: 10 ✅ Complete
+- **Field Effects**: 8 ✅ Complete
 
 **Goal**: Expand content systematically to support full battle mechanics and diverse gameplay.
 
@@ -28,14 +30,16 @@ This roadmap defines phases for expanding game content. Each phase adds new data
 
 | Category | Current | Target | Priority |
 |----------|---------|--------|----------|
-| **Pokemon** | 26 (Gen 1) | 151+ (Gen 1-2) | High |
+| **Pokemon** | 26/151 (Gen 1) | 151+ (Gen 1-2) | High |
 | **Moves** | 36 (12 types) | 100+ (all types) | High |
-| **Items** | ~23 | 50+ | Medium |
+| **Items** | 23 | 50+ | Medium |
 | **Abilities** | 35 | 50+ | Medium |
 | **Status Effects** | 15 | 15 ✅ | Complete |
 | **Weather** | 9 | 9 ✅ | Complete |
 | **Terrain** | 4 | 4 ✅ | Complete |
 | **Hazards** | 4 | 4 ✅ | Complete |
+| **Side Conditions** | 10 | 10 ✅ | Complete |
+| **Field Effects** | 8 | 8 ✅ | Complete |
 
 ---
 
@@ -265,7 +269,44 @@ This roadmap defines phases for expanding game content. Each phase adds new data
 
 ---
 
-### Phase 3.5: Gen 2 Pokemon
+### Phase 3.5: Status Effect Expansion ✅ COMPLETE
+
+**Goal**: Complete status effects catalog.
+
+**Status**: ✅ Complete (15 statuses)
+
+**Content**:
+- **Persistent Status** (6): Burn, Paralysis, Sleep, Poison, Badly Poisoned, Freeze
+- **Volatile Status** (9): Confusion, Attract, Flinch, Leech Seed, Curse, Encore, Taunt, Torment, Disable
+
+**Files**:
+- `StatusCatalog.cs` ✅
+
+---
+
+### Phase 3.6: Field Conditions Expansion ✅ COMPLETE
+
+**Goal**: Complete field conditions catalogs.
+
+**Status**: ✅ Complete (35 field conditions)
+
+**Content**:
+- **Weather** (9): Rain, Sun, Sandstorm, Hail, Snow, Heavy Rain, Extremely Harsh Sunlight, Strong Winds, Fog
+- **Terrain** (4): Grassy Terrain, Electric Terrain, Psychic Terrain, Misty Terrain
+- **Hazards** (4): Stealth Rock, Spikes, Toxic Spikes, Sticky Web
+- **Side Conditions** (10): Reflect, Light Screen, Aurora Veil, Tailwind, Safeguard, Mist, Lucky Chant, Wide Guard, Quick Guard, Mat Block
+- **Field Effects** (8): Trick Room, Magic Room, Wonder Room, Gravity, Ion Deluge, Fairy Lock, Mud Sport, Water Sport
+
+**Files**:
+- `WeatherCatalog.cs` ✅
+- `TerrainCatalog.cs` ✅
+- `HazardCatalog.cs` ✅
+- `SideConditionCatalog.cs` ✅
+- `FieldEffectCatalog.cs` ✅
+
+---
+
+### Phase 3.7: Gen 2 Pokemon
 
 **Goal**: Add all Gen 2 Pokemon (Johto region, #152-251).
 
@@ -297,7 +338,7 @@ This roadmap defines phases for expanding game content. Each phase adds new data
 
 ---
 
-### Phase 3.6: Complete Move Coverage for Pokemon
+### Phase 3.8: Complete Move Coverage for Pokemon
 
 **Goal**: Ensure all Pokemon have complete, accurate learnsets.
 
@@ -323,6 +364,30 @@ This roadmap defines phases for expanding game content. Each phase adds new data
 **Files to Update**:
 - `PokemonCatalog.Gen1.cs` (update learnsets)
 - `PokemonCatalog.Gen2.cs` (update learnsets)
+
+---
+
+### Phase 3.9: Builders ✅ COMPLETE
+
+**Goal**: Consolidate all builder classes under Feature 3 for content creation.
+
+**Status**: ✅ Complete
+
+**Components**:
+- **13 Builder Classes**: Fluent APIs for creating game content
+- **10 Static Helper Classes**: Convenience entry points
+
+**Implemented**:
+- All builders use namespace `PokemonUltimate.Content.Builders`
+- All XML comments reference Feature 3, Sub-Feature 3.9
+- All catalogs and tests updated to use new namespace
+- Documentation created in Feature 3
+
+**Files**:
+- `PokemonUltimate.Core/Builders/*.cs` (all 13 builder files)
+- **Note**: Files are physically in Core but namespace is `PokemonUltimate.Content.Builders`
+
+**Related**: [Sub-Feature 3.9 Documentation](3.9-builders/)
 
 ---
 
@@ -436,10 +501,15 @@ Each new content addition should include:
 |-------|--------------|---------|--------|----------|--------|--------------|
 | 3.1 | Gen 1 Pokemon | 26/151 | 151 | High | 20-30h | None |
 | 3.2 | Moves (All Types) | 36 | 100+ | High | 30-40h | None |
-| 3.3 | Items | ~23 | 50+ | Medium | 15-20h | None |
+| 3.3 | Items | 23 | 50+ | Medium | 15-20h | None |
 | 3.4 | Abilities | 35 | 50+ | Medium | 10-15h | None |
-| 3.5 | Gen 2 Pokemon | 0/100 | 100 | Medium | 25-35h | 3.2 (moves) |
-| 3.6 | Complete Learnsets | Partial | Complete | High | 20-30h | 3.1, 3.2, 3.5 |
+| 3.5 | Status Effects | 15 | 15 ✅ | Complete | - | None |
+| 3.6 | Field Conditions | 35 | 35 ✅ | Complete | - | None |
+| 3.7 | Content Validation | - | - | Medium | 10-15h | All content |
+| 3.8 | Content Organization | - | - ✅ | Complete | - | None |
+| 3.9 | Builders | 13 builders | 13 ✅ | Complete | - | None |
+| 3.10 | Gen 2 Pokemon | 0/100 | 100 | Medium | 25-35h | 3.2 (moves) |
+| 3.11 | Complete Learnsets | Partial | Complete | High | 20-30h | 3.1, 3.2, 3.10 |
 
 **Total Estimated Effort**: 120-170 hours
 
@@ -486,12 +556,17 @@ PokemonUltimate.Content/Catalogs/
 | Date | Phase | Content Added | Notes |
 |------|-------|---------------|-------|
 | Dec 2025 | Initial | 26 Pokemon, 36 Moves, 23 Items, 35 Abilities | Foundation complete |
+| Jan 2025 | 3.5 | Status Effect Expansion | 15 statuses complete |
+| Jan 2025 | 3.6 | Field Conditions Expansion | 35 field conditions complete |
+| Jan 2025 | 3.8 | Content Organization | Catalog organization complete |
+| Jan 2025 | 3.9 | Builders Consolidation | Builders moved to Feature 3 |
 | TBD | 3.1 | Gen 1 completion | |
 | TBD | 3.2 | Move expansion | |
 | TBD | 3.3 | Item expansion | |
 | TBD | 3.4 | Ability expansion | |
-| TBD | 3.5 | Gen 2 Pokemon | |
-| TBD | 3.6 | Complete learnsets | |
+| TBD | 3.7 | Content Validation | |
+| TBD | 3.10 | Gen 2 Pokemon | |
+| TBD | 3.11 | Complete learnsets | |
 
 ---
 

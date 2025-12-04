@@ -8,8 +8,8 @@ namespace PokemonUltimate.Core.Blueprints
     /// </summary>
     /// <remarks>
     /// **Feature**: 1: Game Data
-    /// **Sub-Feature**: 1.6: Field Conditions Data
-    /// **Documentation**: See `docs/features/1-game-data/1.6-field-conditions-data/README.md`
+    /// **Sub-Feature**: 1.8: Hazard Data
+    /// **Documentation**: See `docs/features/1-game-data/1.8-hazard-data/README.md`
     /// </remarks>
     public sealed class HazardData
     {
@@ -212,13 +212,13 @@ namespace PokemonUltimate.Core.Blueprints
             // Check Levitate immunity
             if (!AffectsLevitate)
             {
-                if (!string.IsNullOrEmpty(abilityName) && 
+                if (!string.IsNullOrEmpty(abilityName) &&
                     abilityName.Equals("Levitate", StringComparison.OrdinalIgnoreCase))
                     return false;
             }
 
             // Check Magic Guard (immune to indirect damage)
-            if (!string.IsNullOrEmpty(abilityName) && 
+            if (!string.IsNullOrEmpty(abilityName) &&
                 abilityName.Equals("Magic Guard", StringComparison.OrdinalIgnoreCase) &&
                 !LowersStat)
                 return false;

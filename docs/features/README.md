@@ -21,7 +21,7 @@ This directory contains all feature-specific documentation, organized by feature
 
 | # | Feature | Status | Description |
 |---|---------|--------|-------------|
-| **1** | **[Pokemon Data](1-pokemon-data/)** | ⏳ Planned | Complete Pokemon data structure |
+| **1** | **[Game Data](1-game-data/)** | ✅ Core Complete | Complete game data structure |
 | **2** | **[Combat System](2-combat-system/)** | ✅ Core Complete | Battle engine (phases 2.1-2.11) |
 | **3** | **[Content Expansion](3-content-expansion/)** | 🎯 In Progress | Adding Pokemon, Moves, Items |
 
@@ -57,8 +57,32 @@ Documentation shared across features:
 - **Testing strategy**: [`../ai/testing_structure_definition.md`](../ai/testing_structure_definition.md) - Test structure standard
 - **AI resources**: [`../ai/`](../ai/) - Workflow, checklists, examples, prompts, guidelines
 
+## Development Process ⭐ **MANDATORY**
+
+**⚠️ CRITICAL: Feature-Driven Development**
+
+Before starting ANY development work:
+
+1. **Review Existing Features** - Read [`../features_master_list.md`](../features_master_list.md) ⭐ **START HERE**
+2. **Assign to Feature** - Determine if work fits existing feature or needs new one
+3. **Read Feature Documentation** - If existing feature, read its complete documentation
+4. **Create Feature Documentation** - If new feature, create complete documentation structure (see [`../feature_documentation_standard.md`](../feature_documentation_standard.md))
+5. **Proceed with Development** - Follow standard workflow after feature assignment
+
+**After completing work:**
+
+- Update feature's `roadmap.md` - Mark completed phases
+- Update feature's `architecture.md` - Reflect actual implementation
+- Update feature's `use_cases.md` - Mark completed cases
+- Update feature's `code_location.md` - Add new files
+- Update feature's `testing.md` - Document tests
+- Update `features_master_list.md` - Update status
+
+**See**: [`../ai/guidelines/feature_driven_development.md`](../ai/guidelines/feature_driven_development.md) for complete process.
+
 ## Quick Navigation
 
+- **Starting development?** → Read [`../features_master_list.md`](../features_master_list.md) first ⭐
 - **Starting a new feature?** → Read feature's README.md
 - **Implementing?** → Check roadmap.md and architecture.md
 - **Testing?** → See testing.md (each feature has its own)

@@ -9,8 +9,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
-    /// **Sub-Feature**: 2.5: Combat Actions
-    /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
+    /// **Sub-Feature**: 2.2: Action Queue System
+    /// **Documentation**: See `docs/features/2-combat-system/2.2-action-queue-system/README.md`
     /// </remarks>
     public abstract class BattleAction
     {

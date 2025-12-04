@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Core.Builders;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
@@ -17,7 +17,6 @@ using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Steps;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Helpers;
-using PokemonUltimate.Content.Builders;
 // Catalogs
 using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
 using PokemonCatalog = PokemonUltimate.Content.Catalogs.Pokemon.PokemonCatalog;

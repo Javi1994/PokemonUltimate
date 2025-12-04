@@ -10,10 +10,10 @@
 
 This document covers all use cases for **all game data structures** organized by sub-features:
 - **Grupo A: Core Entity Data** (1.1-1.4) - Pokemon, Moves, Abilities, Items
-- **Grupo B: Field & Status Data** (1.5-1.6) - Status Effects, Field Conditions
-- **Grupo C: Supporting Systems** (1.7-1.8) - Evolution System, Type Effectiveness
-- **Grupo D: Infrastructure** (1.9-1.13) - Interfaces, Enums, Constants, Builders, Factories, Registries
-- **Grupo E: Planned Features** (1.14-1.15) - Variants System, Pokedex Fields
+- **Grupo B: Field & Status Data** (1.5-1.10) - Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
+- **Grupo C: Supporting Systems** (1.11-1.12) - Evolution System, Type Effectiveness
+- **Grupo D: Infrastructure** (1.13-1.14, 1.16-1.17) - Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
+- **Grupo E: Planned Features** (1.18-1.19) - Variants System, Pokedex Fields
 
 **See**: [Sub-Features Overview](README.md) for complete sub-feature list.
 
@@ -262,7 +262,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-### Grupo B: Field & Status Data (Sub-Features 1.5-1.6)
+### Grupo B: Field & Status Data (Sub-Features 1.5-1.10)
 
 #### Sub-Feature 1.5: Status Effect Data
 
@@ -291,7 +291,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.6: Field Conditions Data
+#### Sub-Feature 1.6: Weather Data
 
 ### UC-022: Define Weather Condition
 **Description**: Create a new weather condition blueprint
@@ -304,6 +304,8 @@ This document covers all use cases for **all game data structures** organized by
 **Expected Result**: `WeatherData` instance
 **Status**: ✅ Implemented
 
+#### Sub-Feature 1.7: Terrain Data
+
 ### UC-023: Define Terrain Condition
 **Description**: Create a new terrain condition blueprint
 **Actor**: Content developer
@@ -314,6 +316,8 @@ This document covers all use cases for **all game data structures** organized by
 3. Call `.Build()` to create `TerrainData`
 **Expected Result**: `TerrainData` instance
 **Status**: ✅ Implemented
+
+#### Sub-Feature 1.8: Hazard Data
 
 ### UC-024: Define Hazard
 **Description**: Create a new entry hazard blueprint
@@ -326,6 +330,8 @@ This document covers all use cases for **all game data structures** organized by
 **Expected Result**: `HazardData` instance
 **Status**: ✅ Implemented
 
+#### Sub-Feature 1.9: Side Condition Data
+
 ### UC-025: Define Side Condition
 **Description**: Create a new side condition blueprint (screens, Tailwind, etc.)
 **Actor**: Content developer
@@ -336,6 +342,8 @@ This document covers all use cases for **all game data structures** organized by
 3. Call `.Build()` to create `SideConditionData`
 **Expected Result**: `SideConditionData` instance
 **Status**: ✅ Implemented
+
+#### Sub-Feature 1.10: Field Effect Data
 
 ### UC-026: Define Field Effect
 **Description**: Create a new field effect blueprint (rooms, Gravity, etc.)
@@ -350,9 +358,9 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-### Grupo C: Supporting Systems (Sub-Features 1.7-1.8)
+### Grupo C: Supporting Systems (Sub-Features 1.11-1.12)
 
-#### Sub-Feature 1.7: Evolution System
+#### Sub-Feature 1.11: Evolution System
 
 ### UC-027: Define Evolution Path
 **Description**: Create an evolution path with conditions
@@ -378,7 +386,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.8: Type Effectiveness Table
+#### Sub-Feature 1.12: Type Effectiveness Table
 
 ### UC-029: Calculate Type Effectiveness
 **Description**: Calculate damage multiplier based on attacker and defender types
@@ -403,9 +411,9 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-### Grupo D: Infrastructure (Sub-Features 1.9-1.13)
+### Grupo D: Infrastructure (Sub-Features 1.13-1.17)
 
-#### Sub-Feature 1.9: Interfaces Base
+#### Sub-Feature 1.13: Interfaces Base
 
 ### UC-031: Identify Data by ID
 **Description**: Access data using IIdentifiable.Id property
@@ -419,7 +427,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.10: Enums & Constants
+#### Sub-Feature 1.14: Enums & Constants
 
 ### UC-032: Use Error Messages
 **Description**: Access centralized error message constants
@@ -443,22 +451,13 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.11: Builders
+#### Builders (Moved to Feature 3.9)
 
-### UC-034: Use Fluent Builder API
-**Description**: Create data structures using fluent builder pattern
-**Actor**: Content developer
-**Preconditions**: None
-**Steps**:
-1. Use static helper class (e.g., `Pokemon.Define(...)`)
-2. Chain builder methods
-3. Call `.Build()` to create data instance
-**Expected Result**: Data instance created with fluent API
-**Status**: ✅ Implemented
+**See**: **[Feature 3.9: Builders](../3-content-expansion/3.9-builders/)** for builder use cases
 
 ---
 
-#### Sub-Feature 1.12: Factories & Calculators
+#### Sub-Feature 1.15: Factories & Calculators
 
 ### UC-035: Calculate Pokemon Stats
 **Description**: Calculate Pokemon stats using Gen 3+ formula with IVs, EVs, and Nature
@@ -484,7 +483,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.13: Registry System
+#### Sub-Feature 1.16: Registry System
 
 ### UC-037: Register Data in Registry
 **Description**: Register data instance in registry for lookup
@@ -521,9 +520,9 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-### Grupo E: Planned Features (Sub-Features 1.14-1.15)
+### Grupo E: Planned Features (Sub-Features 1.18-1.19)
 
-#### Sub-Feature 1.14: Variants System ⏳ Planned
+#### Sub-Feature 1.18: Variants System ⏳ Planned
 
 ### UC-040: Create Mega Evolution Variant
 **Description**: Define Mega Evolution as separate Pokemon species (see UC-010)
@@ -539,7 +538,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.15: Pokedex Fields ⏳ Planned
+#### Sub-Feature 1.19: Pokedex Fields ⏳ Planned
 
 ### UC-043: Display Pokedex Entry
 **Description**: Display Pokemon Pokedex entry with description, category, height, weight, etc.
@@ -609,17 +608,17 @@ This document covers all use cases for **all game data structures** organized by
 2. Combat system accesses instance stats, moves (Sub-Feature 1.2), abilities (Sub-Feature 1.3)
 3. Battle applies move effects (Sub-Feature 1.2), ability effects (Sub-Feature 1.3), item effects (Sub-Feature 1.4)
 4. Battle modifies instance state (HP, status from Sub-Feature 1.5)
-5. Field conditions affect battle (Sub-Feature 1.6)
-6. Type effectiveness calculated (Sub-Feature 1.8)
+5. Field conditions affect battle (Sub-Features 1.6-1.10)
+6. Type effectiveness calculated (Sub-Feature 1.12)
 **Status**: ✅ Implemented
 
 ### INT-002: Game Data → Content Expansion
 **Description**: Adding new content using the data structures
 **Steps**:
-1. Define new Pokemon species using `PokemonBuilder` (Sub-Feature 1.11)
-2. Define new moves using `MoveBuilder` (Sub-Feature 1.11)
-3. Define new abilities using `AbilityBuilder` (Sub-Feature 1.11)
-4. Define new items using `ItemBuilder` (Sub-Feature 1.11)
+1. Define new Pokemon species using `PokemonBuilder` (Sub-Feature 1.15)
+2. Define new moves using `MoveBuilder` (Sub-Feature 1.15)
+3. Define new abilities using `AbilityBuilder` (Sub-Feature 1.15)
+4. Define new items using `ItemBuilder` (Sub-Feature 1.15)
 5. Add to catalogs as partial classes (Feature 3)
 6. New content available throughout game
 **Status**: ✅ Implemented (26 Gen 1 Pokemon, moves, abilities, items)
@@ -636,8 +635,8 @@ This document covers all use cases for **all game data structures** organized by
 ### INT-004: Pokemon Data → Evolution System
 **Description**: Evolution transforms Pokemon instance
 **Steps**:
-1. Pokemon instance meets evolution condition (Sub-Feature 1.7)
-2. System checks evolution conditions (Sub-Feature 1.7)
+1. Pokemon instance meets evolution condition (Sub-Feature 1.11)
+2. System checks evolution conditions (Sub-Feature 1.11)
 3. System creates new instance from evolved species (Sub-Feature 1.1)
 4. Original instance replaced with evolved instance
 **Status**: ✅ Implemented (Level and Item evolutions)
@@ -647,8 +646,8 @@ This document covers all use cases for **all game data structures** organized by
 **Steps**:
 1. Player encounters or catches Pokemon
 2. Pokedex entry unlocked for that species
-3. Pokedex displays species data (Sub-Feature 1.15: Description, Category, Height, Weight, Color, Shape, Habitat)
-**Status**: ⏳ Planned (Sub-Feature 1.15: Pokedex fields not yet implemented)
+3. Pokedex displays species data (Sub-Feature 1.19: Description, Category, Height, Weight, Color, Shape, Habitat)
+**Status**: ⏳ Planned (Sub-Feature 1.19: Pokedex fields not yet implemented)
 
 ### INT-006: Move Effects → Combat System
 **Description**: Move effects modify battle state
@@ -678,26 +677,26 @@ This document covers all use cases for **all game data structures** organized by
 **Description**: Field conditions affect battle
 **Steps**:
 1. Weather condition active (Sub-Feature 1.6)
-2. Terrain condition active (Sub-Feature 1.6)
-3. Hazards on field (Sub-Feature 1.6)
-4. Side conditions active (Sub-Feature 1.6)
-5. Field effects active (Sub-Feature 1.6)
+2. Terrain condition active (Sub-Feature 1.7)
+3. Hazards on field (Sub-Feature 1.8)
+4. Side conditions active (Sub-Feature 1.9)
+5. Field effects active (Sub-Feature 1.10)
 6. All conditions modify battle mechanics
 **Status**: ✅ Implemented
 
 ### INT-010: Type Effectiveness → Damage Calculation
 **Description**: Type effectiveness affects move damage
 **Steps**:
-1. Move type and defender types known (Sub-Feature 1.8)
-2. Type effectiveness calculated (Sub-Feature 1.8)
-3. STAB calculated if applicable (Sub-Feature 1.8)
+1. Move type and defender types known (Sub-Feature 1.12)
+2. Type effectiveness calculated (Sub-Feature 1.12)
+3. STAB calculated if applicable (Sub-Feature 1.12)
 4. Multipliers applied to damage calculation
 **Status**: ✅ Implemented
 
 ### INT-011: Builders → Content Creation
 **Description**: Builders used to create all game data
 **Steps**:
-1. Use builders (Sub-Feature 1.11) to create Pokemon, Moves, Abilities, Items, Field Conditions
+1. Use builders (Sub-Feature 1.15) to create Pokemon, Moves, Abilities, Items, Field Conditions
 2. Builders provide fluent API for data creation
 3. All data created consistently
 **Status**: ✅ Implemented
@@ -705,7 +704,7 @@ This document covers all use cases for **all game data structures** organized by
 ### INT-012: Registries → Data Access
 **Description**: Registries provide centralized data access
 **Steps**:
-1. Data registered in registries (Sub-Feature 1.13)
+1. Data registered in registries (Sub-Feature 1.17)
 2. Game systems query registries for data
 3. Data accessed by ID or specialized queries (Pokedex number, type, etc.)
 **Status**: ✅ Implemented

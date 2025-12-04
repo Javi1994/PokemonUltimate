@@ -33,7 +33,7 @@ Abilities & Items implements an event-driven system for ability and item trigger
 ## Related Sub-Features
 
 - **[2.6: Combat Engine](../2.6-combat-engine/)** - Engine triggers ability/item events
-- **[2.10: Pipeline Hooks](../2.10-pipeline-hooks/)** - Abilities/items hook into damage pipeline
+- **[2.4: Damage Calculation Pipeline](../2.4-damage-calculation-pipeline/)** - Abilities/items provide data for stat/damage modifiers
 
 ## Quick Links
 

@@ -10,8 +10,8 @@ namespace PokemonUltimate.Core.Blueprints
     /// </summary>
     /// <remarks>
     /// **Feature**: 1: Game Data
-    /// **Sub-Feature**: 1.1: Pokemon Data
-    /// **Documentation**: See `docs/features/1-game-data/1.1-pokemon-data/architecture.md`
+    /// **Sub-Feature**: 1.14: Enums & Constants
+    /// **Documentation**: See `docs/features/1-game-data/1.14-enums-constants/README.md`
     /// </remarks>
     public static class NatureData
     {

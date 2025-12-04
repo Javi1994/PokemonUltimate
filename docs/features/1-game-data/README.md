@@ -19,7 +19,8 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 ## Current Status
 
 - ✅ **Core Complete**: All main data structures implemented (Pokemon, Moves, Abilities, Items, Field Conditions)
-- ✅ **Infrastructure Complete**: Builders, Factories, Registries, Enums, Constants
+- ✅ **Infrastructure Complete**: Factories, Registries, Enums, Constants
+- ⚠️ **Note**: Builders moved to Feature 3 (Sub-Feature 3.9) as they are primarily used for content creation
 - ⏳ **Planned**: Variants System (Mega, Dinamax, Terracristalización)
 - ⏳ **Planned**: Pokedex Fields (Description, Category, Height, Weight, Color, Shape, Habitat)
 
@@ -43,22 +44,26 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 
 ### Grupo B: Field & Status Data (Condiciones de Campo)
 - **[1.5: Status Effect Data](1.5-status-effect-data/)** - StatusEffectData (Blueprint)
-- **[1.6: Field Conditions Data](1.6-field-conditions-data/)** - WeatherData, TerrainData, HazardData, SideConditionData, FieldEffectData
+- **[1.6: Weather Data](1.6-weather-data/)** - WeatherData (Blueprint)
+- **[1.7: Terrain Data](1.7-terrain-data/)** - TerrainData (Blueprint)
+- **[1.8: Hazard Data](1.8-hazard-data/)** - HazardData (Blueprint)
+- **[1.9: Side Condition Data](1.9-side-condition-data/)** - SideConditionData (Blueprint)
+- **[1.10: Field Effect Data](1.10-field-effect-data/)** - FieldEffectData (Blueprint)
 
 ### Grupo C: Supporting Systems (Sistemas de Soporte)
-- **[1.7: Evolution System](1.7-evolution-system/)** - Evolution, IEvolutionCondition, EvolutionConditions (6 classes)
-- **[1.8: Type Effectiveness Table](1.8-type-effectiveness-table/)** - TypeEffectiveness (data table)
+- **[1.11: Evolution System](1.11-evolution-system/)** - Evolution, IEvolutionCondition, EvolutionConditions (6 classes)
+- **[1.12: Type Effectiveness Table](1.12-type-effectiveness-table/)** - TypeEffectiveness (data table)
 
 ### Grupo D: Infrastructure (Infraestructura)
-- **[1.9: Interfaces Base](1.9-interfaces-base/)** - IIdentifiable
-- **[1.10: Enums & Constants](1.10-enums-constants/)** - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages
-- **[1.11: Builders](1.11-builders/)** - 13 builder classes + 10 static helper classes
-- **[1.12: Factories & Calculators](1.12-factories-calculators/)** - StatCalculator, PokemonFactory, PokemonInstanceBuilder, NatureData
-- **[1.13: Registry System](1.13-registry-system/)** - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
+- **[1.13: Interfaces Base](1.13-interfaces-base/)** - IIdentifiable
+- **[1.14: Enums & Constants](1.14-enums-constants/)** - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages, NatureData
+- ⚠️ **Builders**: Moved to **[Feature 3.9: Builders](../3-content-expansion/3.9-builders/)** - Used primarily for content creation
+- **[1.16: Factories & Calculators](1.16-factories-calculators/)** - StatCalculator, PokemonFactory, PokemonInstanceBuilder
+- **[1.17: Registry System](1.17-registry-system/)** - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
 
 ### Grupo E: Planned Features
-- **[1.14: Variants System](1.14-variants-system/)** - Mega/Dinamax/Terracristalización as separate species (Planned)
-- **[1.15: Pokedex Fields](1.15-pokedex-fields/)** - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
+- **[1.18: Variants System](1.18-variants-system/)** - Mega/Dinamax/Terracristalización as separate species (Planned)
+- **[1.19: Pokedex Fields](1.19-pokedex-fields/)** - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
 
 ## Related Features
 
@@ -73,7 +78,7 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 - **Current Status**: Core data structures complete, infrastructure complete
 - **Key Classes**: See [code location](code_location.md) for implementation details
 - **Tests**: See [testing](testing.md) for test organization
-- **Sub-Feature Architecture**: Detailed technical specs available for complex sub-features (1.1, 1.2, 1.7, 1.11, 1.13, 1.14)
+- **Sub-Feature Architecture**: Detailed technical specs available for complex sub-features (1.1, 1.2, 1.11, 1.15, 1.17, 1.18)
 
 ---
 

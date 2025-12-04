@@ -4,10 +4,46 @@
 
 ---
 
+## 0. 🎯 Feature Discovery & Assignment ⭐ **MUST DO FIRST**
+
+- [ ] **Read `docs/features_master_list.md`** - Review all existing features and sub-features
+- [ ] **Determine if work fits existing feature:**
+  - [ ] If YES → Assign to existing feature (go to step 0.1)
+  - [ ] If NO → Create new feature/sub-feature (go to step 0.2)
+
+### 0.1 Assign to Existing Feature
+
+- [ ] **Read feature's complete documentation:**
+  - [ ] `README.md` - Feature overview and status
+  - [ ] `architecture.md` - Technical specification
+  - [ ] `roadmap.md` - Implementation plan
+  - [ ] `use_cases.md` - All scenarios
+  - [ ] `code_location.md` - Where code lives
+- [ ] **Determine sub-feature:**
+  - [ ] Fits existing sub-feature → Use that sub-feature
+  - [ ] Needs new sub-feature → Create sub-feature folder and `README.md`
+- [ ] **Proceed to Step 1** (Read Technical Documentation)
+
+### 0.2 Create New Feature/Sub-Feature
+
+- [ ] **Determine feature number** - Check `features_master_list.md` for next available
+- [ ] **Create feature folder** - `docs/features/[N]-[feature-name]/`
+- [ ] **Create complete documentation structure:**
+  - [ ] `README.md` - Feature overview, status, sub-features list
+  - [ ] `architecture.md` - Complete technical specification
+  - [ ] `roadmap.md` - Implementation plan with phases
+  - [ ] `use_cases.md` - All scenarios and behaviors
+  - [ ] `testing.md` - Testing strategy
+  - [ ] `code_location.md` - Where code lives and organization
+- [ ] **For sub-features:** Create `[N.M]-[sub-feature-name]/` folder with `README.md`
+- [ ] **Update `docs/features_master_list.md`** - Add new feature/sub-feature entry
+- [ ] **Follow `docs/feature_documentation_standard.md`** - Use as template
+- [ ] **Proceed to Step 1** (Read Technical Documentation)
+
 ## 1. 📚 Read Technical Documentation
 
-- [ ] **Find the relevant spec** in `docs/features/[N]-[feature-name]/` or sub-feature `architecture.md` (always use numbered format)
-- [ ] **Read the ENTIRE spec** - Don't skim, understand fully
+- [ ] **Read assigned feature's documentation** - `docs/features/[N]-[feature-name]/` (always use numbered format)
+- [ ] **Read the ENTIRE spec** (`architecture.md` or sub-feature `README.md`) - Don't skim, understand fully
 - [ ] **Identify ALL components** mentioned in the spec
 - [ ] **Note the expected API** - Method names, parameters, return types
 - [ ] **Understand integration points** - How does this connect to other systems?

@@ -337,6 +337,8 @@ _Quick reference to workflow guides and processes._
 
 | Need | Document |
 |------|----------|
+| Feature Master List | `docs/features_master_list.md` ⭐ **START HERE** |
+| Feature Documentation Standard | `docs/feature_documentation_standard.md` |
 | Combat Roadmap | `docs/features/2-combat-system/roadmap.md` |
 | Content Roadmap | `docs/features/3-content-expansion/roadmap.md` |
 | Unity Integration Roadmap | `docs/features/4-unity-integration/roadmap.md` |
@@ -347,21 +349,82 @@ _Quick reference to workflow guides and processes._
 | Integration Tests | `docs/features/2-combat-system/testing/integration_guide.md` |
 | Pre-Implementation | `docs/ai/checklists/pre_implementation.md` |
 | Feature Complete | `docs/ai/checklists/feature_complete.md` |
+| Feature-Driven Development | `docs/ai/guidelines/feature_driven_development.md` ⭐ **MANDATORY** |
 | AI Workflow | `.cursorrules` |
 
-### AI-Assisted Development Process
+### 5.1 Feature-Driven Development Process ⭐ **MANDATORY**
+
+**⚠️ CRITICAL: ALL development MUST follow this feature-driven approach.**
+
+#### Step 0: Feature Discovery & Assignment (MUST DO FIRST)
+
+**Before writing ANY code or starting ANY work:**
+
+1. **Review Existing Features**
+   - Read `docs/features_master_list.md` - Master reference for all features
+   - Check if the work fits into an existing feature or sub-feature
+   - Review feature descriptions and sub-feature lists
+
+2. **Assign to Existing Feature (if applicable)**
+   - If work fits existing feature:
+     - Read that feature's complete documentation:
+       - `README.md` - Feature overview
+       - `architecture.md` - Technical specification
+       - `roadmap.md` - Implementation plan
+       - `use_cases.md` - All scenarios
+       - `code_location.md` - Where code lives
+     - Check if it fits an existing sub-feature or needs a new one
+     - If new sub-feature needed: Create sub-feature folder and documentation
+
+3. **Create New Feature/Sub-Feature (if needed)**
+   - **Determine Feature Number**: Check `features_master_list.md` for next available number
+   - **Create Feature Folder**: `docs/features/[N]-[feature-name]/`
+   - **Create Complete Documentation Structure** (follow `docs/feature_documentation_standard.md`):
+     - `README.md` - Feature overview, status, sub-features list
+     - `architecture.md` - Complete technical specification
+     - `roadmap.md` - Implementation plan with phases
+     - `use_cases.md` - All scenarios and behaviors
+     - `testing.md` - Testing strategy
+     - `code_location.md` - Where code lives and organization
+   - **For Sub-Features**: Create `[N.M]-[sub-feature-name]/` folder with:
+     - `README.md` - Sub-feature overview (minimum)
+     - `architecture.md` - If complex sub-feature (optional)
+   - **Update Master List**: Add entry to `docs/features_master_list.md`
+   - **Follow Standard**: Use `docs/feature_documentation_standard.md` as template
+
+4. **Once Feature Assigned**: Proceed with standard development workflow
+
+#### Standard Development Workflow (After Feature Assignment)
 
 The project uses a comprehensive AI workflow defined in `.cursorrules`:
 
+0. **Feature Discovery & Assignment** ⭐ **MUST DO FIRST** (see above)
 1. **Read Context & Specs** - Understand current state and requirements
 2. **Verify Spec Completeness** - Ensure all details documented
 3. **TDD: Write Functional Tests** - Tests before implementation
 4. **Implement Feature** - Follow spec and existing patterns
 5. **Write Edge Case Tests** - Boundary conditions and real-world scenarios
 6. **Write Integration Tests** - System interactions (if applicable)
-7. **Validate Use Cases** - Check against combat use cases document
+7. **Validate Use Cases** - Check against use cases document
 8. **Verify Implementation** - Build, test, check checklists
-9. **Update Documentation** - Context, architecture docs, use cases
+9. **Update Documentation** ⭐ **MANDATORY AFTER EVERY FEATURE** (see below)
+
+#### Step 9: Update Documentation (MANDATORY)
+
+**After completing ANY feature work, update documentation:**
+
+- **Feature Documentation** (update ALL relevant files):
+  - `roadmap.md` - Mark completed phases/sub-features as ✅
+  - `architecture.md` - Update if implementation differs from spec
+  - `use_cases.md` - Mark completed use cases
+  - `code_location.md` - Add new files/classes
+  - `testing.md` - Document new tests and test organization
+- **Master Documents**:
+  - `docs/features_master_list.md` - Update feature status if changed
+  - `.ai/context.md` - Update current project state
+- **CRITICAL**: Documentation must always reflect actual implementation state
+
+**Rule**: If documentation is not updated, the feature is not complete.
 
 ### Problem-Solving Process
 
@@ -385,7 +448,7 @@ _Quick reference to the main combat systems. See individual specs for details._
 
 - **Pokemon Data** (`pokemon_data_detailed.md`): Blueprints (Species) vs Instances, Factory pattern.
 - **Move System** (`move_system_detailed.md`): Composable effects (`IMoveEffect`), no content-specific classes.
-- **Data Loading**: See `docs/features/1-pokemon-data/architecture.md` Section 5 for Registry pattern (`IDataRegistry`), auto-population.
+- **Data Loading**: See `docs/features/1-game-data/architecture.md` Section 5 for Registry pattern (`IDataRegistry`), auto-population.
 - **Catalogs** (`catalogs_system.md`): Modular static data using partial classes, organized by generation/type.
 
 ### Combat Flow

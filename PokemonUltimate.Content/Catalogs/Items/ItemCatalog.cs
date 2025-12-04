@@ -9,7 +9,7 @@ namespace PokemonUltimate.Content.Catalogs.Items
     /// <remarks>
     /// **Feature**: 3: Content Expansion
     /// **Sub-Feature**: 3.3: Item Expansion
-    /// **Documentation**: See `docs/features/3-content-expansion/3.3-item-expansion/architecture.md`
+    /// **Documentation**: See `docs/features/3-content-expansion/3.3-item-expansion/README.md`
     /// </remarks>
     public static partial class ItemCatalog
     {

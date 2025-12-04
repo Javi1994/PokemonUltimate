@@ -13,6 +13,8 @@ This document covers all use cases for expanding game content, including:
 - Adding new moves
 - Adding new items
 - Adding new abilities
+- Adding status effects (complete)
+- Adding field conditions: Weather, Terrain, Hazards, Side Conditions, Field Effects (complete)
 - Validating content quality and consistency
 
 ## Core Use Cases
