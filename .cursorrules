@@ -9,8 +9,12 @@
 2. `docs/ai/guidelines/project_guidelines.md` - Complete coding rules
 
 **Read on-demand:**
-- Feature docs → `docs/features_master_list.md` → `docs/features/[N]-[feature-name]/`
-- Feature-driven development → `docs/ai/guidelines/feature_driven_development.md` ⭐ **MANDATORY**
+- Feature docs → `docs/features_master_list_index.md` ⭐ **OPTIMIZED FOR AI** (or `docs/features_master_list.md` as fallback) → `docs/features/[N]-[feature-name]/`
+- Feature-driven development → `ai_workflow/docs/FDD_GUIDE.md` ⭐ **MANDATORY** (or `docs/ai/guidelines/feature_driven_development.md`)
+- TDD workflow → `ai_workflow/docs/TDD_GUIDE.md` ⭐ **MANDATORY**
+- Game Definition → `ai_workflow/docs/GAME_DEFINITION_GUIDE.md` (for new projects)
+- Smoke Tests → `ai_workflow/docs/SMOKE_TESTS_GUIDE.md`
+- Decision trees → `ai_workflow/decision-trees/` ⭐ **EXECUTABLE WORKFLOWS**
 - Code quality → `docs/ai/anti-patterns.md`
 - Examples → `docs/ai/examples/good_code.md`
 - Feature naming → `docs/ai/guidelines/feature_naming_in_code.md`
@@ -24,9 +28,11 @@
 **MANDATORY WORKFLOW:**
 
 0. **Feature Discovery & Assignment** ⭐ **MUST DO FIRST**
-   - **MANDATORY: Review existing features** - Read `docs/features_master_list.md` to see all features and sub-features
+   - **Follow decision tree**: `ai_workflow/decision-trees/feature-discovery.yaml` ⭐ **EXECUTABLE WORKFLOW**
+   - **MANDATORY: Review existing features** - Read `docs/features_master_list_index.md` ⭐ **OPTIMIZED FOR AI** (or `docs/features_master_list.md` as fallback)
+   - **Semantic search**: Use `codebase_search` to find features related to user request
    - **Check if work fits existing feature:**
-     - If YES → Read that feature's documentation (`README.md`, `architecture.md`, `roadmap.md`)
+     - If YES → Read that feature's documentation (`README.md`, `architecture.md`, `roadmap.md`, `code_location.md`, `testing.md`, `use_cases.md`)
      - If NO → Create new feature or sub-feature (see below)
    - **For new features/sub-features:**
      - Determine feature number (check `features_master_list.md` for next available)
@@ -39,7 +45,7 @@
        - `testing.md` - Testing strategy
        - `code_location.md` - Where code lives
      - For sub-features: Create `[N.M]-[sub-feature-name]/` folder with `README.md` (and `architecture.md` if complex)
-     - Update `docs/features_master_list.md` with new feature/sub-feature entry
+     - Update `docs/features_master_list.md` and `docs/features_master_list_index.md` with new feature/sub-feature entry
      - Follow `docs/feature_documentation_standard.md` for structure
    - **Once feature assigned:** Proceed with standard workflow below
 
@@ -53,32 +59,58 @@
    - List what to implement vs defer
    - Complete spec if incomplete
 
-3. **TDD: Write Tests FIRST**
+3. **TDD: Write Tests FIRST** ⭐ **FOLLOW DECISION TREE**
+   - **Follow decision tree**: `ai_workflow/decision-trees/tdd-workflow.yaml` ⭐ **EXECUTABLE WORKFLOW**
+   - **Determine test type**: Functional / Edge Cases / Integration
+   - **Use templates**: `ai_workflow/templates/tests/functional-template.md` (or edgecases/integration)
    - Follow `docs/ai/testing_structure_definition.md`
    - Write functional tests (red phase)
+   - **Verify test FAILS** (red phase) - If test passes → ERROR: Review test or implementation
 
-4. **Implement Feature**
+4. **Implement Feature** (Green Phase)
    - **MANDATORY: Read existing code first** - Match style and patterns
    - **MANDATORY: Add feature references** - ALL code must reference its feature (see `docs/ai/guidelines/feature_naming_in_code.md`)
    - Follow spec and existing patterns
-   - Make tests pass (green phase)
+   - Write minimal code to make tests pass (green phase)
+   - **Verify test PASSES** (green phase) - If test fails → Fix implementation, retry
 
 5. **Write Edge Case Tests**
+   - Use template: `ai_workflow/templates/tests/edgecases-template.md`
+   - Read feature's `use_cases.md` for edge cases
    - Test boundaries and invalid inputs
-   - Implement missing functionality if discovered
+   - Implement missing functionality if discovered (Test-Driven Discovery)
 
 6. **Write Integration Tests** (if feature interacts with multiple systems)
+   - Use template: `ai_workflow/templates/tests/integration-template.md`
    - Test system interactions
-   - Place in `Systems/[Module]/Integration/`
+   - Place in `Tests/[Feature]/Integration/[Category]/`
 
-7. **Validate Against Use Cases** (combat features only)
-   - Check `docs/combat_use_cases.md`
-   - Mark items complete
+7. **Refactor** (if needed)
+   - Improve code without changing behavior
+   - All tests must still pass
+   - Follow `docs/ai/guidelines/project_guidelines.md`
+   - Avoid `docs/ai/anti-patterns.md`
 
-8. **Verify Implementation**
-   - `dotnet build` - 0 warnings
-   - `dotnet test` - All pass
+8. **Validate Implementation** ⭐ **OBLIGATORY - EXECUTE ALL VALIDATIONS**
+   - **MANDATORY: Run validation scripts** (must exit with code 0):
+     - `ai_workflow/scripts/validate-test-structure.ps1 -TestDir PokemonUltimate.Tests` → Must exit code 0
+     - `ai_workflow/scripts/validate-fdd-compliance.ps1 -CodeDir . -FeaturesDir docs/features -MasterList docs/features_master_list.md` → Must exit code 0
+     - If any script fails → Fix issues, retry. DO NOT continue until all pass.
+   - **Build validation**: `dotnet build` - 0 warnings, 0 errors
+   - **Test validation**: `dotnet test` - All tests pass
    - Check `docs/ai/checklists/feature_complete.md`
+   - **CRITICAL**: Only proceed to next step when ALL validations pass
+
+9. **Check for Smoke Tests Creation** ⭐ **AUTOMATIC**
+   - **Criteria**: 5+ main features completed OR phase completed
+   - **If criteria met**:
+     - Check if smoke tests project exists (`PokemonUltimate.SmokeTests`)
+     - If not → Create project and add to solution
+     - Use template: `ai_workflow/templates/tests/smoke-template.md`
+     - Create smoke tests for completed features
+     - Verify happy path works
+     - Run smoke tests
+   - **See**: `ai_workflow/docs/SMOKE_TESTS_GUIDE.md` for details
 
 9. **Update Documentation** ⭐ **MANDATORY AFTER EVERY FEATURE**
    - Update `.ai/context.md` with current state
@@ -90,11 +122,24 @@
    - Update `docs/features_master_list.md` if feature status changed
    - **CRITICAL**: Documentation must reflect actual implementation state
 
+### When User Says "Define game" or "What is this game?"
+**Follow Game Definition workflow** ⭐ **CRITICAL FOR NEW PROJECTS**
+- **Follow decision tree**: `ai_workflow/decision-trees/game-definition.yaml` ⭐ **EXECUTABLE WORKFLOW**
+- **Use template**: `ai_workflow/templates/game-definition-template.yaml`
+- **Process**:
+  1. Check if `docs/GAME_DEFINITION.yaml` exists
+  2. If not → Define game basics, core concepts, generate features
+  3. If exists → Check user intent (redefine/improve vs validate)
+  4. Generate `docs/features_master_list.md` and `docs/features_master_list_index.md`
+  5. If 5+ features or 20+ sub-features → Create `docs/CODE_ORGANIZATION.md`
+- **See**: `ai_workflow/docs/GAME_DEFINITION_GUIDE.md` for complete guide
+
 ### When User Says "Review X" or "Check X"
 1. Read `docs/ai/anti-patterns.md`
 2. Verify against `docs/ai/guidelines/project_guidelines.md`
 3. Check `docs/ai/checklists/feature_complete.md`
-4. List issues and fix if requested
+4. Run validation scripts if needed
+5. List issues and fix if requested
 
 ### When User Says "Refactor X" or "Improve X"
 1. **Read current implementation** - All related code files
@@ -167,7 +212,8 @@ public void Method(int value) {
 | Need | Read |
 |------|------|
 | Project state | `.ai/context.md` |
-| Feature numbers/names | `docs/features_master_list.md` ⭐ **MASTER REFERENCE** |
+| Feature numbers/names | `docs/features_master_list_index.md` ⭐ **OPTIMIZED FOR AI** (or `docs/features_master_list.md`) |
+| Game definition | `docs/GAME_DEFINITION.yaml` |
 | Feature documentation standard | `docs/feature_documentation_standard.md` |
 | Feature naming in code | `docs/ai/guidelines/feature_naming_in_code.md` ⭐ **MANDATORY** |
 | Coding rules | `docs/ai/guidelines/project_guidelines.md` |
@@ -177,29 +223,56 @@ public void Method(int value) {
 | Pre-implementation | `docs/ai/checklists/pre_implementation.md` |
 | Feature checklist | `docs/ai/checklists/feature_complete.md` |
 | Test structure | `docs/ai/testing_structure_definition.md` |
+| **Workflow Guides** | |
+| FDD Guide | `ai_workflow/docs/FDD_GUIDE.md` ⭐ **MANDATORY** |
+| TDD Guide | `ai_workflow/docs/TDD_GUIDE.md` ⭐ **MANDATORY** |
+| Game Definition Guide | `ai_workflow/docs/GAME_DEFINITION_GUIDE.md` |
+| Smoke Tests Guide | `ai_workflow/docs/SMOKE_TESTS_GUIDE.md` |
+| **Decision Trees** | |
+| Feature Discovery | `ai_workflow/decision-trees/feature-discovery.yaml` ⭐ **EXECUTABLE** |
+| TDD Workflow | `ai_workflow/decision-trees/tdd-workflow.yaml` ⭐ **EXECUTABLE** |
+| Game Definition | `ai_workflow/decision-trees/game-definition.yaml` ⭐ **EXECUTABLE** |
+| **Templates** | |
+| Functional Tests | `ai_workflow/templates/tests/functional-template.md` |
+| Edge Cases | `ai_workflow/templates/tests/edgecases-template.md` |
+| Integration | `ai_workflow/templates/tests/integration-template.md` |
+| Smoke Tests | `ai_workflow/templates/tests/smoke-template.md` |
+| **Validation Scripts** | |
+| Test Structure | `ai_workflow/scripts/validate-test-structure.ps1` ⭐ **MANDATORY** |
+| FDD Compliance | `ai_workflow/scripts/validate-fdd-compliance.ps1` ⭐ **MANDATORY** |
 
 **⚠️ Feature Documentation**: Always use numbered paths: `docs/features/[N]-[feature-name]/`
 
 ## 🔄 After Completing Work
 
 Always:
-1. Run `dotnet build` - Verify no warnings
-2. Run `dotnet test` - Verify all pass
-3. Update `.ai/context.md` if major changes
-4. Mention test count in response
-5. Verify against `docs/ai/checklists/feature_complete.md`
+1. **Run validation scripts** (MANDATORY):
+   - `ai_workflow/scripts/validate-test-structure.ps1 -TestDir PokemonUltimate.Tests` → Must exit code 0
+   - `ai_workflow/scripts/validate-fdd-compliance.ps1 -CodeDir . -FeaturesDir docs/features -MasterList docs/features_master_list.md` → Must exit code 0
+2. Run `dotnet build` - Verify 0 warnings, 0 errors
+3. Run `dotnet test` - Verify all pass
+4. Update `.ai/context.md` if major changes
+5. Update `docs/features_master_list_index.md` if feature status changed
+6. Mention test count in response
+7. Verify against `docs/ai/checklists/feature_complete.md`
 
 ## ⚡ Quick Verification Checklist
 
 Before marking feature complete:
+- [ ] **Validation scripts passed** (exit code 0):
+  - [ ] `validate-test-structure.ps1` passed
+  - [ ] `validate-fdd-compliance.ps1` passed
 - [ ] All tests pass (`dotnet test`)
 - [ ] No warnings (`dotnet build`)
 - [ ] `.ai/context.md` updated
+- [ ] `docs/features_master_list_index.md` updated (if feature status changed)
 - [ ] Use cases validated (if combat-related)
 - [ ] Integration tests written (if applicable)
-- [ ] Documentation updated
+- [ ] Smoke tests created/updated (if 5+ features or phase complete)
+- [ ] Documentation updated (roadmap, architecture, use_cases, code_location, testing)
 - [ ] **Feature references added** - All code references its feature
 - [ ] **Existing code reviewed** - All related code was read before implementation
+- [ ] **Decision trees followed** - Feature Discovery and TDD workflows executed
 
 ## 🎮 Project-Specific Knowledge
 
