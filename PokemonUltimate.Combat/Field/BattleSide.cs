@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Combat
@@ -19,6 +21,7 @@ namespace PokemonUltimate.Combat
     {
         private readonly List<BattleSlot> _slots;
         private IReadOnlyList<PokemonInstance> _party;
+        private readonly Dictionary<HazardType, int> _hazards;
 
         /// <summary>
         /// The slots on this side of the field.
@@ -48,6 +51,7 @@ namespace PokemonUltimate.Combat
 
             IsPlayer = isPlayer;
             _slots = new List<BattleSlot>(slotCount);
+            _hazards = new Dictionary<HazardType, int>();
 
             for (int i = 0; i < slotCount; i++)
             {
@@ -132,6 +136,104 @@ namespace PokemonUltimate.Combat
 
             return _party.All(p => p.IsFainted);
         }
+
+        #region Entry Hazards
+
+        /// <summary>
+        /// Adds an entry hazard to this side.
+        /// For hazards with layers (Spikes, Toxic Spikes), increments the layer count.
+        /// For single-layer hazards (Stealth Rock, Sticky Web), sets to 1 if not present.
+        /// </summary>
+        /// <param name="hazardData">The hazard data to add. Cannot be null.</param>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.14: Hazards System
+        /// **Documentation**: See `docs/features/2-combat-system/2.14-hazards-system/README.md`
+        /// </remarks>
+        public void AddHazard(HazardData hazardData)
+        {
+            if (hazardData == null)
+                throw new ArgumentNullException(nameof(hazardData));
+
+            var hazardType = hazardData.Type;
+
+            if (_hazards.ContainsKey(hazardType))
+            {
+                // Increment layers if hazard supports multiple layers
+                if (hazardData.HasLayers)
+                {
+                    int currentLayers = _hazards[hazardType];
+                    int newLayers = Math.Min(currentLayers + 1, hazardData.MaxLayers);
+                    _hazards[hazardType] = newLayers;
+                }
+                // Single-layer hazards stay at 1
+            }
+            else
+            {
+                // Add new hazard with 1 layer
+                _hazards[hazardType] = 1;
+            }
+        }
+
+        /// <summary>
+        /// Removes a specific entry hazard from this side.
+        /// </summary>
+        /// <param name="hazardType">The type of hazard to remove.</param>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.14: Hazards System
+        /// **Documentation**: See `docs/features/2-combat-system/2.14-hazards-system/README.md`
+        /// </remarks>
+        public void RemoveHazard(HazardType hazardType)
+        {
+            _hazards.Remove(hazardType);
+        }
+
+        /// <summary>
+        /// Removes all entry hazards from this side.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.14: Hazards System
+        /// **Documentation**: See `docs/features/2-combat-system/2.14-hazards-system/README.md`
+        /// </remarks>
+        public void RemoveAllHazards()
+        {
+            _hazards.Clear();
+        }
+
+        /// <summary>
+        /// Checks if this side has a specific entry hazard.
+        /// </summary>
+        /// <param name="hazardType">The type of hazard to check.</param>
+        /// <returns>True if the hazard is present.</returns>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.14: Hazards System
+        /// **Documentation**: See `docs/features/2-combat-system/2.14-hazards-system/README.md`
+        /// </remarks>
+        public bool HasHazard(HazardType hazardType)
+        {
+            return _hazards.ContainsKey(hazardType) && _hazards[hazardType] > 0;
+        }
+
+        /// <summary>
+        /// Gets the number of layers for a specific entry hazard.
+        /// </summary>
+        /// <param name="hazardType">The type of hazard to check.</param>
+        /// <returns>The number of layers (0 if not present).</returns>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.14: Hazards System
+        /// **Documentation**: See `docs/features/2-combat-system/2.14-hazards-system/README.md`
+        /// </remarks>
+        public int GetHazardLayers(HazardType hazardType)
+        {
+            return _hazards.TryGetValue(hazardType, out int layers) ? layers : 0;
+        }
+
+
+        #endregion
     }
 }
 

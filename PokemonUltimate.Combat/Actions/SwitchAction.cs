@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Combat.Actions
@@ -31,6 +34,12 @@ namespace PokemonUltimate.Combat.Actions
         public PokemonInstance NewPokemon { get; }
 
         /// <summary>
+        /// Optional function to get HazardData by type for entry hazard processing.
+        /// If null, entry hazards will not be processed.
+        /// </summary>
+        public Func<HazardType, HazardData> GetHazardData { get; }
+
+        /// <summary>
         /// Switch actions have highest priority (+6).
         /// </summary>
         public override int Priority => 6;
@@ -45,11 +54,13 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         /// <param name="slot">The slot to switch. Cannot be null.</param>
         /// <param name="newPokemon">The Pokemon to switch in. Cannot be null.</param>
+        /// <param name="getHazardData">Optional function to get HazardData for entry hazard processing. If null, hazards won't be processed.</param>
         /// <exception cref="ArgumentNullException">If slot or newPokemon is null.</exception>
-        public SwitchAction(BattleSlot slot, PokemonInstance newPokemon) : base(slot)
+        public SwitchAction(BattleSlot slot, PokemonInstance newPokemon, Func<HazardType, HazardData> getHazardData = null) : base(slot)
         {
             Slot = slot ?? throw new ArgumentNullException(nameof(slot), ErrorMessages.PokemonCannotBeNull);
             NewPokemon = newPokemon ?? throw new ArgumentNullException(nameof(newPokemon), ErrorMessages.PokemonCannotBeNull);
+            GetHazardData = getHazardData;
         }
 
         /// <summary>
@@ -85,10 +96,20 @@ namespace PokemonUltimate.Combat.Actions
 
             // Battle state is reset automatically by SetPokemon -> ResetBattleState
 
+            var allActions = new List<BattleAction>();
+
+            // Process entry hazards if hazard data provider is available
+            if (GetHazardData != null)
+            {
+                var hazardActions = EntryHazardProcessor.ProcessHazards(Slot, NewPokemon, field, GetHazardData);
+                allActions.AddRange(hazardActions);
+            }
+
             // Trigger OnSwitchIn for abilities and items
             var switchInActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, field);
+            allActions.AddRange(switchInActions);
             
-            return switchInActions;
+            return allActions;
         }
 
         /// <summary>

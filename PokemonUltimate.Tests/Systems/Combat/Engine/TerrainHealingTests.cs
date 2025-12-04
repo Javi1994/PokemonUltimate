@@ -76,7 +76,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         public void ProcessTerrainHealing_GrassyTerrain_FlyingTypeNotHealed()
         {
             // Create a Flying-type Pokemon (not grounded)
-            var flyingPokemon = PokemonFactory.Create(PokemonCatalog.Pidgey, 50);
+            var flyingPokemon = PokemonFactory.Create(PokemonCatalog.Charizard, 50);
             var flyingParty = new List<PokemonInstance> { flyingPokemon };
             var field = new BattleField();
             field.Initialize(_rules, flyingParty, _enemyParty);
@@ -149,7 +149,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             var pokemon = slot.Pokemon;
 
             // Ensure Pokemon is at full HP
-            pokemon.RestoreHP(pokemon.MaxHP);
+            pokemon.Heal(pokemon.MaxHP);
 
             var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
 

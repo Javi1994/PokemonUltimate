@@ -37,6 +37,7 @@ The combat system is organized into several key areas:
 - `SetWeatherAction` - Weather condition changes (Sub-Feature 2.12)
 - `SetTerrainAction` - Terrain condition changes (Sub-Feature 2.13)
 - `HealAction` - HP restoration
+- `SwitchAction` - Pokemon switching (includes entry hazard processing, Sub-Feature 2.14)
 - `StatChangeAction` - Stat stage modifications
 - `SwitchAction` - Pokemon switching
 - `FaintAction` - Pokemon fainting
@@ -71,7 +72,7 @@ The combat system is organized into several key areas:
 **Purpose**: Battle field management
 **Key Classes**:
 - `BattleField` - Main battlefield container (includes weather tracking - Sub-Feature 2.12, terrain tracking - Sub-Feature 2.13)
-- `BattleSide` - Player or enemy side
+- `BattleSide` - Player or enemy side (includes entry hazard tracking - Sub-Feature 2.14)
 - `BattleSlot` - Individual Pokemon slot
 - `BattleRules` - Battle format rules
 
@@ -89,6 +90,7 @@ The combat system is organized into several key areas:
 **Key Classes**:
 - `CombatEngine` - Main battle controller (includes weather duration decrement - Sub-Feature 2.12, terrain duration decrement - Sub-Feature 2.13)
 - `EndOfTurnProcessor` - End-of-turn effects processor (includes weather damage - Sub-Feature 2.12, terrain healing - Sub-Feature 2.13)
+- `EntryHazardProcessor` - Entry hazard processing on switch-in (Sub-Feature 2.14)
 
 ### `PokemonUltimate.Combat.Helpers`
 **Purpose**: Utility classes

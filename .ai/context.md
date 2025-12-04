@@ -10,8 +10,8 @@
 | Aspect                  | Status                                                                                                                            |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Current Phase**       | Phase 3: Combat System ✅                                                                                                         |
-| **Sub-Phase**           | 2.13 Terrain System ✅ Complete                                                                                                    |
-| **Tests**               | 2,500+ passing (includes Weather System 48 tests, Terrain System 84+ tests)                                                      |
+| **Sub-Phase**           | 2.14 Hazards System ✅ Core Complete                                                                                              |
+| **Tests**               | 2,488+ passing (includes Weather System 48 tests, Terrain System 84+ tests, Hazards System 25+ tests)                          |
 | **Integration Tests**   | 83+ tests (system interactions)                                                                                                   |
 | **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed. |
 | **Warnings**            | 0                                                                                                                                 |
@@ -130,6 +130,7 @@ See `docs/features/2-combat-system/roadmap.md` for full details.
 | 2.11 Recoil & Drain     | ✅ Complete | RecoilEffect (25%, 33%, 50%), DrainEffect (50%, 75%)                                                          |
 | 2.12 Weather System     | ✅ Complete | Weather tracking, damage modifiers, end-of-turn damage, perfect accuracy moves                                |
 | 2.13 Terrain System     | ✅ Complete | Terrain tracking, damage modifiers, end-of-turn healing, terrain actions                                    |
+| 2.14 Hazards System     | ✅ Complete | Entry hazard tracking, processing on switch-in, Spikes/Stealth Rock/Toxic Spikes/Sticky Web                 |
 
 Reference docs:
 

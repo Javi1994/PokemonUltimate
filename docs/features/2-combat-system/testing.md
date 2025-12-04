@@ -13,7 +13,7 @@ The combat system uses a comprehensive three-phase testing approach:
 - **Edge Case Tests** - Boundary conditions, invalid inputs, special cases
 - **Integration Tests** - System interactions and cascading effects
 
-**Coverage**: 2,460+ passing tests covering all combat phases (2.1-2.11)
+**Coverage**: 2,488+ passing tests covering all combat phases (2.1-2.14)
 
 ## Test Structure
 
@@ -159,8 +159,20 @@ PokemonUltimate.Tests/
 
 **Total**: 84+ terrain-related tests passing (includes integration with other systems)
 
-### ⏳ Planned Coverage (Phases 2.14-2.19)
-- [ ] Hazard effects tests
+### ✅ Hazards System Tests (Sub-Feature 2.14)
+**Location**: `Tests/Systems/Combat/`
+- `Field/EntryHazardsTests.cs` - Entry hazard tracking and layers (12 tests)
+- `Engine/EntryHazardProcessorTests.cs` - Entry hazard processing on switch-in (13 tests)
+  - Spikes damage (1-3 layers)
+  - Stealth Rock damage (type-based effectiveness)
+  - Toxic Spikes status application (1-2 layers, Poison type absorption)
+  - Sticky Web speed reduction (Contrary support)
+  - Multiple hazards processing
+  - Immunity checks (Flying, Levitate)
+
+**Total**: 25+ hazards-related tests passing
+
+### ⏳ Planned Coverage (Phases 2.15-2.19)
 - [ ] Advanced move mechanics tests
 - [ ] Multi-target move tests
 - [ ] Field condition interactions tests

@@ -60,6 +60,16 @@ namespace PokemonUltimate.Core.Constants
 
         #endregion
 
+        #region Entry Hazards
+
+        public const string HazardSpikesDamage = "{0} is hurt by Spikes!";
+        public const string HazardStealthRockDamage = "{0} is hurt by Stealth Rock!";
+        public const string HazardToxicSpikesAbsorbed = "{0} absorbed the Toxic Spikes!";
+        public const string HazardToxicSpikesStatus = "{0} was poisoned by Toxic Spikes!";
+        public const string HazardStickyWebSpeed = "{0} was caught in a Sticky Web!";
+
+        #endregion
+
         #region Abilities & Items
 
         public const string AbilityActivated = "{0}'s {1}!";
