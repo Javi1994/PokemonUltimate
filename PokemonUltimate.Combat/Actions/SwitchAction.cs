@@ -80,6 +80,9 @@ namespace PokemonUltimate.Combat.Actions
             if (side == null)
                 return Enumerable.Empty<BattleAction>();
 
+            // Mark Pokemon as switching out (for Pursuit detection)
+            Slot.AddVolatileStatus(VolatileStatus.SwitchingOut);
+
             // Get the current Pokemon
             var oldPokemon = Slot.Pokemon;
 

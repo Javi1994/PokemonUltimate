@@ -48,6 +48,15 @@ namespace PokemonUltimate.Core.Enums
         SemiInvulnerable = 512,
 
         /// <summary>Charging states (Solar Beam, Skull Bash).</summary>
-        Charging = 1024
+        Charging = 1024,
+
+        /// <summary>Protected from most attacks (Protect, Detect).</summary>
+        Protected = 2048,
+
+        /// <summary>Pokemon is switching out this turn (for Pursuit detection).</summary>
+        SwitchingOut = 4096,
+
+        /// <summary>Pokemon is tightening focus for Focus Punch.</summary>
+        Focusing = 8192
     }
 }

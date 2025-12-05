@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -62,6 +63,23 @@ namespace PokemonUltimate.Combat.Actions
 
             // Apply damage
             int actualDamage = Target.Pokemon.TakeDamage(damage);
+
+            // Record damage taken for Counter/Mirror Coat
+            // Also mark if target was hit while focusing (for Focus Punch)
+            if (actualDamage > 0 && Context.Move != null)
+            {
+                if (Context.Move.Category == MoveCategory.Physical)
+                {
+                    Target.RecordPhysicalDamage(actualDamage);
+                }
+                else if (Context.Move.Category == MoveCategory.Special)
+                {
+                    Target.RecordSpecialDamage(actualDamage);
+                }
+                
+                // Mark if target was hit while focusing
+                Target.MarkHitWhileFocusing();
+            }
 
             // Check if Pokemon fainted
             if (Target.Pokemon.IsFainted)

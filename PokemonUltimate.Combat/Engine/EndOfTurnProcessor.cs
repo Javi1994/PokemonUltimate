@@ -86,6 +86,26 @@ namespace PokemonUltimate.Combat.Engine
             var terrainHealingActions = ProcessTerrainHealing(field);
             actions.AddRange(terrainHealingActions);
 
+            // Remove Protect status at end of turn (but keep consecutive uses counter)
+            // Reset damage tracking for Counter/Mirror Coat
+            // Prepare semi-invulnerable moves for attack turn (if charging)
+            foreach (var slot in field.GetAllActiveSlots())
+            {
+                if (slot.HasVolatileStatus(VolatileStatus.Protected))
+                {
+                    slot.RemoveVolatileStatus(VolatileStatus.Protected);
+                }
+                
+                // If semi-invulnerable and charging, mark as ready for attack turn
+                if (slot.HasVolatileStatus(VolatileStatus.SemiInvulnerable) && slot.IsSemiInvulnerableCharging)
+                {
+                    slot.SetSemiInvulnerableReady();
+                }
+                
+                // Reset damage tracking for next turn (but keep stat stages and other volatile status)
+                slot.ResetDamageTracking();
+            }
+
             return actions;
         }
 

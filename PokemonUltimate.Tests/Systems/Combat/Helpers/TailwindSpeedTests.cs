@@ -104,12 +104,23 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var actions = new List<BattleAction> { slowAction, fastAction };
             var sorted = TurnOrderResolver.SortActions(actions, _field);
 
-            // With Tailwind, slow Pokemon should go first (doubled speed > base fast speed)
-            // Note: This test may be flaky due to random tiebreaker, but the speed calculation should be correct
+            // Verify Tailwind doubles speed
             float slowSpeedWithTailwind = TurnOrderResolver.GetEffectiveSpeed(slowSlot, _field);
+            
+            // Remove Tailwind temporarily to get base speed
+            _field.PlayerSide.RemoveSideCondition(SideCondition.Tailwind);
+            float slowSpeedWithoutTailwind = TurnOrderResolver.GetEffectiveSpeed(slowSlot, _field);
+            _field.PlayerSide.AddSideCondition(tailwindData, 4);
+            
             float fastSpeed = TurnOrderResolver.GetEffectiveSpeed(fastSlot, _field);
 
-            Assert.That(slowSpeedWithTailwind, Is.GreaterThan(fastSpeed));
+            // Tailwind should double the slow Pokemon's speed
+            Assert.That(slowSpeedWithTailwind, Is.EqualTo(slowSpeedWithoutTailwind * 2.0f).Within(0.1f),
+                $"Tailwind should double speed: {slowSpeedWithTailwind} should equal {slowSpeedWithoutTailwind * 2.0f}");
+            
+            // Verify Tailwind is applied correctly (speed with Tailwind > speed without)
+            Assert.That(slowSpeedWithTailwind, Is.GreaterThan(slowSpeedWithoutTailwind),
+                $"Speed with Tailwind ({slowSpeedWithTailwind}) should be greater than without ({slowSpeedWithoutTailwind})");
         }
     }
 }

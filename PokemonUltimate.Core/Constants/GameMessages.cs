@@ -37,6 +37,12 @@ namespace PokemonUltimate.Core.Constants
         public const string MoveFrozen = "{0} is frozen solid!";
         public const string MoveParalyzed = "{0} is paralyzed! It can't move!";
         public const string MoveMissed = "The attack missed!";
+        public const string MoveProtected = "{0} protected itself!";
+        public const string MoveProtectFailed = "{0} avoided the attack!";
+        public const string MoveCountered = "{0} countered the attack!";
+        public const string MoveFocusing = "{0} is tightening its focus!";
+        public const string MoveFocusLost = "{0} lost its focus!";
+        public const string MoveSemiInvulnerable = "{0} {1}!";
 
         #endregion
 

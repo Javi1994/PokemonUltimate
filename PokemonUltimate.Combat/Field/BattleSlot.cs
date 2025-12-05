@@ -23,6 +23,13 @@ namespace PokemonUltimate.Combat
         private readonly Dictionary<Stat, int> _statStages;
         private PokemonInstance _pokemon;
         private VolatileStatus _volatileStatus;
+        private int _protectConsecutiveUses;
+        private int _physicalDamageTakenThisTurn;
+        private int _specialDamageTakenThisTurn;
+        private bool _wasHitWhileFocusing;
+        private string _semiInvulnerableMoveName;
+        private bool _isSemiInvulnerableCharging; // True if charging (turn 1), false if attacking (turn 2)
+        private string _chargingMoveName;
 
         /// <summary>
         /// The Pokemon currently in this slot. Null if empty.
@@ -182,6 +189,136 @@ namespace PokemonUltimate.Combat
         }
 
         /// <summary>
+        /// Gets the number of consecutive Protect uses (for success rate calculation).
+        /// </summary>
+        public int ProtectConsecutiveUses => _protectConsecutiveUses;
+
+        /// <summary>
+        /// Increments the consecutive Protect uses counter.
+        /// </summary>
+        public void IncrementProtectUses()
+        {
+            _protectConsecutiveUses++;
+        }
+
+        /// <summary>
+        /// Resets the consecutive Protect uses counter.
+        /// </summary>
+        public void ResetProtectUses()
+        {
+            _protectConsecutiveUses = 0;
+        }
+
+        /// <summary>
+        /// Records physical damage taken this turn (for Counter).
+        /// </summary>
+        public void RecordPhysicalDamage(int damage)
+        {
+            _physicalDamageTakenThisTurn += damage;
+        }
+
+        /// <summary>
+        /// Records special damage taken this turn (for Mirror Coat).
+        /// </summary>
+        public void RecordSpecialDamage(int damage)
+        {
+            _specialDamageTakenThisTurn += damage;
+        }
+
+        /// <summary>
+        /// Gets the physical damage taken this turn.
+        /// </summary>
+        public int PhysicalDamageTakenThisTurn => _physicalDamageTakenThisTurn;
+
+        /// <summary>
+        /// Gets the special damage taken this turn.
+        /// </summary>
+        public int SpecialDamageTakenThisTurn => _specialDamageTakenThisTurn;
+
+        /// <summary>
+        /// Gets whether the Pokemon was hit while focusing (for Focus Punch).
+        /// </summary>
+        public bool WasHitWhileFocusing => _wasHitWhileFocusing;
+
+        /// <summary>
+        /// Marks that the Pokemon was hit while focusing.
+        /// </summary>
+        public void MarkHitWhileFocusing()
+        {
+            if (HasVolatileStatus(VolatileStatus.Focusing))
+            {
+                _wasHitWhileFocusing = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the semi-invulnerable move being used.
+        /// </summary>
+        public string SemiInvulnerableMoveName => _semiInvulnerableMoveName;
+
+        /// <summary>
+        /// Gets whether the Pokemon is in the charging phase of a semi-invulnerable move (turn 1).
+        /// </summary>
+        public bool IsSemiInvulnerableCharging => _isSemiInvulnerableCharging;
+
+        /// <summary>
+        /// Sets the semi-invulnerable move name and charging state.
+        /// </summary>
+        public void SetSemiInvulnerableMove(string moveName, bool isCharging = true)
+        {
+            _semiInvulnerableMoveName = moveName;
+            _isSemiInvulnerableCharging = isCharging;
+        }
+
+        /// <summary>
+        /// Clears the semi-invulnerable move name and state.
+        /// </summary>
+        public void ClearSemiInvulnerableMove()
+        {
+            _semiInvulnerableMoveName = null;
+            _isSemiInvulnerableCharging = false;
+        }
+
+        /// <summary>
+        /// Marks that the semi-invulnerable move is ready to attack (turn 2).
+        /// </summary>
+        public void SetSemiInvulnerableReady()
+        {
+            _isSemiInvulnerableCharging = false;
+        }
+
+        /// <summary>
+        /// Gets the name of the charging move being used.
+        /// </summary>
+        public string ChargingMoveName => _chargingMoveName;
+
+        /// <summary>
+        /// Sets the charging move name.
+        /// </summary>
+        public void SetChargingMove(string moveName)
+        {
+            _chargingMoveName = moveName;
+        }
+
+        /// <summary>
+        /// Clears the charging move name.
+        /// </summary>
+        public void ClearChargingMove()
+        {
+            _chargingMoveName = null;
+        }
+
+        /// <summary>
+        /// Resets damage tracking for Counter/Mirror Coat at end of turn.
+        /// </summary>
+        public void ResetDamageTracking()
+        {
+            _physicalDamageTakenThisTurn = 0;
+            _specialDamageTakenThisTurn = 0;
+            _wasHitWhileFocusing = false;
+        }
+
+        /// <summary>
         /// Resets all battle-specific state (stat stages, volatile status).
         /// Called when a Pokemon switches in or out.
         /// </summary>
@@ -196,6 +333,13 @@ namespace PokemonUltimate.Combat
             _statStages[Stat.Evasion] = 0;
 
             _volatileStatus = VolatileStatus.None;
+            _protectConsecutiveUses = 0;
+            _physicalDamageTakenThisTurn = 0;
+            _specialDamageTakenThisTurn = 0;
+            _wasHitWhileFocusing = false;
+            _semiInvulnerableMoveName = null;
+            _isSemiInvulnerableCharging = false;
+            _chargingMoveName = null;
         }
     }
 }
