@@ -1,5 +1,6 @@
 using System;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Providers;
 
 namespace PokemonUltimate.Core.Blueprints
 {
@@ -266,13 +267,14 @@ namespace PokemonUltimate.Core.Blueprints
         /// <summary>
         /// Gets a random duration for this status.
         /// </summary>
-        public int GetRandomDuration(Random random = null)
+        /// <param name="randomProvider">Optional random provider. If null, creates a new RandomProvider.</param>
+        public int GetRandomDuration(IRandomProvider randomProvider = null)
         {
             if (IsIndefinite) return 0;
             if (MinTurns == MaxTurns) return MinTurns;
-            
-            random = random ?? new Random();
-            return random.Next(MinTurns, MaxTurns + 1);
+
+            randomProvider = randomProvider ?? new Providers.RandomProvider();
+            return randomProvider.Next(MinTurns, MaxTurns + 1);
         }
 
         /// <summary>
@@ -281,7 +283,7 @@ namespace PokemonUltimate.Core.Blueprints
         public float GetEscalatingDamage(int turnCount)
         {
             if (!DamageEscalates) return EndOfTurnDamage;
-            
+
             int multiplier = EscalatingDamageStart + turnCount - 1;
             return EndOfTurnDamage * multiplier;
         }

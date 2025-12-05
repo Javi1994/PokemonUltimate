@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Providers;
 
 namespace PokemonUltimate.Core.Blueprints
 {
@@ -137,10 +138,11 @@ namespace PokemonUltimate.Core.Blueprints
         /// <summary>
         /// Gets a random non-hidden ability for this Pokemon.
         /// </summary>
-        public AbilityData GetRandomAbility(Random random = null)
+        /// <param name="randomProvider">Optional random provider. If null, creates a new RandomProvider.</param>
+        public AbilityData GetRandomAbility(IRandomProvider randomProvider = null)
         {
-            random = random ?? new Random();
-            if (Ability2 != null && random.Next(2) == 1)
+            randomProvider = randomProvider ?? new Providers.RandomProvider();
+            if (Ability2 != null && randomProvider.Next(2) == 1)
                 return Ability2;
             return Ability1;
         }
@@ -188,7 +190,7 @@ namespace PokemonUltimate.Core.Blueprints
         {
             if (move == null)
                 throw new ArgumentNullException(nameof(move), ErrorMessages.MoveCannotBeNull);
-            
+
             return Learnset.Any(m => m.Move == move);
         }
 

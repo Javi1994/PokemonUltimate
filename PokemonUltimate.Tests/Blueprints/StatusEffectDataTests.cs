@@ -1,8 +1,9 @@
 using NUnit.Framework;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Content.Catalogs.Status;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Providers;
 
 namespace PokemonUltimate.Tests.Blueprints
 {
@@ -228,11 +229,11 @@ namespace PokemonUltimate.Tests.Blueprints
         public void GetRandomDuration_RandomDuration_ReturnsWithinRange()
         {
             var status = Status.Define("Test").LastsTurns(1, 5).Build();
-            var random = new System.Random(42);
+            var randomProvider = new PokemonUltimate.Core.Providers.RandomProvider(42);
 
             for (int i = 0; i < 100; i++)
             {
-                int duration = status.GetRandomDuration(random);
+                int duration = status.GetRandomDuration(randomProvider);
                 Assert.That(duration, Is.InRange(1, 5));
             }
         }

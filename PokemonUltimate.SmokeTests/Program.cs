@@ -12,6 +12,7 @@ using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Evolution.Conditions;
@@ -310,9 +311,9 @@ class Program
         PrintSection("STAT CALCULATOR (WITH IVs/EVs)");
 
         // Constants
-        Test("MaxIV is 31", () => StatCalculator.MaxIV == 31);
-        Test("MaxEV is 252", () => StatCalculator.MaxEV == 252);
-        Test("DefaultIV equals MaxIV", () => StatCalculator.DefaultIV == StatCalculator.MaxIV);
+        Test("MaxIV is 31", () => CoreConstants.MaxIV == 31);
+        Test("MaxEV is 252", () => CoreConstants.MaxEV == 252);
+        Test("DefaultIV equals MaxIV", () => CoreConstants.DefaultIV == CoreConstants.MaxIV);
 
         // HP with max IVs/EVs: ((2*35 + 31 + 63) * 50 / 100) + 50 + 10 = 142
         var pikachuHPMax = StatCalculator.CalculateHP(35, 50);

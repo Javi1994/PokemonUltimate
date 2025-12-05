@@ -174,6 +174,18 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `MoveCategory`, `EffectType`, `PersistentStatus`, `VolatileStatus`
 -   `AbilityTrigger`, `AbilityEffect`, `ItemTrigger`, `ItemCategory`
 -   `LearnMethod`, `TimeOfDay`, `TargetScope`
+
+**Key Constants & Validators** (post-refactor):
+
+-   `CoreConstants` - Core module constants (ShinyOdds, Friendship values, IV/EV limits, Stat stages, Formula constants)
+-   `CoreValidators` - Centralized validation methods (ValidateLevel, ValidateFriendship, ValidateStatStage, ValidateIV, ValidateEV)
+-   `ErrorMessages` - Error message constants
+-   `GameMessages` - In-game message constants
+
+**Key Extensions** (post-refactor):
+
+-   `LevelExtensions` - Extension methods for level validation (`IsValidLevel()`)
+-   `FriendshipExtensions` - Extension methods for friendship (`ClampFriendship()`)
 -   `Weather`, `Terrain`, `HazardType`, `SideCondition`, `FieldEffect`
 -   `EvolutionConditionType`
 
@@ -186,8 +198,12 @@ Game data is organized into logical groups matching the sub-feature structure:
 
 **Key Classes**:
 
+-   `CoreConstants` - Core module constants (ShinyOdds, Friendship values, IV/EV limits, Stat stages, Formula constants, post-refactor)
+-   `CoreValidators` - Centralized validation methods (ValidateLevel, ValidateFriendship, ValidateStatStage, ValidateIV, ValidateEV, post-refactor)
 -   `ErrorMessages` - Error message constants
 -   `GameMessages` - In-game message constants
+-   `LevelExtensions` - Extension methods for level validation (`IsValidLevel()`, post-refactor)
+-   `FriendshipExtensions` - Extension methods for friendship (`ClampFriendship()`, post-refactor)
 
 #### Builders (Moved to Feature 3.9)
 
@@ -202,9 +218,15 @@ Game data is organized into logical groups matching the sub-feature structure:
 
 **Key Classes**:
 
--   `StatCalculator` - Stat calculation formulas (Gen 3+)
+-   `IStatCalculator` - Stat calculation interface (post-refactor)
+-   `StatCalculator` - Stat calculation formulas (Gen 3+, instance-based, post-refactor)
+-   `ITypeEffectiveness` - Type effectiveness interface (post-refactor)
+-   `TypeEffectiveness` - Type effectiveness calculator (instance-based, post-refactor)
 -   `PokemonFactory` - Static factory for Pokemon creation
--   `PokemonInstanceBuilder` - Fluent builder for Pokemon instances
+-   `PokemonInstanceBuilder` - Fluent builder for Pokemon instances (uses `IRandomProvider`, post-refactor)
+-   `IMoveSelector` - Move selection interface (post-refactor)
+-   `MoveSelector` - Move selection with strategies (post-refactor)
+-   `MoveSelection/Strategies/` - Move selection strategies (RandomMoveStrategy, StabMoveStrategy, PowerMoveStrategy, OptimalMoveStrategy)
 
 #### 1.16: Registry System
 
@@ -271,15 +293,61 @@ Game data is organized into logical groups matching the sub-feature structure:
 ```
 PokemonUltimate.Core/
 ├── Blueprints/
-│   └── PokemonSpeciesData.cs          # Species blueprint class
+│   ├── PokemonSpeciesData.cs          # Species blueprint class
+│   ├── BaseStats.cs                   # Base stats (uses StatGetterRegistry, post-refactor)
+│   └── Strategies/                    # Strategy Pattern for stat getters (post-refactor)
+│       ├── IStatGetterStrategy.cs
+│       ├── StatGetterRegistry.cs
+│       └── [Stat]StatGetterStrategy.cs
 ├── Instances/
-│   ├── PokemonInstance.cs             # Main instance class
+│   ├── PokemonInstance.cs             # Main instance class (uses StatsCache, post-refactor)
 │   ├── PokemonInstance.Core.cs        # Core data (partial)
-│   ├── PokemonInstance.Battle.cs      # Battle state (partial)
-│   ├── PokemonInstance.LevelUp.cs    # Level-up logic (partial)
-│   └── PokemonInstance.Evolution.cs  # Evolution tracking (partial)
+│   ├── PokemonInstance.Battle.cs      # Battle state (partial, uses StatStageManager, post-refactor)
+│   ├── PokemonInstance.LevelUp.cs    # Level-up logic (partial, uses StatsCache, post-refactor)
+│   ├── PokemonInstance.Evolution.cs  # Evolution tracking (partial)
+│   ├── StatsCache.cs                  # Stats caching system (post-refactor)
+│   └── Strategies/                    # Strategy Pattern for PokemonInstance stat getters (post-refactor)
+│       ├── IPokemonStatGetterStrategy.cs
+│       ├── PokemonStatGetterRegistry.cs
+│       └── [Stat]StatGetterStrategy.cs
 ├── Factories/
-│   └── PokemonInstanceBuilder.cs     # Instance builder
+│   ├── IStatCalculator.cs             # Stat calculator interface (post-refactor)
+│   ├── StatCalculator.cs              # Stat calculation (instance-based, post-refactor)
+│   ├── ITypeEffectiveness.cs          # Type effectiveness interface (post-refactor)
+│   ├── TypeEffectiveness.cs           # Type effectiveness (instance-based, post-refactor)
+│   ├── PokemonFactory.cs              # Static factory wrapper
+│   ├── PokemonInstanceBuilder.cs     # Instance builder (uses IRandomProvider, MoveSelector, post-refactor)
+│   ├── MoveSelection/                 # Move selection system (post-refactor)
+│   │   ├── IMoveSelector.cs
+│   │   ├── MoveSelector.cs
+│   │   └── Strategies/
+│   │       ├── IMoveSelectionStrategy.cs
+│   │       ├── RandomMoveStrategy.cs
+│   │       ├── StabMoveStrategy.cs
+│   │       ├── PowerMoveStrategy.cs
+│   │       └── OptimalMoveStrategy.cs
+│   └── Strategies/                    # Strategy Pattern for nature boosting (post-refactor)
+│       └── NatureBoosting/
+│           ├── INatureBoostingStrategy.cs
+│           ├── NatureBoostingRegistry.cs
+│           └── [Stat]NatureBoostingStrategy.cs
+├── Managers/
+│   ├── IStatStageManager.cs           # Stat stage manager interface (post-refactor)
+│   └── StatStageManager.cs            # Stat stage manager (post-refactor)
+├── Providers/
+│   ├── IRandomProvider.cs             # Random provider interface (post-refactor)
+│   └── RandomProvider.cs              # Random provider implementation (post-refactor)
+├── Constants/
+│   ├── CoreConstants.cs               # Core module constants (post-refactor)
+│   ├── CoreValidators.cs              # Centralized validators (post-refactor)
+│   ├── ErrorMessages.cs               # Error messages
+│   └── GameMessages.cs                # Game messages
+├── Extensions/
+│   ├── LevelExtensions.cs             # Level validation extensions (post-refactor)
+│   └── FriendshipExtensions.cs        # Friendship extensions (post-refactor)
+├── Effects/
+│   └── Strategies/                    # Strategy Pattern for effect descriptions (post-refactor)
+│       └── [Effect]DescriptionStrategy.cs
 └── Enums/
     ├── PokemonType.cs                 # Type enum
     ├── PokemonColor.cs                # Pokedex color enum
@@ -372,11 +440,12 @@ public static readonly PokemonSpeciesData Pikachu = Pokemon.Define("Pikachu", 25
 
 **Namespace**: `PokemonUltimate.Core.Factories`
 **File**: `PokemonUltimate.Core/Factories/PokemonInstanceBuilder.cs`
-**Purpose**: Fluent builder for creating `PokemonInstance`
+**Purpose**: Fluent builder for creating `PokemonInstance` (refactored with DI and Strategy Pattern, post-refactor)
 **Usage**:
 
 ```csharp
-var pikachu = Pokemon.Create(PokemonCatalog.Pikachu, 25)
+var randomProvider = new RandomProvider();
+var pikachu = Pokemon.Create(PokemonCatalog.Pikachu, 25, randomProvider)
     .WithNature(Nature.Jolly)
     .Named("Sparky")
     .Build();
@@ -384,11 +453,59 @@ var pikachu = Pokemon.Create(PokemonCatalog.Pikachu, 25)
 
 **Key Methods**:
 
--   `Create(PokemonSpeciesData species, int level)` - Start creating an instance
+-   `Create(PokemonSpeciesData species, int level, IRandomProvider randomProvider)` - Start creating an instance (requires IRandomProvider, post-refactor)
 -   `WithNature(Nature)` - Set nature
 -   `Named(string)` - Set nickname
--   `WithMoves(...)` - Set specific moves
--   `Build()` - Create the `PokemonInstance`
+-   `WithMoves(...)` - Set specific moves (uses MoveSelector internally, post-refactor)
+-   `Build()` - Create the `PokemonInstance` (includes validation, post-refactor)
+
+**Post-Refactor Improvements**:
+
+-   Uses `IRandomProvider` instead of static `Random` for testability
+-   Uses `CoreConstants` instead of magic numbers
+-   Uses `MoveSelector` with strategies for move selection
+-   Uses `CoreValidators` for validation
+-   Methods extracted for better SRP (CalculateStats, DetermineShiny, DetermineAbility, etc.)
+
+### StatCalculator
+
+**Namespace**: `PokemonUltimate.Core.Factories`
+**File**: `PokemonUltimate.Core/Factories/StatCalculator.cs`
+**Purpose**: Calculates Pokemon stats using official formulas (instance-based, post-refactor)
+**Interface**: `IStatCalculator` (post-refactor)
+**Usage**:
+
+```csharp
+var calculator = new StatCalculator();
+var hp = calculator.CalculateHP(baseHP, level, iv, ev);
+var attack = calculator.CalculateStat(baseAttack, level, nature, Stat.Attack, iv, ev);
+```
+
+**Post-Refactor Improvements**:
+
+-   Converted from static class to instance-based with `IStatCalculator` interface
+-   Uses `CoreConstants` for formula constants
+-   Uses `CoreValidators` for validation
+-   Static methods maintained as wrappers for backward compatibility
+
+### TypeEffectiveness
+
+**Namespace**: `PokemonUltimate.Core.Factories`
+**File**: `PokemonUltimate.Core/Factories/TypeEffectiveness.cs`
+**Purpose**: Calculates type effectiveness for damage calculations (instance-based, post-refactor)
+**Interface**: `ITypeEffectiveness` (post-refactor)
+**Usage**:
+
+```csharp
+var typeEffectiveness = new TypeEffectiveness();
+var multiplier = typeEffectiveness.GetEffectiveness(PokemonType.Fire, PokemonType.Grass);
+var stab = typeEffectiveness.GetSTABMultiplier(PokemonType.Fire, PokemonType.Fire, null);
+```
+
+**Post-Refactor Improvements**:
+
+-   Converted from static class to instance-based with `ITypeEffectiveness` interface
+-   Static methods maintained as wrappers for backward compatibility
 
 ## Catalogs & Registries
 
@@ -471,4 +588,4 @@ See **[Testing Strategy](testing.md)** for complete test organization by sub-fea
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-XX)

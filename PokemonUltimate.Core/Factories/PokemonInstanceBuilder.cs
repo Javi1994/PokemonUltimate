@@ -4,14 +4,17 @@ using System.Linq;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Factories.MoveSelection;
+using PokemonUltimate.Core.Factories.Strategies.NatureBoosting;
 using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Providers;
 
 namespace PokemonUltimate.Core.Factories
 {
     /// <summary>
     /// Fluent builder for creating PokemonInstance objects.
     /// Provides a clean, readable API for generating Pokemon with full control.
-    /// 
+    ///
     /// Usage:
     ///   var pokemon = Pokemon.Create(PokemonCatalog.Pikachu, 25)
     ///       .WithNature(Nature.Jolly)
@@ -25,10 +28,11 @@ namespace PokemonUltimate.Core.Factories
     /// </remarks>
     public class PokemonInstanceBuilder
     {
-        private static Random _random = new Random();
+        private static IRandomProvider _defaultRandomProvider = new Providers.RandomProvider();
 
         private readonly PokemonSpeciesData _species;
         private readonly int _level;
+        private readonly IRandomProvider _randomProvider;
 
         // Optional configurations
         private Nature? _nature;
@@ -45,9 +49,8 @@ namespace PokemonUltimate.Core.Factories
         private int _moveCount = 4;
 
         // Friendship and Shiny
-        private int _friendship = 70; // Default for wild Pokemon
+        private int _friendship = CoreConstants.DefaultWildFriendship; // Default for wild Pokemon
         private bool? _isShiny;
-        private const int ShinyOdds = 4096; // 1/4096 chance
 
         // Ability and Item
         private AbilityData _ability;
@@ -64,14 +67,14 @@ namespace PokemonUltimate.Core.Factories
 
         #region Constructor
 
-        private PokemonInstanceBuilder(PokemonSpeciesData species, int level)
+        private PokemonInstanceBuilder(PokemonSpeciesData species, int level, IRandomProvider randomProvider = null)
         {
             _species = species ?? throw new ArgumentNullException(nameof(species));
-            
-            if (level < 1 || level > 100)
-                throw new ArgumentException(ErrorMessages.LevelMustBeBetween1And100, nameof(level));
-            
+
+            CoreValidators.ValidateLevel(level);
+
             _level = level;
+            _randomProvider = randomProvider ?? _defaultRandomProvider;
         }
 
         #endregion
@@ -93,8 +96,8 @@ namespace PokemonUltimate.Core.Factories
         {
             if (minLevel > maxLevel)
                 throw new ArgumentException(ErrorMessages.MinLevelCannotBeGreaterThanMaxLevel);
-            
-            int level = _random.Next(minLevel, maxLevel + 1);
+
+            int level = _defaultRandomProvider.Next(minLevel, maxLevel + 1);
             return new PokemonInstanceBuilder(species, level);
         }
 
@@ -141,7 +144,7 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public static void SetSeed(int seed)
         {
-            _random = new Random(seed);
+            _defaultRandomProvider = new Providers.RandomProvider(seed);
         }
 
         /// <summary>
@@ -149,7 +152,7 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public static void ResetRandom()
         {
-            _random = new Random();
+            _defaultRandomProvider = new Providers.RandomProvider();
         }
 
         #endregion
@@ -298,7 +301,7 @@ namespace PokemonUltimate.Core.Factories
         {
             if (count < 1 || count > 4)
                 throw new ArgumentException(ErrorMessages.MoveCountMustBeBetween1And4);
-            
+
             _moveCount = count;
             return this;
         }
@@ -379,9 +382,6 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public PokemonInstanceBuilder AtHealth(int currentHP)
         {
-            if (currentHP < 0)
-                throw new ArgumentException(ErrorMessages.HPCannotBeNegative);
-            
             _currentHP = currentHP;
             _hpPercent = null;
             return this;
@@ -392,9 +392,6 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public PokemonInstanceBuilder AtHealthPercent(float percent)
         {
-            if (percent < 0 || percent > 1)
-                throw new ArgumentException(ErrorMessages.PercentMustBeBetween0And1);
-            
             _hpPercent = percent;
             _currentHP = null;
             return this;
@@ -414,6 +411,22 @@ namespace PokemonUltimate.Core.Factories
         public PokemonInstanceBuilder AtOneHP()
         {
             return AtHealth(1);
+        }
+
+        /// <summary>
+        /// Set current HP to a specific value (alias for AtHealth).
+        /// </summary>
+        public PokemonInstanceBuilder WithCurrentHP(int currentHP)
+        {
+            return AtHealth(currentHP);
+        }
+
+        /// <summary>
+        /// Set current HP as a percentage (0.0 to 1.0) (alias for AtHealthPercent).
+        /// </summary>
+        public PokemonInstanceBuilder WithHPPercent(float hpPercent)
+        {
+            return AtHealthPercent(hpPercent);
         }
 
         /// <summary>
@@ -494,9 +507,6 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public PokemonInstanceBuilder WithExperience(int exp)
         {
-            if (exp < 0)
-                throw new ArgumentException(ErrorMessages.ExperienceCannotBeNegative);
-            
             _experience = exp;
             return this;
         }
@@ -510,9 +520,8 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public PokemonInstanceBuilder WithFriendship(int friendship)
         {
-            if (friendship < 0 || friendship > 255)
-                throw new ArgumentException(ErrorMessages.FriendshipMustBeBetween0And255);
-            
+            CoreValidators.ValidateFriendship(friendship);
+
             _friendship = friendship;
             return this;
         }
@@ -522,7 +531,7 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public PokemonInstanceBuilder WithHighFriendship()
         {
-            _friendship = 220;
+            _friendship = CoreConstants.HighFriendshipThreshold;
             return this;
         }
 
@@ -531,7 +540,7 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public PokemonInstanceBuilder WithMaxFriendship()
         {
-            _friendship = 255;
+            _friendship = CoreConstants.MaxFriendship;
             return this;
         }
 
@@ -549,7 +558,7 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public PokemonInstanceBuilder AsHatched()
         {
-            _friendship = 120;
+            _friendship = CoreConstants.HatchedFriendship;
             return this;
         }
 
@@ -693,6 +702,33 @@ namespace PokemonUltimate.Core.Factories
             return this;
         }
 
+        /// <summary>
+        /// Override defense stat (for testing purposes).
+        /// </summary>
+        public PokemonInstanceBuilder WithDefense(int defense)
+        {
+            _overrideDefense = defense;
+            return this;
+        }
+
+        /// <summary>
+        /// Override special attack stat (for testing purposes).
+        /// </summary>
+        public PokemonInstanceBuilder WithSpAttack(int spAttack)
+        {
+            _overrideSpAttack = spAttack;
+            return this;
+        }
+
+        /// <summary>
+        /// Override special defense stat (for testing purposes).
+        /// </summary>
+        public PokemonInstanceBuilder WithSpDefense(int spDefense)
+        {
+            _overrideSpDefense = spDefense;
+            return this;
+        }
+
         #endregion
 
         #region Build
@@ -702,13 +738,145 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public PokemonInstance Build()
         {
+            // Validate configuration before building
+            ValidateConfiguration();
+
             // Determine nature
-            Nature nature = _nature ?? GetRandomNature();
+            Nature nature = _nature ?? GetRandomNature(_randomProvider);
 
             // Determine gender
             Gender gender = DetermineGender();
 
             // Calculate stats
+            var stats = CalculateStats(nature);
+
+            // Select moves
+            List<MoveInstance> moves = SelectMoves();
+
+            // Determine shiny
+            bool isShiny = DetermineShiny();
+
+            // Determine ability
+            AbilityData ability = DetermineAbility();
+
+            // Create instance
+            var pokemon = new PokemonInstance(
+                _species, _level, stats.HP, stats.Attack, stats.Defense,
+                stats.SpAttack, stats.SpDefense, stats.Speed, nature, gender, moves,
+                _friendship, isShiny, ability, _heldItem);
+
+            // Apply optional configurations
+            ApplyOptionalConfigurations(pokemon);
+
+            return pokemon;
+        }
+
+        #endregion
+
+        #region Private Helpers
+
+        /// <summary>
+        /// Validates the builder configuration before building the Pokemon instance.
+        /// </summary>
+        private void ValidateConfiguration()
+        {
+            // Validate stat overrides
+            if (_overrideMaxHP.HasValue && _overrideMaxHP.Value < 0)
+                throw new ArgumentException(ErrorMessages.StatOverrideCannotBeNegative, nameof(_overrideMaxHP));
+
+            if (_overrideAttack.HasValue && _overrideAttack.Value < 0)
+                throw new ArgumentException(ErrorMessages.StatOverrideCannotBeNegative, nameof(_overrideAttack));
+
+            if (_overrideDefense.HasValue && _overrideDefense.Value < 0)
+                throw new ArgumentException(ErrorMessages.StatOverrideCannotBeNegative, nameof(_overrideDefense));
+
+            if (_overrideSpAttack.HasValue && _overrideSpAttack.Value < 0)
+                throw new ArgumentException(ErrorMessages.StatOverrideCannotBeNegative, nameof(_overrideSpAttack));
+
+            if (_overrideSpDefense.HasValue && _overrideSpDefense.Value < 0)
+                throw new ArgumentException(ErrorMessages.StatOverrideCannotBeNegative, nameof(_overrideSpDefense));
+
+            if (_overrideSpeed.HasValue && _overrideSpeed.Value < 0)
+                throw new ArgumentException(ErrorMessages.StatOverrideCannotBeNegative, nameof(_overrideSpeed));
+
+            // Validate HP percent
+            if (_hpPercent.HasValue)
+            {
+                if (_hpPercent.Value < 0.0f || _hpPercent.Value > 1.0f)
+                    throw new ArgumentException(ErrorMessages.InvalidHPPercent, nameof(_hpPercent));
+            }
+
+            // Validate current HP
+            if (_currentHP.HasValue && _currentHP.Value < 0)
+                throw new ArgumentException(ErrorMessages.HPCannotBeNegative, nameof(_currentHP));
+
+            // Validate experience
+            if (_experience < 0)
+                throw new ArgumentException(ErrorMessages.ExperienceCannotBeNegative, nameof(_experience));
+
+            // Validate ability (if explicitly set)
+            if (_ability != null)
+            {
+                ValidateAbility();
+            }
+
+            // Validate specific moves (if provided)
+            if (_specificMoves != null && _specificMoves.Count > 0)
+            {
+                ValidateMoves();
+            }
+        }
+
+        /// <summary>
+        /// Validates that the ability is valid for the species.
+        /// </summary>
+        private void ValidateAbility()
+        {
+            bool isValid = _species.Ability1 == _ability ||
+                          _species.Ability2 == _ability ||
+                          _species.HiddenAbility == _ability;
+
+            if (!isValid)
+            {
+                throw new ArgumentException(
+                    ErrorMessages.Format(ErrorMessages.AbilityNotValidForSpecies, _ability.Name, _species.Name),
+                    nameof(_ability));
+            }
+        }
+
+        /// <summary>
+        /// Validates that all specified moves are in the species' learnset.
+        /// </summary>
+        private void ValidateMoves()
+        {
+            if (_species.Learnset == null || _species.Learnset.Count == 0)
+            {
+                // If species has no learnset, we can't validate moves
+                // This is acceptable - moves will be empty
+                return;
+            }
+
+            var learnsetMoveIds = _species.Learnset.Select(m => m.Move.Id).ToHashSet();
+
+            foreach (var move in _specificMoves)
+            {
+                if (move == null)
+                    continue;
+
+                if (!learnsetMoveIds.Contains(move.Id))
+                {
+                    throw new ArgumentException(
+                        ErrorMessages.Format(ErrorMessages.MoveNotInLearnset, move.Name, _species.Name),
+                        nameof(_specificMoves));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates all stats for the Pokemon instance.
+        /// </summary>
+        private (int HP, int Attack, int Defense, int SpAttack, int SpDefense, int Speed) CalculateStats(Nature nature)
+        {
             int hp = _overrideMaxHP ?? StatCalculator.CalculateHP(_species.BaseStats.HP, _level);
             int attack = _overrideAttack ?? StatCalculator.CalculateStat(_species.BaseStats.Attack, _level, nature, Stat.Attack);
             int defense = _overrideDefense ?? StatCalculator.CalculateStat(_species.BaseStats.Defense, _level, nature, Stat.Defense);
@@ -716,22 +884,25 @@ namespace PokemonUltimate.Core.Factories
             int spDefense = _overrideSpDefense ?? StatCalculator.CalculateStat(_species.BaseStats.SpDefense, _level, nature, Stat.SpDefense);
             int speed = _overrideSpeed ?? StatCalculator.CalculateStat(_species.BaseStats.Speed, _level, nature, Stat.Speed);
 
-            // Select moves
-            List<MoveInstance> moves = SelectMoves();
+            return (hp, attack, defense, spAttack, spDefense, speed);
+        }
 
-            // Determine shiny
-            bool isShiny = _isShiny ?? (_random.Next(ShinyOdds) == 0);
+        /// <summary>
+        /// Determines if the Pokemon should be shiny.
+        /// </summary>
+        private bool DetermineShiny()
+        {
+            if (_isShiny.HasValue)
+                return _isShiny.Value;
 
-            // Determine ability
-            AbilityData ability = DetermineAbility();
+            return _randomProvider.Next(CoreConstants.ShinyOdds) == 0;
+        }
 
-            // Create instance
-            var pokemon = new PokemonInstance(
-                _species, _level, hp, attack, defense,
-                spAttack, spDefense, speed, nature, gender, moves,
-                _friendship, isShiny, ability, _heldItem);
-
-            // Apply optional configurations
+        /// <summary>
+        /// Applies optional configurations to the Pokemon instance.
+        /// </summary>
+        private void ApplyOptionalConfigurations(PokemonInstance pokemon)
+        {
             if (_nickname != null)
                 pokemon.Nickname = _nickname;
 
@@ -745,13 +916,7 @@ namespace PokemonUltimate.Core.Factories
 
             if (_experience > 0)
                 pokemon.CurrentExp = _experience;
-
-            return pokemon;
         }
-
-        #endregion
-
-        #region Private Helpers
 
         private Gender DetermineGender()
         {
@@ -769,7 +934,7 @@ namespace PokemonUltimate.Core.Factories
                 return Gender.Female;
 
             // Random based on ratio
-            double roll = _random.NextDouble() * 100;
+            double roll = _randomProvider.NextDouble() * 100;
             return roll < _species.GenderRatio ? Gender.Male : Gender.Female;
         }
 
@@ -793,12 +958,29 @@ namespace PokemonUltimate.Core.Factories
             // Specific moves provided
             if (_specificMoves != null)
             {
-                return _specificMoves
-                    .Take(4)
-                    .Select(m => new MoveInstance(m))
-                    .ToList();
+                return SelectSpecificMoves();
             }
 
+            // Select from learnset
+            return SelectFromLearnset();
+        }
+
+        /// <summary>
+        /// Selects specific moves provided by the builder.
+        /// </summary>
+        private List<MoveInstance> SelectSpecificMoves()
+        {
+            return _specificMoves
+                .Take(4)
+                .Select(m => new MoveInstance(m))
+                .ToList();
+        }
+
+        /// <summary>
+        /// Selects moves from the Pokemon's learnset based on configuration.
+        /// </summary>
+        private List<MoveInstance> SelectFromLearnset()
+        {
             // No learnset
             if (_species.Learnset == null || _species.Learnset.Count == 0)
                 return new List<MoveInstance>();
@@ -809,101 +991,57 @@ namespace PokemonUltimate.Core.Factories
             if (availableMoves.Count == 0)
                 return new List<MoveInstance>();
 
-            IEnumerable<LearnableMove> selectedMoves;
+            // Create appropriate move selector based on configuration
+            IMoveSelector selector = CreateMoveSelector();
 
-            if (_useRandomMoves)
-            {
-                // Shuffle and take random moves
-                selectedMoves = availableMoves
-                    .OrderBy(x => _random.Next())
-                    .Take(_moveCount);
-            }
-            else if (_prioritizeStab || _prioritizePower)
-            {
-                // Apply smart move selection
-                selectedMoves = SelectSmartMoves(availableMoves);
-            }
-            else
-            {
-                // Default: highest level first
-                selectedMoves = availableMoves
-                    .OrderByDescending(m => m.Level)
-                    .ThenBy(m => m.Move.Name)
-                    .Take(_moveCount);
-            }
+            // Select moves using the selector
+            var selectedMoves = selector.SelectMoves(availableMoves, _moveCount);
 
             return selectedMoves
                 .Select(m => new MoveInstance(m.Move))
                 .ToList();
         }
 
-        private IEnumerable<LearnableMove> SelectSmartMoves(List<LearnableMove> availableMoves)
+        /// <summary>
+        /// Creates the appropriate move selector based on builder configuration.
+        /// </summary>
+        private IMoveSelector CreateMoveSelector()
         {
-            var scored = availableMoves.Select(m => new
+            if (_useRandomMoves)
             {
-                Move = m,
-                Score = CalculateMoveScore(m.Move)
-            });
-
-            return scored
-                .OrderByDescending(x => x.Score)
-                .Take(_moveCount)
-                .Select(x => x.Move);
-        }
-
-        private int CalculateMoveScore(MoveData move)
-        {
-            int score = 0;
-
-            // Base power score (0-150 range mapped to 0-150)
-            if (_prioritizePower)
-            {
-                score += move.Power;
+                return MoveSelector.CreateRandom(_randomProvider);
             }
 
-            // STAB bonus
+            if (_prioritizeStab && _prioritizePower)
+            {
+                // Both STAB and Power - use Optimal strategy
+                return MoveSelector.CreateOptimal(_species.PrimaryType, _species.SecondaryType, _randomProvider);
+            }
+
             if (_prioritizeStab)
             {
-                bool isStab = move.Type == _species.PrimaryType || 
-                              move.Type == _species.SecondaryType;
-                if (isStab)
-                {
-                    score += 100; // Significant STAB bonus
-                }
+                return MoveSelector.CreateStab(_species.PrimaryType, _species.SecondaryType);
             }
 
-            // Small bonus for accuracy (higher is better, 0 means always hits)
-            if (move.Accuracy > 0)
+            if (_prioritizePower)
             {
-                score += move.Accuracy / 10;
+                return MoveSelector.CreatePower();
             }
 
-            // Bonus for damaging moves when prioritizing power
-            if (_prioritizePower && move.Category != MoveCategory.Status)
-            {
-                score += 50;
-            }
-
-            return score;
+            // Default strategy
+            return MoveSelector.CreateDefault();
         }
 
-        private static Nature GetRandomNature()
+
+        private static Nature GetRandomNature(IRandomProvider randomProvider)
         {
             var natures = (Nature[])Enum.GetValues(typeof(Nature));
-            return natures[_random.Next(natures.Length)];
+            return natures[randomProvider.Next(natures.Length)];
         }
 
         private static Nature GetNatureBoostingStat(Stat stat)
         {
-            switch (stat)
-            {
-                case Stat.Attack: return Nature.Adamant;
-                case Stat.Defense: return Nature.Bold;
-                case Stat.SpAttack: return Nature.Modest;
-                case Stat.SpDefense: return Nature.Calm;
-                case Stat.Speed: return Nature.Jolly;
-                default: return Nature.Hardy;
-            }
+            return NatureBoostingRegistry.GetBoostingNature(stat);
         }
 
         private AbilityData DetermineAbility()
@@ -917,7 +1055,7 @@ namespace PokemonUltimate.Core.Factories
                 return _species.HiddenAbility;
 
             // Random ability from species
-            return _species.GetRandomAbility(_random);
+            return _species.GetRandomAbility(_randomProvider);
         }
 
         #endregion

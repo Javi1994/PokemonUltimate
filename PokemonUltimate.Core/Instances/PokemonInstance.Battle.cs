@@ -1,6 +1,8 @@
 using System;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Managers;
 
 namespace PokemonUltimate.Core.Instances
 {
@@ -25,7 +27,7 @@ namespace PokemonUltimate.Core.Instances
         public int GetEffectiveStat(Stat stat)
         {
             int baseStat = GetBaseStat(stat);
-            int stage = StatStages.ContainsKey(stat) ? StatStages[stat] : 0;
+            int stage = StatStageManager.Default.GetStage(StatStages, stat);
 
             if (stat == Stat.Accuracy || stat == Stat.Evasion)
             {
@@ -47,7 +49,7 @@ namespace PokemonUltimate.Core.Instances
         public int GetEffectiveStatRaw(Stat stat)
         {
             int baseStat = GetBaseStat(stat);
-            int stage = StatStages.ContainsKey(stat) ? StatStages[stat] : 0;
+            int stage = StatStageManager.Default.GetStage(StatStages, stat);
 
             if (stat == Stat.Accuracy || stat == Stat.Evasion)
             {
@@ -84,15 +86,7 @@ namespace PokemonUltimate.Core.Instances
         /// </summary>
         public int ModifyStatStage(Stat stat, int change)
         {
-            if (!StatStages.ContainsKey(stat))
-                return 0;
-
-            int oldStage = StatStages[stat];
-            int newStage = Math.Max(StatCalculator.MinStage,
-                Math.Min(StatCalculator.MaxStage, oldStage + change));
-
-            StatStages[stat] = newStage;
-            return newStage - oldStage;
+            return StatStageManager.Default.ModifyStage(StatStages, stat, change);
         }
 
         #endregion
@@ -109,13 +103,7 @@ namespace PokemonUltimate.Core.Instances
             StatusTurnCounter = 0;
 
             // Reset all stat stages to 0
-            StatStages[Stat.Attack] = 0;
-            StatStages[Stat.Defense] = 0;
-            StatStages[Stat.SpAttack] = 0;
-            StatStages[Stat.SpDefense] = 0;
-            StatStages[Stat.Speed] = 0;
-            StatStages[Stat.Accuracy] = 0;
-            StatStages[Stat.Evasion] = 0;
+            StatStageManager.Default.ResetStages(StatStages);
         }
 
         /// <summary>
@@ -180,7 +168,7 @@ namespace PokemonUltimate.Core.Instances
                 throw new ArgumentException("Amount cannot be negative", nameof(amount));
 
             int oldFriendship = Friendship;
-            Friendship = Math.Min(255, Friendship + amount);
+            Friendship = Math.Min(CoreConstants.MaxFriendship, Friendship + amount);
             return Friendship - oldFriendship;
         }
 

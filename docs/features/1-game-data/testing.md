@@ -18,6 +18,8 @@ This document defines how to organize and create tests for **all game data struc
 
 **See**: [Sub-Features Overview](README.md) for complete sub-feature list.
 
+> **📋 Post-Refactoring Note (2024-12-XX)**: After the comprehensive refactoring, all major components now use Dependency Injection, making them highly testable. Mock implementations can be easily injected for testing (e.g., `IRandomProvider`, `IStatCalculator`, `ITypeEffectiveness`). The refactoring improved testability significantly by removing static dependencies and direct object creation. See `PokemonUltimate.Core/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for refactoring details.
+
 ---
 
 ## Testing Philosophy
@@ -1922,4 +1924,4 @@ public void Habitats_AreValid()
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-XX)

@@ -14,44 +14,58 @@ namespace PokemonUltimate.Core.Factories
     /// **Sub-Feature**: 1.12: Factories & Calculators
     /// **Documentation**: See `docs/features/1-game-data/1.12-factories-calculators/README.md`
     /// </remarks>
-    public static class StatCalculator
+    public class StatCalculator : IStatCalculator
     {
+        private static readonly IStatCalculator _defaultInstance = new StatCalculator();
+
+        /// <summary>
+        /// Gets the default instance for static method compatibility.
+        /// </summary>
+        public static IStatCalculator Default => _defaultInstance;
+
         #region Constants
 
         /// <summary>
         /// Maximum Individual Value (0-31).
         /// </summary>
-        public const int MaxIV = 31;
+        [Obsolete("Use CoreConstants.MaxIV instead")]
+        public const int MaxIV = CoreConstants.MaxIV;
 
         /// <summary>
         /// Maximum Effort Value per stat (0-252).
         /// </summary>
-        public const int MaxEV = 252;
+        [Obsolete("Use CoreConstants.MaxEV instead")]
+        public const int MaxEV = CoreConstants.MaxEV;
 
         /// <summary>
         /// Maximum total EVs across all stats (510).
         /// </summary>
-        public const int MaxTotalEV = 510;
+        [Obsolete("Use CoreConstants.MaxTotalEV instead")]
+        public const int MaxTotalEV = CoreConstants.MaxTotalEV;
 
         /// <summary>
         /// Default IV used in this game (always max for roguelike).
         /// </summary>
-        public const int DefaultIV = MaxIV;
+        [Obsolete("Use CoreConstants.DefaultIV instead")]
+        public const int DefaultIV = CoreConstants.DefaultIV;
 
         /// <summary>
         /// Default EV used in this game (always max for roguelike).
         /// </summary>
-        public const int DefaultEV = MaxEV;
+        [Obsolete("Use CoreConstants.DefaultEV instead")]
+        public const int DefaultEV = CoreConstants.DefaultEV;
 
         /// <summary>
         /// Minimum stat stage (-6).
         /// </summary>
-        public const int MinStage = -6;
+        [Obsolete("Use CoreConstants.MinStatStage instead")]
+        public const int MinStage = CoreConstants.MinStatStage;
 
         /// <summary>
         /// Maximum stat stage (+6).
         /// </summary>
-        public const int MaxStage = 6;
+        [Obsolete("Use CoreConstants.MaxStatStage instead")]
+        public const int MaxStage = CoreConstants.MaxStatStage;
 
         #endregion
 
@@ -61,24 +75,32 @@ namespace PokemonUltimate.Core.Factories
         /// Calculates HP stat using full Gen3+ formula with max IVs/EVs.
         /// Formula: floor((2 * Base + IV + floor(EV/4)) * Level / 100) + Level + 10
         /// </summary>
-        public static int CalculateHP(int baseHP, int level)
+        int IStatCalculator.CalculateHP(int baseHP, int level)
         {
-            return CalculateHP(baseHP, level, DefaultIV, DefaultEV);
+            return CalculateHPInternal(baseHP, level, CoreConstants.DefaultIV, CoreConstants.DefaultEV);
         }
 
         /// <summary>
         /// Calculates HP stat with custom IVs/EVs (for testing).
         /// </summary>
-        public static int CalculateHP(int baseHP, int level, int iv, int ev)
+        int IStatCalculator.CalculateHP(int baseHP, int level, int iv, int ev)
+        {
+            return CalculateHPInternal(baseHP, level, iv, ev);
+        }
+
+        /// <summary>
+        /// Internal implementation of HP calculation.
+        /// </summary>
+        private int CalculateHPInternal(int baseHP, int level, int iv, int ev)
         {
             ValidateBaseStat(baseHP, nameof(baseHP));
-            ValidateLevel(level);
-            ValidateIV(iv);
-            ValidateEV(ev);
+            CoreValidators.ValidateLevel(level);
+            CoreValidators.ValidateIV(iv);
+            CoreValidators.ValidateEV(ev);
 
-            // HP formula: floor((2 * Base + IV + floor(EV/4)) * Level / 100) + Level + 10
-            int evBonus = ev / 4;
-            return ((2 * baseHP + iv + evBonus) * level / 100) + level + 10;
+            // HP formula: floor((StatFormulaBase * Base + IV + floor(EV/EVBonusDivisor)) * Level / StatFormulaDivisor) + Level + HPFormulaBonus
+            int evBonus = ev / CoreConstants.EVBonusDivisor;
+            return ((CoreConstants.StatFormulaBase * baseHP + iv + evBonus) * level / CoreConstants.StatFormulaDivisor) + level + CoreConstants.HPFormulaBonus;
         }
 
         #endregion
@@ -87,26 +109,34 @@ namespace PokemonUltimate.Core.Factories
 
         /// <summary>
         /// Calculates a non-HP stat using full Gen3+ formula with max IVs/EVs.
-        /// Formula: floor((floor((2 * Base + IV + floor(EV/4)) * Level / 100) + 5) * Nature)
+        /// Formula: floor((floor((StatFormulaBase * Base + IV + floor(EV/EVBonusDivisor)) * Level / StatFormulaDivisor) + StatFormulaBonus) * Nature)
         /// </summary>
-        public static int CalculateStat(int baseStat, int level, Nature nature, Stat stat)
+        int IStatCalculator.CalculateStat(int baseStat, int level, Nature nature, Stat stat)
         {
-            return CalculateStat(baseStat, level, nature, stat, DefaultIV, DefaultEV);
+            return CalculateStatInternal(baseStat, level, nature, stat, CoreConstants.DefaultIV, CoreConstants.DefaultEV);
         }
 
         /// <summary>
         /// Calculates a non-HP stat with custom IVs/EVs (for testing).
         /// </summary>
-        public static int CalculateStat(int baseStat, int level, Nature nature, Stat stat, int iv, int ev)
+        int IStatCalculator.CalculateStat(int baseStat, int level, Nature nature, Stat stat, int iv, int ev)
+        {
+            return CalculateStatInternal(baseStat, level, nature, stat, iv, ev);
+        }
+
+        /// <summary>
+        /// Internal implementation of stat calculation.
+        /// </summary>
+        private int CalculateStatInternal(int baseStat, int level, Nature nature, Stat stat, int iv, int ev)
         {
             ValidateBaseStat(baseStat, nameof(baseStat));
-            ValidateLevel(level);
-            ValidateIV(iv);
-            ValidateEV(ev);
+            CoreValidators.ValidateLevel(level);
+            CoreValidators.ValidateIV(iv);
+            CoreValidators.ValidateEV(ev);
 
-            // Stat formula: floor((floor((2 * Base + IV + floor(EV/4)) * Level / 100) + 5) * Nature)
-            int evBonus = ev / 4;
-            int rawStat = ((2 * baseStat + iv + evBonus) * level / 100) + 5;
+            // Stat formula: floor((floor((StatFormulaBase * Base + IV + floor(EV/EVBonusDivisor)) * Level / StatFormulaDivisor) + StatFormulaBonus) * Nature)
+            int evBonus = ev / CoreConstants.EVBonusDivisor;
+            int rawStat = ((CoreConstants.StatFormulaBase * baseStat + iv + evBonus) * level / CoreConstants.StatFormulaDivisor) + CoreConstants.StatFormulaBonus;
             float natureMultiplier = NatureData.GetStatMultiplier(nature, stat);
 
             return (int)(rawStat * natureMultiplier);
@@ -120,9 +150,9 @@ namespace PokemonUltimate.Core.Factories
         /// Gets the stat stage multiplier for battle calculations.
         /// Stages range from -6 to +6.
         /// </summary>
-        public static float GetStageMultiplier(int stage)
+        float IStatCalculator.GetStageMultiplier(int stage)
         {
-            stage = Math.Max(MinStage, Math.Min(MaxStage, stage));
+            stage = Math.Max(CoreConstants.MinStatStage, Math.Min(CoreConstants.MaxStatStage, stage));
 
             if (stage >= 0)
                 return (2f + stage) / 2f;
@@ -133,12 +163,12 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Calculates the effective stat in battle, applying stat stages.
         /// </summary>
-        public static int GetEffectiveStat(int calculatedStat, int stage)
+        int IStatCalculator.GetEffectiveStat(int calculatedStat, int stage)
         {
             if (calculatedStat < 0)
                 throw new ArgumentException(ErrorMessages.StatCannotBeNegative, nameof(calculatedStat));
 
-            float multiplier = GetStageMultiplier(stage);
+            float multiplier = ((IStatCalculator)this).GetStageMultiplier(stage);
             return (int)(calculatedStat * multiplier);
         }
 
@@ -146,9 +176,9 @@ namespace PokemonUltimate.Core.Factories
         /// Gets the accuracy/evasion stage multiplier.
         /// Uses different formula: (3 + stage) / 3 or 3 / (3 + |stage|)
         /// </summary>
-        public static float GetAccuracyStageMultiplier(int stage)
+        float IStatCalculator.GetAccuracyStageMultiplier(int stage)
         {
-            stage = Math.Max(MinStage, Math.Min(MaxStage, stage));
+            stage = Math.Max(CoreConstants.MinStatStage, Math.Min(CoreConstants.MaxStatStage, stage));
 
             if (stage >= 0)
                 return (3f + stage) / 3f;
@@ -164,10 +194,9 @@ namespace PokemonUltimate.Core.Factories
         /// Experience required to reach a level (Medium Fast growth rate).
         /// Formula: Level^3
         /// </summary>
-        public static int GetExpForLevel(int level)
+        int IStatCalculator.GetExpForLevel(int level)
         {
-            if (level < 1 || level > 100)
-                throw new ArgumentException(ErrorMessages.LevelMustBeBetween1And100, nameof(level));
+            CoreValidators.ValidateLevel(level);
 
             return level * level * level;
         }
@@ -175,29 +204,113 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Experience required to go from current level to next level.
         /// </summary>
-        public static int GetExpToNextLevel(int currentLevel)
+        int IStatCalculator.GetExpToNextLevel(int currentLevel)
         {
             if (currentLevel < 1 || currentLevel >= 100)
                 return 0;
 
-            return GetExpForLevel(currentLevel + 1) - GetExpForLevel(currentLevel);
+            return ((IStatCalculator)this).GetExpForLevel(currentLevel + 1) - ((IStatCalculator)this).GetExpForLevel(currentLevel);
         }
 
         /// <summary>
         /// Calculates what level a Pokemon should be at given total experience.
         /// </summary>
-        public static int GetLevelForExp(int totalExp)
+        int IStatCalculator.GetLevelForExp(int totalExp)
         {
             if (totalExp < 0)
                 throw new ArgumentException(ErrorMessages.ExperienceCannotBeNegative, nameof(totalExp));
 
             for (int level = 100; level >= 1; level--)
             {
-                if (totalExp >= GetExpForLevel(level))
+                if (totalExp >= ((IStatCalculator)this).GetExpForLevel(level))
                     return level;
             }
 
             return 1;
+        }
+
+        #endregion
+
+        #region Static Compatibility Methods
+
+        /// <summary>
+        /// Calculates HP stat using full Gen3+ formula with max IVs/EVs (static wrapper for compatibility).
+        /// </summary>
+        public static int CalculateHP(int baseHP, int level)
+        {
+            return ((StatCalculator)_defaultInstance).CalculateHPInternal(baseHP, level, CoreConstants.DefaultIV, CoreConstants.DefaultEV);
+        }
+
+        /// <summary>
+        /// Calculates HP stat with custom IVs/EVs (static wrapper for compatibility).
+        /// </summary>
+        public static int CalculateHP(int baseHP, int level, int iv, int ev)
+        {
+            return ((StatCalculator)_defaultInstance).CalculateHPInternal(baseHP, level, iv, ev);
+        }
+
+        /// <summary>
+        /// Calculates a non-HP stat using full Gen3+ formula with max IVs/EVs (static wrapper for compatibility).
+        /// </summary>
+        public static int CalculateStat(int baseStat, int level, Nature nature, Stat stat)
+        {
+            return ((StatCalculator)_defaultInstance).CalculateStatInternal(baseStat, level, nature, stat, CoreConstants.DefaultIV, CoreConstants.DefaultEV);
+        }
+
+        /// <summary>
+        /// Calculates a non-HP stat with custom IVs/EVs (static wrapper for compatibility).
+        /// </summary>
+        public static int CalculateStat(int baseStat, int level, Nature nature, Stat stat, int iv, int ev)
+        {
+            return ((StatCalculator)_defaultInstance).CalculateStatInternal(baseStat, level, nature, stat, iv, ev);
+        }
+
+        /// <summary>
+        /// Gets the stat stage multiplier for battle calculations (static wrapper for compatibility).
+        /// </summary>
+        public static float GetStageMultiplier(int stage)
+        {
+            return ((IStatCalculator)_defaultInstance).GetStageMultiplier(stage);
+        }
+
+        /// <summary>
+        /// Calculates the effective stat in battle, applying stat stages (static wrapper for compatibility).
+        /// </summary>
+        public static int GetEffectiveStat(int calculatedStat, int stage)
+        {
+            return ((IStatCalculator)_defaultInstance).GetEffectiveStat(calculatedStat, stage);
+        }
+
+        /// <summary>
+        /// Gets the accuracy/evasion stage multiplier (static wrapper for compatibility).
+        /// </summary>
+        public static float GetAccuracyStageMultiplier(int stage)
+        {
+            return ((IStatCalculator)_defaultInstance).GetAccuracyStageMultiplier(stage);
+        }
+
+        /// <summary>
+        /// Experience required to reach a level (static wrapper for compatibility).
+        /// </summary>
+        public static int GetExpForLevel(int level)
+        {
+            return ((IStatCalculator)_defaultInstance).GetExpForLevel(level);
+        }
+
+        /// <summary>
+        /// Experience required to go from current level to next level (static wrapper for compatibility).
+        /// </summary>
+        public static int GetExpToNextLevel(int currentLevel)
+        {
+            return ((IStatCalculator)_defaultInstance).GetExpToNextLevel(currentLevel);
+        }
+
+        /// <summary>
+        /// Calculates what level a Pokemon should be at given total experience (static wrapper for compatibility).
+        /// </summary>
+        public static int GetLevelForExp(int totalExp)
+        {
+            return ((IStatCalculator)_defaultInstance).GetLevelForExp(totalExp);
         }
 
         #endregion
@@ -212,20 +325,17 @@ namespace PokemonUltimate.Core.Factories
 
         private static void ValidateLevel(int level)
         {
-            if (level < 1 || level > 100)
-                throw new ArgumentException(ErrorMessages.LevelMustBeBetween1And100, nameof(level));
+            CoreValidators.ValidateLevel(level);
         }
 
         private static void ValidateIV(int iv)
         {
-            if (iv < 0 || iv > MaxIV)
-                throw new ArgumentException(ErrorMessages.Format(ErrorMessages.IVMustBeBetween, MaxIV), nameof(iv));
+            CoreValidators.ValidateIV(iv);
         }
 
         private static void ValidateEV(int ev)
         {
-            if (ev < 0 || ev > MaxEV)
-                throw new ArgumentException(ErrorMessages.Format(ErrorMessages.EVMustBeBetween, MaxEV), nameof(ev));
+            CoreValidators.ValidateEV(ev);
         }
 
         #endregion

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.Core.Blueprints.Strategies;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Blueprints
@@ -165,16 +166,7 @@ namespace PokemonUltimate.Core.Blueprints
         /// </summary>
         public int GetStat(Stat stat)
         {
-            switch (stat)
-            {
-                case Stat.HP: return HP;
-                case Stat.Attack: return Attack;
-                case Stat.Defense: return Defense;
-                case Stat.SpAttack: return SpAttack;
-                case Stat.SpDefense: return SpDefense;
-                case Stat.Speed: return Speed;
-                default: return 0;
-            }
+            return StatGetterRegistry.GetStat(this, stat);
         }
 
         /// <summary>

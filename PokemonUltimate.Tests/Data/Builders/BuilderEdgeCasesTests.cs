@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using PokemonUltimate.Content.Builders;
-using PokemonBuilder = PokemonUltimate.Content.Builders.Pokemon;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
+using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
+using PokemonBuilder = PokemonUltimate.Content.Builders.Pokemon;
 
 namespace PokemonUltimate.Tests.Data.Builders
 {
@@ -29,7 +30,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Stats(100, 100, 100, 100, 100, 100)
                 .Build();
-            
+
             Assert.That(pokemon.Name, Is.EqualTo(""));
         }
 
@@ -40,7 +41,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Stats(100, 100, 100, 100, 100, 100)
                 .Build();
-            
+
             Assert.That(pokemon.PokedexNumber, Is.EqualTo(0));
         }
 
@@ -52,7 +53,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Stats(100, 100, 100, 100, 100, 100)
                 .Build();
-            
+
             Assert.That(pokemon.PokedexNumber, Is.EqualTo(-1));
         }
 
@@ -63,7 +64,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Stats(0, 0, 0, 0, 0, 0)
                 .Build();
-            
+
             Assert.That(pokemon.BaseStats.Total, Is.EqualTo(0));
         }
 
@@ -74,7 +75,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Stats(999, 999, 999, 999, 999, 999)
                 .Build();
-            
+
             Assert.That(pokemon.BaseStats.Total, Is.EqualTo(5994));
         }
 
@@ -86,7 +87,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Types(PokemonType.Fire, PokemonType.Fire)
                 .Stats(100, 100, 100, 100, 100, 100)
                 .Build();
-            
+
             Assert.That(pokemon.PrimaryType, Is.EqualTo(PokemonType.Fire));
             Assert.That(pokemon.SecondaryType, Is.EqualTo(PokemonType.Fire));
         }
@@ -123,7 +124,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Stats(100, 100, 100, 100, 100, 100)
                 .Build();
-            
+
             Assert.That(pokemon.Evolutions, Is.Empty);
             Assert.That(pokemon.CanEvolve, Is.False);
         }
@@ -135,7 +136,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Stats(100, 100, 100, 100, 100, 100)
                 .Build();
-            
+
             Assert.That(pokemon.Learnset, Is.Empty);
         }
 
@@ -150,7 +151,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Physical(50, 100, 10)
                 .Build();
-            
+
             Assert.That(move.Name, Is.EqualTo(""));
         }
 
@@ -162,7 +163,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Status(100, 10)
                 .Build();
-            
+
             Assert.That(move.Power, Is.EqualTo(0));
             Assert.That(move.IsStatus, Is.True);
         }
@@ -175,7 +176,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Physical(60, 0, 20)
                 .Build();
-            
+
             Assert.That(move.Accuracy, Is.EqualTo(0));
         }
 
@@ -186,7 +187,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Physical(50, 200, 10)
                 .Build();
-            
+
             Assert.That(move.Accuracy, Is.EqualTo(200));
         }
 
@@ -197,7 +198,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Physical(500, 100, 5)
                 .Build();
-            
+
             Assert.That(move.Power, Is.EqualTo(500));
         }
 
@@ -208,7 +209,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Physical(50, 100, 0)
                 .Build();
-            
+
             Assert.That(move.MaxPP, Is.EqualTo(0));
         }
 
@@ -220,7 +221,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Physical(60, 100, 10)
                 .Priority(-4)
                 .Build();
-            
+
             Assert.That(move.Priority, Is.EqualTo(-4));
         }
 
@@ -232,7 +233,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Physical(40, 100, 30)
                 .Priority(1)
                 .Build();
-            
+
             Assert.That(move.Priority, Is.EqualTo(1));
         }
 
@@ -243,7 +244,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Type(PokemonType.Normal)
                 .Physical(50, 100, 10)
                 .Build();
-            
+
             move.MakesContact = true;
             move.IsSoundBased = true;
             move.NeverMisses = true;
@@ -260,7 +261,7 @@ namespace PokemonUltimate.Tests.Data.Builders
             move.IsSnatched = true;
             move.IgnoresTargetStatChanges = true;
             move.IgnoresUserStatChanges = true;
-            
+
             Assert.That(move.MakesContact, Is.True);
             Assert.That(move.IsSoundBased, Is.True);
             Assert.That(move.NeverMisses, Is.True);
@@ -351,7 +352,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .WithFriendship(0)
                 .Build();
             Assert.That(low.Friendship, Is.EqualTo(0));
-            
+
             var high = PokemonInstanceBuilder.Create(PokemonCatalog.Pikachu, 50)
                 .WithFriendship(255)
                 .Build();
@@ -383,7 +384,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .AtHealthPercent(0.0f)
                 .Build();
             Assert.That(fainted.CurrentHP, Is.EqualTo(0));
-            
+
             var full = PokemonInstanceBuilder.Create(PokemonCatalog.Pikachu, 50)
                 .AtHealthPercent(1.0f)
                 .Build();
@@ -393,15 +394,16 @@ namespace PokemonUltimate.Tests.Data.Builders
         [Test]
         public void InstanceBuilder_MoreThan4Moves_LimitedTo4()
         {
+            // Use moves that are actually in Pikachu's learnset
             var pokemon = PokemonInstanceBuilder.Create(PokemonCatalog.Pikachu, 50)
                 .WithMoves(
-                    MoveCatalog.Tackle, 
-                    MoveCatalog.Growl, 
-                    MoveCatalog.ThunderShock, 
-                    MoveCatalog.Thunderbolt,
-                    MoveCatalog.Thunder)  // 5th move should be ignored
+                    MoveCatalog.ThunderShock,  // Starting move
+                    MoveCatalog.Growl,         // Starting move
+                    MoveCatalog.QuickAttack,   // Level 11
+                    MoveCatalog.Thunderbolt,   // Level 26
+                    MoveCatalog.Thunder)       // TM - 5th move should be ignored
                 .Build();
-            
+
             Assert.That(pokemon.Moves.Count, Is.EqualTo(4));
         }
 
@@ -430,7 +432,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .WithNature(Nature.Jolly)
                 .WithNature(Nature.Modest)  // Should override
                 .Build();
-            
+
             Assert.That(pokemon.Nature, Is.EqualTo(Nature.Modest));
         }
 
@@ -441,7 +443,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Shiny()
                 .NotShiny()  // Should override
                 .Build();
-            
+
             Assert.That(pokemon.IsShiny, Is.False);
         }
 
@@ -462,7 +464,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Stats(50, 50, 50, 50, 50, 50)
                 .EvolvesTo(target, e => e.AtLevel(0))
                 .Build();
-            
+
             Assert.That(pokemon.Evolutions.Count, Is.EqualTo(1));
         }
 
@@ -479,7 +481,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Stats(50, 50, 50, 50, 50, 50)
                 .EvolvesTo(target, e => e.AtLevel(100))
                 .Build();
-            
+
             Assert.That(pokemon.Evolutions[0].GetCondition<Core.Evolution.Conditions.LevelCondition>().MinLevel, Is.EqualTo(100));
         }
 
@@ -496,7 +498,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Stats(50, 50, 50, 50, 50, 50)
                 .EvolvesTo(target, e => e.WithItem(""))
                 .Build();
-            
+
             Assert.That(pokemon.Evolutions.Count, Is.EqualTo(1));
         }
 
@@ -514,7 +516,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Stats(50, 50, 50, 50, 50, 50)
                 .EvolvesTo(target, e => e.AtLevel(16).WithFriendship().AtLevel(20))  // Two levels
                 .Build();
-            
+
             // Should have at least one evolution with conditions
             Assert.That(pokemon.Evolutions.Count, Is.EqualTo(1));
         }
@@ -531,7 +533,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Stats(100, 100, 100, 100, 100, 100)
                 .Moves(m => m.AtLevel(0, MoveCatalog.Tackle))
                 .Build();
-            
+
             Assert.That(pokemon.Learnset.Count, Is.GreaterThan(0));
         }
 
@@ -543,7 +545,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Stats(100, 100, 100, 100, 100, 100)
                 .Moves(m => m.AtLevel(100, MoveCatalog.Tackle))
                 .Build();
-            
+
             var move = pokemon.GetMovesAtLevel(100).First();
             Assert.That(move.Level, Is.EqualTo(100));
         }
@@ -559,7 +561,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                     .AtLevel(10, MoveCatalog.Tackle)
                     .AtLevel(15, MoveCatalog.Tackle))
                 .Build();
-            
+
             Assert.That(pokemon.Learnset.Count(l => l.Move == MoveCatalog.Tackle), Is.EqualTo(3));
         }
 
@@ -569,14 +571,14 @@ namespace PokemonUltimate.Tests.Data.Builders
             var pokemon = PokemonBuilder.Define("Test", 1)
                 .Type(PokemonType.Normal)
                 .Stats(100, 100, 100, 100, 100, 100)
-                .Moves(m => m.AtLevel(10, 
-                    MoveCatalog.Tackle, 
-                    MoveCatalog.Growl, 
+                .Moves(m => m.AtLevel(10,
+                    MoveCatalog.Tackle,
+                    MoveCatalog.Growl,
                     MoveCatalog.Scratch,
                     MoveCatalog.Ember,
                     MoveCatalog.WaterGun))
                 .Build();
-            
+
             Assert.That(pokemon.GetMovesAtLevel(10).Count(), Is.EqualTo(5));
         }
 
@@ -592,7 +594,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Physical(0, 100, 10)
                 .WithEffects(e => e.Damage())
                 .Build();
-            
+
             Assert.That(move.Effects.Count, Is.GreaterThan(0));
         }
 
@@ -604,7 +606,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Special(80, 100, 10)
                 .WithEffects(e => e.Damage().MayBurn(200))  // 200% chance
                 .Build();
-            
+
             Assert.That(move.Effects.Count, Is.EqualTo(2));
         }
 
@@ -617,7 +619,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Special(80, 100, 10)
                 .WithEffects(e => e.Damage().MayBurn(-10))
                 .Build();
-            
+
             Assert.That(move.Effects.Count, Is.EqualTo(2));
         }
 
@@ -633,7 +635,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                     .RaiseSpeed(1)
                     .RaiseSpAttack(1))
                 .Build();
-            
+
             Assert.That(move.Effects.Count, Is.EqualTo(4));
         }
 
@@ -646,7 +648,7 @@ namespace PokemonUltimate.Tests.Data.Builders
                 .Status(100, 5)
                 .WithEffects(e => e.RaiseAttack(12))
                 .Build();
-            
+
             Assert.That(move.Effects.Count, Is.EqualTo(1));
         }
 

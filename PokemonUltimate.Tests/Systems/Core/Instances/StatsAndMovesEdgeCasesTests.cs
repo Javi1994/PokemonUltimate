@@ -232,7 +232,7 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
         public void MoveInstance_UseAtZeroPP_ReturnsFalse()
         {
             var move = new MoveInstance(_testMove);
-            
+
             // Use all PP
             while (move.CurrentPP > 0)
                 move.Use();
@@ -400,13 +400,12 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
         }
 
         [Test]
-        public void ModifyStatStage_HP_DoesNothing()
+        public void ModifyStatStage_HP_ThrowsArgumentException()
         {
             var pokemon = CreatePokemon(50);
 
-            int change = pokemon.ModifyStatStage(Stat.HP, 2);
-
-            Assert.That(change, Is.EqualTo(0)); // HP doesn't have stages
+            // HP stat stage modification should throw an exception
+            Assert.Throws<ArgumentException>(() => pokemon.ModifyStatStage(Stat.HP, 2));
         }
 
         [Test]

@@ -55,6 +55,16 @@ namespace PokemonUltimate.Core.Constants
 
         #endregion
 
+        #region Builder Validation
+
+        public const string StatOverrideCannotBeNegative = "Stat override cannot be negative";
+        public const string HPCannotExceedMaxHP = "HP cannot exceed MaxHP";
+        public const string AbilityNotValidForSpecies = "Ability {0} is not valid for species {1}";
+        public const string MoveNotInLearnset = "Move {0} is not in species {1} learnset";
+        public const string InvalidHPPercent = "HP percent must be between 0.0 and 1.0";
+
+        #endregion
+
         #region Combat
 
         public const string SlotIndexCannotBeNegative = "Slot index cannot be negative";

@@ -3,6 +3,7 @@ using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Catalogs.Items;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Providers;
 
 namespace PokemonUltimate.Tests.Systems.Core.Instances
 {
@@ -113,14 +114,14 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
         public void Species_GetRandomAbility_WithSecondaryAbility_CanReturnEither()
         {
             // Arrange
-            var random = new System.Random(12345);
+            var randomProvider = new RandomProvider(12345);
             bool gotPrimary = false;
             bool gotSecondary = false;
 
             // Act - Run multiple times to check randomness
             for (int i = 0; i < 100; i++)
             {
-                var ability = PokemonCatalog.Eevee.GetRandomAbility(random);
+                var ability = PokemonCatalog.Eevee.GetRandomAbility(randomProvider);
                 if (ability == AbilityCatalog.RunAway) gotPrimary = true;
                 if (ability == AbilityCatalog.Adaptability) gotSecondary = true;
             }
@@ -230,14 +231,14 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
         [Test]
         public void WithHiddenAbility_ThenWithAbility_UsesSpecificAbility()
         {
-            // Act
+            // Act - Use Pikachu's valid primary ability (Static) after setting hidden ability
             var pokemon = PokemonInstanceBuilder.Create(PokemonCatalog.Pikachu, 25)
                 .WithHiddenAbility()
-                .WithAbility(AbilityCatalog.Intimidate)
+                .WithAbility(AbilityCatalog.Static)  // Override with primary ability
                 .Build();
 
             // Assert
-            Assert.That(pokemon.Ability, Is.EqualTo(AbilityCatalog.Intimidate));
+            Assert.That(pokemon.Ability, Is.EqualTo(AbilityCatalog.Static));
         }
 
         [Test]

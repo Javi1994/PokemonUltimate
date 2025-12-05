@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 
@@ -20,25 +21,25 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
         [Test]
         public void MaxIV_Should_Be_31()
         {
-            Assert.That(StatCalculator.MaxIV, Is.EqualTo(31));
+            Assert.That(CoreConstants.MaxIV, Is.EqualTo(31));
         }
 
         [Test]
         public void MaxEV_Should_Be_252()
         {
-            Assert.That(StatCalculator.MaxEV, Is.EqualTo(252));
+            Assert.That(CoreConstants.MaxEV, Is.EqualTo(252));
         }
 
         [Test]
         public void DefaultIV_Should_Be_MaxIV()
         {
-            Assert.That(StatCalculator.DefaultIV, Is.EqualTo(StatCalculator.MaxIV));
+            Assert.That(CoreConstants.DefaultIV, Is.EqualTo(CoreConstants.MaxIV));
         }
 
         [Test]
         public void DefaultEV_Should_Be_MaxEV()
         {
-            Assert.That(StatCalculator.DefaultEV, Is.EqualTo(StatCalculator.MaxEV));
+            Assert.That(CoreConstants.DefaultEV, Is.EqualTo(CoreConstants.MaxEV));
         }
 
         #endregion

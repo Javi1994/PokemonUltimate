@@ -1,3 +1,4 @@
+using PokemonUltimate.Core.Effects.Strategies;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Effects
@@ -16,38 +17,30 @@ namespace PokemonUltimate.Core.Effects
     {
         public EffectType EffectType => EffectType.PriorityModifier;
         public string Description => GetDescription();
-        
+
         /// <summary>Priority change when condition is met.</summary>
         public int PriorityChange { get; set; } = 1;
-        
+
         /// <summary>Condition type that activates this modifier.</summary>
         public PriorityCondition Condition { get; set; } = PriorityCondition.Always;
-        
+
         /// <summary>Required terrain for TerrainBased condition.</summary>
         public Terrain? RequiredTerrain { get; set; }
-        
+
         /// <summary>Required weather for WeatherBased condition.</summary>
         public Weather? RequiredWeather { get; set; }
-        
+
         /// <summary>HP threshold for HPBased condition (1.0 = full HP).</summary>
         public float HPThreshold { get; set; } = 1.0f;
-        
+
         public PriorityModifierEffect() { }
-        
+
         private string GetDescription()
         {
-            switch (Condition)
-            {
-                case PriorityCondition.Always: return $"Priority {(PriorityChange > 0 ? "+" : "")}{PriorityChange}.";
-                case PriorityCondition.TerrainBased: return $"+{PriorityChange} priority in {RequiredTerrain}.";
-                case PriorityCondition.WeatherBased: return $"+{PriorityChange} priority in {RequiredWeather}.";
-                case PriorityCondition.FullHP: return $"+{PriorityChange} priority at full HP.";
-                case PriorityCondition.LowHP: return $"+{PriorityChange} priority below {HPThreshold * 100}% HP.";
-                default: return "Modifies priority.";
-            }
+            return EffectDescriptionRegistries.GetPriorityModifierDescription(this);
         }
     }
-    
+
     /// <summary>
     /// Conditions for priority modification.
     /// </summary>

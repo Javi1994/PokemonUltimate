@@ -1,3 +1,4 @@
+using PokemonUltimate.Core.Effects.Strategies;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Core.Effects
@@ -15,30 +16,30 @@ namespace PokemonUltimate.Core.Effects
     {
         public EffectType EffectType => EffectType.SelfDestruct;
         public string Description => GetDescription();
-        
+
         /// <summary>Type of self-destruct effect.</summary>
         public SelfDestructType Type { get; set; } = SelfDestructType.Explosion;
-        
+
         /// <summary>Whether the move deals damage (Explosion) or has other effects (Memento).</summary>
         public bool DealsDamage { get; set; } = true;
-        
+
         /// <summary>Whether target's Defense is halved for damage calc (Explosion, Gen 1-4).</summary>
         public bool HalvesTargetDefense { get; set; } = false;
-        
+
         /// <summary>Stat changes to apply to target before fainting (Memento).</summary>
         public StatChangeEffect[] StatChanges { get; set; }
-        
+
         /// <summary>Whether the next Pokemon is fully healed (Healing Wish, Lunar Dance).</summary>
         public bool HealsReplacement { get; set; } = false;
-        
+
         /// <summary>Whether PP is restored to replacement (Lunar Dance).</summary>
         public bool RestoresPP { get; set; } = false;
-        
+
         /// <summary>For Final Gambit: deals damage equal to user's remaining HP.</summary>
         public bool DamageEqualsHP { get; set; } = false;
-        
+
         public SelfDestructEffect() { }
-        
+
         public SelfDestructEffect(SelfDestructType type)
         {
             Type = type;
@@ -47,21 +48,13 @@ namespace PokemonUltimate.Core.Effects
             DamageEqualsHP = type == SelfDestructType.FinalGambit;
             RestoresPP = type == SelfDestructType.LunarDance;
         }
-        
+
         private string GetDescription()
         {
-            switch (Type)
-            {
-                case SelfDestructType.Explosion: return "User faints. Deals massive damage.";
-                case SelfDestructType.Memento: return "User faints. Sharply lowers target's Atk and SpA.";
-                case SelfDestructType.FinalGambit: return "User faints. Deals damage equal to user's HP.";
-                case SelfDestructType.HealingWish: return "User faints. Fully heals replacement.";
-                case SelfDestructType.LunarDance: return "User faints. Fully heals and restores PP of replacement.";
-                default: return "User faints after using.";
-            }
+            return EffectDescriptionRegistries.GetSelfDestructDescription(this);
         }
     }
-    
+
     /// <summary>
     /// Types of self-destruct moves.
     /// </summary>

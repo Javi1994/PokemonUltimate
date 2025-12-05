@@ -9,33 +9,41 @@
 ## Overview
 
 This sub-feature defines the type effectiveness table:
-- **TypeEffectiveness**: Static class containing Gen 6+ type chart data
+
+-   **ITypeEffectiveness** / **TypeEffectiveness**: Instance-based class with interface containing Gen 6+ type chart data (post-refactor)
 
 ## Components
 
-### TypeEffectiveness
-**Namespace**: `PokemonUltimate.Core.Factories`  
-**File**: `PokemonUltimate.Core/Factories/TypeEffectiveness.cs`
+### ITypeEffectiveness / TypeEffectiveness
 
-Static class containing:
-- Type effectiveness multipliers (0x, 0.5x, 1x, 2x)
-- Gen 6+ type chart (includes Fairy type)
-- STAB (Same Type Attack Bonus) multiplier
-- Methods: GetEffectiveness(), GetStabMultiplier()
+**Namespace**: `PokemonUltimate.Core.Factories`  
+**Files**: `PokemonUltimate.Core/Factories/ITypeEffectiveness.cs`, `TypeEffectiveness.cs`
+
+Instance-based calculator with interface (post-refactor) containing:
+
+-   Type effectiveness multipliers (0x, 0.5x, 1x, 2x)
+-   Gen 6+ type chart (includes Fairy type)
+-   STAB (Same Type Attack Bonus) multiplier
+-   Methods: `GetEffectiveness()`, `GetSTABMultiplier()`, `GetEffectivenessDescription()`
+
+**Post-Refactor Improvements**:
+
+-   Converted from static class to instance-based with `ITypeEffectiveness` interface
+-   Static methods maintained as wrappers for backward compatibility
+-   Improved testability through dependency injection
 
 **Note**: This contains the **data table**. The logic for using this data in damage calculation is in Feature 2: Combat System.
 
 ## Related Sub-Features
 
-- **[1.1: Pokemon Data](../1.1-pokemon-data/)** - Pokemon types used in effectiveness calculations
-- **[1.2: Move Data](../1.2-move-data/)** - Move types used in effectiveness calculations
+-   **[1.1: Pokemon Data](../1.1-pokemon-data/)** - Pokemon types used in effectiveness calculations
+-   **[1.2: Move Data](../1.2-move-data/)** - Move types used in effectiveness calculations
 
 ## Documentation
 
-- **[Parent Architecture](../architecture.md#112-type-effectiveness-table)** - Technical specification
-- **[Parent Code Location](../code_location.md#grupo-c-supporting-systems)** - Code organization
+-   **[Parent Architecture](../architecture.md#112-type-effectiveness-table)** - Technical specification
+-   **[Parent Code Location](../code_location.md#grupo-c-supporting-systems)** - Code organization
 
 ---
 
-**Last Updated**: 2025-01-XX
-
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-XX)

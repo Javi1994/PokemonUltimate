@@ -207,7 +207,7 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
         {
             Pokemon.SetSeed(11111);
             var pokemon1 = Pokemon.Create(_pikachu, 25).WithRandomNature().Build();
-            
+
             Pokemon.SetSeed(22222);
             var pokemon2 = Pokemon.Create(_pikachu, 25).WithRandomNature().Build();
 
@@ -355,12 +355,31 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
         [Test]
         public void WithMoves_Should_Limit_To_4()
         {
-            var move3 = new MoveData { Name = "Move3", MaxPP = 10 };
-            var move4 = new MoveData { Name = "Move4", MaxPP = 10 };
-            var move5 = new MoveData { Name = "Move5", MaxPP = 10 };
+            // Create a Pokemon with more moves in learnset for this test
+            var testMove1 = new MoveData { Name = "TestMove1", Type = PokemonType.Normal, MaxPP = 10 };
+            var testMove2 = new MoveData { Name = "TestMove2", Type = PokemonType.Normal, MaxPP = 10 };
+            var testMove3 = new MoveData { Name = "TestMove3", Type = PokemonType.Normal, MaxPP = 10 };
+            var testMove4 = new MoveData { Name = "TestMove4", Type = PokemonType.Normal, MaxPP = 10 };
+            var testMove5 = new MoveData { Name = "TestMove5", Type = PokemonType.Normal, MaxPP = 10 };
 
-            var pokemon = Pokemon.Create(_pikachu, 25)
-                .WithMoves(_tackle, _thunderShock, _thunderbolt, move3, move4, move5)
+            var testSpecies = new PokemonSpeciesData
+            {
+                Name = "TestMon",
+                PokedexNumber = 999,
+                PrimaryType = PokemonType.Normal,
+                BaseStats = new BaseStats(100, 100, 100, 100, 100, 100),
+                Learnset = new List<LearnableMove>
+                {
+                    new LearnableMove(testMove1, LearnMethod.Start, 1),
+                    new LearnableMove(testMove2, LearnMethod.Start, 1),
+                    new LearnableMove(testMove3, LearnMethod.Start, 1),
+                    new LearnableMove(testMove4, LearnMethod.Start, 1),
+                    new LearnableMove(testMove5, LearnMethod.Start, 1)
+                }
+            };
+
+            var pokemon = Pokemon.Create(testSpecies, 25)
+                .WithMoves(testMove1, testMove2, testMove3, testMove4, testMove5)  // 5 moves, should limit to 4
                 .Build();
 
             Assert.That(pokemon.Moves, Has.Count.EqualTo(4));
@@ -401,13 +420,13 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
         {
             Pokemon.SetSeed(11111);
             var pokemon1 = Pokemon.Create(_pikachu, 30).WithRandomMoves().Build();
-            
+
             Pokemon.SetSeed(22222);
             var pokemon2 = Pokemon.Create(_pikachu, 30).WithRandomMoves().Build();
 
             var moves1 = string.Join(",", pokemon1.Moves.Select(m => m.Move.Name));
             var moves2 = string.Join(",", pokemon2.Moves.Select(m => m.Move.Name));
-            
+
             // Different seeds should give different order (usually)
             Assert.That(moves1, Is.Not.EqualTo(moves2).Or.EqualTo(moves2)); // May be same by chance
         }

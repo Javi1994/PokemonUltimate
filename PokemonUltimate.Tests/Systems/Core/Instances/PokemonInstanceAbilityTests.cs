@@ -46,13 +46,13 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
         [Test]
         public void Create_WithSpecificAbility_GetsSpecifiedAbility()
         {
-            // Arrange & Act
+            // Arrange & Act - Use Pikachu's valid ability (Static)
             var pokemon = PokemonInstanceBuilder.Create(PokemonCatalog.Pikachu, 25)
-                .WithAbility(AbilityCatalog.Levitate)
+                .WithAbility(AbilityCatalog.Static)
                 .Build();
 
             // Assert
-            Assert.That(pokemon.Ability, Is.EqualTo(AbilityCatalog.Levitate));
+            Assert.That(pokemon.Ability, Is.EqualTo(AbilityCatalog.Static));
         }
 
         [Test]

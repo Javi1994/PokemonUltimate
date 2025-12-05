@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Instances.Strategies;
+using PokemonUltimate.Core.Managers;
 
 namespace PokemonUltimate.Core.Instances
 {
@@ -9,7 +13,7 @@ namespace PokemonUltimate.Core.Instances
     /// Runtime instance of a Pokemon with mutable state.
     /// Created from a PokemonSpeciesData blueprint via PokemonFactory.
     /// Tracks level, HP, stats, moves, status, and battle state.
-    /// 
+    ///
     /// This is a partial class split across multiple files:
     /// - PokemonInstance.cs: Core properties and constructor
     /// - PokemonInstance.Battle.cs: Battle-related methods
@@ -247,19 +251,19 @@ namespace PokemonUltimate.Core.Instances
         /// <summary>
         /// Returns true if friendship is high enough for friendship-based evolutions (>= 220).
         /// </summary>
-        public bool HasHighFriendship => Friendship >= 220;
+        public bool HasHighFriendship => Friendship >= CoreConstants.HighFriendshipThreshold;
 
         /// <summary>
         /// Returns true if friendship is at maximum (255).
         /// </summary>
-        public bool HasMaxFriendship => Friendship >= 255;
+        public bool HasMaxFriendship => Friendship >= CoreConstants.MaxFriendship;
 
         #endregion
 
         #region Constructor
 
         /// <summary>
-        /// Creates a new Pokemon instance. 
+        /// Creates a new Pokemon instance.
         /// Prefer using PokemonFactory.Create() for normal usage.
         /// </summary>
         public PokemonInstance(
@@ -292,10 +296,13 @@ namespace PokemonUltimate.Core.Instances
             SpDefense = spDefense;
             Speed = speed;
 
+            // Initialize cache with initial stats
+            _statsCache.SetStats(level, nature, species, maxHP, attack, defense, spAttack, spDefense, speed);
+
             // Personal
             Nature = nature;
             Gender = gender;
-            Friendship = Math.Max(0, Math.Min(255, friendship));
+            Friendship = friendship.ClampFriendship();
             IsShiny = isShiny;
 
             // Moves
@@ -311,19 +318,13 @@ namespace PokemonUltimate.Core.Instances
             StatusTurnCounter = 0;
 
             // Initialize stat stages to 0
-            StatStages = new Dictionary<Stat, int>
-            {
-                { Stat.Attack, 0 },
-                { Stat.Defense, 0 },
-                { Stat.SpAttack, 0 },
-                { Stat.SpDefense, 0 },
-                { Stat.Speed, 0 },
-                { Stat.Accuracy, 0 },
-                { Stat.Evasion, 0 }
-            };
+            StatStages = StatStageManager.Default.CreateInitialStages();
 
             // Initialize move check level to current level
             _lastMoveCheckLevel = level;
+
+            // Initialize cache with initial stats
+            _statsCache.SetStats(level, nature, species, maxHP, attack, defense, spAttack, spDefense, speed);
         }
 
         #endregion
@@ -332,18 +333,7 @@ namespace PokemonUltimate.Core.Instances
 
         private int GetBaseStat(Stat stat)
         {
-            switch (stat)
-            {
-                case Stat.HP: return MaxHP;
-                case Stat.Attack: return Attack;
-                case Stat.Defense: return Defense;
-                case Stat.SpAttack: return SpAttack;
-                case Stat.SpDefense: return SpDefense;
-                case Stat.Speed: return Speed;
-                case Stat.Accuracy: return 100; // Base accuracy is 100%
-                case Stat.Evasion: return 100;  // Base evasion is 100%
-                default: return 0;
-            }
+            return PokemonStatGetterRegistry.GetStat(this, stat);
         }
 
         #endregion

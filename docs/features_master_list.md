@@ -29,6 +29,8 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 **Status**: ✅ Core Complete  
 **Description**: All game data structures (blueprints) and supporting systems for Pokemon, Moves, Abilities, Items, Field Conditions, and infrastructure
 
+> **📋 Refactoring Completed (2024-12-XX)**: Comprehensive refactoring completed following SOLID principles. All major components now use Dependency Injection, Strategy Pattern, Constants centralization, Extension methods, Validation, Move selection, Stat stage management, and Stats caching. See `PokemonUltimate.Core/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details. Phases 0-8 completed (21/22 tasks, 95.5%).
+
 **Sub-Features** (Organized by Groups):
 
 #### Grupo A: Core Entity Data (Entidades Principales)
@@ -50,14 +52,14 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 #### Grupo C: Supporting Systems (Sistemas de Soporte)
 
 -   **1.11**: Evolution System - Evolution, IEvolutionCondition, EvolutionConditions (6 classes)
--   **1.12**: Type Effectiveness Table - TypeEffectiveness (data table)
+-   **1.12**: Type Effectiveness Table - ITypeEffectiveness/TypeEffectiveness (instance-based with interface, post-refactor)
 
 #### Grupo D: Infrastructure (Infraestructura)
 
 -   **1.13**: Interfaces Base - IIdentifiable
--   **1.14**: Enums & Constants - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages, NatureData
+-   **1.14**: Enums & Constants - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages, CoreConstants, CoreValidators, Extensions, NatureData (post-refactor)
 -   ⚠️ **Builders**: Moved to Feature 3.9 (see Feature 3 below)
--   **1.15**: Factories & Calculators - StatCalculator, PokemonFactory, PokemonInstanceBuilder
+-   **1.15**: Factories & Calculators - IStatCalculator/StatCalculator, ITypeEffectiveness/TypeEffectiveness, PokemonFactory, PokemonInstanceBuilder, IMoveSelector/MoveSelector (post-refactor)
 -   **1.16**: Registry System - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
 
 #### Grupo E: Planned Features
@@ -416,5 +418,5 @@ When adding a new sub-feature, provide:
 
 ---
 
-**Last Updated**: 2025-01-XX  
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-XX)  
 **Maintained By**: Project maintainers

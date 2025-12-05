@@ -78,7 +78,7 @@ namespace PokemonUltimate.Core.Instances
                     bool allOthersMet = evolution.Conditions
                         .Where(c => !(c is ItemCondition))
                         .All(c => c.IsMet(this));
-                    
+
                     if (allOthersMet)
                         return evolution;
                 }
@@ -105,7 +105,7 @@ namespace PokemonUltimate.Core.Instances
                     bool allOthersMet = evolution.Conditions
                         .Where(c => !(c is TradeCondition))
                         .All(c => c.IsMet(this));
-                    
+
                     if (allOthersMet)
                         return evolution;
                 }
@@ -215,6 +215,9 @@ namespace PokemonUltimate.Core.Instances
 
             // Change species
             Species = targetSpecies;
+
+            // Invalidate cache since species changed
+            _statsCache.Invalidate();
 
             // Recalculate stats for new species
             RecalculateStats();

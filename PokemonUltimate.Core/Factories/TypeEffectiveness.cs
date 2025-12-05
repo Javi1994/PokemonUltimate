@@ -14,7 +14,7 @@ namespace PokemonUltimate.Core.Factories
     /// **Sub-Feature**: 1.8: Type Effectiveness Table
     /// **Documentation**: See `docs/features/1-game-data/1.8-type-effectiveness-table/README.md`
     /// </remarks>
-    public static class TypeEffectiveness
+    public class TypeEffectiveness : ITypeEffectiveness
     {
         #region Constants
 
@@ -47,15 +47,25 @@ namespace PokemonUltimate.Core.Factories
 
         #region Type Chart
 
-        // Type chart: attackingType -> defendingType -> effectiveness
-        private static readonly Dictionary<PokemonType, Dictionary<PokemonType, float>> _typeChart;
+        private static readonly ITypeEffectiveness _defaultInstance = new TypeEffectiveness();
 
-        static TypeEffectiveness()
+        // Type chart: attackingType -> defendingType -> effectiveness
+        private readonly Dictionary<PokemonType, Dictionary<PokemonType, float>> _typeChart;
+
+        /// <summary>
+        /// Gets the default instance for static method compatibility.
+        /// </summary>
+        public static ITypeEffectiveness Default => _defaultInstance;
+
+        /// <summary>
+        /// Creates a new TypeEffectiveness instance.
+        /// </summary>
+        public TypeEffectiveness()
         {
             _typeChart = InitializeTypeChart();
         }
 
-        private static Dictionary<PokemonType, Dictionary<PokemonType, float>> InitializeTypeChart()
+        private Dictionary<PokemonType, Dictionary<PokemonType, float>> InitializeTypeChart()
         {
             var chart = new Dictionary<PokemonType, Dictionary<PokemonType, float>>();
 
@@ -242,7 +252,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Gets the type effectiveness multiplier for a single defender type.
         /// </summary>
-        public static float GetEffectiveness(PokemonType attackType, PokemonType defenderType)
+        float ITypeEffectiveness.GetEffectiveness(PokemonType attackType, PokemonType defenderType)
         {
             if (_typeChart.TryGetValue(attackType, out var defenderChart))
             {
@@ -257,13 +267,13 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Gets the combined type effectiveness for a dual-type defender.
         /// </summary>
-        public static float GetEffectiveness(PokemonType attackType, PokemonType primaryType, PokemonType? secondaryType)
+        float ITypeEffectiveness.GetEffectiveness(PokemonType attackType, PokemonType primaryType, PokemonType? secondaryType)
         {
-            float primaryMult = GetEffectiveness(attackType, primaryType);
-            
+            float primaryMult = ((ITypeEffectiveness)this).GetEffectiveness(attackType, primaryType);
+
             if (secondaryType.HasValue)
             {
-                float secondaryMult = GetEffectiveness(attackType, secondaryType.Value);
+                float secondaryMult = ((ITypeEffectiveness)this).GetEffectiveness(attackType, secondaryType.Value);
                 return primaryMult * secondaryMult;
             }
 
@@ -273,7 +283,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Checks if the attack is super effective (>1x).
         /// </summary>
-        public static bool IsSuperEffective(float effectiveness)
+        bool ITypeEffectiveness.IsSuperEffective(float effectiveness)
         {
             return effectiveness > Normal;
         }
@@ -281,7 +291,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Checks if the attack is not very effective (<1x but >0x).
         /// </summary>
-        public static bool IsNotVeryEffective(float effectiveness)
+        bool ITypeEffectiveness.IsNotVeryEffective(float effectiveness)
         {
             return effectiveness > Immune && effectiveness < Normal;
         }
@@ -289,7 +299,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Checks if the defender is immune (0x).
         /// </summary>
-        public static bool IsImmune(float effectiveness)
+        bool ITypeEffectiveness.IsImmune(float effectiveness)
         {
             return effectiveness == Immune;
         }
@@ -297,7 +307,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Gets a human-readable description of the effectiveness.
         /// </summary>
-        public static string GetEffectivenessDescription(float effectiveness)
+        string ITypeEffectiveness.GetEffectivenessDescription(float effectiveness)
         {
             if (effectiveness == Immune)
                 return GameMessages.NoEffect;
@@ -315,7 +325,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Calculates STAB bonus if the move type matches the attacker's type.
         /// </summary>
-        public static float GetSTABMultiplier(PokemonType moveType, PokemonType primaryType, PokemonType? secondaryType)
+        float ITypeEffectiveness.GetSTABMultiplier(PokemonType moveType, PokemonType primaryType, PokemonType? secondaryType)
         {
             if (moveType == primaryType || (secondaryType.HasValue && moveType == secondaryType.Value))
             {
@@ -327,7 +337,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Gets all types that the given type is super effective against.
         /// </summary>
-        public static List<PokemonType> GetSuperEffectiveAgainst(PokemonType attackType)
+        List<PokemonType> ITypeEffectiveness.GetSuperEffectiveAgainst(PokemonType attackType)
         {
             var result = new List<PokemonType>();
             if (_typeChart.TryGetValue(attackType, out var defenderChart))
@@ -344,7 +354,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Gets all types that the given type is resisted by.
         /// </summary>
-        public static List<PokemonType> GetResistedBy(PokemonType attackType)
+        List<PokemonType> ITypeEffectiveness.GetResistedBy(PokemonType attackType)
         {
             var result = new List<PokemonType>();
             if (_typeChart.TryGetValue(attackType, out var defenderChart))
@@ -361,7 +371,7 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Gets all types that are immune to the given attack type.
         /// </summary>
-        public static List<PokemonType> GetImmuneTypes(PokemonType attackType)
+        List<PokemonType> ITypeEffectiveness.GetImmuneTypes(PokemonType attackType)
         {
             var result = new List<PokemonType>();
             if (_typeChart.TryGetValue(attackType, out var defenderChart))
@@ -373,6 +383,90 @@ namespace PokemonUltimate.Core.Factories
                 }
             }
             return result;
+        }
+
+        #endregion
+
+        #region Static Compatibility Methods
+
+        /// <summary>
+        /// Gets the type effectiveness multiplier for a single defender type (static wrapper for compatibility).
+        /// </summary>
+        public static float GetEffectiveness(PokemonType attackType, PokemonType defenderType)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).GetEffectiveness(attackType, defenderType);
+        }
+
+        /// <summary>
+        /// Gets the combined type effectiveness for a dual-type defender (static wrapper for compatibility).
+        /// </summary>
+        public static float GetEffectiveness(PokemonType attackType, PokemonType primaryType, PokemonType? secondaryType)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).GetEffectiveness(attackType, primaryType, secondaryType);
+        }
+
+        /// <summary>
+        /// Checks if the attack is super effective (static wrapper for compatibility).
+        /// </summary>
+        public static bool IsSuperEffective(float effectiveness)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).IsSuperEffective(effectiveness);
+        }
+
+        /// <summary>
+        /// Checks if the attack is not very effective (static wrapper for compatibility).
+        /// </summary>
+        public static bool IsNotVeryEffective(float effectiveness)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).IsNotVeryEffective(effectiveness);
+        }
+
+        /// <summary>
+        /// Checks if the defender is immune (static wrapper for compatibility).
+        /// </summary>
+        public static bool IsImmune(float effectiveness)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).IsImmune(effectiveness);
+        }
+
+        /// <summary>
+        /// Gets a human-readable description of the effectiveness (static wrapper for compatibility).
+        /// </summary>
+        public static string GetEffectivenessDescription(float effectiveness)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).GetEffectivenessDescription(effectiveness);
+        }
+
+        /// <summary>
+        /// Calculates STAB bonus if the move type matches the attacker's type (static wrapper for compatibility).
+        /// </summary>
+        public static float GetSTABMultiplier(PokemonType moveType, PokemonType primaryType, PokemonType? secondaryType)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).GetSTABMultiplier(moveType, primaryType, secondaryType);
+        }
+
+        /// <summary>
+        /// Gets all types that the given type is super effective against (static wrapper for compatibility).
+        /// </summary>
+        public static List<PokemonType> GetSuperEffectiveAgainst(PokemonType attackType)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).GetSuperEffectiveAgainst(attackType);
+        }
+
+        /// <summary>
+        /// Gets all types that the given type is resisted by (static wrapper for compatibility).
+        /// </summary>
+        public static List<PokemonType> GetResistedBy(PokemonType attackType)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).GetResistedBy(attackType);
+        }
+
+        /// <summary>
+        /// Gets all types that are immune to the given attack type (static wrapper for compatibility).
+        /// </summary>
+        public static List<PokemonType> GetImmuneTypes(PokemonType attackType)
+        {
+            return ((ITypeEffectiveness)_defaultInstance).GetImmuneTypes(attackType);
         }
 
         #endregion

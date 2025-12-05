@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 
@@ -22,6 +23,9 @@ namespace PokemonUltimate.Core.Instances
 
         // Tracks the last level at which moves were checked (for multi-level ups)
         private int _lastMoveCheckLevel;
+
+        // Cache for calculated stats to avoid unnecessary recalculations
+        private readonly StatsCache _statsCache = new StatsCache();
 
         #endregion
 
@@ -111,8 +115,7 @@ namespace PokemonUltimate.Core.Instances
         /// </summary>
         public int LevelUpTo(int targetLevel)
         {
-            if (targetLevel < 1 || targetLevel > 100)
-                throw new ArgumentException("Target level must be between 1 and 100", nameof(targetLevel));
+            CoreValidators.ValidateLevel(targetLevel);
 
             if (targetLevel <= Level)
                 return 0;
@@ -141,12 +144,48 @@ namespace PokemonUltimate.Core.Instances
 
         private void RecalculateStats()
         {
-            MaxHP = StatCalculator.CalculateHP(Species.BaseStats.HP, Level);
-            Attack = StatCalculator.CalculateStat(Species.BaseStats.Attack, Level, Nature, Stat.Attack);
-            Defense = StatCalculator.CalculateStat(Species.BaseStats.Defense, Level, Nature, Stat.Defense);
-            SpAttack = StatCalculator.CalculateStat(Species.BaseStats.SpAttack, Level, Nature, Stat.SpAttack);
-            SpDefense = StatCalculator.CalculateStat(Species.BaseStats.SpDefense, Level, Nature, Stat.SpDefense);
-            Speed = StatCalculator.CalculateStat(Species.BaseStats.Speed, Level, Nature, Stat.Speed);
+            // Check if cache is still valid
+            if (_statsCache.IsValid(Level, Nature, Species))
+            {
+                // Use cached values
+                var cachedMaxHP = _statsCache.GetMaxHP();
+                var cachedAttack = _statsCache.GetAttack();
+                var cachedDefense = _statsCache.GetDefense();
+                var cachedSpAttack = _statsCache.GetSpAttack();
+                var cachedSpDefense = _statsCache.GetSpDefense();
+                var cachedSpeed = _statsCache.GetSpeed();
+
+                if (cachedMaxHP.HasValue && cachedAttack.HasValue && cachedDefense.HasValue &&
+                    cachedSpAttack.HasValue && cachedSpDefense.HasValue && cachedSpeed.HasValue)
+                {
+                    MaxHP = cachedMaxHP.Value;
+                    Attack = cachedAttack.Value;
+                    Defense = cachedDefense.Value;
+                    SpAttack = cachedSpAttack.Value;
+                    SpDefense = cachedSpDefense.Value;
+                    Speed = cachedSpeed.Value;
+                    return;
+                }
+            }
+
+            // Cache invalid or missing - recalculate
+            int maxHP = StatCalculator.CalculateHP(Species.BaseStats.HP, Level);
+            int attack = StatCalculator.CalculateStat(Species.BaseStats.Attack, Level, Nature, Stat.Attack);
+            int defense = StatCalculator.CalculateStat(Species.BaseStats.Defense, Level, Nature, Stat.Defense);
+            int spAttack = StatCalculator.CalculateStat(Species.BaseStats.SpAttack, Level, Nature, Stat.SpAttack);
+            int spDefense = StatCalculator.CalculateStat(Species.BaseStats.SpDefense, Level, Nature, Stat.SpDefense);
+            int speed = StatCalculator.CalculateStat(Species.BaseStats.Speed, Level, Nature, Stat.Speed);
+
+            // Update properties
+            MaxHP = maxHP;
+            Attack = attack;
+            Defense = defense;
+            SpAttack = spAttack;
+            SpDefense = spDefense;
+            Speed = speed;
+
+            // Update cache
+            _statsCache.SetStats(Level, Nature, Species, maxHP, attack, defense, spAttack, spDefense, speed);
         }
 
         #endregion

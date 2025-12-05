@@ -7,18 +7,19 @@
 
 ## 📍 Current Project State
 
-| Aspect                  | Status                                                                                                                                                                      |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Current Phase**       | Phase 3: Combat System ✅                                                                                                                                                   |
-| **Sub-Phase**           | 2.14 Hazards System ✅ Core Complete                                                                                                                                        |
-| **Combat Refactoring**  | ✅ Complete (2024-12-05) - Phases 0-13 completed (42/44 tasks, 95.5%). DI, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, Validation implemented. |
-| **Tests**               | 2,528+ passing (includes Weather System 48 tests, Terrain System 84+ tests, Hazards System 25+ tests)                                                                       |
-| **Integration Tests**   | 83+ tests (system interactions)                                                                                                                                             |
-| **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed.                                           |
-| **Warnings**            | 0                                                                                                                                                                           |
-| **Pokemon Catalog**     | 26 Pokemon (Gen1)                                                                                                                                                           |
-| **Move Catalog**        | 36 Moves (12 types)                                                                                                                                                         |
-| **Last Updated**        | January 2025 (Post-Refactoring)                                                                                                                                             |
+| Aspect                  | Status                                                                                                                                                                                                                                                                                                    |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Current Phase**       | Phase 3: Combat System ✅                                                                                                                                                                                                                                                                                 |
+| **Sub-Phase**           | 2.14 Hazards System ✅ Core Complete                                                                                                                                                                                                                                                                      |
+| **Combat Refactoring**  | ✅ Complete (2024-12-05) - Phases 0-13 completed (42/44 tasks, 95.5%). DI, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, Validation implemented.                                                                                                                               |
+| **Core Refactoring**    | ✅ Complete (2024-12-XX) - Phases 0-8 completed (21/22 tasks, 95.5%). DI, Strategy Pattern, Constants centralization, Extension methods, Validation, Move selection, Stat stage management, Stats caching implemented. See `PokemonUltimate.Core/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details. |
+| **Tests**               | 2,528+ passing (includes Weather System 48 tests, Terrain System 84+ tests, Hazards System 25+ tests)                                                                                                                                                                                                     |
+| **Integration Tests**   | 83+ tests (system interactions)                                                                                                                                                                                                                                                                           |
+| **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed.                                                                                                                                                                         |
+| **Warnings**            | 0                                                                                                                                                                                                                                                                                                         |
+| **Pokemon Catalog**     | 26 Pokemon (Gen1)                                                                                                                                                                                                                                                                                         |
+| **Move Catalog**        | 36 Moves (12 types)                                                                                                                                                                                                                                                                                       |
+| **Last Updated**        | January 2025 (Post-Refactoring)                                                                                                                                                                                                                                                                           |
 
 ---
 
@@ -26,15 +27,18 @@
 
 ```
 PokemonUltimate/
-├── Core/           # Game logic (DO NOT add game data here)
-│   ├── Blueprints/ # Immutable data structures
-│   ├── Instances/  # Mutable runtime state
-│   ├── Factories/  # Object creation
-│   ├── Effects/    # Move effects (IMoveEffect)
+├── Core/           # Game logic (DO NOT add game data here) - ✅ Refactored (2024-12-XX)
+│   ├── Blueprints/ # Immutable data structures (uses Strategy Pattern for stat getters, post-refactor)
+│   ├── Instances/  # Mutable runtime state (uses StatsCache, StatStageManager, post-refactor)
+│   ├── Factories/  # Object creation (DI-based: IStatCalculator, ITypeEffectiveness, IMoveSelector, post-refactor)
+│   ├── Effects/    # Move effects (IMoveEffect, uses Strategy Pattern for descriptions, post-refactor)
 │   ├── Evolution/  # Evolution conditions
 │   ├── Registry/   # Data access layer
+│   ├── Managers/   # StatStageManager (post-refactor)
+│   ├── Providers/  # IRandomProvider (post-refactor)
+│   ├── Extensions/ # LevelExtensions, FriendshipExtensions (post-refactor)
 │   ├── Enums/      # Type definitions
-│   └── Constants/  # Centralized strings
+│   └── Constants/  # CoreConstants, CoreValidators, ErrorMessages, GameMessages (post-refactor)
 │
 ├── Combat/         # Battle system (depends on Core) - ✅ Refactored (2024-12-05)
 │   ├── Field/      # BattleField, BattleSide, BattleSlot, BattleRules
