@@ -7,11 +7,11 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Moves;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Moves;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
 {
@@ -24,6 +24,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
         private BattleField _field;
         private BattleSlot _playerSlot;
         private BattleSlot _enemySlot;
+        private TargetResolver _targetResolver;
 
         [SetUp]
         public void SetUp()
@@ -35,6 +36,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
 
             _playerSlot = _field.PlayerSide.Slots[0];
             _enemySlot = _field.EnemySide.Slots[0];
+
+            // Create target resolver instance
+            _targetResolver = new TargetResolver();
         }
 
         #region TargetResolver -> AI Integration
@@ -70,9 +74,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             Assert.That(action, Is.InstanceOf<UseMoveAction>());
             var useMoveAction = (UseMoveAction)action;
             Assert.That(useMoveAction.Target, Is.Not.Null);
-            
+
             // Verify target is valid for the move
-            var validTargets = TargetResolver.GetValidTargets(_playerSlot, useMoveAction.Move, _field);
+            var validTargets = _targetResolver.GetValidTargets(_playerSlot, useMoveAction.Move, _field);
             Assert.That(validTargets, Contains.Item(useMoveAction.Target));
         }
 
@@ -96,9 +100,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             Assert.That(action, Is.Not.Null);
             Assert.That(action, Is.InstanceOf<UseMoveAction>());
             var useMoveAction = (UseMoveAction)action;
-            
+
             // Verify target was validated by TargetResolver
-            var validTargets = TargetResolver.GetValidTargets(_playerSlot, useMoveAction.Move, _field);
+            var validTargets = _targetResolver.GetValidTargets(_playerSlot, useMoveAction.Move, _field);
             Assert.That(validTargets, Contains.Item(useMoveAction.Target));
         }
 
@@ -131,7 +135,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             var move = MoveCatalog.Thunderbolt; // SingleEnemy target
 
             // Act
-            var validTargets = TargetResolver.GetValidTargets(_playerSlot, move, _field);
+            var validTargets = _targetResolver.GetValidTargets(_playerSlot, move, _field);
 
             // Assert
             Assert.That(validTargets, Has.Count.EqualTo(1));
@@ -150,7 +154,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             }
 
             // Act
-            var validTargets = TargetResolver.GetValidTargets(_playerSlot, selfMove.Move, _field);
+            var validTargets = _targetResolver.GetValidTargets(_playerSlot, selfMove.Move, _field);
 
             // Assert
             Assert.That(validTargets, Contains.Item(_playerSlot));
@@ -165,7 +169,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             var move = MoveCatalog.Thunderbolt;
 
             // Act
-            var validTargets = TargetResolver.GetValidTargets(_playerSlot, move, _field);
+            var validTargets = _targetResolver.GetValidTargets(_playerSlot, move, _field);
 
             // Assert
             Assert.That(validTargets, Is.Empty);
@@ -196,7 +200,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             var move = MoveCatalog.Thunderbolt; // SingleEnemy
 
             // Act
-            var validTargets = TargetResolver.GetValidTargets(playerSlot, move, doublesField);
+            var targetResolver = new TargetResolver();
+            var validTargets = targetResolver.GetValidTargets(playerSlot, move, doublesField);
 
             // Assert
             Assert.That(validTargets, Has.Count.EqualTo(2)); // Two enemy slots

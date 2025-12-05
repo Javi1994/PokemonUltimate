@@ -27,6 +27,11 @@ namespace PokemonUltimate.Combat.Damage.Steps
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ContextCannotBeNull);
 
             var defenderSide = context.Defender.Side;
+
+            // If defender has no side assigned (e.g., in tests), skip screen checks
+            if (defenderSide == null)
+                return;
+
             var moveCategory = context.Move.Category;
 
             // Check for screens on defender's side

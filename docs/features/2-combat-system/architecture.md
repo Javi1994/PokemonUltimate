@@ -7,13 +7,16 @@
 **See**: [`../../features_master_list.md`](../../features_master_list.md) for feature numbering standards.
 
 ## 1. Core Philosophy: "Everything is an Action"
+
 Instead of complex methods calling each other, the entire battle is a linear sequence of **Actions** processed by a **Queue**.
 Logic and View are unified in these Actions, but executed in phases.
 
 ## 2. The Action Queue System
 
 ### `BattleAction` (Abstract Class)
+
 The base unit of work.
+
 ```csharp
 public abstract class BattleAction {
     // Phase 1: Logic (Instant)
@@ -28,7 +31,9 @@ public abstract class BattleAction {
 ```
 
 ### `BattleQueue` (Controller)
+
 Manages the flow.
+
 ```csharp
 public class BattleQueue {
     private Queue<BattleAction> _queue = new Queue<BattleAction>();
@@ -37,18 +42,18 @@ public class BattleQueue {
         int safetyCounter = 0;
         while (_queue.Count > 0) {
             if (safetyCounter++ > 1000) throw new Exception("Infinite Loop in Battle Queue!");
-            
+
             var action = _queue.Dequeue();
-            
+
             // 1. Run Logic
             var reactions = action.ExecuteLogic(field);
-            
+
             // 2. Run Visual (Wait for it)
             // This handles Animations, Text, and Audio via IBattleView
             await action.ExecuteVisual(view);
-            
+
             // 3. Enqueue reactions (Priority: Immediate)
-            InsertAtFront(reactions); 
+            InsertAtFront(reactions);
         }
     }
 }
@@ -58,6 +63,7 @@ public class BattleQueue {
 > Actions can be purely visual/audio (e.g., `PlaySoundAction`, `MessageAction`). These actions return no logic reactions but are critical for player feedback. See `ui_presentation_system.md`.
 
 ### Event Triggers (Abilities & Items)
+
 After processing actions, the engine fires event triggers for Abilities and Items.
 
 ```csharp
@@ -80,6 +86,7 @@ private async Task ProcessTriggers(BattleTrigger trigger) {
 ```
 
 ## 3. Battle Configuration (Modes: 1v1, 2v2, 1v3)
+
 To support any battle type, we pass a `BattleRules` object when starting combat.
 
 ```csharp
@@ -99,7 +106,8 @@ public void InitializeBattle(BattleRules rules, Party playerParty, Party enemyPa
 ```
 
 ### Turn Flow with Turn Order
-```csharp
+
+````csharp
 ### Battle Loop (Victory Check)
 The engine runs turns in a loop until a Victory/Defeat condition is met.
 
@@ -107,7 +115,7 @@ The engine runs turns in a loop until a Victory/Defeat condition is met.
 public async Task RunBattle() {
     while (true) {
         await RunTurn();
-        
+
         // Check Outcome via Arbiter (See victory_defeat_system.md)
         var outcome = BattleArbiter.CheckOutcome(_field);
         if (outcome != BattleOutcome.Ongoing) {
@@ -124,26 +132,27 @@ public async Task RunTurn() {
         var action = await slot.ActionProvider.GetAction(_field, slot);
         pendingActions.Add(action);
     }
-    
+
     // 2. Sort by Turn Order (Priority, Speed)
     var sortedActions = TurnOrderResolver.SortActions(pendingActions, _field);
-    
+
     // 3. Enqueue in sorted order
     foreach (var action in sortedActions) {
         _queue.Enqueue(action);
     }
-    
+
     // 4. Process the queue
     await _queue.ProcessQueue(_field, _view);
-    
+
     // 5. End of turn triggers (Status damage, Leftovers)
     await ProcessTriggers(BattleTrigger.OnTurnEnd);
 }
-```
+````
 
 ## 4. Examples of Actions
 
 ### `DamageAction` (Core Logic)
+
 ```csharp
 public class DamageAction : BattleAction {
     private BattleSlot _target;
@@ -151,7 +160,7 @@ public class DamageAction : BattleAction {
 
     public override IEnumerable<BattleAction> ExecuteLogic(BattleField field) {
         _target.Pokemon.CurrentHP -= _amount;
-        
+
         // Check for Faint reaction
         if (_target.Pokemon.CurrentHP <= 0) {
             return new List<BattleAction> { new FaintAction(_target) };
@@ -167,6 +176,7 @@ public class DamageAction : BattleAction {
 ```
 
 ### `UseMoveAction` (The Trigger & Conditional Logic)
+
 ```csharp
 public class UseMoveAction : BattleAction {
     private BattleSlot _user;
@@ -184,58 +194,63 @@ public class UseMoveAction : BattleAction {
         var actions = new List<BattleAction>();
         actions.Add(new MessageAction($"{_user.Pokemon.Name} used {_move.Name}!"));
         actions.Add(new MoveAnimationAction(_user, _target, _move.VisualId));
-        
+
         int damage = DamageCalculator.Calculate(_user, _target, _move);
         actions.Add(new DamageAction(_target, damage));
-        
+
         if (_move.HasStatusEffect) {
              actions.Add(new StatusRollAction(_target, _move.StatusEffect, _move.StatusChance));
         }
-        
-        return actions; 
+
+        return actions;
     }
 
     public override Task ExecuteVisual(IBattleView view) {
-        return Task.CompletedTask; 
+        return Task.CompletedTask;
     }
 }
 ```
 
 ## 5. Trace Example: Flinch Interaction (Retroceso)
+
 Scenario: Pokemon A uses "Headbutt" (Causes Flinch). Pokemon B is slower.
 
 1.  **`UseMoveAction(A)`** executes.
-    *   Spawns `DamageAction` + `ApplyVolatileAction(B, Flinch)`.
+    -   Spawns `DamageAction` + `ApplyVolatileAction(B, Flinch)`.
 2.  **`DamageAction`** executes. B takes damage.
 3.  **`ApplyVolatileAction`** executes.
-    *   *Logic*: Sets `B.VolatileStatus |= Flinch`.
-    *   *Visual*: None (or small icon).
+    -   _Logic_: Sets `B.VolatileStatus |= Flinch`.
+    -   _Visual_: None (or small icon).
 4.  **`UseMoveAction(B)`** (which was already in the queue) finally executes.
-    *   *Logic*: Checks `if (B.HasFlag(Flinch))`. **TRUE**.
-    *   *Result*: Returns ONLY `[MessageAction("B flinched!")]`.
-    *   *Note*: The Damage/Animation for B's move are NEVER created. The turn ends.
+    -   _Logic_: Checks `if (B.HasFlag(Flinch))`. **TRUE**.
+    -   _Result_: Returns ONLY `[MessageAction("B flinched!")]`.
+    -   _Note_: The Damage/Animation for B's move are NEVER created. The turn ends.
 
 ## 6. Verification against Pillars
 
 ### Is it Simple?
-*   **Yes.** The flow is linear. No complex state machines jumping around. Just a list of things to do.
-*   **Safety**: Added a loop counter to prevent infinite reaction chains.
+
+-   **Yes.** The flow is linear. No complex state machines jumping around. Just a list of things to do.
+-   **Safety**: Added a loop counter to prevent infinite reaction chains.
 
 ### Is it Readable?
-*   **Yes.** `UseMoveAction` clearly lists what happens: Message -> Animation -> Damage. Anyone can read it and understand the move's sequence.
+
+-   **Yes.** `UseMoveAction` clearly lists what happens: Message -> Animation -> Damage. Anyone can read it and understand the move's sequence.
 
 ### Is it Modular?
-*   **Yes.**
-    *   Want to add **Weather**? Create `WeatherDamageAction`.
-    *   Want to add **Dialogue** mid-fight? Create `DialogueAction`.
-    *   Want to add **Tutorial Popups**? Create `TutorialAction`.
-    *   None of these require changing the `CombatEngine` code.
+
+-   **Yes.**
+    -   Want to add **Weather**? Create `WeatherDamageAction`.
+    -   Want to add **Dialogue** mid-fight? Create `DialogueAction`.
+    -   Want to add **Tutorial Popups**? Create `TutorialAction`.
+    -   None of these require changing the `CombatEngine` code.
 
 ### Is it Testable?
-*   **Yes.**
-    *   **Logic Tests**: Enqueue `DamageAction`, call `ExecuteLogic`, assert HP.
-    *   **Visual Tests**: Mock `IBattleView`, run queue, assert that `PlayAnimation` was called.
-    *   **Scenario Tests**: Setup a 1v3 battle (via `BattleRules`), enqueue an Area of Effect move, verify 3 enemies took damage.
+
+-   **Yes.**
+    -   **Logic Tests**: Enqueue `DamageAction`, call `ExecuteLogic`, assert HP.
+    -   **Visual Tests**: Mock `IBattleView`, run queue, assert that `PlayAnimation` was called.
+    -   **Scenario Tests**: Setup a 1v3 battle (via `BattleRules`), enqueue an Area of Effect move, verify 3 enemies took damage.
 
 ---
 
@@ -246,147 +261,381 @@ This section catalogs **all BattleActions, IMoveEffects, and Data Types** needed
 ### 4.1 Core BattleActions
 
 #### Damage & HP
-| Action | Description | Example |
-|--------|-------------|---------|
-| `DamageAction` | Standard damage application | All damaging moves |
-| `FixedDamageAction` | Fixed amount (ignores stats) | Seismic Toss, Dragon Rage |
-| `PercentDamageAction` | % of target's max HP | Super Fang (50%) |
-| `HealAction` | Restore HP | Synthesis, Moonlight |
-| `RecoilDamageAction` | User takes % of damage dealt | Double-Edge, Brave Bird |
-| `DrainAction` | Damage + heal user | Giga Drain, Drain Punch |
+
+| Action                | Description                  | Example                   |
+| --------------------- | ---------------------------- | ------------------------- |
+| `DamageAction`        | Standard damage application  | All damaging moves        |
+| `FixedDamageAction`   | Fixed amount (ignores stats) | Seismic Toss, Dragon Rage |
+| `PercentDamageAction` | % of target's max HP         | Super Fang (50%)          |
+| `HealAction`          | Restore HP                   | Synthesis, Moonlight      |
+| `RecoilDamageAction`  | User takes % of damage dealt | Double-Edge, Brave Bird   |
+| `DrainAction`         | Damage + heal user           | Giga Drain, Drain Punch   |
 
 #### Status & Stats
-| Action | Description | Example |
-|--------|-------------|---------|
-| `ApplyStatusAction` | Apply major status | Burn, Paralysis, Sleep |
-| `CureStatusAction` | Remove status | Heal Bell, Aromatherapy |
-| `StatChangeAction` | Modify stat stages | Swords Dance (+2 Atk) |
-| `StatResetAction` | Reset all stat changes | Haze, Clear Smog |
-| `StatSwapAction` | Swap stat stages | Psych Up, Guard Swap |
+
+| Action              | Description            | Example                 |
+| ------------------- | ---------------------- | ----------------------- |
+| `ApplyStatusAction` | Apply major status     | Burn, Paralysis, Sleep  |
+| `CureStatusAction`  | Remove status          | Heal Bell, Aromatherapy |
+| `StatChangeAction`  | Modify stat stages     | Swords Dance (+2 Atk)   |
+| `StatResetAction`   | Reset all stat changes | Haze, Clear Smog        |
+| `StatSwapAction`    | Swap stat stages       | Psych Up, Guard Swap    |
 
 #### Field & Environment
-| Action | Description | Example |
-|--------|-------------|---------|
-| `SetWeatherAction` | Change weather | Rain Dance, Sunny Day |
-| `SetTerrainAction` | Change terrain | Electric Terrain |
-| `SetFieldEffectAction` | Room effects | Trick Room, Wonder Room |
-| `SetHazardAction` | Entry hazards | Stealth Rock, Spikes |
-| `SetScreenAction` | Defensive screens | Reflect, Light Screen |
+
+| Action                 | Description       | Example                 |
+| ---------------------- | ----------------- | ----------------------- |
+| `SetWeatherAction`     | Change weather    | Rain Dance, Sunny Day   |
+| `SetTerrainAction`     | Change terrain    | Electric Terrain        |
+| `SetFieldEffectAction` | Room effects      | Trick Room, Wonder Room |
+| `SetHazardAction`      | Entry hazards     | Stealth Rock, Spikes    |
+| `SetScreenAction`      | Defensive screens | Reflect, Light Screen   |
 
 #### Control & Utility
-| Action | Description | Example |
-|--------|-------------|---------|
-| `FlinchAction` | Apply flinch status | Fake Out, Air Slash |
-| `ConfuseAction` | Apply confusion | Confuse Ray, Swagger |
-| `ProtectAction` | Block next move | Protect, Detect |
-| `DisableAction` | Disable last used move | Disable |
-| `TauntAction` | Can only use damaging moves | Taunt |
+
+| Action          | Description                 | Example              |
+| --------------- | --------------------------- | -------------------- |
+| `FlinchAction`  | Apply flinch status         | Fake Out, Air Slash  |
+| `ConfuseAction` | Apply confusion             | Confuse Ray, Swagger |
+| `ProtectAction` | Block next move             | Protect, Detect      |
+| `DisableAction` | Disable last used move      | Disable              |
+| `TauntAction`   | Can only use damaging moves | Taunt                |
 
 #### Special Mechanics
-| Action | Description | Example |
-|--------|-------------|---------|
-| `FaintAction` | Mark as fainted, trigger death events | HP reaches 0 |
-| `TransformAction` | Copy target's stats/moves | Transform (Ditto) |
-| `SubstituteAction` | Create HP-based decoy | Substitute |
-| `BatonPassAction` | Switch + keep stat changes | Baton Pass |
-| `WishAction` | Delayed heal (2 turns) | Wish |
-| `FutureSightAction` | Delayed damage (2 turns) | Future Sight |
+
+| Action              | Description                           | Example           |
+| ------------------- | ------------------------------------- | ----------------- |
+| `FaintAction`       | Mark as fainted, trigger death events | HP reaches 0      |
+| `TransformAction`   | Copy target's stats/moves             | Transform (Ditto) |
+| `SubstituteAction`  | Create HP-based decoy                 | Substitute        |
+| `BatonPassAction`   | Switch + keep stat changes            | Baton Pass        |
+| `WishAction`        | Delayed heal (2 turns)                | Wish              |
+| `FutureSightAction` | Delayed damage (2 turns)              | Future Sight      |
 
 ### 4.2 IMoveEffect Catalog
 
 #### Damage Effects
-| Effect | Parameters | Description |
-|--------|-----------|-------------|
-| `DamageEffect` | - | Standard damage formula |
-| `FixedDamageEffect` | `int Amount` | Fixed damage (20, 40, 80) |
-| `LevelDamageEffect` | - | Damage = User's Level |
-| `PercentDamageEffect` | `float Percent` | % of target's HP (0.5 = 50%) |
-| `MultiHitEffect` | `int MinHits, int MaxHits` | Hit 2-5 times |
-| `CriticalRatioEffect` | `int Stages` | Increased crit chance |
-| `OneHitKOEffect` | - | OHKO if hits (Fissure, Guillotine) |
+
+| Effect                | Parameters                 | Description                        |
+| --------------------- | -------------------------- | ---------------------------------- |
+| `DamageEffect`        | -                          | Standard damage formula            |
+| `FixedDamageEffect`   | `int Amount`               | Fixed damage (20, 40, 80)          |
+| `LevelDamageEffect`   | -                          | Damage = User's Level              |
+| `PercentDamageEffect` | `float Percent`            | % of target's HP (0.5 = 50%)       |
+| `MultiHitEffect`      | `int MinHits, int MaxHits` | Hit 2-5 times                      |
+| `CriticalRatioEffect` | `int Stages`               | Increased crit chance              |
+| `OneHitKOEffect`      | -                          | OHKO if hits (Fissure, Guillotine) |
 
 #### HP Manipulation
-| Effect | Parameters | Description |
-|--------|-----------|-------------|
-| `RecoilEffect` | `float Percent` | User takes % of damage dealt |
-| `DrainEffect` | `float Percent` | User heals % of damage dealt |
-| `HealEffect` | `float Percent` | Heal % of max HP |
-| `SacrificialEffect` | - | User faints (Explosion, Self-Destruct) |
-| `PainSplitEffect` | - | Average HP of user and target |
+
+| Effect              | Parameters      | Description                            |
+| ------------------- | --------------- | -------------------------------------- |
+| `RecoilEffect`      | `float Percent` | User takes % of damage dealt           |
+| `DrainEffect`       | `float Percent` | User heals % of damage dealt           |
+| `HealEffect`        | `float Percent` | Heal % of max HP                       |
+| `SacrificialEffect` | -               | User faints (Explosion, Self-Destruct) |
+| `PainSplitEffect`   | -               | Average HP of user and target          |
 
 #### Status Application
-| Effect | Parameters | Description |
-|--------|-----------|-------------|
-| `BurnEffect` | `float Chance` | Apply Burn |
-| `ParalyzeEffect` | `float Chance` | Apply Paralysis |
-| `PoisonEffect` | `float Chance, bool BadlyPoisoned` | Apply Poison/Badly Poisoned |
-| `SleepEffect` | `float Chance` | Apply Sleep |
-| `FreezeEffect` | `float Chance` | Apply Freeze |
-| `ConfuseEffect` | `float Chance` | Apply Confusion |
-| `FlinchEffect` | `float Chance` | Apply Flinch (only if slower) |
+
+| Effect           | Parameters                         | Description                   |
+| ---------------- | ---------------------------------- | ----------------------------- |
+| `BurnEffect`     | `float Chance`                     | Apply Burn                    |
+| `ParalyzeEffect` | `float Chance`                     | Apply Paralysis               |
+| `PoisonEffect`   | `float Chance, bool BadlyPoisoned` | Apply Poison/Badly Poisoned   |
+| `SleepEffect`    | `float Chance`                     | Apply Sleep                   |
+| `FreezeEffect`   | `float Chance`                     | Apply Freeze                  |
+| `ConfuseEffect`  | `float Chance`                     | Apply Confusion               |
+| `FlinchEffect`   | `float Chance`                     | Apply Flinch (only if slower) |
 
 #### Stat Modification
-| Effect | Parameters | Description |
-|--------|-----------|-------------|
-| `StatChangeEffect` | `Stat, int Stages, bool Self` | Raise/lower stat |
-| `MultiStatChangeEffect` | `Dictionary<Stat, int>` | Multiple stats at once |
-| `SwaggerEffect` | - | Confuse + raise target's Attack |
+
+| Effect                  | Parameters                    | Description                     |
+| ----------------------- | ----------------------------- | ------------------------------- |
+| `StatChangeEffect`      | `Stat, int Stages, bool Self` | Raise/lower stat                |
+| `MultiStatChangeEffect` | `Dictionary<Stat, int>`       | Multiple stats at once          |
+| `SwaggerEffect`         | -                             | Confuse + raise target's Attack |
 
 #### Field Effects
-| Effect | Parameters | Description |
-|--------|-----------|-------------|
-| `WeatherEffect` | `WeatherType, int Duration` | Set weather |
-| `TerrainEffect` | `TerrainType, int Duration` | Set terrain |
-| `HazardEffect` | `HazardType, int Layers` | Set entry hazard |
-| `ScreenEffect` | `ScreenType, int Duration` | Set defensive screen |
-| `TrickRoomEffect` | `int Duration` | Reverse speed order |
+
+| Effect            | Parameters                  | Description          |
+| ----------------- | --------------------------- | -------------------- |
+| `WeatherEffect`   | `WeatherType, int Duration` | Set weather          |
+| `TerrainEffect`   | `TerrainType, int Duration` | Set terrain          |
+| `HazardEffect`    | `HazardType, int Layers`    | Set entry hazard     |
+| `ScreenEffect`    | `ScreenType, int Duration`  | Set defensive screen |
+| `TrickRoomEffect` | `int Duration`              | Reverse speed order  |
 
 #### Special Mechanics
-| Effect | Parameters | Description |
-|--------|-----------|-------------|
-| `ChargeEffect` | `bool Invulnerable, string Message` | 2-turn moves (Fly, Solar Beam) |
-| `ProtectEffect` | - | Block incoming move |
-| `CounterEffect` | `bool Physical` | Return 2x damage (Counter, Mirror Coat) |
-| `BindEffect` | `int Turns` | Trap + damage (Wrap, Fire Spin) |
-| `LeechSeedEffect` | - | Drain 1/8 HP each turn |
-| `DestinyBondEffect` | - | If user faints, faint attacker too |
+
+| Effect              | Parameters                          | Description                             |
+| ------------------- | ----------------------------------- | --------------------------------------- |
+| `ChargeEffect`      | `bool Invulnerable, string Message` | 2-turn moves (Fly, Solar Beam)          |
+| `ProtectEffect`     | -                                   | Block incoming move                     |
+| `CounterEffect`     | `bool Physical`                     | Return 2x damage (Counter, Mirror Coat) |
+| `BindEffect`        | `int Turns`                         | Trap + damage (Wrap, Fire Spin)         |
+| `LeechSeedEffect`   | -                                   | Drain 1/8 HP each turn                  |
+| `DestinyBondEffect` | -                                   | If user faints, faint attacker too      |
 
 ### 4.3 Implementation Priority
 
 **Phase 1 (MVP)**: ✅ Complete
-- DamageAction, HealAction, FaintAction
-- ApplyStatusAction, StatChangeAction
-- Basic IMoveEffects (Damage, Status, StatChange)
+
+-   DamageAction, HealAction, FaintAction
+-   ApplyStatusAction, StatChangeAction
+-   Basic IMoveEffects (Damage, Status, StatChange)
 
 **Phase 2 (Core Mechanics)**: ✅ Complete
-- RecoilEffect, DrainEffect, MultiHitEffect
-- FlinchEffect, ConfuseEffect
-- WeatherEffect, HazardEffect
+
+-   RecoilEffect, DrainEffect, MultiHitEffect
+-   FlinchEffect, ConfuseEffect
+-   WeatherEffect, HazardEffect
 
 **Phase 3 (Advanced)**: ⏳ Planned
-- ChargeEffect (2-turn moves)
-- ProtectEffect, SubstituteEffect
-- TransformEffect, MetronomeEffect
+
+-   ChargeEffect (2-turn moves)
+-   ProtectEffect, SubstituteEffect
+-   TransformEffect, MetronomeEffect
 
 **Phase 4 (Complex)**: ⏳ Planned
-- BatonPassAction, WishEffect
-- CounterEffect, DestinyBondEffect
-- Field effects (Trick Room, Terrain)
+
+-   BatonPassAction, WishEffect
+-   CounterEffect, DestinyBondEffect
+-   Field effects (Trick Room, Terrain)
+
+---
+
+## 7. Architectural Patterns & Refactoring
+
+> **Note**: A comprehensive refactoring was completed (2024-12-05) following SOLID principles and clean code practices. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for complete details.
+
+### 7.1 Dependency Injection
+
+All major components now use dependency injection for improved testability and flexibility:
+
+**Key Interfaces**:
+
+-   `IRandomProvider` - Random number generation (replaces static `Random`)
+-   `IDamagePipeline` - Damage calculation pipeline
+-   `IEndOfTurnProcessor` - End-of-turn effects processing
+-   `IBattleTriggerProcessor` - Battle trigger processing
+-   `ITargetResolver` - Target selection
+-   `IEntryHazardProcessor` - Entry hazard processing
+-   `IBattleFieldFactory` - BattleField creation
+-   `IBattleQueueFactory` - BattleQueue creation
+-   `IBattleStateValidator` - Battle state validation
+-   `IBattleLogger` - Battle logging
+-   `IBattleEventBus` - Event bus for decoupled communication
+-   `IBattleMessageFormatter` - Centralized message formatting
+
+**Example**:
+
+```csharp
+public class CombatEngine
+{
+    private readonly IBattleFieldFactory _battleFieldFactory;
+    private readonly IBattleQueueFactory _battleQueueFactory;
+    private readonly IRandomProvider _randomProvider;
+    private readonly IEndOfTurnProcessor _endOfTurnProcessor;
+    // ... other dependencies
+
+    public CombatEngine(
+        IBattleFieldFactory battleFieldFactory,
+        IBattleQueueFactory battleQueueFactory,
+        IRandomProvider randomProvider,
+        IEndOfTurnProcessor endOfTurnProcessor,
+        // ... other dependencies
+    )
+    {
+        // Dependencies injected via constructor
+    }
+}
+```
+
+### 7.2 Value Objects
+
+Complex state is encapsulated in Value Objects for better organization and immutability:
+
+**Value Objects**:
+
+-   `StatStages` - Manages stat stage modifications (-6 to +6)
+-   `DamageTracker` - Tracks damage for Counter/Mirror Coat
+-   `ProtectTracker` - Tracks Protect/Detect state
+-   `SemiInvulnerableState` - Tracks semi-invulnerable move state
+-   `ChargingMoveState` - Tracks charging move state
+-   `MoveStateTracker` - Unified tracker for all move states
+-   `WeatherState` - Weather condition and duration
+-   `TerrainState` - Terrain condition and duration
+
+**Example**:
+
+```csharp
+public class BattleSlot
+{
+    private StatStages _statStages;
+    private MoveStateTracker _moveStateTracker;
+    private DamageTracker _damageTracker;
+
+    public StatStages StatStages => _statStages;
+    public MoveStateTracker MoveState => _moveStateTracker;
+    // ...
+}
+```
+
+### 7.3 Strategy Pattern
+
+Move effects are processed using Strategy Pattern for extensibility:
+
+**Key Components**:
+
+-   `IMoveEffectProcessor` - Interface for effect processors
+-   `MoveEffectProcessorRegistry` - Registry for effect processors
+-   Implementations: `StatusEffectProcessor`, `StatChangeEffectProcessor`, `RecoilEffectProcessor`, `DrainEffectProcessor`, `FlinchEffectProcessor`, `ProtectEffectProcessor`, `CounterEffectProcessor`, `HealEffectProcessor`
+
+**Example**:
+
+```csharp
+public class UseMoveAction : BattleAction
+{
+    private readonly MoveEffectProcessorRegistry _effectProcessorRegistry;
+
+    private IEnumerable<BattleAction> ProcessEffects(MoveData move)
+    {
+        foreach (var effect in move.Effects)
+        {
+            var actions = _effectProcessorRegistry.ProcessEffect(effect, this);
+            foreach (var action in actions)
+                yield return action;
+        }
+    }
+}
+```
+
+### 7.4 Factory Pattern
+
+Object creation is centralized using Factory Pattern:
+
+**Factories**:
+
+-   `DamageContextFactory` - Creates `DamageContext` instances for different scenarios
+-   `BattleFieldFactory` - Creates `BattleField` instances
+-   `BattleQueueFactory` - Creates `BattleQueue` instances
+
+**Example**:
+
+```csharp
+public class DamageContextFactory
+{
+    public DamageContext CreateForMove(
+        BattleSlot attacker,
+        BattleSlot defender,
+        MoveData move,
+        BattleField field)
+    {
+        return new DamageContext(attacker, defender, move, field);
+    }
+
+    public DamageContext CreateForStatusDamage(
+        BattleSlot slot,
+        int damage,
+        BattleField field)
+    {
+        // Creates appropriate context for status damage
+    }
+}
+```
+
+### 7.5 Event System
+
+Decoupled communication using Event Bus pattern:
+
+**Components**:
+
+-   `IBattleEventBus` - Event bus interface
+-   `BattleEventBus` - Event bus implementation
+-   Supports subscription/unsubscription for battle events
+
+### 7.6 Logging System
+
+Structured logging for debugging and monitoring:
+
+**Components**:
+
+-   `IBattleLogger` - Logger interface
+-   `BattleLogger` - Logger implementation
+-   `NullBattleLogger` - Null implementation for tests
+-   Logs battle events, errors, and debug information
+
+### 7.7 Validation System
+
+Battle state validation ensures consistency:
+
+**Components**:
+
+-   `IBattleStateValidator` - Validator interface
+-   `BattleStateValidator` - Validator implementation
+-   Validates slot consistency, stat stages, status counters, party-slot consistency
+
+### 7.8 Extension Methods
+
+Utility methods for common operations:
+
+**Extensions**:
+
+-   `BattleSlotExtensions.IsActive()` - Checks if slot has active Pokemon
+-   `DamageCalculationExtensions.EnsureMinimumDamage()` - Ensures minimum damage
+
+### 7.9 Constants Centralization
+
+Magic numbers and strings replaced with constants:
+
+**Constant Classes**:
+
+-   `BattleConstants` - Battle system limits (`MaxTurns`, `MaxQueueIterations`)
+-   `StatusConstants` - Status effect constants (`ParalysisSpeedMultiplier`, `ParalysisFullParalysisChance`)
+-   `ItemConstants` - Item effect constants (`LeftoversHealDivisor`)
+-   `MoveConstants` - Move-related constants (semi-invulnerable move names)
+
+### 7.10 Refactoring Summary
+
+**Completed Phases (0-13)**:
+
+-   ✅ Dependency Injection throughout
+-   ✅ Value Objects for complex state
+-   ✅ Strategy Pattern for move effects
+-   ✅ Factory Pattern for object creation
+-   ✅ Event Bus for decoupled communication
+-   ✅ Logging system
+-   ✅ Validation system
+-   ✅ Extension methods
+-   ✅ Constants centralization
+-   ✅ Target redirection system
+-   ✅ Message formatting system
+-   ✅ Accumulative effect tracking
+
+**Benefits**:
+
+-   Improved testability (all dependencies injectable)
+-   Better maintainability (clear separation of concerns)
+-   Enhanced extensibility (Strategy Pattern, Factory Pattern)
+-   Reduced coupling (DI, Event Bus)
+-   Better code organization (Value Objects, Extension Methods)
 
 ---
 
 ## Related Documents
 
-- **[Use Cases](use_cases.md)** - Scenarios this architecture supports
-- **[Roadmap](roadmap.md)** - Implementation plan for all phases (2.1-2.19)
-- **[Testing](testing.md)** - How to test this architecture
-- **[Code Location](code_location.md)** - Where this is implemented
-- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Pokemon instances used in battles
-- **[Feature 3: Content Expansion](../3-content-expansion/roadmap.md)** - Moves, abilities, items
-- **[Feature 4: Unity Integration](../4-unity-integration/architecture.md)** - Visual battle presentation
+-   **[Use Cases](use_cases.md)** - Scenarios this architecture supports
+-   **[Roadmap](roadmap.md)** - Implementation plan for all phases (2.1-2.19)
+-   **[Testing](testing.md)** - How to test this architecture
+-   **[Code Location](code_location.md)** - Where this is implemented
+-   **[Feature 1: Game Data](../1-game-data/architecture.md)** - Pokemon instances used in battles
+-   **[Feature 3: Content Expansion](../3-content-expansion/roadmap.md)** - Moves, abilities, items
+-   **[Feature 4: Unity Integration](../4-unity-integration/architecture.md)** - Visual battle presentation
+-   **[Refactoring Analysis](../../../PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md)** - Complete refactoring documentation
 
 **⚠️ Always use numbered feature paths**: `../[N]-[feature-name]/` instead of `../feature-name/`
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: 2025-01-XX (Post-Refactoring: 2024-12-05)

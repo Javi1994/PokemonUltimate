@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.Combat.ValueObjects;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -21,12 +22,8 @@ namespace PokemonUltimate.Combat
         private BattleSide _playerSide;
         private BattleSide _enemySide;
         private BattleRules _rules;
-        private Weather _weather;
-        private int _weatherDuration;
-        private WeatherData _weatherData;
-        private Terrain _terrain;
-        private int _terrainDuration;
-        private TerrainData _terrainData;
+        private WeatherState _weatherState;
+        private TerrainState _terrainState;
 
         /// <summary>
         /// The player's side of the field.
@@ -46,19 +43,19 @@ namespace PokemonUltimate.Combat
         /// <summary>
         /// The current weather condition on the battlefield.
         /// </summary>
-        public Weather Weather => _weather;
+        public Weather Weather => _weatherState.Weather;
 
         /// <summary>
         /// The remaining duration of the current weather in turns.
         /// 0 means infinite duration (primal weather or indefinite weather).
         /// </summary>
-        public int WeatherDuration => _weatherDuration;
+        public int WeatherDuration => _weatherState.Duration;
 
         /// <summary>
         /// The weather data for the current weather condition.
         /// Null if no weather is active.
         /// </summary>
-        public WeatherData WeatherData => _weatherData;
+        public WeatherData WeatherData => _weatherState.WeatherData;
 
         /// <summary>
         /// The current terrain condition on the battlefield.
@@ -68,7 +65,7 @@ namespace PokemonUltimate.Combat
         /// **Sub-Feature**: 2.13: Terrain System
         /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
         /// </remarks>
-        public Terrain Terrain => _terrain;
+        public Terrain Terrain => _terrainState.Terrain;
 
         /// <summary>
         /// The remaining duration of the current terrain in turns.
@@ -79,7 +76,7 @@ namespace PokemonUltimate.Combat
         /// **Sub-Feature**: 2.13: Terrain System
         /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
         /// </remarks>
-        public int TerrainDuration => _terrainDuration;
+        public int TerrainDuration => _terrainState.Duration;
 
         /// <summary>
         /// The terrain data for the current terrain condition.
@@ -90,7 +87,7 @@ namespace PokemonUltimate.Combat
         /// **Sub-Feature**: 2.13: Terrain System
         /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
         /// </remarks>
-        public TerrainData TerrainData => _terrainData;
+        public TerrainData TerrainData => _terrainState.TerrainData;
 
         /// <summary>
         /// Initializes the battlefield with the given rules and parties.
@@ -113,15 +110,9 @@ namespace PokemonUltimate.Combat
 
             _rules = rules;
 
-            // Initialize weather to None
-            _weather = Weather.None;
-            _weatherDuration = 0;
-            _weatherData = null;
-
-            // Initialize terrain to None
-            _terrain = Terrain.None;
-            _terrainDuration = 0;
-            _terrainData = null;
+            // Initialize weather and terrain to None
+            _weatherState = new WeatherState();
+            _terrainState = new TerrainState();
 
             // Create sides
             _playerSide = new BattleSide(rules.PlayerSlots, isPlayer: true);
@@ -195,22 +186,13 @@ namespace PokemonUltimate.Combat
         /// **Feature**: 2: Combat System
         /// **Sub-Feature**: 2.12: Weather System
         /// **Documentation**: See `docs/features/2-combat-system/2.12-weather-system/README.md`
-        /// 
+        ///
         /// Note: Primal weather overwrite protection should be handled by the caller (e.g., SetWeatherAction)
         /// by checking WeatherData.CanBeOverwritten before calling this method.
         /// </remarks>
         public void SetWeather(Weather weather, int duration, WeatherData weatherData = null)
         {
-            // Clear weather if None is specified
-            if (weather == Weather.None)
-            {
-                ClearWeather();
-                return;
-            }
-
-            _weather = weather;
-            _weatherDuration = duration;
-            _weatherData = weatherData;
+            _weatherState = _weatherState.SetWeather(weather, duration, weatherData);
         }
 
         /// <summary>
@@ -223,9 +205,7 @@ namespace PokemonUltimate.Combat
         /// </remarks>
         public void ClearWeather()
         {
-            _weather = Weather.None;
-            _weatherDuration = 0;
-            _weatherData = null;
+            _weatherState = _weatherState.Clear();
         }
 
         /// <summary>
@@ -239,20 +219,7 @@ namespace PokemonUltimate.Combat
         /// </remarks>
         public void DecrementWeatherDuration()
         {
-            if (_weather == Weather.None)
-                return;
-
-            // Infinite duration (0) does not decrement
-            if (_weatherDuration == 0)
-                return;
-
-            _weatherDuration--;
-
-            // If duration reached 0, clear weather
-            if (_weatherDuration <= 0)
-            {
-                ClearWeather();
-            }
+            _weatherState = _weatherState.DecrementDuration();
         }
 
         #endregion
@@ -272,16 +239,7 @@ namespace PokemonUltimate.Combat
         /// </remarks>
         public void SetTerrain(Terrain terrain, int duration, TerrainData terrainData = null)
         {
-            // Clear terrain if None is specified
-            if (terrain == Terrain.None)
-            {
-                ClearTerrain();
-                return;
-            }
-
-            _terrain = terrain;
-            _terrainDuration = duration;
-            _terrainData = terrainData;
+            _terrainState = _terrainState.SetTerrain(terrain, duration, terrainData);
         }
 
         /// <summary>
@@ -294,9 +252,7 @@ namespace PokemonUltimate.Combat
         /// </remarks>
         public void ClearTerrain()
         {
-            _terrain = Terrain.None;
-            _terrainDuration = 0;
-            _terrainData = null;
+            _terrainState = _terrainState.Clear();
         }
 
         /// <summary>
@@ -310,20 +266,7 @@ namespace PokemonUltimate.Combat
         /// </remarks>
         public void DecrementTerrainDuration()
         {
-            if (_terrain == Terrain.None)
-                return;
-
-            // Infinite duration (0) does not decrement
-            if (_terrainDuration == 0)
-                return;
-
-            _terrainDuration--;
-
-            // If duration reached 0, clear terrain
-            if (_terrainDuration <= 0)
-            {
-                ClearTerrain();
-            }
+            _terrainState = _terrainState.DecrementDuration();
         }
 
         #endregion

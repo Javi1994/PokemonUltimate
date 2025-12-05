@@ -3,13 +3,13 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Events;
-using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Content.Builders;
+using PokemonUltimate.Content.Catalogs.Items;
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Items;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Events
 {
@@ -29,6 +29,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
         private BattleSlot _enemySlot;
         private PokemonInstance _playerPokemon;
         private PokemonInstance _enemyPokemon;
+        private BattleTriggerProcessor _processor;
 
         [SetUp]
         public void SetUp()
@@ -42,6 +43,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
             _enemySlot = _field.EnemySide.Slots[0];
             _playerPokemon = _playerSlot.Pokemon;
             _enemyPokemon = _enemySlot.Pokemon;
+
+            // Create processor instance
+            _processor = new BattleTriggerProcessor();
         }
 
         #region OnTurnEnd Tests
@@ -56,7 +60,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
             _playerPokemon.CurrentHP = maxHP - 10; // Damage Pokemon
 
             // Act
-            var actions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
+            var actions = _processor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
 
             // Assert
             Assert.That(actions.Count, Is.GreaterThan(0), "Should generate actions for Leftovers");
@@ -70,7 +74,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
             // Arrange - no items
 
             // Act
-            var actions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
+            var actions = _processor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
 
             // Assert
             Assert.That(actions, Is.Empty);
@@ -85,7 +89,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
             _playerPokemon.CurrentHP = maxHP; // Full HP
 
             // Act
-            var actions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
+            var actions = _processor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
 
             // Assert
             Assert.That(actions, Is.Empty);
@@ -109,7 +113,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
             _playerPokemon.SetAbility(intimidateAbility);
 
             // Act
-            var actions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, _field);
+            var actions = _processor.ProcessTrigger(BattleTrigger.OnSwitchIn, _field);
 
             // Assert
             Assert.That(actions.Count, Is.GreaterThan(0));
@@ -123,7 +127,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
             // Arrange - no abilities
 
             // Act
-            var actions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, _field);
+            var actions = _processor.ProcessTrigger(BattleTrigger.OnSwitchIn, _field);
 
             // Assert
             Assert.That(actions, Is.Empty);
@@ -138,7 +142,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
         {
             // Act & Assert
             Assert.Throws<System.ArgumentNullException>(() =>
-                BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, null));
+                _processor.ProcessTrigger(BattleTrigger.OnTurnEnd, null));
         }
 
         [Test]
@@ -148,7 +152,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
             _playerSlot.ClearSlot();
 
             // Act
-            var actions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
+            var actions = _processor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
 
             // Assert - should not throw, just skip empty slots
             Assert.That(actions, Is.Not.Null);
@@ -162,7 +166,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
             _playerPokemon.HeldItem = ItemCatalog.Leftovers;
 
             // Act
-            var actions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
+            var actions = _processor.ProcessTrigger(BattleTrigger.OnTurnEnd, _field);
 
             // Assert - fainted Pokemon shouldn't trigger items
             Assert.That(actions, Is.Empty);

@@ -1,5 +1,7 @@
 using System;
+using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 
@@ -14,9 +16,19 @@ namespace PokemonUltimate.Combat.Helpers
     /// **Sub-Feature**: 2.5: Combat Actions
     /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
     /// </remarks>
-    public static class AccuracyChecker
+    public class AccuracyChecker
     {
-        private static readonly Random _random = new Random();
+        private readonly IRandomProvider _randomProvider;
+
+        /// <summary>
+        /// Creates a new AccuracyChecker with a random provider.
+        /// </summary>
+        /// <param name="randomProvider">The random provider for accuracy rolls. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">If randomProvider is null.</exception>
+        public AccuracyChecker(IRandomProvider randomProvider)
+        {
+            _randomProvider = randomProvider ?? throw new ArgumentNullException(nameof(randomProvider), ErrorMessages.PokemonCannotBeNull);
+        }
 
         /// <summary>
         /// Checks if a move hits its target.
@@ -27,7 +39,7 @@ namespace PokemonUltimate.Combat.Helpers
         /// <param name="fixedRandomValue">Fixed random value for testing (0.0 to 1.0).</param>
         /// <returns>True if the move hits, false if it misses.</returns>
         /// <exception cref="ArgumentNullException">If user, target, or move is null.</exception>
-        public static bool CheckHit(BattleSlot user, BattleSlot target, MoveData move, float? fixedRandomValue = null)
+        public bool CheckHit(BattleSlot user, BattleSlot target, MoveData move, float? fixedRandomValue = null)
         {
             return CheckHit(user, target, move, field: null, fixedRandomValue);
         }
@@ -47,7 +59,7 @@ namespace PokemonUltimate.Combat.Helpers
         /// **Sub-Feature**: 2.12: Weather System (Perfect Accuracy)
         /// **Documentation**: See `docs/features/2-combat-system/2.12-weather-system/README.md`
         /// </remarks>
-        public static bool CheckHit(BattleSlot user, BattleSlot target, MoveData move, BattleField field, float? fixedRandomValue = null)
+        public bool CheckHit(BattleSlot user, BattleSlot target, MoveData move, BattleField field, float? fixedRandomValue = null)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -77,12 +89,12 @@ namespace PokemonUltimate.Combat.Helpers
             // Calculate effective accuracy
             float accuracyMultiplier = StatCalculator.GetAccuracyStageMultiplier(user.GetStatStage(Stat.Accuracy));
             float evasionMultiplier = StatCalculator.GetAccuracyStageMultiplier(target.GetStatStage(Stat.Evasion));
-            
+
             float effectiveAccuracy = move.Accuracy * (accuracyMultiplier / evasionMultiplier);
             effectiveAccuracy = Math.Max(1f, Math.Min(100f, effectiveAccuracy)); // Clamp to 1-100%
 
             // Roll for hit
-            float roll = fixedRandomValue ?? (float)_random.NextDouble() * 100f;
+            float roll = fixedRandomValue ?? _randomProvider.NextFloat() * 100f;
             return roll < effectiveAccuracy;
         }
     }

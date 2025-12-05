@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
+using PokemonUltimate.Content.Catalogs.Moves;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Moves;
-using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Tests.Systems.Combat.Engine;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
 {
@@ -24,7 +25,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
         [SetUp]
         public void SetUp()
         {
-            _engine = new CombatEngine();
+            _engine = CombatEngineTestHelper.CreateCombatEngine();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             _view = new NullBattleView();
         }
@@ -46,7 +47,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
 
             // Assert: Battle should complete
             Assert.That(result.Outcome, Is.Not.EqualTo(BattleOutcome.Ongoing));
-            
+
             // At least one Pokemon might have status (probabilistic)
             // This test mainly verifies that status moves don't break the battle
             bool battleCompleted = result.Outcome != BattleOutcome.Ongoing;
@@ -69,11 +70,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
 
             // Assert: Battle should complete
             Assert.That(result.Outcome, Is.Not.EqualTo(BattleOutcome.Ongoing));
-            
+
             // Verify that stat stages can be modified during battle
             var playerSlot = _engine.Field.PlayerSide.Slots[0];
             var enemySlot = _engine.Field.EnemySide.Slots[0];
-            
+
             // Stat stages should be within valid range (-6 to +6)
             foreach (var stat in new[] { Stat.Attack, Stat.Defense, Stat.SpAttack, Stat.SpDefense, Stat.Speed })
             {
@@ -170,11 +171,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             // Assert: Battle should run (may end as Ongoing if no active slots but party has Pokemon)
             // This is expected behavior until auto-switching is implemented
             Assert.That(result.TurnsTaken, Is.GreaterThan(0));
-            
+
             // At least one Pokemon should have fainted
             bool playerHasFainted = playerParty.Any(p => p.IsFainted);
             bool enemyHasFainted = enemyParty.Any(p => p.IsFainted);
-            
+
             Assert.That(playerHasFainted || enemyHasFainted, Is.True,
                 "At least one Pokemon should have fainted");
         }
@@ -200,7 +201,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             // Arrange: All Pokemon already fainted
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             // Faint all Pokemon
             playerParty[0].TakeDamage(playerParty[0].MaxHP);
             enemyParty[0].TakeDamage(enemyParty[0].MaxHP);

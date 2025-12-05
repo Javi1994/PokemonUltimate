@@ -4,9 +4,9 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Tests.Systems.Combat.Engine;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
@@ -39,16 +39,16 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
         public async Task CombatEngine_HealAction_RestoresHP()
         {
             // Arrange
-            var engine = new CombatEngine();
+            var engine = CombatEngineTestHelper.CreateCombatEngine();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             var view = new NullBattleView();
-            
+
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
-            engine.Initialize(rules, playerParty, enemyParty, 
-                new TestActionProvider(new MessageAction("Pass")), 
-                new TestActionProvider(new MessageAction("Pass")), 
+
+            engine.Initialize(rules, playerParty, enemyParty,
+                new TestActionProvider(new MessageAction("Pass")),
+                new TestActionProvider(new MessageAction("Pass")),
                 view);
 
             // Damage the Pokemon after initialization
@@ -76,7 +76,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
             // Arrange
             var queue = new BattleQueue();
             int initialHP = _target.CurrentHP;
-            
+
             // Damage the Pokemon
             _target.TakeDamage(50);
             int damagedHP = _target.CurrentHP;
@@ -99,7 +99,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
             // Arrange
             int maxHP = _target.MaxHP;
             int currentHP = _target.CurrentHP;
-            
+
             // Heal more than needed
             int healAmount = maxHP + 100;
             var healAction = new HealAction(null, _targetSlot, healAmount);
@@ -115,21 +115,21 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
         public async Task CombatEngine_HealAction_AfterDamage_RestoresHP()
         {
             // Arrange
-            var engine = new CombatEngine();
+            var engine = CombatEngineTestHelper.CreateCombatEngine();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             var view = new NullBattleView();
-            
+
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
-            engine.Initialize(rules, playerParty, enemyParty, 
-                new TestActionProvider(new MessageAction("Pass")), 
-                new TestActionProvider(new MessageAction("Pass")), 
+
+            engine.Initialize(rules, playerParty, enemyParty,
+                new TestActionProvider(new MessageAction("Pass")),
+                new TestActionProvider(new MessageAction("Pass")),
                 view);
 
             var targetSlot = engine.Field.PlayerSide.Slots[0];
             int maxHP = targetSlot.Pokemon.MaxHP;
-            
+
             // Damage the Pokemon
             targetSlot.Pokemon.TakeDamage(50);
             int damagedHP = targetSlot.Pokemon.CurrentHP;

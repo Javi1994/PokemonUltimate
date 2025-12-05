@@ -11,8 +11,10 @@
 The Damage Calculation Pipeline uses a modular pipeline pattern to calculate damage, avoiding a single giant function. Damage passes through multiple steps, each modifying the damage context.
 
 **Key Components**:
-- **DamagePipeline**: Orchestrates damage calculation
+- **DamagePipeline**: Orchestrates damage calculation (implements `IDamagePipeline`, post-refactor)
+- **IDamagePipeline**: Pipeline interface for dependency injection (post-refactor)
 - **DamageContext**: Mutable snapshot of attack event
+- **DamageContextFactory**: Factory for creating DamageContext instances (post-refactor)
 - **IDamageStep**: Individual pipeline steps (ability, item, type effectiveness, etc.)
 - **IStatModifier**: Interface for stat and damage modifications from abilities/items
 - **AbilityStatModifier**: Adapter for ability-based stat/damage modifiers
@@ -20,7 +22,7 @@ The Damage Calculation Pipeline uses a modular pipeline pattern to calculate dam
 
 ## Current Status
 
-- ✅ **Implemented**: Complete pipeline with all core steps
+- ✅ **Implemented**: Complete pipeline with all core steps (refactored with DI and Factory Pattern, 2024-12-05)
 - ✅ **Tested**: Comprehensive test coverage
 
 ## Documentation
@@ -46,5 +48,5 @@ The Damage Calculation Pipeline uses a modular pipeline pattern to calculate dam
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-05)
 

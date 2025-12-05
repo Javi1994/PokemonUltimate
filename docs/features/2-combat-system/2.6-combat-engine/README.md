@@ -9,15 +9,17 @@
 ## Overview
 
 The Combat Engine orchestrates the entire battle, including:
-- **CombatEngine**: Main battle loop controller
+- **CombatEngine**: Main battle loop controller (uses Dependency Injection, post-refactor)
 - **BattleArbiter**: Victory/defeat detection
 - **Turn Execution**: Coordinates turn processing
 - **Battle Outcome**: Determines battle result
+- **Dependencies**: Uses factories for BattleField and BattleQueue creation, injects processors and helpers
 
 ## Current Status
 
-- ✅ **Implemented**: Complete battle engine with turn execution
+- ✅ **Implemented**: Complete battle engine with turn execution (refactored with DI, 2024-12-05)
 - ✅ **Tested**: Comprehensive test coverage
+- ✅ **Refactored**: All dependencies injected, improved testability and maintainability
 
 ## Documentation
 
@@ -42,5 +44,5 @@ The Combat Engine orchestrates the entire battle, including:
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-05)
 

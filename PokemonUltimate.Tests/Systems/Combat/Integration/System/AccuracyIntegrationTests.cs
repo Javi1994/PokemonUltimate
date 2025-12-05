@@ -3,11 +3,12 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Moves;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Moves;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
 {
@@ -22,6 +23,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
         private BattleSlot _targetSlot;
         private PokemonInstance _user;
         private PokemonInstance _target;
+        private AccuracyChecker _accuracyChecker;
 
         [SetUp]
         public void SetUp()
@@ -35,6 +37,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             _targetSlot = _field.EnemySide.Slots[0];
             _user = _userSlot.Pokemon;
             _target = _targetSlot.Pokemon;
+
+            // Create accuracy checker instance with random provider
+            var randomProvider = new RandomProvider(42);
+            _accuracyChecker = new AccuracyChecker(randomProvider);
         }
 
         #region AccuracyChecker -> UseMoveAction Integration
@@ -58,7 +64,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             {
                 var useMoveAction = new UseMoveAction(_userSlot, _targetSlot, moveInstance);
                 var reactions = useMoveAction.ExecuteLogic(_field).ToList();
-                
+
                 // If we get a DamageAction, the move hit
                 if (reactions.OfType<DamageAction>().Any())
                 {
@@ -87,13 +93,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             {
                 var useMoveAction = new UseMoveAction(_userSlot, _targetSlot, moveInstance);
                 var reactions = useMoveAction.ExecuteLogic(_field).ToList();
-                
+
                 // Never-misses moves should always generate damage action (if they have power)
                 if (moveInstance.Move.Power > 0)
                 {
                     var damageAction = reactions.OfType<DamageAction>().FirstOrDefault();
                     // If move has power, it should hit (unless blocked by status)
-                    if (_user.Status != PersistentStatus.Sleep && 
+                    if (_user.Status != PersistentStatus.Sleep &&
                         _user.Status != PersistentStatus.Freeze)
                     {
                         // Move should execute (may have damage or other effects)
@@ -115,13 +121,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             _userSlot.ModifyStatStage(Stat.Accuracy, -2); // Lower accuracy
 
             // Act - Check hit with low accuracy stage
-            bool hitWithLowAccuracy = AccuracyChecker.CheckHit(_userSlot, _targetSlot, move, 50.0f); // Fixed roll
+            bool hitWithLowAccuracy = _accuracyChecker.CheckHit(_userSlot, _targetSlot, move, 50.0f); // Fixed roll
 
             // Reset accuracy
             _userSlot.ModifyStatStage(Stat.Accuracy, 2);
 
             // Check hit with normal accuracy
-            bool hitWithNormalAccuracy = AccuracyChecker.CheckHit(_userSlot, _targetSlot, move, 50.0f); // Same roll
+            bool hitWithNormalAccuracy = _accuracyChecker.CheckHit(_userSlot, _targetSlot, move, 50.0f); // Same roll
 
             // Assert - Lower accuracy stage should reduce hit chance
             // With same roll, lower accuracy should miss more often
@@ -137,13 +143,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             _targetSlot.ModifyStatStage(Stat.Evasion, 2); // Higher evasion
 
             // Act
-            bool hitWithHighEvasion = AccuracyChecker.CheckHit(_userSlot, _targetSlot, move, 50.0f); // Fixed roll
+            bool hitWithHighEvasion = _accuracyChecker.CheckHit(_userSlot, _targetSlot, move, 50.0f); // Fixed roll
 
             // Reset evasion
             _targetSlot.ModifyStatStage(Stat.Evasion, -2);
 
             // Check hit with normal evasion
-            bool hitWithNormalEvasion = AccuracyChecker.CheckHit(_userSlot, _targetSlot, move, 50.0f); // Same roll
+            bool hitWithNormalEvasion = _accuracyChecker.CheckHit(_userSlot, _targetSlot, move, 50.0f); // Same roll
 
             // Assert - Higher evasion should reduce hit chance
             // Note: This is probabilistic, so we test the mechanism works
@@ -173,7 +179,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             {
                 var useMoveAction = new UseMoveAction(_userSlot, _targetSlot, moveInstance);
                 var reactions = useMoveAction.ExecuteLogic(_field).ToList();
-                
+
                 // If we get a MessageAction about missing, the move missed
                 var messageAction = reactions.OfType<MessageAction>().FirstOrDefault();
                 if (messageAction != null && messageAction.Message.Contains("missed"))

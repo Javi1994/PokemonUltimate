@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -15,8 +16,19 @@ namespace PokemonUltimate.Combat.Helpers
     /// **Sub-Feature**: 2.5: Combat Actions
     /// **Documentation**: See `docs/features/2-combat-system/2.5-combat-actions/architecture.md`
     /// </remarks>
-    public static class TargetResolver
+    public class TargetResolver : ITargetResolver
     {
+        private readonly ITargetRedirectionResolver _redirectionResolver;
+
+        /// <summary>
+        /// Creates a new target resolver.
+        /// </summary>
+        /// <param name="redirectionResolver">The redirection resolver. If null, creates a default one.</param>
+        public TargetResolver(ITargetRedirectionResolver redirectionResolver = null)
+        {
+            _redirectionResolver = redirectionResolver ?? new TargetRedirectionResolvers.TargetRedirectionResolver();
+        }
+
         /// <summary>
         /// Gets all valid targets for a move based on its TargetScope.
         /// </summary>
@@ -25,7 +37,7 @@ namespace PokemonUltimate.Combat.Helpers
         /// <param name="field">The battlefield. Cannot be null.</param>
         /// <returns>List of valid target slots. May be empty if no valid targets.</returns>
         /// <exception cref="ArgumentNullException">If user, move, or field is null.</exception>
-        public static List<BattleSlot> GetValidTargets(BattleSlot user, MoveData move, BattleField field)
+        public List<BattleSlot> GetValidTargets(BattleSlot user, MoveData move, BattleField field)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user), ErrorMessages.PokemonCannotBeNull);
@@ -101,11 +113,15 @@ namespace PokemonUltimate.Combat.Helpers
 
             // 2. Filter out empty and fainted slots (standard rule)
             // Note: Some moves like "Revive" would skip this, but that's handled by the move effect
-            potentialTargets = potentialTargets.Where(s => !s.IsEmpty && !s.HasFainted).ToList();
+            potentialTargets = potentialTargets.Where(s => s.IsActive()).ToList();
 
-            // 3. Handle redirection (Follow Me, Rage Powder, etc.)
-            // TODO: Implement redirection logic when volatile status system is complete
-            // For now, return targets as-is
+            // 3. Handle redirection (Follow Me, Rage Powder, Lightning Rod, Storm Drain)
+            var redirectedTarget = _redirectionResolver.ResolveRedirection(user, potentialTargets, move, field);
+            if (redirectedTarget != null)
+            {
+                // Replace original targets with redirected target
+                return new List<BattleSlot> { redirectedTarget };
+            }
 
             return potentialTargets;
         }
@@ -113,7 +129,7 @@ namespace PokemonUltimate.Combat.Helpers
         /// <summary>
         /// Gets all opposing slots (enemy side) relative to the user's side.
         /// </summary>
-        private static IEnumerable<BattleSlot> GetOpposingSlots(BattleSlot user, BattleField field)
+        private IEnumerable<BattleSlot> GetOpposingSlots(BattleSlot user, BattleField field)
         {
             var oppositeSide = field.GetOppositeSide(user.Side);
             return oppositeSide.GetActiveSlots();
@@ -122,7 +138,7 @@ namespace PokemonUltimate.Combat.Helpers
         /// <summary>
         /// Gets all ally slots (same side) relative to the user.
         /// </summary>
-        private static IEnumerable<BattleSlot> GetAllySlots(BattleSlot user, BattleField field)
+        private IEnumerable<BattleSlot> GetAllySlots(BattleSlot user, BattleField field)
         {
             return user.Side.GetActiveSlots();
         }

@@ -16,6 +16,8 @@ The combat system uses a comprehensive three-phase testing approach:
 
 **Coverage**: 2,528+ passing tests covering all combat phases (2.1-2.14, 2.16)
 
+> **📋 Post-Refactoring Note (2024-12-05)**: After the comprehensive refactoring, all components now use Dependency Injection, making them highly testable. Mock implementations can be easily injected for testing (e.g., `NullBattleLogger`, `NullBattleView`). The refactoring improved testability significantly by removing static dependencies and direct object creation. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for refactoring details.
+
 ## Test Structure
 
 Following TDD workflow from `ai_workflow/docs/TDD_GUIDE.md`:

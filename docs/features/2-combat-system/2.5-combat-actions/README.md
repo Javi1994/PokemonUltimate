@@ -9,19 +9,21 @@
 ## Overview
 
 Combat Actions are the concrete implementations of `BattleAction` (base class from Sub-Feature 2.2), including:
-- **UseMoveAction**: Execute a move
+- **UseMoveAction**: Execute a move (refactored with Strategy Pattern for effects, DI for dependencies, post-refactor)
 - **DamageAction**: Apply damage
 - **ApplyStatusAction**: Apply status conditions
 - **HealAction**: Restore HP
-- **SwitchAction**: Switch Pokemon
+- **SwitchAction**: Switch Pokemon (uses IEntryHazardProcessor, post-refactor)
 - **FaintAction**: Handle fainting
 - **StatChangeAction**: Modify stat stages
 - **MessageAction**: Display battle messages
+- **MoveEffectProcessorRegistry**: Strategy Pattern registry for processing move effects (post-refactor)
 
 ## Current Status
 
-- ✅ **Implemented**: All core action types
+- ✅ **Implemented**: All core action types (refactored with Strategy Pattern and DI, 2024-12-05)
 - ✅ **Tested**: Comprehensive test coverage
+- ✅ **Refactored**: UseMoveAction uses MoveEffectProcessorRegistry (Strategy Pattern), all dependencies injected
 
 ## Documentation
 
@@ -47,5 +49,5 @@ Combat Actions are the concrete implementations of `BattleAction` (base class fr
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-05)
 

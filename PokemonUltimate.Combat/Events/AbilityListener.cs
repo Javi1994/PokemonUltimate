@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -19,6 +20,17 @@ namespace PokemonUltimate.Combat.Events
     public class AbilityListener : IBattleListener
     {
         private readonly AbilityData _abilityData;
+
+        // Dictionary mapping BattleTrigger to AbilityTrigger for efficient lookup
+        private static readonly Dictionary<BattleTrigger, Core.Enums.AbilityTrigger> TriggerMapping = new Dictionary<BattleTrigger, Core.Enums.AbilityTrigger>
+        {
+            { BattleTrigger.OnSwitchIn, Core.Enums.AbilityTrigger.OnSwitchIn },
+            { BattleTrigger.OnTurnEnd, Core.Enums.AbilityTrigger.OnTurnEnd },
+            { BattleTrigger.OnDamageTaken, Core.Enums.AbilityTrigger.OnDamageTaken },
+            { BattleTrigger.OnBeforeMove, Core.Enums.AbilityTrigger.OnBeforeMove },
+            { BattleTrigger.OnAfterMove, Core.Enums.AbilityTrigger.OnAfterMove },
+            { BattleTrigger.OnWeatherChange, Core.Enums.AbilityTrigger.OnWeatherChange }
+        };
 
         /// <summary>
         /// Creates a new ability listener for the given ability data.
@@ -53,26 +65,16 @@ namespace PokemonUltimate.Combat.Events
 
         /// <summary>
         /// Checks if this ability should respond to the given trigger.
+        /// Uses dictionary lookup for efficient trigger mapping.
         /// </summary>
         private bool ShouldRespondToTrigger(BattleTrigger trigger)
         {
-            switch (trigger)
+            if (TriggerMapping.TryGetValue(trigger, out var abilityTrigger))
             {
-                case BattleTrigger.OnSwitchIn:
-                    return _abilityData.ListensTo(AbilityTrigger.OnSwitchIn);
-                case BattleTrigger.OnTurnEnd:
-                    return _abilityData.ListensTo(AbilityTrigger.OnTurnEnd);
-                case BattleTrigger.OnDamageTaken:
-                    return _abilityData.ListensTo(AbilityTrigger.OnDamageTaken);
-                case BattleTrigger.OnBeforeMove:
-                    return _abilityData.ListensTo(AbilityTrigger.OnBeforeMove);
-                case BattleTrigger.OnAfterMove:
-                    return _abilityData.ListensTo(AbilityTrigger.OnAfterMove);
-                case BattleTrigger.OnWeatherChange:
-                    return _abilityData.ListensTo(AbilityTrigger.OnWeatherChange);
-                default:
-                    return false;
+                return _abilityData.ListensTo(abilityTrigger);
             }
+
+            return false;
         }
 
         /// <summary>
@@ -113,7 +115,7 @@ namespace PokemonUltimate.Combat.Events
             // Lower stat for all opposing active Pokemon
             foreach (var enemySlot in opposingSide.GetActiveSlots())
             {
-                if (!enemySlot.IsEmpty && !enemySlot.HasFainted)
+                if (enemySlot.IsActive())
                 {
                     yield return new StatChangeAction(holder, enemySlot, _abilityData.TargetStat.Value, _abilityData.StatStages);
                 }

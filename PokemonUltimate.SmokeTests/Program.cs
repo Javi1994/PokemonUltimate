@@ -1,6 +1,15 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+// Combat
+using PokemonUltimate.Combat;
+using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.AI;
+using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Damage.Steps;
+using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
@@ -9,26 +18,18 @@ using PokemonUltimate.Core.Evolution.Conditions;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 using PokemonUltimate.Core.Registry;
-// Combat
-using PokemonUltimate.Combat;
-using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.AI;
-using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Combat.Damage.Steps;
-using PokemonUltimate.Combat.Events;
-using PokemonUltimate.Combat.Helpers;
+using AbilityCatalog = PokemonUltimate.Content.Catalogs.Abilities.AbilityCatalog;
+using FieldEffectCatalog = PokemonUltimate.Content.Catalogs.Field.FieldEffectCatalog;
+using HazardCatalog = PokemonUltimate.Content.Catalogs.Field.HazardCatalog;
+using ItemCatalog = PokemonUltimate.Content.Catalogs.Items.ItemCatalog;
 // Catalogs
 using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
-using PokemonCatalog = PokemonUltimate.Content.Catalogs.Pokemon.PokemonCatalog;
-using AbilityCatalog = PokemonUltimate.Content.Catalogs.Abilities.AbilityCatalog;
-using ItemCatalog = PokemonUltimate.Content.Catalogs.Items.ItemCatalog;
-using StatusCatalog = PokemonUltimate.Content.Catalogs.Status.StatusCatalog;
-using WeatherCatalog = PokemonUltimate.Content.Catalogs.Weather.WeatherCatalog;
-using TerrainCatalog = PokemonUltimate.Content.Catalogs.Terrain.TerrainCatalog;
-using HazardCatalog = PokemonUltimate.Content.Catalogs.Field.HazardCatalog;
-using SideConditionCatalog = PokemonUltimate.Content.Catalogs.Field.SideConditionCatalog;
-using FieldEffectCatalog = PokemonUltimate.Content.Catalogs.Field.FieldEffectCatalog;
 using Pokemon = PokemonUltimate.Core.Factories.Pokemon;
+using PokemonCatalog = PokemonUltimate.Content.Catalogs.Pokemon.PokemonCatalog;
+using SideConditionCatalog = PokemonUltimate.Content.Catalogs.Field.SideConditionCatalog;
+using StatusCatalog = PokemonUltimate.Content.Catalogs.Status.StatusCatalog;
+using TerrainCatalog = PokemonUltimate.Content.Catalogs.Terrain.TerrainCatalog;
+using WeatherCatalog = PokemonUltimate.Content.Catalogs.Weather.WeatherCatalog;
 
 namespace PokemonUltimate.SmokeTests;
 
@@ -773,16 +774,16 @@ class Program
         var slot = new BattleSlot(0);
         var combatPikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
         slot.SetPokemon(combatPikachu);
-        
+
         Test("BattleSlot holds Pokemon", () => slot.Pokemon == combatPikachu);
         Test("BattleSlot starts with 0 Attack stage", () => slot.GetStatStage(Stat.Attack) == 0);
-        
+
         slot.ModifyStatStage(Stat.Attack, 2);
         Test("ModifyStatStage works", () => slot.GetStatStage(Stat.Attack) == 2);
-        
+
         slot.AddVolatileStatus(VolatileStatus.Confusion);
         Test("AddVolatileStatus works", () => slot.HasVolatileStatus(VolatileStatus.Confusion));
-        
+
         slot.ResetBattleState();
         Test("ResetBattleState clears stages", () => slot.GetStatStage(Stat.Attack) == 0);
 
@@ -795,10 +796,10 @@ class Program
         var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charizard, 50) };
         var battleRules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
-        
+
         var field = new BattleField();
         field.Initialize(battleRules, playerParty, enemyParty);
-        
+
         Test("BattleField has PlayerSide", () => field.PlayerSide != null);
         Test("BattleField has EnemySide", () => field.EnemySide != null);
         Test("BattleField.Rules is set", () => field.Rules != null);
@@ -812,10 +813,10 @@ class Program
 
         var battleQueue = new BattleQueue();
         var testAction = new MessageAction("Test message");
-        
+
         battleQueue.Enqueue(testAction);
         Test("BattleQueue.Enqueue works", () => battleQueue.Count == 1);
-        
+
         battleQueue.Clear();
         Test("BattleQueue.Clear works", () => battleQueue.Count == 0);
 
@@ -824,7 +825,7 @@ class Program
         var processQueue = new BattleQueue();
         processQueue.Enqueue(new TestAction(() => executedActions++));
         processQueue.Enqueue(new TestAction(() => executedActions++));
-        
+
         processQueue.ProcessQueue(field, new NullBattleView()).Wait();
         Test("BattleQueue.ProcessQueue executes all", () => executedActions == 2);
 
@@ -837,7 +838,7 @@ class Program
 
         var fastPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50); // Speed ~110
         var slowPokemon = PokemonFactory.Create(PokemonCatalog.Snorlax, 50); // Speed ~30
-        
+
         var fastSlot = new BattleSlot(0);
         fastSlot.SetPokemon(fastPokemon);
         var slowSlot = new BattleSlot(1);
@@ -849,7 +850,8 @@ class Program
             new TestMoveAction(fastSlot, 0)
         };
 
-        var sorted = TurnOrderResolver.SortActions(turnActions, field);
+        var helpers = CombatEngineFactory.CreateHelpers();
+        var sorted = helpers.TurnOrderResolver.SortActions(turnActions, field);
         Test("Faster Pokemon moves first", () => sorted[0].User == fastSlot);
 
         // Priority test
@@ -859,7 +861,7 @@ class Program
             new TestMoveAction(fastSlot, 0)  // Normal move
         };
 
-        var prioritySorted = TurnOrderResolver.SortActions(priorityActions, field);
+        var prioritySorted = helpers.TurnOrderResolver.SortActions(priorityActions, field);
         Test("Priority beats speed", () => prioritySorted[0].User == slowSlot);
 
         PrintInfo($"TurnOrderResolver: Priority > Speed > Random");
@@ -869,17 +871,22 @@ class Program
         // ═══════════════════════════════════════════════════════
         PrintSection("DAMAGE PIPELINE");
 
-        // Create slots with Pokemon for damage calculation
-        var attackerSlot = new BattleSlot(0);
-        var defenderSlot = new BattleSlot(1);
-        attackerSlot.SetPokemon(PokemonFactory.Create(PokemonCatalog.Charizard, 50));
-        defenderSlot.SetPokemon(PokemonFactory.Create(PokemonCatalog.Venusaur, 50));
+        // Create a proper BattleField with slots for damage calculation
+        var damagePipelineField = new BattleField();
+        var damagePipelinePlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Charizard, 50) };
+        var damagePipelineEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Venusaur, 50) };
+        damagePipelineField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+            damagePipelinePlayerParty, damagePipelineEnemyParty);
+
+        var attackerSlot = damagePipelineField.PlayerSide.Slots[0];
+        var defenderSlot = damagePipelineField.EnemySide.Slots[0];
         var attackMove = MoveCatalog.Flamethrower;
 
-        var pipeline = new DamagePipeline(); // Uses default steps
+        var damageHelpers = CombatEngineFactory.CreateHelpers();
+        var pipeline = damageHelpers.DamagePipeline;
 
-        var damageContext = pipeline.Calculate(attackerSlot, defenderSlot, attackMove, field, forceCritical: false, fixedRandomValue: 1.0f);
-        
+        var damageContext = pipeline.Calculate(attackerSlot, defenderSlot, attackMove, damagePipelineField, forceCritical: false, fixedRandomValue: 1.0f);
+
         Test("DamagePipeline calculates damage", () => damageContext.FinalDamage > 0);
         Test("STAB applied (Charizard Fire)", () => damageContext.IsStab);
         Test("Type effectiveness (Fire vs Grass)", () => damageContext.TypeEffectiveness == 2.0f);
@@ -896,7 +903,7 @@ class Program
         var actionField = new BattleField();
         var actionPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var actionEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-        actionField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+        actionField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             actionPlayerParty, actionEnemyParty);
 
         var actionUserSlot = actionField.PlayerSide.Slots[0];
@@ -909,10 +916,10 @@ class Program
         var testDamageContext = new DamageContext(actionUserSlot, actionTargetSlot, MoveCatalog.Thunderbolt, actionField);
         testDamageContext.BaseDamage = 50;
         testDamageContext.Multiplier = 1.0f;
-        
+
         var damageAction = new DamageAction(actionUserSlot, actionTargetSlot, testDamageContext);
         var damageReactions = damageAction.ExecuteLogic(actionField).ToList();
-        
+
         Test("DamageAction reduces HP", () => actionTarget.CurrentHP < initialHP);
         Test("DamageAction returns empty if no faint", () => damageReactions.Count == 0 || damageReactions[0] is FaintAction);
 
@@ -928,7 +935,7 @@ class Program
         var healAction = new HealAction(null, actionTargetSlot, 30);
         healAction.ExecuteLogic(actionField);
         Test("HealAction restores HP", () => actionTarget.CurrentHP == 80);
-        
+
         var overhealAction = new HealAction(null, actionTargetSlot, 999);
         overhealAction.ExecuteLogic(actionField);
         Test("HealAction prevents overhealing", () => actionTarget.CurrentHP == actionTarget.MaxHP);
@@ -938,7 +945,7 @@ class Program
         var statChangeAction = new StatChangeAction(null, actionUserSlot, Stat.Attack, 2);
         statChangeAction.ExecuteLogic(actionField);
         Test("StatChangeAction increases stat stage", () => actionUserSlot.GetStatStage(Stat.Attack) == initialAttackStage + 2);
-        
+
         var clampStatAction = new StatChangeAction(null, actionUserSlot, Stat.Attack, 10);
         clampStatAction.ExecuteLogic(actionField);
         Test("StatChangeAction clamps to +6", () => actionUserSlot.GetStatStage(Stat.Attack) == 6);
@@ -947,7 +954,7 @@ class Program
         var statusAction = new ApplyStatusAction(null, actionTargetSlot, PersistentStatus.Burn);
         statusAction.ExecuteLogic(actionField);
         Test("ApplyStatusAction applies status", () => actionTarget.Status == PersistentStatus.Burn);
-        
+
         var clearStatusAction = new ApplyStatusAction(null, actionTargetSlot, PersistentStatus.None);
         clearStatusAction.ExecuteLogic(actionField);
         Test("ApplyStatusAction clears status with None", () => actionTarget.Status == PersistentStatus.None);
@@ -957,37 +964,37 @@ class Program
         actionTarget.CurrentHP = actionTarget.MaxHP; // Reset target
         var useMoveInstance = actionUser.Moves[0];
         var initialPP = useMoveInstance.CurrentPP;
-        
+
         var useMoveAction = new UseMoveAction(actionUserSlot, actionTargetSlot, useMoveInstance);
         var moveReactions = useMoveAction.ExecuteLogic(actionField).ToList();
-        
+
         Test("UseMoveAction deducts PP", () => useMoveInstance.CurrentPP == initialPP - 1);
         Test("UseMoveAction generates reactions", () => moveReactions.Count > 0);
         Test("UseMoveAction generates MessageAction", () => moveReactions.Any(r => r is MessageAction));
-        Test("UseMoveAction generates DamageAction for damaging moves", () => 
+        Test("UseMoveAction generates DamageAction for damaging moves", () =>
             moveReactions.Any(r => r is DamageAction) || useMoveInstance.Move.Category == MoveCategory.Status);
 
         // SwitchAction
         var switchField = new BattleField();
-        var switchPlayerParty = new[] 
-        { 
+        var switchPlayerParty = new[]
+        {
             PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
             PokemonFactory.Create(PokemonCatalog.Charmander, 50)
         };
         var switchEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
-        switchField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+        switchField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             switchPlayerParty, switchEnemyParty);
-        
+
         var switchSlot = switchField.PlayerSide.Slots[0];
         var switchBenchPokemon = switchField.PlayerSide.Party[1];
         var switchActivePokemon = switchSlot.Pokemon;
-        
+
         switchSlot.ModifyStatStage(Stat.Attack, 2);
         switchSlot.AddVolatileStatus(VolatileStatus.Flinch);
-        
+
         var switchAction = new SwitchAction(switchSlot, switchBenchPokemon);
         switchAction.ExecuteLogic(switchField);
-        
+
         Test("SwitchAction swaps Pokemon", () => switchSlot.Pokemon == switchBenchPokemon);
         Test("SwitchAction resets stat stages", () => switchSlot.GetStatStage(Stat.Attack) == 0);
         Test("SwitchAction clears volatile status", () => !switchSlot.HasVolatileStatus(VolatileStatus.Flinch));
@@ -1025,34 +1032,34 @@ class Program
         };
         Test("BattleResult stores outcome", () => battleResult.Outcome == BattleOutcome.Victory);
         Test("BattleResult stores turns", () => battleResult.TurnsTaken == 10);
-        Test("BattleResult initializes collections", () => 
+        Test("BattleResult initializes collections", () =>
             battleResult.DefeatedEnemies != null && battleResult.ExpEarned != null && battleResult.LootDropped != null);
 
         // BattleArbiter
         var arbiterField = new BattleField();
         var arbiterPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var arbiterEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-        arbiterField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+        arbiterField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             arbiterPlayerParty, arbiterEnemyParty);
-        
-        Test("BattleArbiter returns Ongoing for active battle", () => 
+
+        Test("BattleArbiter returns Ongoing for active battle", () =>
             BattleArbiter.CheckOutcome(arbiterField) == BattleOutcome.Ongoing);
-        
+
         // Test victory condition
         arbiterEnemyParty[0].CurrentHP = 0;
-        Test("BattleArbiter detects Victory", () => 
+        Test("BattleArbiter detects Victory", () =>
             BattleArbiter.CheckOutcome(arbiterField) == BattleOutcome.Victory);
-        
+
         // Reset and test defeat
         arbiterEnemyParty[0].CurrentHP = arbiterEnemyParty[0].MaxHP;
         arbiterPlayerParty[0].CurrentHP = 0;
-        Test("BattleArbiter detects Defeat", () => 
+        Test("BattleArbiter detects Defeat", () =>
             BattleArbiter.CheckOutcome(arbiterField) == BattleOutcome.Defeat);
-        
+
         // Test draw
         arbiterPlayerParty[0].CurrentHP = 0;
         arbiterEnemyParty[0].CurrentHP = 0;
-        Test("BattleArbiter detects Draw", () => 
+        Test("BattleArbiter detects Draw", () =>
             BattleArbiter.CheckOutcome(arbiterField) == BattleOutcome.Draw);
 
         // IActionProvider
@@ -1065,50 +1072,50 @@ class Program
         Test("IActionProvider message matches", () => ((MessageAction)providerAction).Message == "Test action");
 
         // CombatEngine initialization
-        var engine = new CombatEngine();
+        var engine = CombatEngineFactory.Create();
         var enginePlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var engineEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
         var enginePlayerProvider = new SimpleTestActionProvider("Player action");
         var engineEnemyProvider = new SimpleTestActionProvider("Enemy action");
         var engineView = new NullBattleView();
-        
-        engine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+
+        engine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             enginePlayerParty, engineEnemyParty, enginePlayerProvider, engineEnemyProvider, engineView);
-        
+
         Test("CombatEngine initializes Field", () => engine.Field != null);
         Test("CombatEngine initializes Queue", () => engine.Queue != null);
         Test("CombatEngine starts with Ongoing outcome", () => engine.Outcome == BattleOutcome.Ongoing);
-        Test("CombatEngine assigns action providers", () => 
+        Test("CombatEngine assigns action providers", () =>
             engine.Field.PlayerSide.Slots[0].ActionProvider == enginePlayerProvider &&
             engine.Field.EnemySide.Slots[0].ActionProvider == engineEnemyProvider);
 
         // CombatEngine RunTurn
-        var turnEngine = new CombatEngine();
+        var turnEngine = CombatEngineFactory.Create();
         var turnPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var turnEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
         var turnPlayerProvider = new SimpleTestActionProvider(new MessageAction("Player turn"));
         var turnEnemyProvider = new SimpleTestActionProvider(new MessageAction("Enemy turn"));
-        
-        turnEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+
+        turnEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             turnPlayerParty, turnEnemyParty, turnPlayerProvider, turnEnemyProvider, engineView);
-        
+
         var initialQueueCount = turnEngine.Queue.Count;
         turnEngine.RunTurn().Wait();
         Test("CombatEngine.RunTurn processes actions", () => turnEngine.Queue.Count >= initialQueueCount);
 
         // CombatEngine RunBattle (simplified test - just verify method exists and can be called)
-        var battleEngine = new CombatEngine();
+        var battleEngine = CombatEngineFactory.Create();
         var battlePlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var battleEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
         var battlePlayerProvider = new SimpleTestActionProvider(new MessageAction("Player"));
         var battleEnemyProvider = new SimpleTestActionProvider(new MessageAction("Enemy"));
-        
-        battleEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+
+        battleEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             battlePlayerParty, battleEnemyParty, battlePlayerProvider, battleEnemyProvider, engineView);
-        
+
         // For smoke test, just verify RunBattle method exists and returns Task<BattleResult>
         // Full battle simulation would take too long for smoke test
-        Test("CombatEngine.RunBattle method exists", () => 
+        Test("CombatEngine.RunBattle method exists", () =>
         {
             try
             {
@@ -1134,38 +1141,39 @@ class Program
         var randomAIField = new BattleField();
         var randomAIPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var randomAIEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-        randomAIField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+        randomAIField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             randomAIPlayerParty, randomAIEnemyParty);
-        
+
         var randomAI = new RandomAI();
         var randomAISlot = randomAIField.PlayerSide.Slots[0];
         var randomAIAction = randomAI.GetAction(randomAIField, randomAISlot).Result;
-        
+
         Test("RandomAI returns action", () => randomAIAction != null);
         Test("RandomAI returns UseMoveAction", () => randomAIAction is UseMoveAction);
 
         // Test AlwaysAttackAI
         var alwaysAttackAI = new AlwaysAttackAI();
         var alwaysAttackAIAction = alwaysAttackAI.GetAction(randomAIField, randomAISlot).Result;
-        
+
         Test("AlwaysAttackAI returns action", () => alwaysAttackAIAction != null);
         Test("AlwaysAttackAI returns UseMoveAction", () => alwaysAttackAIAction is UseMoveAction);
 
         // Test TargetResolver
+        var targetHelpers = CombatEngineFactory.CreateHelpers();
         var targetResolverMove = randomAIPlayerParty[0].Moves[0].Move;
-        var validTargets = TargetResolver.GetValidTargets(randomAISlot, targetResolverMove, randomAIField);
+        var validTargets = targetHelpers.TargetResolver.GetValidTargets(randomAISlot, targetResolverMove, randomAIField);
         Test("TargetResolver returns valid targets", () => validTargets.Count > 0);
 
         // Test full battle (simplified - just verify it runs)
-        var fullBattleEngine = new CombatEngine();
+        var fullBattleEngine = CombatEngineFactory.Create();
         var fullBattlePlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var fullBattleEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
         var fullBattlePlayerAI = new RandomAI();
         var fullBattleEnemyAI = new AlwaysAttackAI();
-        
+
         fullBattleEngine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             fullBattlePlayerParty, fullBattleEnemyParty, fullBattlePlayerAI, fullBattleEnemyAI, new NullBattleView());
-        
+
         // Run a few turns to verify it works (not full battle to keep smoke test fast)
         fullBattleEngine.RunTurn().Wait();
         Test("Full battle engine runs turns", () => fullBattleEngine.Field != null);
@@ -1194,15 +1202,16 @@ class Program
         var triggerField = new BattleField();
         var triggerPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
         var triggerEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-        triggerField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+        triggerField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             triggerPlayerParty, triggerEnemyParty);
 
-        Test("BattleTriggerProcessor.ProcessTrigger method exists", () => 
+        var triggerHelpers = CombatEngineFactory.CreateHelpers();
+        Test("BattleTriggerProcessor.ProcessTrigger method exists", () =>
         {
             try
             {
-                var method = typeof(BattleTriggerProcessor).GetMethod("ProcessTrigger");
-                return method != null && method.IsStatic;
+                var method = typeof(BattleTriggerProcessor).GetMethod("ProcessTrigger", new[] { typeof(BattleTrigger), typeof(BattleField) });
+                return method != null;
             }
             catch
             {
@@ -1219,13 +1228,14 @@ class Program
         var leftoversField = new BattleField();
         var leftoversPlayerParty = new[] { leftoversPokemon };
         var leftoversEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-        leftoversField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+        leftoversField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             leftoversPlayerParty, leftoversEnemyParty);
 
         var leftoversSlot = leftoversField.PlayerSide.Slots[0];
         int leftoversInitialHP = leftoversSlot.Pokemon.CurrentHP;
 
-        var leftoversActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, leftoversField);
+        var leftoversTriggerHelpers = CombatEngineFactory.CreateHelpers();
+        var leftoversActions = leftoversTriggerHelpers.BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, leftoversField);
         Test("Leftovers generates actions on OnTurnEnd", () => leftoversActions.Count > 0);
         Test("Leftovers generates MessageAction", () => leftoversActions.Any(a => a is MessageAction));
         Test("Leftovers generates HealAction", () => leftoversActions.Any(a => a is HealAction));
@@ -1248,13 +1258,13 @@ class Program
         intimidatePokemon.SetAbility(intimidateAbility);
 
         var intimidateField = new BattleField();
-        var intimidatePlayerParty = new[] 
-        { 
+        var intimidatePlayerParty = new[]
+        {
             intimidatePokemon, // Put Intimidate Pokemon first so it's in the active slot
             PokemonFactory.Create(PokemonCatalog.Pikachu, 50)
         };
         var intimidateEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-        intimidateField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+        intimidateField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
             intimidatePlayerParty, intimidateEnemyParty);
 
         var intimidateSlot = intimidateField.PlayerSide.Slots[0];
@@ -1265,7 +1275,8 @@ class Program
         Test("Intimidate Pokemon is in active slot", () => intimidateSlot.Pokemon == intimidatePokemon);
         Test("Intimidate Pokemon has ability", () => intimidateSlot.Pokemon.Ability == intimidateAbility);
 
-        var intimidateActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, intimidateField);
+        var intimidateTriggerHelpers = CombatEngineFactory.CreateHelpers();
+        var intimidateActions = intimidateTriggerHelpers.BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, intimidateField);
         Test("Intimidate generates actions on OnSwitchIn", () => intimidateActions.Count > 0);
         Test("Intimidate generates MessageAction", () => intimidateActions.Any(a => a is MessageAction));
         Test("Intimidate generates StatChangeAction", () => intimidateActions.Any(a => a is StatChangeAction));
@@ -1279,9 +1290,9 @@ class Program
         }
 
         // Test integration with CombatEngine
-        var integrationEngine = new CombatEngine();
-        var integrationPlayerParty = new[] 
-        { 
+        var integrationEngine = CombatEngineFactory.Create();
+        var integrationPlayerParty = new[]
+        {
             PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
             PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
         };
@@ -1299,14 +1310,14 @@ class Program
 
         // Test that CombatEngine has trigger support
         Test("CombatEngine initializes with trigger support", () => integrationEngine.Field != null);
-        
+
         // Test that SwitchAction triggers OnSwitchIn (verify by checking actions generated)
         var integrationSwitchSlot = integrationEngine.Field.PlayerSide.Slots[0];
         var integrationSwitchNewPokemon = integrationPlayerParty[1];
         var integrationSwitchAction = new SwitchAction(integrationSwitchSlot, integrationSwitchNewPokemon);
         var switchReactions = integrationSwitchAction.ExecuteLogic(integrationEngine.Field).ToList();
         Test("SwitchAction generates OnSwitchIn trigger actions", () => switchReactions.Count > 0);
-        Test("SwitchAction generates Intimidate actions", () => 
+        Test("SwitchAction generates Intimidate actions", () =>
             switchReactions.Any(a => a is StatChangeAction || a is MessageAction));
 
         // Test that CombatEngine.RunTurn processes OnTurnEnd triggers
@@ -1314,7 +1325,7 @@ class Program
         int endOfTurnInitialHP = endOfTurnSlot.Pokemon.CurrentHP;
         integrationEngine.RunTurn().Wait();
         // Leftovers should heal, so HP should be >= initial (or same if already at max)
-        Test("CombatEngine.RunTurn processes OnTurnEnd triggers", () => 
+        Test("CombatEngine.RunTurn processes OnTurnEnd triggers", () =>
             endOfTurnSlot.Pokemon.CurrentHP >= endOfTurnInitialHP);
 
         PrintInfo($"BattleTrigger system: OnSwitchIn, OnTurnEnd working");
@@ -1342,29 +1353,30 @@ class Program
             var choiceBandField = new BattleField();
             var choiceBandPlayerParty = new[] { choiceBandPokemon };
             var choiceBandEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
-            choiceBandField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            choiceBandField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
                 choiceBandPlayerParty, choiceBandEnemyParty);
 
             var choiceBandSlot = choiceBandField.PlayerSide.Slots[0];
             var choiceBandModifier = new ItemStatModifier(ItemCatalog.ChoiceBand);
-            Test("Choice Band returns 1.5x for Attack stat", () => 
+            Test("Choice Band returns 1.5x for Attack stat", () =>
                 Math.Abs(choiceBandModifier.GetStatMultiplier(choiceBandSlot, Stat.Attack, choiceBandField) - 1.5f) < 0.001f);
-            Test("Choice Band returns 1.0x for other stats", () => 
+            Test("Choice Band returns 1.0x for other stats", () =>
                 Math.Abs(choiceBandModifier.GetStatMultiplier(choiceBandSlot, Stat.Defense, choiceBandField) - 1.0f) < 0.001f);
 
             // Test Choice Band in damage calculation
-            var choiceBandPipeline = new DamagePipeline();
+            var choiceBandHelpers = CombatEngineFactory.CreateHelpers();
+            var choiceBandPipeline = choiceBandHelpers.DamagePipeline;
             var choiceBandMove = MoveCatalog.Tackle; // Physical move
-            var choiceBandContext = choiceBandPipeline.Calculate(choiceBandSlot, choiceBandField.EnemySide.Slots[0], 
+            var choiceBandContext = choiceBandPipeline.Calculate(choiceBandSlot, choiceBandField.EnemySide.Slots[0],
                 choiceBandMove, choiceBandField, false, 1.0f);
-            
+
             choiceBandPokemon.HeldItem = null;
             var choiceBandFieldNoItem = new BattleField();
-            choiceBandFieldNoItem.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            choiceBandFieldNoItem.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
                 new[] { choiceBandPokemon }, choiceBandEnemyParty);
-            var choiceBandContextNoItem = choiceBandPipeline.Calculate(choiceBandFieldNoItem.PlayerSide.Slots[0], 
+            var choiceBandContextNoItem = choiceBandPipeline.Calculate(choiceBandFieldNoItem.PlayerSide.Slots[0],
                 choiceBandFieldNoItem.EnemySide.Slots[0], choiceBandMove, choiceBandFieldNoItem, false, 1.0f);
-            
+
             Test("Choice Band increases base damage", () => choiceBandContext.BaseDamage > choiceBandContextNoItem.BaseDamage);
 
             // Life Orb - Damage modifier
@@ -1373,28 +1385,29 @@ class Program
             var lifeOrbField = new BattleField();
             var lifeOrbPlayerParty = new[] { lifeOrbPokemon };
             var lifeOrbEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
-            lifeOrbField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            lifeOrbField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
                 lifeOrbPlayerParty, lifeOrbEnemyParty);
 
             var lifeOrbSlot = lifeOrbField.PlayerSide.Slots[0];
             var lifeOrbMove = MoveCatalog.ThunderShock;
             var lifeOrbContext = new DamageContext(lifeOrbSlot, lifeOrbField.EnemySide.Slots[0], lifeOrbMove, lifeOrbField);
             var lifeOrbModifier = new ItemStatModifier(ItemCatalog.LifeOrb);
-            Test("Life Orb returns 1.3x damage multiplier", () => 
+            Test("Life Orb returns 1.3x damage multiplier", () =>
                 Math.Abs(lifeOrbModifier.GetDamageMultiplier(lifeOrbContext) - 1.3f) < 0.001f);
 
             // Test Life Orb in damage calculation
-            var lifeOrbPipeline = new DamagePipeline();
-            var lifeOrbContextWithItem = lifeOrbPipeline.Calculate(lifeOrbSlot, lifeOrbField.EnemySide.Slots[0], 
+            var lifeOrbHelpers = CombatEngineFactory.CreateHelpers();
+            var lifeOrbPipeline = lifeOrbHelpers.DamagePipeline;
+            var lifeOrbContextWithItem = lifeOrbPipeline.Calculate(lifeOrbSlot, lifeOrbField.EnemySide.Slots[0],
                 lifeOrbMove, lifeOrbField, false, 1.0f);
-            
+
             lifeOrbPokemon.HeldItem = null;
             var lifeOrbFieldNoItem = new BattleField();
-            lifeOrbFieldNoItem.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            lifeOrbFieldNoItem.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
                 new[] { lifeOrbPokemon }, lifeOrbEnemyParty);
-            var lifeOrbContextNoItem = lifeOrbPipeline.Calculate(lifeOrbFieldNoItem.PlayerSide.Slots[0], 
+            var lifeOrbContextNoItem = lifeOrbPipeline.Calculate(lifeOrbFieldNoItem.PlayerSide.Slots[0],
                 lifeOrbFieldNoItem.EnemySide.Slots[0], lifeOrbMove, lifeOrbFieldNoItem, false, 1.0f);
-            
+
             Test("Life Orb increases final damage", () => lifeOrbContextWithItem.FinalDamage > lifeOrbContextNoItem.FinalDamage);
 
             // Blaze - Ability damage modifier
@@ -1404,35 +1417,36 @@ class Program
             var blazeField = new BattleField();
             var blazePlayerParty = new[] { blazePokemon };
             var blazeEnemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
-            blazeField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            blazeField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
                 blazePlayerParty, blazeEnemyParty);
 
             var blazeSlot = blazeField.PlayerSide.Slots[0];
             var blazeMove = MoveCatalog.Ember; // Fire move
             var blazeContext = new DamageContext(blazeSlot, blazeField.EnemySide.Slots[0], blazeMove, blazeField);
             var blazeModifier = new AbilityStatModifier(AbilityCatalog.Blaze);
-            Test("Blaze returns 1.5x damage multiplier when HP is low", () => 
+            Test("Blaze returns 1.5x damage multiplier when HP is low", () =>
                 Math.Abs(blazeModifier.GetDamageMultiplier(blazeContext) - 1.5f) < 0.001f);
 
             // Test Blaze doesn't activate when HP is high
             blazePokemon.CurrentHP = (int)(blazePokemon.MaxHP * 0.50f); // Above 33% threshold
             var blazeContextHighHP = new DamageContext(blazeSlot, blazeField.EnemySide.Slots[0], blazeMove, blazeField);
-            Test("Blaze returns 1.0x when HP is high", () => 
+            Test("Blaze returns 1.0x when HP is high", () =>
                 Math.Abs(blazeModifier.GetDamageMultiplier(blazeContextHighHP) - 1.0f) < 0.001f);
 
             // Test Blaze in damage calculation
             blazePokemon.CurrentHP = (int)(blazePokemon.MaxHP * 0.30f); // Below threshold
-            var blazePipeline = new DamagePipeline();
-            var blazeContextWithAbility = blazePipeline.Calculate(blazeSlot, blazeField.EnemySide.Slots[0], 
+            var blazeHelpers = CombatEngineFactory.CreateHelpers();
+            var blazePipeline = blazeHelpers.DamagePipeline;
+            var blazeContextWithAbility = blazePipeline.Calculate(blazeSlot, blazeField.EnemySide.Slots[0],
                 blazeMove, blazeField, false, 1.0f);
-            
+
             blazePokemon.SetAbility(null);
             var blazeFieldNoAbility = new BattleField();
-            blazeFieldNoAbility.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 }, 
+            blazeFieldNoAbility.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
                 new[] { blazePokemon }, blazeEnemyParty);
-            var blazeContextNoAbility = blazePipeline.Calculate(blazeFieldNoAbility.PlayerSide.Slots[0], 
+            var blazeContextNoAbility = blazePipeline.Calculate(blazeFieldNoAbility.PlayerSide.Slots[0],
                 blazeFieldNoAbility.EnemySide.Slots[0], blazeMove, blazeFieldNoAbility, false, 1.0f);
-            
+
             Test("Blaze increases final damage when HP is low", () => blazeContextWithAbility.FinalDamage > blazeContextNoAbility.FinalDamage);
 
             PrintInfo($"IStatModifier system: Passive stat and damage modifiers");

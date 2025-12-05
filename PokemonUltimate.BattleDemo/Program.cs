@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat;
-using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.BattleDemo
 {
@@ -71,7 +72,7 @@ namespace PokemonUltimate.BattleDemo
             var enemyAI = new RandomAI();
             var view = new ConsoleBattleView();
 
-            var engine = new CombatEngine();
+            var engine = CombatEngineFactory.Create();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
 
             engine.Initialize(rules, playerParty, enemyParty, playerAI, enemyAI, view);
@@ -81,7 +82,7 @@ namespace PokemonUltimate.BattleDemo
             var result = await RunBattleWithDisplay(engine, view);
 
             DisplayBattleResult(result);
-            
+
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write("\nPress any key to continue to next scenario... ");
             Console.ResetColor();
@@ -105,7 +106,7 @@ namespace PokemonUltimate.BattleDemo
             var enemyAI = new AlwaysAttackAI();
             var view = new ConsoleBattleView();
 
-            var engine = new CombatEngine();
+            var engine = CombatEngineFactory.Create();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
 
             engine.Initialize(rules, playerParty, enemyParty, playerAI, enemyAI, view);
@@ -115,7 +116,7 @@ namespace PokemonUltimate.BattleDemo
             var result = await RunBattleWithDisplay(engine, view);
 
             DisplayBattleResult(result);
-            
+
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write("\nPress any key to continue to next scenario... ");
             Console.ResetColor();
@@ -149,7 +150,7 @@ namespace PokemonUltimate.BattleDemo
             var enemyAI = new RandomAI();
             var view = new ConsoleBattleView();
 
-            var engine = new CombatEngine();
+            var engine = CombatEngineFactory.Create();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
 
             engine.Initialize(rules, playerParty, enemyParty, playerAI, enemyAI, view);
@@ -159,7 +160,7 @@ namespace PokemonUltimate.BattleDemo
             var result = await RunBattleWithDisplay(engine, view);
 
             DisplayBattleResult(result);
-            
+
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write("\nPress any key to continue to next scenario... ");
             Console.ResetColor();
@@ -183,7 +184,7 @@ namespace PokemonUltimate.BattleDemo
             var enemyAI = new AlwaysAttackAI();
             var view = new ConsoleBattleView();
 
-            var engine = new CombatEngine();
+            var engine = CombatEngineFactory.Create();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
 
             engine.Initialize(rules, playerParty, enemyParty, playerAI, enemyAI, view);
@@ -193,7 +194,7 @@ namespace PokemonUltimate.BattleDemo
             var result = await RunBattleWithDisplay(engine, view);
 
             DisplayBattleResult(result);
-            
+
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write("\nPress any key to continue to next scenario... ");
             Console.ResetColor();
@@ -219,9 +220,9 @@ namespace PokemonUltimate.BattleDemo
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write("\nPress ENTER to execute turn, 'q' to quit battle... ");
                 Console.ResetColor();
-                
+
                 var key = Console.ReadKey(true);
-                
+
                 if (key.Key == ConsoleKey.Q)
                 {
                     Console.WriteLine("\nBattle cancelled by user.");
@@ -266,7 +267,8 @@ namespace PokemonUltimate.BattleDemo
             }
 
             // 2. Sort by turn order and show debug info
-            var sortedActions = TurnOrderResolver.SortActions(pendingActions, engine.Field);
+            var turnOrderHelpers = CombatEngineFactory.CreateHelpers();
+            var sortedActions = turnOrderHelpers.TurnOrderResolver.SortActions(pendingActions, engine.Field);
             view.DisplayTurnOrderDebug(sortedActions, engine.Field);
 
             // 3. Enqueue all actions
@@ -311,9 +313,9 @@ namespace PokemonUltimate.BattleDemo
         static async Task ProcessSingleActionWithDebug(BattleQueue queue, BattleField field, IBattleView view, int queueSizeBefore)
         {
             // Access private _queue field via reflection
-            var queueField = typeof(BattleQueue).GetField("_queue", 
+            var queueField = typeof(BattleQueue).GetField("_queue",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            
+
             if (queueField == null)
             {
                 // Fallback: just process normally without detailed debug
@@ -336,7 +338,7 @@ namespace PokemonUltimate.BattleDemo
             // Show debug info
             var actionName = GetActionName(action);
             var user = action.User?.Pokemon?.DisplayName ?? "System";
-            
+
             System.Console.ForegroundColor = System.ConsoleColor.DarkGray;
             System.Console.Write($"[DEBUG] Executing: [{actionName}]");
             System.Console.ResetColor();
@@ -394,7 +396,7 @@ namespace PokemonUltimate.BattleDemo
         static Dictionary<BattleSlot, int> CaptureHpBefore(BattleAction action)
         {
             var hpMap = new Dictionary<BattleSlot, int>();
-            
+
             if (action is DamageAction damageAction && damageAction.Target?.Pokemon != null)
             {
                 hpMap[damageAction.Target] = damageAction.Target.Pokemon.CurrentHP;
@@ -403,7 +405,7 @@ namespace PokemonUltimate.BattleDemo
             {
                 hpMap[healAction.Target] = healAction.Target.Pokemon.CurrentHP;
             }
-            
+
             return hpMap;
         }
 
@@ -418,22 +420,22 @@ namespace PokemonUltimate.BattleDemo
                     var damageTarget = damageAction.Target?.Pokemon;
                     var damage = damageAction.Context.FinalDamage;
                     var targetName = damageTarget?.DisplayName ?? "Unknown";
-                    
+
                     // Get HP before damage was applied
-                    var hpBeforeDamage = (damageAction.Target != null && hpBefore.ContainsKey(damageAction.Target)) 
-                        ? hpBefore[damageAction.Target] 
+                    var hpBeforeDamage = (damageAction.Target != null && hpBefore.ContainsKey(damageAction.Target))
+                        ? hpBefore[damageAction.Target]
                         : (damageTarget?.CurrentHP ?? 0);
-                    
+
                     System.Console.ForegroundColor = System.ConsoleColor.Red;
                     System.Console.Write($"[DEBUG]   → Damage: {damage} HP");
                     System.Console.ResetColor();
-                    
+
                     if (damageTarget != null)
                     {
                         // HP after damage (already applied in ExecuteLogic)
                         var hpAfterDamage = damageTarget.CurrentHP;
                         System.Console.Write($" → {targetName} ({hpBeforeDamage} → {hpAfterDamage})");
-                        
+
                         // Show effectiveness if available
                         var effectiveness = damageAction.Context.TypeEffectiveness;
                         if (effectiveness != 1.0f)
@@ -447,13 +449,13 @@ namespace PokemonUltimate.BattleDemo
                                 0.0f => "No Effect",
                                 _ => $"{effectiveness:F1}x"
                             };
-                            System.Console.ForegroundColor = effectiveness >= 2.0f 
-                                ? System.ConsoleColor.Green 
+                            System.Console.ForegroundColor = effectiveness >= 2.0f
+                                ? System.ConsoleColor.Green
                                 : System.ConsoleColor.Yellow;
                             System.Console.Write($" [{effectivenessText}]");
                             System.Console.ResetColor();
                         }
-                        
+
                         // Show critical hit
                         if (damageAction.Context.IsCritical)
                         {
@@ -461,7 +463,7 @@ namespace PokemonUltimate.BattleDemo
                             System.Console.Write(" [CRITICAL HIT!]");
                             System.Console.ResetColor();
                         }
-                        
+
                         // Show STAB
                         if (damageAction.Context.IsStab)
                         {
@@ -478,7 +480,7 @@ namespace PokemonUltimate.BattleDemo
                     var statName = statAction.Stat.ToString();
                     var change = statAction.Change;
                     var changeSymbol = change > 0 ? "+" : "";
-                    
+
                     System.Console.ForegroundColor = change > 0 ? System.ConsoleColor.Green : System.ConsoleColor.Red;
                     System.Console.WriteLine($"[DEBUG]   → Stat Change: {statTarget}'s {statName} {changeSymbol}{change} stage(s)");
                     System.Console.ResetColor();
@@ -487,16 +489,16 @@ namespace PokemonUltimate.BattleDemo
                 case HealAction healAction:
                     var healTarget = healAction.Target?.Pokemon?.DisplayName ?? "Unknown";
                     var healAmount = healAction.Amount;
-                    
+
                     // Get HP before heal was applied
-                    var hpBeforeHeal = (healAction.Target != null && hpBefore.ContainsKey(healAction.Target)) 
-                        ? hpBefore[healAction.Target] 
+                    var hpBeforeHeal = (healAction.Target != null && hpBefore.ContainsKey(healAction.Target))
+                        ? hpBefore[healAction.Target]
                         : (healAction.Target?.Pokemon?.CurrentHP ?? 0);
-                    
+
                     System.Console.ForegroundColor = System.ConsoleColor.Green;
                     System.Console.Write($"[DEBUG]   → Heal: {healTarget} +{healAmount} HP");
                     System.Console.ResetColor();
-                    
+
                     if (healAction.Target?.Pokemon != null)
                     {
                         var hpAfterHeal = healAction.Target.Pokemon.CurrentHP;

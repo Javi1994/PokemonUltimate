@@ -67,6 +67,7 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 **Key Classes**:
 
 -   `DamagePipeline` - Main damage calculator
+-   `IDamagePipeline` - Damage pipeline interface (post-refactor)
 -   `DamageContext` - Damage calculation context
 -   `IDamageStep` - Pipeline step interface
 -   `IStatModifier` - Stat and damage modifier interface (abilities, items)
@@ -109,7 +110,10 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 -   `IBattleListener` - Listener interface
 -   `AbilityListener` - Ability event handler
 -   `ItemListener` - Item event handler
--   `BattleTriggerProcessor` - Trigger processor
+-   `BattleTriggerProcessor` - Trigger processor (instance-based, post-refactor)
+-   `IBattleTriggerProcessor` - Trigger processor interface
+-   `IBattleEventBus` - Event bus interface for decoupled communication
+-   `BattleEventBus` - Event bus implementation
 
 ### `PokemonUltimate.Combat.Engine`
 
@@ -117,17 +121,26 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 **Key Classes**:
 
 -   `CombatEngine` - Main battle controller (includes weather duration decrement - Sub-Feature 2.12, terrain duration decrement - Sub-Feature 2.13, side condition duration decrement - Sub-Feature 2.16)
--   `EndOfTurnProcessor` - End-of-turn effects processor (includes weather damage - Sub-Feature 2.12, terrain healing - Sub-Feature 2.13)
--   `EntryHazardProcessor` - Entry hazard processing on switch-in (Sub-Feature 2.14)
+-   `BattleQueue` - Action queue processor (uses `LinkedList<BattleAction>` internally)
+-   `BattleArbiter` - Victory/defeat detection
+-   `EndOfTurnProcessor` - End-of-turn effects processor (instance-based, post-refactor)
+-   `IEndOfTurnProcessor` - End-of-turn processor interface
+-   `EntryHazardProcessor` - Entry hazard processing on switch-in (instance-based, post-refactor)
+-   `IEntryHazardProcessor` - Entry hazard processor interface
 
 ### `PokemonUltimate.Combat.Helpers`
 
 **Purpose**: Utility classes
 **Key Classes**:
 
--   `TurnOrderResolver` - Turn order calculation (includes Tailwind speed multiplier - Sub-Feature 2.16)
--   `TargetResolver` - Target selection
--   `AccuracyChecker` - Accuracy calculation (includes weather perfect accuracy - Sub-Feature 2.12)
+-   `TurnOrderResolver` - Turn order calculation (instance-based, post-refactor, includes Tailwind speed multiplier - Sub-Feature 2.16)
+-   `TargetResolver` - Target selection (instance-based, post-refactor)
+-   `ITargetResolver` - Target resolver interface
+-   `AccuracyChecker` - Accuracy calculation (instance-based, post-refactor, includes weather perfect accuracy - Sub-Feature 2.12)
+-   `ITargetRedirectionResolver` - Target redirection resolver interface
+-   `TargetRedirectionResolver` - Target redirection coordinator
+-   `FollowMeResolver` - Follow Me redirection resolver
+-   `LightningRodResolver` - Lightning Rod redirection resolver
 
 ### `PokemonUltimate.Combat.AI`
 
@@ -139,11 +152,13 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 
 ### `PokemonUltimate.Combat.Providers`
 
-**Purpose**: Action provider interfaces
+**Purpose**: Action provider interfaces and random number generation
 **Key Classes**:
 
 -   `IActionProvider` - Action provider interface
 -   `PlayerInputProvider` - Human player input provider
+-   `IRandomProvider` - Random number generation interface (replaces static Random)
+-   `RandomProvider` - Random number generation implementation
 
 ### `PokemonUltimate.Combat.View`
 
@@ -160,6 +175,94 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 
 -   `BattleOutcome` - Outcome enum
 -   `BattleResult` - Detailed battle result
+
+### `PokemonUltimate.Combat.Factories`
+
+**Purpose**: Factory pattern for object creation (post-refactor)
+**Key Classes**:
+
+-   `IBattleFieldFactory` - BattleField factory interface
+-   `BattleFieldFactory` - BattleField factory implementation
+-   `IBattleQueueFactory` - BattleQueue factory interface
+-   `BattleQueueFactory` - BattleQueue factory implementation
+-   `DamageContextFactory` - DamageContext factory for creating contexts for different scenarios
+
+### `PokemonUltimate.Combat.ValueObjects`
+
+**Purpose**: Value Objects for complex state management (post-refactor)
+**Key Classes**:
+
+-   `StatStages` - Manages stat stage modifications (-6 to +6)
+-   `DamageTracker` - Tracks damage for Counter/Mirror Coat calculations
+-   `ProtectTracker` - Tracks Protect/Detect state
+-   `SemiInvulnerableState` - Tracks semi-invulnerable move state
+-   `ChargingMoveState` - Tracks charging move state
+-   `MoveStateTracker` - Unified tracker for all move states
+-   `TerrainState` - Terrain condition and duration
+-   `WeatherState` - Weather condition and duration
+
+### `PokemonUltimate.Combat.Effects`
+
+**Purpose**: Move effect processing using Strategy Pattern (post-refactor)
+**Key Classes**:
+
+-   `IMoveEffectProcessor` - Move effect processor interface
+-   `MoveEffectProcessorRegistry` - Registry for effect processors
+-   `StatusEffectProcessor` - Processes status effects
+-   `StatChangeEffectProcessor` - Processes stat change effects
+-   `RecoilEffectProcessor` - Processes recoil effects
+-   `DrainEffectProcessor` - Processes drain effects
+-   `FlinchEffectProcessor` - Processes flinch effects
+-   `ProtectEffectProcessor` - Processes protect effects
+-   `CounterEffectProcessor` - Processes counter effects
+-   `HealEffectProcessor` - Processes heal effects
+-   `IMoveModifier` - Move modifier interface for temporary move modifications
+-   `MoveModifier` - Move modifier implementation
+-   `IAccumulativeEffect` - Accumulative effect interface
+-   `AccumulativeEffectTracker` - Tracks accumulative effects (e.g., Badly Poisoned)
+
+### `PokemonUltimate.Combat.Logging`
+
+**Purpose**: Structured logging system (post-refactor)
+**Key Classes**:
+
+-   `IBattleLogger` - Logger interface
+-   `BattleLogger` - Logger implementation
+-   `NullBattleLogger` - Null implementation for tests
+
+### `PokemonUltimate.Combat.Messages`
+
+**Purpose**: Centralized message formatting (post-refactor)
+**Key Classes**:
+
+-   `IBattleMessageFormatter` - Message formatter interface
+-   `BattleMessageFormatter` - Message formatter implementation
+
+### `PokemonUltimate.Combat.Validation`
+
+**Purpose**: Battle state validation (post-refactor)
+**Key Classes**:
+
+-   `IBattleStateValidator` - Battle state validator interface
+-   `BattleStateValidator` - Battle state validator implementation
+
+### `PokemonUltimate.Combat.Extensions`
+
+**Purpose**: Extension methods for common operations (post-refactor)
+**Key Classes**:
+
+-   `BattleSlotExtensions` - Extension methods for BattleSlot (e.g., `IsActive()`)
+-   `DamageCalculationExtensions` - Extension methods for damage calculations (e.g., `EnsureMinimumDamage()`)
+
+### `PokemonUltimate.Combat.Constants`
+
+**Purpose**: Centralized constants (post-refactor)
+**Key Classes**:
+
+-   `BattleConstants` - Battle system limits (`MaxTurns`, `MaxQueueIterations`)
+-   `StatusConstants` - Status effect constants (`ParalysisSpeedMultiplier`, `ParalysisFullParalysisChance`)
+-   `ItemConstants` - Item effect constants (`LeftoversHealDivisor`)
+-   `MoveConstants` - Move-related constants (semi-invulnerable move names)
 
 ## Project Structure
 
@@ -183,6 +286,7 @@ PokemonUltimate.Combat/
 │
 ├── Damage/
 │   ├── DamagePipeline.cs               # Main damage calculator
+│   ├── IDamagePipeline.cs               # Damage pipeline interface
 │   ├── DamageContext.cs                # Damage context
 │   ├── IDamageStep.cs                  # Pipeline step interface
 │   ├── IStatModifier.cs                # Stat modifier interface
@@ -200,17 +304,23 @@ PokemonUltimate.Combat/
 │       └── BurnStep.cs                 # Burn penalty
 │
 ├── Engine/
-│   ├── CombatEngine.cs                 # Main battle controller (weather duration - Sub-Feature 2.12)
-│   ├── BattleQueue.cs                  # Action queue
+│   ├── CombatEngine.cs                 # Main battle controller (DI-based, post-refactor)
+│   ├── BattleQueue.cs                  # Action queue (uses LinkedList internally)
 │   ├── BattleArbiter.cs                # Victory/defeat detection
-│   └── EndOfTurnProcessor.cs          # End-of-turn effects (weather damage - Sub-Feature 2.12)
+│   ├── EndOfTurnProcessor.cs          # End-of-turn effects (instance-based, post-refactor)
+│   ├── IEndOfTurnProcessor.cs         # End-of-turn processor interface
+│   ├── EntryHazardProcessor.cs        # Entry hazard processing (instance-based, post-refactor)
+│   └── IEntryHazardProcessor.cs       # Entry hazard processor interface
 │
 ├── Events/
 │   ├── BattleTrigger.cs                # Trigger enum
 │   ├── IBattleListener.cs              # Listener interface
 │   ├── AbilityListener.cs              # Ability handler
 │   ├── ItemListener.cs                 # Item handler
-│   └── BattleTriggerProcessor.cs       # Trigger processor
+│   ├── BattleTriggerProcessor.cs       # Trigger processor (instance-based, post-refactor)
+│   ├── IBattleTriggerProcessor.cs     # Trigger processor interface
+│   ├── IBattleEventBus.cs              # Event bus interface
+│   └── BattleEventBus.cs               # Event bus implementation
 │
 ├── Field/
 │   ├── BattleField.cs                  # Main battlefield (weather tracking - Sub-Feature 2.12)
@@ -219,17 +329,81 @@ PokemonUltimate.Combat/
 │   └── BattleRules.cs                 # Battle rules
 │
 ├── Helpers/
-│   ├── TurnOrderResolver.cs           # Turn order calculation
-│   ├── TargetResolver.cs              # Target selection
-│   └── AccuracyChecker.cs             # Accuracy calculation (weather perfect accuracy - Sub-Feature 2.12)
+│   ├── TurnOrderResolver.cs           # Turn order calculation (instance-based, post-refactor)
+│   ├── TargetResolver.cs              # Target selection (instance-based, post-refactor)
+│   ├── ITargetResolver.cs             # Target resolver interface
+│   ├── AccuracyChecker.cs             # Accuracy calculation (instance-based, post-refactor)
+│   ├── ITargetRedirectionResolver.cs  # Target redirection resolver interface
+│   ├── TargetRedirectionResolver.cs   # Target redirection coordinator
+│   └── TargetRedirectionResolvers/
+│       ├── FollowMeResolver.cs        # Follow Me resolver
+│       └── LightningRodResolver.cs    # Lightning Rod resolver
 │
 ├── Providers/
 │   ├── IActionProvider.cs              # Action provider interface
-│   └── PlayerInputProvider.cs          # Human input provider
+│   ├── PlayerInputProvider.cs          # Human input provider
+│   ├── IRandomProvider.cs              # Random number generation interface
+│   └── RandomProvider.cs               # Random number generation implementation
 │
 ├── Results/
 │   ├── BattleOutcome.cs                # Outcome enum
 │   └── BattleResult.cs                 # Result data
+│
+├── Factories/
+│   ├── IBattleFieldFactory.cs         # BattleField factory interface
+│   ├── BattleFieldFactory.cs           # BattleField factory implementation
+│   ├── IBattleQueueFactory.cs         # BattleQueue factory interface
+│   ├── BattleQueueFactory.cs          # BattleQueue factory implementation
+│   └── DamageContextFactory.cs        # DamageContext factory
+│
+├── ValueObjects/
+│   ├── StatStages.cs                   # Stat stage management
+│   ├── DamageTracker.cs                # Damage tracking for Counter/Mirror Coat
+│   ├── ProtectTracker.cs               # Protect/Detect state tracking
+│   ├── SemiInvulnerableState.cs        # Semi-invulnerable move state
+│   ├── ChargingMoveState.cs            # Charging move state
+│   ├── MoveStateTracker.cs             # Unified move state tracker
+│   ├── TerrainState.cs                 # Terrain state and duration
+│   └── WeatherState.cs                 # Weather state and duration
+│
+├── Effects/
+│   ├── IMoveEffectProcessor.cs        # Move effect processor interface
+│   ├── MoveEffectProcessorRegistry.cs  # Effect processor registry
+│   ├── StatusEffectProcessor.cs        # Status effect processor
+│   ├── StatChangeEffectProcessor.cs    # Stat change effect processor
+│   ├── RecoilEffectProcessor.cs       # Recoil effect processor
+│   ├── DrainEffectProcessor.cs         # Drain effect processor
+│   ├── FlinchEffectProcessor.cs        # Flinch effect processor
+│   ├── ProtectEffectProcessor.cs       # Protect effect processor
+│   ├── CounterEffectProcessor.cs       # Counter effect processor
+│   ├── HealEffectProcessor.cs         # Heal effect processor
+│   ├── IMoveModifier.cs                # Move modifier interface
+│   ├── MoveModifier.cs                 # Move modifier implementation
+│   ├── IAccumulativeEffect.cs         # Accumulative effect interface
+│   └── AccumulativeEffectTracker.cs    # Accumulative effect tracker
+│
+├── Logging/
+│   ├── IBattleLogger.cs                # Logger interface
+│   ├── BattleLogger.cs                 # Logger implementation
+│   └── NullBattleLogger.cs             # Null logger for tests
+│
+├── Messages/
+│   ├── IBattleMessageFormatter.cs      # Message formatter interface
+│   └── BattleMessageFormatter.cs       # Message formatter implementation
+│
+├── Validation/
+│   ├── IBattleStateValidator.cs        # Battle state validator interface
+│   └── BattleStateValidator.cs          # Battle state validator implementation
+│
+├── Extensions/
+│   ├── BattleSlotExtensions.cs         # BattleSlot extension methods
+│   └── DamageCalculationExtensions.cs   # Damage calculation extension methods
+│
+├── Constants/
+│   ├── BattleConstants.cs               # Battle system constants
+│   ├── StatusConstants.cs               # Status effect constants
+│   ├── ItemConstants.cs                 # Item effect constants
+│   └── MoveConstants.cs                 # Move-related constants
 │
 └── View/
     ├── IBattleView.cs                  # View interface

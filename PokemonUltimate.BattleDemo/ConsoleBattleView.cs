@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Core.Instances;
 
@@ -22,6 +23,7 @@ namespace PokemonUltimate.BattleDemo
     {
         private BattleField? _field;
         private int _turnNumber;
+        private TurnOrderResolver? _turnOrderResolver;
 
         /// <summary>
         /// Sets the battle field for display purposes.
@@ -30,6 +32,10 @@ namespace PokemonUltimate.BattleDemo
         {
             _field = field;
             _turnNumber = 0;
+
+            // Create TurnOrderResolver for debug display
+            var helpers = CombatEngineFactory.CreateHelpers();
+            _turnOrderResolver = helpers.TurnOrderResolver;
         }
 
         /// <summary>
@@ -242,27 +248,34 @@ namespace PokemonUltimate.BattleDemo
             Console.WriteLine("\n[DEBUG] Turn Order Resolution:");
             Console.ResetColor();
 
+            // Ensure we have a TurnOrderResolver instance
+            if (_turnOrderResolver == null)
+            {
+                var helpers = CombatEngineFactory.CreateHelpers();
+                _turnOrderResolver = helpers.TurnOrderResolver;
+            }
+
             var actionList = actions.ToList();
             for (int i = 0; i < actionList.Count; i++)
             {
                 var action = actionList[i];
                 var actionName = GetActionName(action);
                 var user = action.User?.Pokemon?.DisplayName ?? "System";
-                var priority = TurnOrderResolver.GetPriority(action);
-                var speed = action.User != null ? TurnOrderResolver.GetEffectiveSpeed(action.User, field) : 0;
+                var priority = _turnOrderResolver.GetPriority(action);
+                var speed = action.User != null ? _turnOrderResolver.GetEffectiveSpeed(action.User, field) : 0;
 
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write($"  {i + 1}. [{actionName}] ");
                 Console.ResetColor();
                 Console.Write($"User: {user}");
-                
+
                 if (priority != 0)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write($" | Priority: {priority:+0;-#}");
                     Console.ResetColor();
                 }
-                
+
                 if (speed > 0)
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;

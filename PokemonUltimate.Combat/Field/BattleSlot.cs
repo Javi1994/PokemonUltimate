@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using PokemonUltimate.Combat.ValueObjects;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Instances;
@@ -17,19 +17,12 @@ namespace PokemonUltimate.Combat
     /// </remarks>
     public class BattleSlot
     {
-        private const int MinStatStage = -6;
-        private const int MaxStatStage = 6;
-
-        private readonly Dictionary<Stat, int> _statStages;
         private PokemonInstance _pokemon;
         private VolatileStatus _volatileStatus;
-        private int _protectConsecutiveUses;
-        private int _physicalDamageTakenThisTurn;
-        private int _specialDamageTakenThisTurn;
-        private bool _wasHitWhileFocusing;
-        private string _semiInvulnerableMoveName;
-        private bool _isSemiInvulnerableCharging; // True if charging (turn 1), false if attacking (turn 2)
-        private string _chargingMoveName;
+        private StatStages _statStages;
+        private ProtectTracker _protectTracker;
+        private DamageTracker _damageTracker;
+        private MoveStateTracker _moveStateTracker;
 
         /// <summary>
         /// The Pokemon currently in this slot. Null if empty.
@@ -89,17 +82,11 @@ namespace PokemonUltimate.Combat
 
             SlotIndex = slotIndex;
             Side = side;
-            _statStages = new Dictionary<Stat, int>
-            {
-                { Stat.Attack, 0 },
-                { Stat.Defense, 0 },
-                { Stat.SpAttack, 0 },
-                { Stat.SpDefense, 0 },
-                { Stat.Speed, 0 },
-                { Stat.Accuracy, 0 },
-                { Stat.Evasion, 0 }
-            };
+            _statStages = new StatStages();
             _volatileStatus = VolatileStatus.None;
+            _protectTracker = new ProtectTracker();
+            _damageTracker = new DamageTracker();
+            _moveStateTracker = new MoveStateTracker();
         }
 
         /// <summary>
@@ -132,10 +119,7 @@ namespace PokemonUltimate.Combat
         /// <returns>The current stage (-6 to +6).</returns>
         public int GetStatStage(Stat stat)
         {
-            if (stat == Stat.HP)
-                return 0;
-
-            return _statStages.TryGetValue(stat, out var stage) ? stage : 0;
+            return _statStages.GetStage(stat);
         }
 
         /// <summary>
@@ -147,17 +131,8 @@ namespace PokemonUltimate.Combat
         /// <exception cref="ArgumentException">If stat is HP.</exception>
         public int ModifyStatStage(Stat stat, int change)
         {
-            if (stat == Stat.HP)
-                throw new ArgumentException(ErrorMessages.CannotModifyHPStatStage, nameof(stat));
-
-            if (!_statStages.ContainsKey(stat))
-                return 0;
-
-            var oldStage = _statStages[stat];
-            var newStage = Math.Max(MinStatStage, Math.Min(MaxStatStage, oldStage + change));
-            _statStages[stat] = newStage;
-
-            return newStage - oldStage;
+            _statStages = _statStages.ModifyStage(stat, change, out var actualChange);
+            return actualChange;
         }
 
         /// <summary>
@@ -191,14 +166,14 @@ namespace PokemonUltimate.Combat
         /// <summary>
         /// Gets the number of consecutive Protect uses (for success rate calculation).
         /// </summary>
-        public int ProtectConsecutiveUses => _protectConsecutiveUses;
+        public int ProtectConsecutiveUses => _protectTracker.ConsecutiveUses;
 
         /// <summary>
         /// Increments the consecutive Protect uses counter.
         /// </summary>
         public void IncrementProtectUses()
         {
-            _protectConsecutiveUses++;
+            _protectTracker = _protectTracker.Increment();
         }
 
         /// <summary>
@@ -206,7 +181,7 @@ namespace PokemonUltimate.Combat
         /// </summary>
         public void ResetProtectUses()
         {
-            _protectConsecutiveUses = 0;
+            _protectTracker = _protectTracker.Reset();
         }
 
         /// <summary>
@@ -214,7 +189,7 @@ namespace PokemonUltimate.Combat
         /// </summary>
         public void RecordPhysicalDamage(int damage)
         {
-            _physicalDamageTakenThisTurn += damage;
+            _damageTracker = _damageTracker.AddPhysicalDamage(damage);
         }
 
         /// <summary>
@@ -222,23 +197,23 @@ namespace PokemonUltimate.Combat
         /// </summary>
         public void RecordSpecialDamage(int damage)
         {
-            _specialDamageTakenThisTurn += damage;
+            _damageTracker = _damageTracker.AddSpecialDamage(damage);
         }
 
         /// <summary>
         /// Gets the physical damage taken this turn.
         /// </summary>
-        public int PhysicalDamageTakenThisTurn => _physicalDamageTakenThisTurn;
+        public int PhysicalDamageTakenThisTurn => _damageTracker.PhysicalDamage;
 
         /// <summary>
         /// Gets the special damage taken this turn.
         /// </summary>
-        public int SpecialDamageTakenThisTurn => _specialDamageTakenThisTurn;
+        public int SpecialDamageTakenThisTurn => _damageTracker.SpecialDamage;
 
         /// <summary>
         /// Gets whether the Pokemon was hit while focusing (for Focus Punch).
         /// </summary>
-        public bool WasHitWhileFocusing => _wasHitWhileFocusing;
+        public bool WasHitWhileFocusing => _damageTracker.WasHitWhileFocusing;
 
         /// <summary>
         /// Marks that the Pokemon was hit while focusing.
@@ -247,27 +222,27 @@ namespace PokemonUltimate.Combat
         {
             if (HasVolatileStatus(VolatileStatus.Focusing))
             {
-                _wasHitWhileFocusing = true;
+                _damageTracker = _damageTracker.SetHitWhileFocusing(true);
             }
         }
 
         /// <summary>
         /// Gets the name of the semi-invulnerable move being used.
         /// </summary>
-        public string SemiInvulnerableMoveName => _semiInvulnerableMoveName;
+        public string SemiInvulnerableMoveName => _moveStateTracker.SemiInvulnerableState.MoveName;
 
         /// <summary>
         /// Gets whether the Pokemon is in the charging phase of a semi-invulnerable move (turn 1).
         /// </summary>
-        public bool IsSemiInvulnerableCharging => _isSemiInvulnerableCharging;
+        public bool IsSemiInvulnerableCharging => _moveStateTracker.SemiInvulnerableState.IsCharging;
 
         /// <summary>
         /// Sets the semi-invulnerable move name and charging state.
         /// </summary>
         public void SetSemiInvulnerableMove(string moveName, bool isCharging = true)
         {
-            _semiInvulnerableMoveName = moveName;
-            _isSemiInvulnerableCharging = isCharging;
+            var newState = _moveStateTracker.SemiInvulnerableState.SetMove(moveName, isCharging);
+            _moveStateTracker = _moveStateTracker.WithSemiInvulnerableState(newState);
         }
 
         /// <summary>
@@ -275,8 +250,8 @@ namespace PokemonUltimate.Combat
         /// </summary>
         public void ClearSemiInvulnerableMove()
         {
-            _semiInvulnerableMoveName = null;
-            _isSemiInvulnerableCharging = false;
+            var newState = _moveStateTracker.SemiInvulnerableState.Clear();
+            _moveStateTracker = _moveStateTracker.WithSemiInvulnerableState(newState);
         }
 
         /// <summary>
@@ -284,20 +259,22 @@ namespace PokemonUltimate.Combat
         /// </summary>
         public void SetSemiInvulnerableReady()
         {
-            _isSemiInvulnerableCharging = false;
+            var newState = _moveStateTracker.SemiInvulnerableState.SetReady();
+            _moveStateTracker = _moveStateTracker.WithSemiInvulnerableState(newState);
         }
 
         /// <summary>
         /// Gets the name of the charging move being used.
         /// </summary>
-        public string ChargingMoveName => _chargingMoveName;
+        public string ChargingMoveName => _moveStateTracker.ChargingMoveState.MoveName;
 
         /// <summary>
         /// Sets the charging move name.
         /// </summary>
         public void SetChargingMove(string moveName)
         {
-            _chargingMoveName = moveName;
+            var newState = _moveStateTracker.ChargingMoveState.SetMove(moveName);
+            _moveStateTracker = _moveStateTracker.WithChargingMoveState(newState);
         }
 
         /// <summary>
@@ -305,7 +282,8 @@ namespace PokemonUltimate.Combat
         /// </summary>
         public void ClearChargingMove()
         {
-            _chargingMoveName = null;
+            var newState = _moveStateTracker.ChargingMoveState.Clear();
+            _moveStateTracker = _moveStateTracker.WithChargingMoveState(newState);
         }
 
         /// <summary>
@@ -313,9 +291,7 @@ namespace PokemonUltimate.Combat
         /// </summary>
         public void ResetDamageTracking()
         {
-            _physicalDamageTakenThisTurn = 0;
-            _specialDamageTakenThisTurn = 0;
-            _wasHitWhileFocusing = false;
+            _damageTracker = _damageTracker.Reset();
         }
 
         /// <summary>
@@ -324,22 +300,11 @@ namespace PokemonUltimate.Combat
         /// </summary>
         public void ResetBattleState()
         {
-            _statStages[Stat.Attack] = 0;
-            _statStages[Stat.Defense] = 0;
-            _statStages[Stat.SpAttack] = 0;
-            _statStages[Stat.SpDefense] = 0;
-            _statStages[Stat.Speed] = 0;
-            _statStages[Stat.Accuracy] = 0;
-            _statStages[Stat.Evasion] = 0;
-
+            _statStages = _statStages.Reset();
             _volatileStatus = VolatileStatus.None;
-            _protectConsecutiveUses = 0;
-            _physicalDamageTakenThisTurn = 0;
-            _specialDamageTakenThisTurn = 0;
-            _wasHitWhileFocusing = false;
-            _semiInvulnerableMoveName = null;
-            _isSemiInvulnerableCharging = false;
-            _chargingMoveName = null;
+            _protectTracker = _protectTracker.Reset();
+            _damageTracker = _damageTracker.Reset();
+            _moveStateTracker = _moveStateTracker.Reset();
         }
     }
 }

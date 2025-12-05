@@ -3,12 +3,13 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Field;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Field;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Helpers
 {
@@ -25,6 +26,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
     {
         private BattleField _field;
         private BattleSlot _slot;
+        private TurnOrderResolver _resolver;
 
         [SetUp]
         public void SetUp()
@@ -35,6 +37,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var enemyParty = new List<PokemonInstance> { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
             _field.Initialize(rules, playerParty, enemyParty);
             _slot = _field.PlayerSide.Slots[0];
+
+            // Create resolver instance with random provider
+            var randomProvider = new RandomProvider(42); // Fixed seed for reproducible tests
+            _resolver = new TurnOrderResolver(randomProvider);
         }
 
         [Test]
@@ -43,9 +49,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var tailwindData = SideConditionCatalog.GetByType(SideCondition.Tailwind);
             _slot.Side.AddSideCondition(tailwindData, 4);
 
-            float speedWithTailwind = TurnOrderResolver.GetEffectiveSpeed(_slot, _field);
+            float speedWithTailwind = _resolver.GetEffectiveSpeed(_slot, _field);
             _slot.Side.RemoveSideCondition(SideCondition.Tailwind);
-            float speedWithoutTailwind = TurnOrderResolver.GetEffectiveSpeed(_slot, _field);
+            float speedWithoutTailwind = _resolver.GetEffectiveSpeed(_slot, _field);
 
             // Tailwind doubles speed (2.0x multiplier)
             Assert.That(speedWithTailwind, Is.EqualTo(speedWithoutTailwind * 2.0f).Within(0.1f));
@@ -56,7 +62,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
         {
             // No Tailwind added
 
-            float speed = TurnOrderResolver.GetEffectiveSpeed(_slot, _field);
+            float speed = _resolver.GetEffectiveSpeed(_slot, _field);
 
             // Should calculate normally without Tailwind
             Assert.That(speed, Is.GreaterThan(0));
@@ -68,9 +74,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var tailwindData = SideConditionCatalog.GetByType(SideCondition.Tailwind);
             _field.EnemySide.AddSideCondition(tailwindData, 4); // Tailwind on enemy side
 
-            float speed = TurnOrderResolver.GetEffectiveSpeed(_slot, _field);
+            float speed = _resolver.GetEffectiveSpeed(_slot, _field);
             _field.EnemySide.RemoveSideCondition(SideCondition.Tailwind);
-            float speedWithoutTailwind = TurnOrderResolver.GetEffectiveSpeed(_slot, _field);
+            float speedWithoutTailwind = _resolver.GetEffectiveSpeed(_slot, _field);
 
             // Tailwind on enemy side should not affect player side
             Assert.That(speed, Is.EqualTo(speedWithoutTailwind));
@@ -102,22 +108,22 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var fastAction = new UseMoveAction(fastSlot, fastSlot, fastMoveInstance);
 
             var actions = new List<BattleAction> { slowAction, fastAction };
-            var sorted = TurnOrderResolver.SortActions(actions, _field);
+            var sorted = _resolver.SortActions(actions, _field);
 
             // Verify Tailwind doubles speed
-            float slowSpeedWithTailwind = TurnOrderResolver.GetEffectiveSpeed(slowSlot, _field);
-            
+            float slowSpeedWithTailwind = _resolver.GetEffectiveSpeed(slowSlot, _field);
+
             // Remove Tailwind temporarily to get base speed
             _field.PlayerSide.RemoveSideCondition(SideCondition.Tailwind);
-            float slowSpeedWithoutTailwind = TurnOrderResolver.GetEffectiveSpeed(slowSlot, _field);
+            float slowSpeedWithoutTailwind = _resolver.GetEffectiveSpeed(slowSlot, _field);
             _field.PlayerSide.AddSideCondition(tailwindData, 4);
-            
-            float fastSpeed = TurnOrderResolver.GetEffectiveSpeed(fastSlot, _field);
+
+            float fastSpeed = _resolver.GetEffectiveSpeed(fastSlot, _field);
 
             // Tailwind should double the slow Pokemon's speed
             Assert.That(slowSpeedWithTailwind, Is.EqualTo(slowSpeedWithoutTailwind * 2.0f).Within(0.1f),
                 $"Tailwind should double speed: {slowSpeedWithTailwind} should equal {slowSpeedWithoutTailwind * 2.0f}");
-            
+
             // Verify Tailwind is applied correctly (speed with Tailwind > speed without)
             Assert.That(slowSpeedWithTailwind, Is.GreaterThan(slowSpeedWithoutTailwind),
                 $"Speed with Tailwind ({slowSpeedWithTailwind}) should be greater than without ({slowSpeedWithoutTailwind})");

@@ -3,12 +3,12 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Actions
 {
@@ -50,8 +50,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
                 MaxPP = 15,
                 Priority = 0,
                 TargetScope = TargetScope.SingleEnemy,
-                Effects = new List<IMoveEffect> 
-                { 
+                Effects = new List<IMoveEffect>
+                {
                     new DamageEffect(),
                     new SemiInvulnerableEffect()
                 }
@@ -63,7 +63,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
         public void UseMoveAction_Fly_ChargeTurn_SemiInvulnerable()
         {
             // Arrange
-            
+
             // Act - First use (charge turn)
             var flyAction = new UseMoveAction(_userSlot, _targetSlot, _flyMove);
             var reactions = flyAction.ExecuteLogic(_field).ToList();
@@ -73,14 +73,14 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
             Assert.That(_userSlot.HasVolatileStatus(VolatileStatus.SemiInvulnerable), Is.True);
             Assert.That(_userSlot.SemiInvulnerableMoveName, Is.EqualTo("Fly"));
             Assert.That(_userSlot.IsSemiInvulnerableCharging, Is.True);
-            
+
             // Should show charge message
             Assert.That(reactions.Any(r => r is MessageAction msg && msg.Message.Contains("flew up high")), Is.True);
-            
+
             // Should NOT deal damage on charge turn
             var damageAction = reactions.OfType<DamageAction>().FirstOrDefault();
             Assert.That(damageAction, Is.Null);
-            
+
             // PP should be deducted
             Assert.That(_flyMove.CurrentPP, Is.LessThan(_flyMove.MaxPP));
         }
@@ -92,10 +92,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
             // User is charging Fly
             _userSlot.AddVolatileStatus(VolatileStatus.SemiInvulnerable);
             _userSlot.SetSemiInvulnerableMove("Fly", isCharging: true);
-            
+
             // Simulate end of turn (marks as ready for attack)
             _userSlot.SetSemiInvulnerableReady();
-            
+
             // Act - Second use (attack turn)
             var flyAction = new UseMoveAction(_userSlot, _targetSlot, _flyMove);
             var reactions = flyAction.ExecuteLogic(_field).ToList();
@@ -104,7 +104,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
             // Should clear semi-invulnerable status
             Assert.That(_userSlot.HasVolatileStatus(VolatileStatus.SemiInvulnerable), Is.False);
             Assert.That(_userSlot.SemiInvulnerableMoveName, Is.Null);
-            
+
             // Should deal damage
             var damageAction = reactions.OfType<DamageAction>().FirstOrDefault();
             Assert.That(damageAction, Is.Not.Null);
@@ -118,7 +118,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
             // User is charging Fly
             _userSlot.AddVolatileStatus(VolatileStatus.SemiInvulnerable);
             _userSlot.SetSemiInvulnerableMove("Fly", isCharging: true);
-            
+
             // Create Earthquake move (hits Fly users)
             var earthquakeMoveData = new MoveData
             {
@@ -133,7 +133,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
                 Effects = new List<IMoveEffect> { new DamageEffect() }
             };
             var earthquakeMove = new MoveInstance(earthquakeMoveData);
-            
+
             // Act - Target uses Earthquake on semi-invulnerable user
             var earthquakeAction = new UseMoveAction(_targetSlot, _userSlot, earthquakeMove);
             var reactions = earthquakeAction.ExecuteLogic(_field).ToList();
@@ -162,20 +162,20 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
                 MaxPP = 10,
                 Priority = 0,
                 TargetScope = TargetScope.SingleEnemy,
-                Effects = new List<IMoveEffect> 
-                { 
+                Effects = new List<IMoveEffect>
+                {
                     new DamageEffect(),
                     new SemiInvulnerableEffect()
                 }
             };
             var diveMove = new MoveInstance(diveMoveData);
-            
+
             // User charges Dive
             var diveChargeAction = new UseMoveAction(_userSlot, _targetSlot, diveMove);
             diveChargeAction.ExecuteLogic(_field);
             Assert.That(_userSlot.HasVolatileStatus(VolatileStatus.SemiInvulnerable), Is.True);
             Assert.That(_userSlot.SemiInvulnerableMoveName, Is.EqualTo("Dive"));
-            
+
             // Create Surf move (hits Dive users)
             var surfMoveData = new MoveData
             {
@@ -190,7 +190,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
                 Effects = new List<IMoveEffect> { new DamageEffect() }
             };
             var surfMove = new MoveInstance(surfMoveData);
-            
+
             // Act - Target uses Surf on Dive user
             var surfAction = new UseMoveAction(_targetSlot, _userSlot, surfMove);
             var reactions = surfAction.ExecuteLogic(_field).ToList();
@@ -209,7 +209,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
             // User is charging Fly
             _userSlot.AddVolatileStatus(VolatileStatus.SemiInvulnerable);
             _userSlot.SetSemiInvulnerableMove("Fly", isCharging: true);
-            
+
             // Create different move
             var tackleMoveData = new MoveData
             {
@@ -224,7 +224,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
                 Effects = new List<IMoveEffect> { new DamageEffect() }
             };
             var tackleMove = new MoveInstance(tackleMoveData);
-            
+
             // Act - User uses different move
             var tackleAction = new UseMoveAction(_userSlot, _targetSlot, tackleMove);
             tackleAction.ExecuteLogic(_field);
@@ -243,10 +243,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
             _userSlot.AddVolatileStatus(VolatileStatus.SemiInvulnerable);
             _userSlot.SetSemiInvulnerableMove("Fly", isCharging: true);
             Assert.That(_userSlot.IsSemiInvulnerableCharging, Is.True);
-            
+
             // Act - Process end of turn
-            EndOfTurnProcessor.ProcessEffects(_field);
-            
+            var processor = new EndOfTurnProcessor(new PokemonUltimate.Combat.Factories.DamageContextFactory());
+            processor.ProcessEffects(_field);
+
             // Assert
             // Should be marked as ready for attack turn
             Assert.That(_userSlot.IsSemiInvulnerableCharging, Is.False);

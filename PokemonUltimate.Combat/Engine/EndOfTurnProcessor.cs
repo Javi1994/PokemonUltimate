@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Extensions;
+using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -35,22 +37,21 @@ namespace PokemonUltimate.Combat.Engine
     /// **Sub-Feature**: 2.8: End-of-Turn Effects
     /// **Documentation**: See `docs/features/2-combat-system/2.8-end-of-turn-effects/architecture.md`
     /// </remarks>
-    public static class EndOfTurnProcessor
+    public class EndOfTurnProcessor : IEndOfTurnProcessor
     {
-        // Dummy move for status damage context (not used in calculation)
-        private static MoveData CreateStatusDamageMove()
+        private readonly DamageContextFactory _damageContextFactory;
+        private readonly Effects.AccumulativeEffectTracker _accumulativeEffectTracker;
+
+        /// <summary>
+        /// Creates a new EndOfTurnProcessor with a damage context factory.
+        /// </summary>
+        /// <param name="damageContextFactory">The factory for creating damage contexts. Cannot be null.</param>
+        /// <param name="accumulativeEffectTracker">Tracker for accumulative effects. If null, creates a default one.</param>
+        /// <exception cref="ArgumentNullException">If damageContextFactory is null.</exception>
+        public EndOfTurnProcessor(DamageContextFactory damageContextFactory, Effects.AccumulativeEffectTracker accumulativeEffectTracker = null)
         {
-            return new MoveData
-            {
-                Name = "Status Damage",
-                Power = 0,
-                Accuracy = 100,
-                Type = PokemonType.Normal,
-                Category = MoveCategory.Status,
-                MaxPP = 0,
-                Priority = 0,
-                TargetScope = TargetScope.Self
-            };
+            _damageContextFactory = damageContextFactory ?? throw new ArgumentNullException(nameof(damageContextFactory), ErrorMessages.FieldCannotBeNull);
+            _accumulativeEffectTracker = accumulativeEffectTracker ?? new Effects.AccumulativeEffectTracker();
         }
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <param name="field">The battlefield. Cannot be null.</param>
         /// <returns>List of actions to execute for end-of-turn effects.</returns>
         /// <exception cref="ArgumentNullException">If field is null.</exception>
-        public static List<BattleAction> ProcessEffects(BattleField field)
+        public List<BattleAction> ProcessEffects(BattleField field)
         {
             if (field == null)
                 throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
@@ -70,7 +71,7 @@ namespace PokemonUltimate.Combat.Engine
             // Process all active slots
             foreach (var slot in field.GetAllActiveSlots())
             {
-                if (slot.IsEmpty || slot.HasFainted)
+                if (!slot.IsActive())
                     continue;
 
                 var pokemon = slot.Pokemon;
@@ -95,13 +96,13 @@ namespace PokemonUltimate.Combat.Engine
                 {
                     slot.RemoveVolatileStatus(VolatileStatus.Protected);
                 }
-                
+
                 // If semi-invulnerable and charging, mark as ready for attack turn
                 if (slot.HasVolatileStatus(VolatileStatus.SemiInvulnerable) && slot.IsSemiInvulnerableCharging)
                 {
                     slot.SetSemiInvulnerableReady();
                 }
-                
+
                 // Reset damage tracking for next turn (but keep stat stages and other volatile status)
                 slot.ResetDamageTracking();
             }
@@ -112,7 +113,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Processes status effects for a single Pokemon slot.
         /// </summary>
-        private static List<BattleAction> ProcessStatusEffects(BattleSlot slot, BattleField field)
+        private List<BattleAction> ProcessStatusEffects(BattleSlot slot, BattleField field)
         {
             var actions = new List<BattleAction>();
             var pokemon = slot.Pokemon;
@@ -145,7 +146,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Processes Burn status: deals 1/16 Max HP damage.
         /// </summary>
-        private static List<BattleAction> ProcessBurn(BattleSlot slot, BattleField field)
+        private List<BattleAction> ProcessBurn(BattleSlot slot, BattleField field)
         {
             var actions = new List<BattleAction>();
             var pokemon = slot.Pokemon;
@@ -160,7 +161,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Processes Poison status: deals 1/8 Max HP damage.
         /// </summary>
-        private static List<BattleAction> ProcessPoison(BattleSlot slot, BattleField field)
+        private List<BattleAction> ProcessPoison(BattleSlot slot, BattleField field)
         {
             var actions = new List<BattleAction>();
             var pokemon = slot.Pokemon;
@@ -174,22 +175,24 @@ namespace PokemonUltimate.Combat.Engine
 
         /// <summary>
         /// Processes Badly Poisoned (Toxic) status: deals escalating damage and increments counter.
+        /// Uses AccumulativeEffectTracker for centralized logic.
         /// </summary>
-        private static List<BattleAction> ProcessBadlyPoisoned(BattleSlot slot, BattleField field)
+        private List<BattleAction> ProcessBadlyPoisoned(BattleSlot slot, BattleField field)
         {
             var actions = new List<BattleAction>();
             var pokemon = slot.Pokemon;
 
-            // Ensure counter starts at 1 if not set
-            if (pokemon.StatusTurnCounter < 1)
-                pokemon.StatusTurnCounter = 1;
+            // Process using AccumulativeEffectTracker
+            int damage = _accumulativeEffectTracker.ProcessEffect(
+                PersistentStatus.BadlyPoisoned,
+                pokemon.MaxHP,
+                pokemon.StatusTurnCounter,
+                out int nextCounter);
 
-            int damage = CalculateBadlyPoisonedDamage(pokemon.MaxHP, pokemon.StatusTurnCounter);
+            pokemon.StatusTurnCounter = nextCounter;
+
             actions.Add(new MessageAction(string.Format(GameMessages.StatusPoisonDamage, pokemon.DisplayName)));
             actions.Add(CreateStatusDamageAction(slot, field, damage));
-
-            // Increment counter for next turn
-            pokemon.StatusTurnCounter++;
 
             return actions;
         }
@@ -197,42 +200,28 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Calculates Burn damage: 1/16 of Max HP (minimum 1).
         /// </summary>
-        private static int CalculateBurnDamage(int maxHP)
+        private int CalculateBurnDamage(int maxHP)
         {
             int damage = maxHP / 16;
-            return Math.Max(EndOfTurnConstants.MinimumDamage, damage);
+            return damage.EnsureMinimumDamage();
         }
 
         /// <summary>
         /// Calculates Poison damage: 1/8 of Max HP (minimum 1).
         /// </summary>
-        private static int CalculatePoisonDamage(int maxHP)
+        private int CalculatePoisonDamage(int maxHP)
         {
             int damage = maxHP / 8;
-            return Math.Max(EndOfTurnConstants.MinimumDamage, damage);
+            return damage.EnsureMinimumDamage();
         }
 
-        /// <summary>
-        /// Calculates Badly Poisoned damage: (counter * Max HP) / 16 (minimum 1).
-        /// </summary>
-        private static int CalculateBadlyPoisonedDamage(int maxHP, int counter)
-        {
-            int damage = (counter * maxHP) / 16;
-            return Math.Max(EndOfTurnConstants.MinimumDamage, damage);
-        }
 
         /// <summary>
-        /// Creates a DamageAction for status damage using a simple DamageContext.
+        /// Creates a DamageAction for status damage using DamageContextFactory.
         /// </summary>
-        private static DamageAction CreateStatusDamageAction(BattleSlot slot, BattleField field, int damage)
+        private DamageAction CreateStatusDamageAction(BattleSlot slot, BattleField field, int damage)
         {
-            // Create a dummy context with the desired damage
-            var dummyMove = CreateStatusDamageMove();
-            var context = new DamageContext(slot, slot, dummyMove, field);
-            context.BaseDamage = damage;
-            context.Multiplier = 1.0f;
-            context.TypeEffectiveness = 1.0f; // Status damage is always effective
-
+            var context = _damageContextFactory.CreateForStatusDamage(slot, damage, field);
             return new DamageAction(slot, slot, context);
         }
 
@@ -245,7 +234,7 @@ namespace PokemonUltimate.Combat.Engine
         /// **Sub-Feature**: 2.12: Weather System
         /// **Documentation**: See `docs/features/2-combat-system/2.12-weather-system/README.md`
         /// </remarks>
-        private static List<BattleAction> ProcessWeatherDamage(BattleField field)
+        private List<BattleAction> ProcessWeatherDamage(BattleField field)
         {
             var actions = new List<BattleAction>();
 
@@ -258,7 +247,7 @@ namespace PokemonUltimate.Combat.Engine
             // Process all active slots
             foreach (var slot in field.GetAllActiveSlots())
             {
-                if (slot.IsEmpty || slot.HasFainted)
+                if (!slot.IsActive())
                     continue;
 
                 var pokemon = slot.Pokemon;
@@ -287,7 +276,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Checks if a Pokemon's type makes it immune to weather damage.
         /// </summary>
-        private static bool IsTypeImmuneToWeatherDamage(PokemonInstance pokemon, WeatherData weatherData)
+        private bool IsTypeImmuneToWeatherDamage(PokemonInstance pokemon, WeatherData weatherData)
         {
             if (weatherData.DamageImmuneTypes == null || weatherData.DamageImmuneTypes.Length == 0)
                 return false;
@@ -309,7 +298,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Checks if a Pokemon has an ability that grants immunity to weather damage.
         /// </summary>
-        private static bool HasWeatherImmunityAbility(PokemonInstance pokemon, WeatherData weatherData)
+        private bool HasWeatherImmunityAbility(PokemonInstance pokemon, WeatherData weatherData)
         {
             if (pokemon.Ability == null)
                 return false;
@@ -330,16 +319,16 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Calculates weather damage based on Max HP and damage fraction.
         /// </summary>
-        private static int CalculateWeatherDamage(int maxHP, float damageFraction)
+        private int CalculateWeatherDamage(int maxHP, float damageFraction)
         {
             int damage = (int)(maxHP * damageFraction);
-            return System.Math.Max(EndOfTurnConstants.MinimumDamage, damage);
+            return damage.EnsureMinimumDamage();
         }
 
         /// <summary>
         /// Gets the appropriate message for weather damage.
         /// </summary>
-        private static string GetWeatherDamageMessage(Weather weather)
+        private string GetWeatherDamageMessage(Weather weather)
         {
             switch (weather)
             {
@@ -361,7 +350,7 @@ namespace PokemonUltimate.Combat.Engine
         /// **Sub-Feature**: 2.13: Terrain System
         /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
         /// </remarks>
-        private static List<BattleAction> ProcessTerrainHealing(BattleField field)
+        private List<BattleAction> ProcessTerrainHealing(BattleField field)
         {
             var actions = new List<BattleAction>();
 
@@ -374,7 +363,7 @@ namespace PokemonUltimate.Combat.Engine
             // Process all active slots
             foreach (var slot in field.GetAllActiveSlots())
             {
-                if (slot.IsEmpty || slot.HasFainted)
+                if (!slot.IsActive())
                     continue;
 
                 var pokemon = slot.Pokemon;
@@ -400,7 +389,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Checks if a Pokemon is grounded (affected by terrain).
         /// </summary>
-        private static bool IsGrounded(PokemonInstance pokemon)
+        private bool IsGrounded(PokemonInstance pokemon)
         {
             if (pokemon == null)
                 return false;
@@ -415,7 +404,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Calculates terrain healing based on Max HP and healing fraction.
         /// </summary>
-        private static int CalculateTerrainHealing(int maxHP, float healingFraction)
+        private int CalculateTerrainHealing(int maxHP, float healingFraction)
         {
             int healing = (int)(maxHP * healingFraction);
             return System.Math.Max(0, healing); // Minimum 0 (no negative healing)

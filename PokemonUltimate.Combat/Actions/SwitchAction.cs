@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -23,6 +24,9 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class SwitchAction : BattleAction
     {
+        private readonly IEntryHazardProcessor _entryHazardProcessor;
+        private readonly IBattleTriggerProcessor _battleTriggerProcessor;
+
         /// <summary>
         /// The slot being switched.
         /// </summary>
@@ -55,12 +59,25 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="slot">The slot to switch. Cannot be null.</param>
         /// <param name="newPokemon">The Pokemon to switch in. Cannot be null.</param>
         /// <param name="getHazardData">Optional function to get HazardData for entry hazard processing. If null, hazards won't be processed.</param>
+        /// <param name="entryHazardProcessor">The entry hazard processor. If null, creates a temporary one.</param>
+        /// <param name="battleTriggerProcessor">The battle trigger processor. If null, creates a temporary one.</param>
         /// <exception cref="ArgumentNullException">If slot or newPokemon is null.</exception>
-        public SwitchAction(BattleSlot slot, PokemonInstance newPokemon, Func<HazardType, HazardData> getHazardData = null) : base(slot)
+        public SwitchAction(
+            BattleSlot slot,
+            PokemonInstance newPokemon,
+            Func<HazardType, HazardData> getHazardData = null,
+            IEntryHazardProcessor entryHazardProcessor = null,
+            IBattleTriggerProcessor battleTriggerProcessor = null) : base(slot)
         {
             Slot = slot ?? throw new ArgumentNullException(nameof(slot), ErrorMessages.PokemonCannotBeNull);
             NewPokemon = newPokemon ?? throw new ArgumentNullException(nameof(newPokemon), ErrorMessages.PokemonCannotBeNull);
             GetHazardData = getHazardData;
+
+            // Create EntryHazardProcessor if not provided (temporary until full DI refactoring)
+            _entryHazardProcessor = entryHazardProcessor ?? new EntryHazardProcessor(new DamageContextFactory());
+
+            // Create BattleTriggerProcessor if not provided (temporary until full DI refactoring)
+            _battleTriggerProcessor = battleTriggerProcessor ?? new BattleTriggerProcessor();
         }
 
         /// <summary>
@@ -87,15 +104,15 @@ namespace PokemonUltimate.Combat.Actions
             var oldPokemon = Slot.Pokemon;
 
             // Switch Pokemon
+            // Note: SetPokemon automatically resets battle state for the new Pokemon
             Slot.SetPokemon(NewPokemon);
 
-            // Return old Pokemon to bench (if it exists and isn't already there)
-            if (oldPokemon != null && !side.Party.Contains(oldPokemon))
-            {
-                // Note: BattleSide.Party is read-only, so we can't modify it directly
-                // In a real implementation, BattleSide would handle this
-                // For now, we just ensure the slot has the new Pokemon
-            }
+            // Note: The party management is handled externally by BattleField initialization.
+            // BattleSide.Party is a read-only reference to the party provided during initialization.
+            // When switching, we simply replace the Pokemon in the slot. The old Pokemon
+            // remains in the party list (if it was there) and can be switched back in later.
+            // If the old Pokemon is not in the party, it means it was a temporary instance
+            // or the party structure is managed elsewhere in the system.
 
             // Battle state is reset automatically by SetPokemon -> ResetBattleState
 
@@ -104,14 +121,14 @@ namespace PokemonUltimate.Combat.Actions
             // Process entry hazards if hazard data provider is available
             if (GetHazardData != null)
             {
-                var hazardActions = EntryHazardProcessor.ProcessHazards(Slot, NewPokemon, field, GetHazardData);
+                var hazardActions = _entryHazardProcessor.ProcessHazards(Slot, NewPokemon, field, GetHazardData);
                 allActions.AddRange(hazardActions);
             }
 
             // Trigger OnSwitchIn for abilities and items
-            var switchInActions = BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, field);
+            var switchInActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, field);
             allActions.AddRange(switchInActions);
-            
+
             return allActions;
         }
 

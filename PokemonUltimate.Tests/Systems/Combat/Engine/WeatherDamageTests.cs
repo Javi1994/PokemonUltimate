@@ -4,11 +4,12 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Content.Catalogs.Weather;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Content.Catalogs.Weather;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Engine
 {
@@ -27,13 +28,14 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         private List<PokemonInstance> _playerParty;
         private List<PokemonInstance> _enemyParty;
         private BattleRules _rules;
+        private EndOfTurnProcessor _processor;
 
         [SetUp]
         public void SetUp()
         {
             _field = new BattleField();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
-            
+
             _playerParty = new List<PokemonInstance>
             {
                 PokemonFactory.Create(PokemonCatalog.Pikachu, 50)
@@ -45,6 +47,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             };
 
             _field.Initialize(_rules, _playerParty, _enemyParty);
+
+            // Create processor instance with required dependencies
+            var damageContextFactory = new DamageContextFactory();
+            _processor = new EndOfTurnProcessor(damageContextFactory);
         }
 
         #region Sandstorm Damage Tests
@@ -59,13 +65,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamage = maxHP / 16;
             if (expectedDamage < 1) expectedDamage = 1;
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Sandstorm should deal damage to non-Rock/Ground/Steel types
             // Pikachu is Electric type, so should take damage
             var damageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             Assert.That(damageAction, Is.Not.Null);
             Assert.That(damageAction.Context.FinalDamage, Is.EqualTo(expectedDamage));
         }
@@ -81,12 +87,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             field.SetWeather(Weather.Sandstorm, 5, WeatherCatalog.Sandstorm);
 
             var slot = field.PlayerSide.Slots[0];
-            var actions = EndOfTurnProcessor.ProcessEffects(field).ToList();
+            var processor = new EndOfTurnProcessor(new DamageContextFactory());
+            var actions = processor.ProcessEffects(field).ToList();
 
             // Rock type should be immune to Sandstorm damage
             var weatherDamageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             // Should not have weather damage action for Rock type
             Assert.That(weatherDamageAction, Is.Null);
         }
@@ -105,13 +112,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamage = maxHP / 16;
             if (expectedDamage < 1) expectedDamage = 1;
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Hail should deal damage to non-Ice types
             // Pikachu is Electric type, so should take damage
             var damageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             Assert.That(damageAction, Is.Not.Null);
             Assert.That(damageAction.Context.FinalDamage, Is.EqualTo(expectedDamage));
         }
@@ -125,12 +132,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             _field.SetWeather(Weather.Hail, 5, WeatherCatalog.Hail);
             var slot = _field.PlayerSide.Slots[0];
             var pokemon = slot.Pokemon;
-            
+
             // Pikachu is Electric, not Ice, so should take damage
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
             var damageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             // Non-Ice types should take damage
             Assert.That(damageAction, Is.Not.Null);
         }
@@ -144,12 +151,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         {
             // No weather set
             var slot = _field.PlayerSide.Slots[0];
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // No weather damage should occur
             var weatherDamageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             Assert.That(weatherDamageAction, Is.Null);
         }
 
@@ -158,12 +165,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         {
             _field.SetWeather(Weather.Rain, 5, WeatherCatalog.Rain);
             var slot = _field.PlayerSide.Slots[0];
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Rain doesn't deal damage, only modifies move power
             var weatherDamageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             Assert.That(weatherDamageAction, Is.Null);
         }
 
@@ -172,12 +179,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         {
             _field.SetWeather(Weather.Sun, 5, WeatherCatalog.Sun);
             var slot = _field.PlayerSide.Slots[0];
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Sun doesn't deal damage, only modifies move power
             var weatherDamageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             Assert.That(weatherDamageAction, Is.Null);
         }
 
@@ -195,12 +202,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamage = maxHP / 16;
             if (expectedDamage < 1) expectedDamage = 1; // Minimum 1 damage
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Sandstorm deals 1/16 of Max HP damage
             var damageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             Assert.That(damageAction, Is.Not.Null);
             Assert.That(damageAction.Context.FinalDamage, Is.EqualTo(expectedDamage));
         }
@@ -215,12 +222,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamage = maxHP / 16;
             if (expectedDamage < 1) expectedDamage = 1; // Minimum 1 damage
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Hail deals 1/16 of Max HP damage
             var damageAction = actions.OfType<PokemonUltimate.Combat.Actions.DamageAction>()
                 .FirstOrDefault(a => a.Target == slot && a.Context.Move.Name == "Status Damage");
-            
+
             Assert.That(damageAction, Is.Not.Null);
             Assert.That(damageAction.Context.FinalDamage, Is.EqualTo(expectedDamage));
         }

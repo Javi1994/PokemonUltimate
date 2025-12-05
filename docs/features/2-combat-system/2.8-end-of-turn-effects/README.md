@@ -12,11 +12,12 @@ End-of-Turn Effects processes all effects that occur at the end of each turn:
 - **Status Damage**: Burn, Poison, Leech Seed damage
 - **Status Processing**: Status effect updates
 - **Stat Modifications**: Stat stage management
-- **EndOfTurnProcessor**: Coordinates end-of-turn processing
+- **EndOfTurnProcessor**: Coordinates end-of-turn processing (instance-based with DI, post-refactor)
+- **IEndOfTurnProcessor**: Processor interface for dependency injection
 
 ## Current Status
 
-- ✅ **Implemented**: Status damage and processing
+- ✅ **Implemented**: Status damage and processing (refactored to instance-based with DI, 2024-12-05)
 - ✅ **Tested**: Comprehensive test coverage
 
 ## Documentation
@@ -41,5 +42,5 @@ End-of-Turn Effects processes all effects that occur at the end of each turn:
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-05)
 

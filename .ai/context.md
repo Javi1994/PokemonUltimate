@@ -7,17 +7,18 @@
 
 ## 📍 Current Project State
 
-| Aspect                  | Status                                                                                                                            |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **Current Phase**       | Phase 3: Combat System ✅                                                                                                         |
-| **Sub-Phase**           | 2.14 Hazards System ✅ Core Complete                                                                                              |
-| **Tests**               | 2,488+ passing (includes Weather System 48 tests, Terrain System 84+ tests, Hazards System 25+ tests)                          |
-| **Integration Tests**   | 83+ tests (system interactions)                                                                                                   |
-| **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed. |
-| **Warnings**            | 0                                                                                                                                 |
-| **Pokemon Catalog**     | 26 Pokemon (Gen1)                                                                                                                 |
-| **Move Catalog**        | 36 Moves (12 types)                                                                                                               |
-| **Last Updated**        | December 2025                                                                                                                     |
+| Aspect                  | Status                                                                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Current Phase**       | Phase 3: Combat System ✅                                                                                                                                                   |
+| **Sub-Phase**           | 2.14 Hazards System ✅ Core Complete                                                                                                                                        |
+| **Combat Refactoring**  | ✅ Complete (2024-12-05) - Phases 0-13 completed (42/44 tasks, 95.5%). DI, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, Validation implemented. |
+| **Tests**               | 2,528+ passing (includes Weather System 48 tests, Terrain System 84+ tests, Hazards System 25+ tests)                                                                       |
+| **Integration Tests**   | 83+ tests (system interactions)                                                                                                                                             |
+| **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed.                                           |
+| **Warnings**            | 0                                                                                                                                                                           |
+| **Pokemon Catalog**     | 26 Pokemon (Gen1)                                                                                                                                                           |
+| **Move Catalog**        | 36 Moves (12 types)                                                                                                                                                         |
+| **Last Updated**        | January 2025 (Post-Refactoring)                                                                                                                                             |
 
 ---
 
@@ -35,18 +36,26 @@ PokemonUltimate/
 │   ├── Enums/      # Type definitions
 │   └── Constants/  # Centralized strings
 │
-├── Combat/         # Battle system (depends on Core)
+├── Combat/         # Battle system (depends on Core) - ✅ Refactored (2024-12-05)
 │   ├── Field/      # BattleField, BattleSide, BattleSlot, BattleRules
-│   ├── Engine/     # CombatEngine, BattleArbiter, BattleQueue, EndOfTurnProcessor
-│   ├── Events/     # BattleTrigger, IBattleListener, AbilityListener, ItemListener, BattleTriggerProcessor
+│   ├── Engine/     # CombatEngine (DI-based), BattleArbiter, BattleQueue, EndOfTurnProcessor (instance-based)
+│   ├── Events/     # BattleTrigger, IBattleListener, AbilityListener, ItemListener, BattleTriggerProcessor (instance-based), IBattleEventBus
 │   ├── Damage/Steps/ # BaseDamageStep, AttackerAbilityStep, AttackerItemStep, etc.
 │   ├── Results/    # BattleOutcome, BattleResult
-│   ├── Providers/  # IActionProvider, PlayerInputProvider
+│   ├── Providers/  # IActionProvider, PlayerInputProvider, IRandomProvider
 │   ├── View/       # IBattleView, NullBattleView (with input methods)
 │   ├── Actions/    # BattleAction implementations, BattleActionType
-│   ├── Damage/     # DamagePipeline, DamageContext, IStatModifier, AbilityStatModifier, ItemStatModifier
+│   ├── Damage/     # DamagePipeline (IDamagePipeline), DamageContext, IStatModifier, AbilityStatModifier, ItemStatModifier
 │   ├── AI/         # RandomAI, AlwaysAttackAI
-│   └── Helpers/    # AccuracyChecker, TurnOrderResolver, TargetResolver
+│   ├── Helpers/    # AccuracyChecker (instance-based), TurnOrderResolver (instance-based), TargetResolver (instance-based), ITargetRedirectionResolver
+│   ├── Factories/  # IBattleFieldFactory, IBattleQueueFactory, DamageContextFactory
+│   ├── ValueObjects/ # StatStages, DamageTracker, ProtectTracker, MoveStateTracker, WeatherState, TerrainState
+│   ├── Effects/    # IMoveEffectProcessor, MoveEffectProcessorRegistry, effect processors (Strategy Pattern)
+│   ├── Logging/    # IBattleLogger, BattleLogger, NullBattleLogger
+│   ├── Messages/   # IBattleMessageFormatter, BattleMessageFormatter
+│   ├── Validation/ # IBattleStateValidator, BattleStateValidator
+│   ├── Extensions/ # BattleSlotExtensions, DamageCalculationExtensions
+│   └── Constants/  # BattleConstants, StatusConstants, ItemConstants, MoveConstants
 │
 ├── Content/        # Game data definitions
 │   ├── Catalogs/   # Pokemon, Move, Ability, Item definitions
@@ -129,8 +138,8 @@ See `docs/features/2-combat-system/roadmap.md` for full details.
 | 2.10 Pipeline Hooks     | ✅ Extended | IStatModifier system, Choice Band/Specs/Scarf, Life Orb, Assault Vest, Eviolite, Blaze/Torrent/Overgrow/Swarm |
 | 2.11 Recoil & Drain     | ✅ Complete | RecoilEffect (25%, 33%, 50%), DrainEffect (50%, 75%)                                                          |
 | 2.12 Weather System     | ✅ Complete | Weather tracking, damage modifiers, end-of-turn damage, perfect accuracy moves                                |
-| 2.13 Terrain System     | ✅ Complete | Terrain tracking, damage modifiers, end-of-turn healing, terrain actions                                    |
-| 2.14 Hazards System     | ✅ Complete | Entry hazard tracking, processing on switch-in, Spikes/Stealth Rock/Toxic Spikes/Sticky Web                 |
+| 2.13 Terrain System     | ✅ Complete | Terrain tracking, damage modifiers, end-of-turn healing, terrain actions                                      |
+| 2.14 Hazards System     | ✅ Complete | Entry hazard tracking, processing on switch-in, Spikes/Stealth Rock/Toxic Spikes/Sticky Web                   |
 
 Reference docs:
 
@@ -147,39 +156,47 @@ Reference docs:
 
 See `docs/features/3-content-expansion/roadmap.md` for full details.
 
-| Sub-Feature | Status | Description |
-|-------------|--------|-------------|
-| 3.1 Pokemon Expansion | 🎯 In Progress | 26/151 Gen 1 Pokemon |
-| 3.2 Move Expansion | 🎯 In Progress | 36 moves (12 types) |
-| 3.3 Item Expansion | 🎯 In Progress | 23 items (15 held + 8 berries) |
-| 3.4 Ability Expansion | 🎯 In Progress | 35 abilities |
-| 3.5 Status Effect Expansion | ✅ Complete | 15 statuses (6 persistent + 9 volatile) |
-| 3.6 Field Conditions Expansion | ✅ Complete | 35 field conditions (9 weather, 4 terrain, 4 hazards, 10 side, 8 field) |
-| 3.7 Content Validation | ⏳ Planned | Quality standards and validation |
-| 3.8 Content Organization | ✅ Complete | Catalog organization and maintenance |
+| Sub-Feature                    | Status         | Description                                                             |
+| ------------------------------ | -------------- | ----------------------------------------------------------------------- |
+| 3.1 Pokemon Expansion          | 🎯 In Progress | 26/151 Gen 1 Pokemon                                                    |
+| 3.2 Move Expansion             | 🎯 In Progress | 36 moves (12 types)                                                     |
+| 3.3 Item Expansion             | 🎯 In Progress | 23 items (15 held + 8 berries)                                          |
+| 3.4 Ability Expansion          | 🎯 In Progress | 35 abilities                                                            |
+| 3.5 Status Effect Expansion    | ✅ Complete    | 15 statuses (6 persistent + 9 volatile)                                 |
+| 3.6 Field Conditions Expansion | ✅ Complete    | 35 field conditions (9 weather, 4 terrain, 4 hazards, 10 side, 8 field) |
+| 3.7 Content Validation         | ⏳ Planned     | Quality standards and validation                                        |
+| 3.8 Content Organization       | ✅ Complete    | Catalog organization and maintenance                                    |
 
 **Current Content**:
-- **Core**: 26 Pokemon, 36 Moves, 35 Abilities, 23 Items
-- **Supporting**: 15 Status Effects, 9 Weather, 4 Terrain, 4 Hazards, 10 Side Conditions, 8 Field Effects
+
+-   **Core**: 26 Pokemon, 36 Moves, 35 Abilities, 23 Items
+-   **Supporting**: 15 Status Effects, 9 Weather, 4 Terrain, 4 Hazards, 10 Side Conditions, 8 Field Effects
 
 ---
 
 ## 📐 Key Architectural Decisions
 
-| Decision                            | Rationale                                                                               |
-| ----------------------------------- | --------------------------------------------------------------------------------------- |
-| Blueprint/Instance pattern          | Immutable data vs mutable runtime state                                                 |
-| Partial classes for PokemonInstance | File size management, separation of concerns                                            |
-| Nullable disabled in Tests/Content  | Practical for testing patterns, Unity compatibility                                     |
-| Centralized constants               | No magic strings, easy maintenance                                                      |
-| Fail-fast exceptions                | Clear error detection, no silent failures                                               |
-| IMoveEffect composition             | Moves can have multiple effects                                                         |
-| Three-Phase Testing                 | Functional → Edge Cases → Integration ensures complete coverage                         |
-| Integration Test Standard           | Mandatory for system interactions, ensures components work together                     |
-| Structured Workflow                 | Clear process for implementation, troubleshooting, and refactoring                      |
-| Event-Driven Abilities & Items      | IBattleListener pattern for reactive effects, keeps engine clean                        |
-| Pipeline Hooks for Modifiers        | IStatModifier pattern for passive stat/damage modifiers, integrates with DamagePipeline |
-| Test Structure Organization         | Systems/Blueprints/Data separation for clear test organization and easy navigation      |
+| Decision                                 | Rationale                                                                               |
+| ---------------------------------------- | --------------------------------------------------------------------------------------- |
+| Blueprint/Instance pattern               | Immutable data vs mutable runtime state                                                 |
+| Partial classes for PokemonInstance      | File size management, separation of concerns                                            |
+| Nullable disabled in Tests/Content       | Practical for testing patterns, Unity compatibility                                     |
+| Centralized constants                    | No magic strings, easy maintenance                                                      |
+| Fail-fast exceptions                     | Clear error detection, no silent failures                                               |
+| IMoveEffect composition                  | Moves can have multiple effects                                                         |
+| Three-Phase Testing                      | Functional → Edge Cases → Integration ensures complete coverage                         |
+| Integration Test Standard                | Mandatory for system interactions, ensures components work together                     |
+| Structured Workflow                      | Clear process for implementation, troubleshooting, and refactoring                      |
+| Event-Driven Abilities & Items           | IBattleListener pattern for reactive effects, keeps engine clean                        |
+| Pipeline Hooks for Modifiers             | IStatModifier pattern for passive stat/damage modifiers, integrates with DamagePipeline |
+| Test Structure Organization              | Systems/Blueprints/Data separation for clear test organization and easy navigation      |
+| **Dependency Injection (Post-Refactor)** | All major components use DI for improved testability and flexibility                    |
+| **Value Objects (Post-Refactor)**        | Complex state encapsulated in Value Objects (StatStages, MoveStateTracker, etc.)        |
+| **Strategy Pattern (Post-Refactor)**     | Move effects processed using Strategy Pattern for extensibility                         |
+| **Factory Pattern (Post-Refactor)**      | Object creation centralized using Factory Pattern                                       |
+| **Event Bus (Post-Refactor)**            | Decoupled communication using Event Bus pattern                                         |
+| **Structured Logging (Post-Refactor)**   | IBattleLogger for debugging and monitoring                                              |
+| **State Validation (Post-Refactor)**     | IBattleStateValidator ensures battle state consistency                                  |
 
 ---
 
@@ -243,8 +260,8 @@ See `docs/features/3-content-expansion/roadmap.md` for full details.
 | `docs/implementation_plan.md`                                              | Technical roadmap                          |
 | `docs/features/2-combat-system/roadmap.md`                                 | **Combat phases**                          |
 | `docs/features/3-content-expansion/roadmap.md`                             | **📦 Content expansion phases**            |
-| `docs/features/1-game-data/roadmap.md`                                  | **📊 Game data fields spec**            |
-| `docs/features/1-game-data/1.18-variants-system/README.md`         | **🔀 Variants system (Mega/Dinamax/Tera)** |
+| `docs/features/1-game-data/roadmap.md`                                     | **📊 Game data fields spec**               |
+| `docs/features/1-game-data/1.18-variants-system/README.md`                 | **🔀 Variants system (Mega/Dinamax/Tera)** |
 | `docs/features/4-unity-integration/roadmap.md`                             | **🎮 Unity integration phases**            |
 | `docs/features/5-game-features/roadmap.md`                                 | **🎯 Game features phases**                |
 | `docs/features/2-combat-system/use_cases.md`                               | **All battle cases**                       |
@@ -259,7 +276,7 @@ See `docs/features/3-content-expansion/roadmap.md` for full details.
 | `docs/ai/workflow/refactoring_guide.md`                                    | **Safe refactoring process**               |
 | `docs/features/2-combat-system/testing/integration_guide.md`               | **Integration test patterns**              |
 | `docs/ai/testing_structure_definition.md`                                  | **⭐ Test structure standard**             |
-| `docs/features/1-game-data/testing.md`                                  | **📊 Game data testing strategy**       |
+| `docs/features/1-game-data/testing.md`                                     | **📊 Game data testing strategy**          |
 | `docs/features/README.md`                                                  | **Features overview**                      |
 | `docs/ai/anti-patterns.md`                                                 | What NOT to do                             |
 

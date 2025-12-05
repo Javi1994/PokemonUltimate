@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Damage.Steps;
+using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 
 namespace PokemonUltimate.Combat.Damage
 {
     /// <summary>
     /// Calculates damage by running a series of steps in order.
     /// Each step can modify the DamageContext.
-    /// 
+    ///
     /// This pipeline pattern makes the damage formula:
     /// - Modular: Each step is independent and testable
     /// - Extensible: Add new steps without changing existing code
@@ -19,20 +21,24 @@ namespace PokemonUltimate.Combat.Damage
     /// **Sub-Feature**: 2.4: Damage Calculation Pipeline
     /// **Documentation**: See `docs/features/2-combat-system/2.4-damage-calculation-pipeline/architecture.md`
     /// </remarks>
-    public class DamagePipeline
+    public class DamagePipeline : IDamagePipeline
     {
         private readonly List<IDamageStep> _steps;
 
         /// <summary>
         /// Creates a new damage pipeline with the standard steps.
         /// </summary>
-        public DamagePipeline()
+        /// <param name="randomProvider">The random provider for random steps. If null, creates a temporary one.</param>
+        public DamagePipeline(IRandomProvider randomProvider = null)
         {
+            // Create RandomProvider if not provided (temporary until full DI refactoring)
+            var random = randomProvider ?? new RandomProvider();
+
             _steps = new List<IDamageStep>
             {
                 new BaseDamageStep(),        // 1. Calculate base damage from formula (includes stat modifiers)
-                new CriticalHitStep(),       // 2. Check for critical hit (1.5x)
-                new RandomFactorStep(),      // 3. Apply random factor (0.85-1.0)
+                new CriticalHitStep(random), // 2. Check for critical hit (1.5x)
+                new RandomFactorStep(random), // 3. Apply random factor (0.85-1.0)
                 new StabStep(),              // 4. Apply STAB bonus (1.5x)
                 new AttackerAbilityStep(),   // 5. Apply ability damage multipliers (Blaze, etc.)
                 new AttackerItemStep(),      // 6. Apply item damage multipliers (Life Orb, etc.)
@@ -81,11 +87,11 @@ namespace PokemonUltimate.Combat.Damage
                 throw new ArgumentNullException(nameof(field));
 
             var context = new DamageContext(
-                attacker, 
-                defender, 
-                move, 
-                field, 
-                forceCritical, 
+                attacker,
+                defender,
+                move,
+                field,
+                forceCritical,
                 fixedRandomValue);
 
             // Run each step in order
@@ -105,7 +111,7 @@ namespace PokemonUltimate.Combat.Damage
         {
             if (step == null)
                 throw new ArgumentNullException(nameof(step));
-            
+
             _steps.Add(step);
         }
 
@@ -118,7 +124,7 @@ namespace PokemonUltimate.Combat.Damage
         {
             if (step == null)
                 throw new ArgumentNullException(nameof(step));
-            
+
             _steps.Insert(index, step);
         }
 

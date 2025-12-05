@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Instances;
@@ -45,7 +46,7 @@ namespace PokemonUltimate.Combat.AI
                 throw new ArgumentNullException(nameof(mySlot), ErrorMessages.PokemonCannotBeNull);
 
             // Return null if slot is empty or Pokemon is fainted
-            if (mySlot.IsEmpty || mySlot.HasFainted)
+            if (!mySlot.IsActive())
                 return Task.FromResult<BattleAction>(null);
 
             // Get moves with PP > 0
@@ -60,7 +61,8 @@ namespace PokemonUltimate.Combat.AI
             var selectedMove = availableMoves[_random.Next(availableMoves.Count)];
 
             // Get valid targets for this move
-            var validTargets = TargetResolver.GetValidTargets(mySlot, selectedMove.Move, field);
+            var targetResolver = new TargetResolver();
+            var validTargets = targetResolver.GetValidTargets(mySlot, selectedMove.Move, field);
 
             if (validTargets.Count == 0)
             {

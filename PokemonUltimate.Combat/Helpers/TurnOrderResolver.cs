@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Combat.Helpers
@@ -16,9 +19,19 @@ namespace PokemonUltimate.Combat.Helpers
     /// **Sub-Feature**: 2.3: Turn Order Resolution
     /// **Documentation**: See `docs/features/2-combat-system/2.3-turn-order-resolution/architecture.md`
     /// </remarks>
-    public static class TurnOrderResolver
+    public class TurnOrderResolver
     {
-        private static readonly Random _random = new Random();
+        private readonly IRandomProvider _randomProvider;
+
+        /// <summary>
+        /// Creates a new TurnOrderResolver with a random provider.
+        /// </summary>
+        /// <param name="randomProvider">The random provider for tie-breaking. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">If randomProvider is null.</exception>
+        public TurnOrderResolver(IRandomProvider randomProvider)
+        {
+            _randomProvider = randomProvider ?? throw new ArgumentNullException(nameof(randomProvider), ErrorMessages.PokemonCannotBeNull);
+        }
 
         /// <summary>
         /// Sorts actions by priority (descending), then by effective speed (descending).
@@ -28,7 +41,7 @@ namespace PokemonUltimate.Combat.Helpers
         /// <param name="field">The battlefield for context (speed modifiers, etc.).</param>
         /// <returns>Actions sorted by turn order.</returns>
         /// <exception cref="ArgumentNullException">If actions or field is null.</exception>
-        public static List<BattleAction> SortActions(IEnumerable<BattleAction> actions, BattleField field)
+        public List<BattleAction> SortActions(IEnumerable<BattleAction> actions, BattleField field)
         {
             if (actions == null)
                 throw new ArgumentNullException(nameof(actions));
@@ -38,7 +51,7 @@ namespace PokemonUltimate.Combat.Helpers
             return actions
                 .OrderByDescending(a => GetPriority(a))
                 .ThenByDescending(a => GetEffectiveSpeed(a?.User, field))
-                .ThenBy(_ => _random.Next()) // Random tiebreaker
+                .ThenBy(_ => _randomProvider.Next(int.MaxValue)) // Random tiebreaker
                 .ToList();
         }
 
@@ -48,7 +61,7 @@ namespace PokemonUltimate.Combat.Helpers
         /// </summary>
         /// <param name="action">The action to check.</param>
         /// <returns>The priority value (default 0).</returns>
-        public static int GetPriority(BattleAction action)
+        public int GetPriority(BattleAction action)
         {
             if (action == null)
                 return 0;
@@ -62,7 +75,7 @@ namespace PokemonUltimate.Combat.Helpers
         /// <param name="slot">The slot to calculate speed for.</param>
         /// <param name="field">The battlefield for field effects.</param>
         /// <returns>The effective speed value.</returns>
-        public static float GetEffectiveSpeed(BattleSlot slot, BattleField field)
+        public float GetEffectiveSpeed(BattleSlot slot, BattleField field)
         {
             if (slot == null || slot.Pokemon == null)
                 return 0;
@@ -118,7 +131,7 @@ namespace PokemonUltimate.Combat.Helpers
         {
             if (status == PersistentStatus.Paralysis)
             {
-                return 0.5f;
+                return StatusConstants.ParalysisSpeedMultiplier;
             }
 
             return 1.0f;

@@ -2,8 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Effects;
+using PokemonUltimate.Combat.Extensions;
+using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Combat.Messages;
+using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Effects;
@@ -24,6 +30,12 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class UseMoveAction : BattleAction
     {
+        private readonly AccuracyChecker _accuracyChecker;
+        private readonly IRandomProvider _randomProvider;
+        private readonly IDamagePipeline _damagePipeline;
+        private readonly Effects.MoveEffectProcessorRegistry _effectProcessorRegistry;
+        private readonly IBattleMessageFormatter _messageFormatter;
+
         /// <summary>
         /// The target slot for this move.
         /// </summary>
@@ -55,13 +67,42 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="user">The slot using the move. Cannot be null.</param>
         /// <param name="target">The target slot. Cannot be null.</param>
         /// <param name="moveInstance">The move instance to use. Cannot be null.</param>
+        /// <param name="randomProvider">The random provider. If null, creates a temporary one.</param>
+        /// <param name="accuracyChecker">The accuracy checker. If null, creates a temporary one.</param>
+        /// <param name="damagePipeline">The damage pipeline. If null, creates a temporary one.</param>
+        /// <param name="effectProcessorRegistry">The effect processor registry. If null, creates a temporary one.</param>
+        /// <param name="messageFormatter">The message formatter. If null, creates a default one.</param>
         /// <exception cref="ArgumentNullException">If user, target, or moveInstance is null.</exception>
-        public UseMoveAction(BattleSlot user, BattleSlot target, MoveInstance moveInstance) : base(user)
+        public UseMoveAction(
+            BattleSlot user,
+            BattleSlot target,
+            MoveInstance moveInstance,
+            IRandomProvider randomProvider = null,
+            AccuracyChecker accuracyChecker = null,
+            IDamagePipeline damagePipeline = null,
+            Effects.MoveEffectProcessorRegistry effectProcessorRegistry = null,
+            IBattleMessageFormatter messageFormatter = null) : base(user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user), ErrorMessages.PokemonCannotBeNull);
             Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
             MoveInstance = moveInstance ?? throw new ArgumentNullException(nameof(moveInstance), ErrorMessages.MoveCannotBeNull);
+
+            // Create RandomProvider if not provided (temporary until full DI refactoring)
+            _randomProvider = randomProvider ?? new RandomProvider();
+
+            // Create AccuracyChecker if not provided (temporary until full DI refactoring)
+            _accuracyChecker = accuracyChecker ?? new AccuracyChecker(_randomProvider);
+
+            // Create DamagePipeline if not provided (temporary until full DI refactoring)
+            _damagePipeline = damagePipeline ?? new DamagePipeline(_randomProvider);
+
+            // Create MoveEffectProcessorRegistry if not provided (temporary until full DI refactoring)
+            var damageContextFactory = new DamageContextFactory();
+            _effectProcessorRegistry = effectProcessorRegistry ?? new Effects.MoveEffectProcessorRegistry(_randomProvider, damageContextFactory);
+
+            // Create BattleMessageFormatter if not provided
+            _messageFormatter = messageFormatter ?? new BattleMessageFormatter();
         }
 
         /// <summary>
@@ -73,144 +114,64 @@ namespace PokemonUltimate.Combat.Actions
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
 
-            if (User.IsEmpty || User.HasFainted || Target.IsEmpty)
+            // User must be active to use a move
+            if (!User.IsActive())
+                return Enumerable.Empty<BattleAction>();
+
+            // Target slot must not be empty (but can be fainted - move still executes, consumes PP, but deals no damage)
+            if (Target.IsEmpty)
                 return Enumerable.Empty<BattleAction>();
 
             var actions = new List<BattleAction>();
 
-            // 0. Check if user is charging a different move - cancel it
-            if (User.HasVolatileStatus(VolatileStatus.Charging) && User.ChargingMoveName != Move.Name)
-            {
-                User.RemoveVolatileStatus(VolatileStatus.Charging);
-                User.ClearChargingMove();
-            }
+            // Cancel conflicting move states
+            CancelConflictingMoveStates();
 
-            // 0.5. Check if user is semi-invulnerable
-            bool hasSemiInvulnerableEffect = Move.Effects.Any(e => e is SemiInvulnerableEffect);
-            // Only cancel if using a different move (not the same move on attack turn)
-            if (User.HasVolatileStatus(VolatileStatus.SemiInvulnerable) && 
-                User.SemiInvulnerableMoveName != Move.Name)
-            {
-                // Using different move - cancel semi-invulnerable
-                User.RemoveVolatileStatus(VolatileStatus.SemiInvulnerable);
-                User.ClearSemiInvulnerableMove();
-            }
+            // Validate move execution (PP, Flinch, Status)
+            var validationResult = ValidateMoveExecution(actions);
+            if (validationResult != null)
+                return validationResult;
 
-            // 1. Check PP
-            if (!MoveInstance.HasPP)
-            {
-                actions.Add(new MessageAction(string.Format(GameMessages.MoveNoPP, User.Pokemon.DisplayName)));
-                return actions;
-            }
-
-            // 2. Check Flinch (volatile status)
-            if (User.HasVolatileStatus(VolatileStatus.Flinch))
-            {
-                actions.Add(new MessageAction(string.Format(GameMessages.MoveFlinched, User.Pokemon.DisplayName)));
-                User.RemoveVolatileStatus(VolatileStatus.Flinch); // Consume flinch
-                return actions;
-            }
-
-            // 3. Check persistent status conditions
-            var statusCheckResult = CheckStatusConditions();
-            if (statusCheckResult != null)
-            {
-                actions.Add(statusCheckResult);
-                return actions;
-            }
-
-            // 4. Check Multi-Turn effect - if user is already charging this move, execute attack
+            // Process Multi-Turn moves
             bool hasMultiTurnEffect = Move.Effects.Any(e => e is MultiTurnEffect);
-            if (hasMultiTurnEffect && User.HasVolatileStatus(VolatileStatus.Charging) && User.ChargingMoveName == Move.Name)
-            {
-                // This is the attack turn - clear charging and proceed with normal execution
-                User.RemoveVolatileStatus(VolatileStatus.Charging);
-                User.ClearChargingMove();
-            }
-            else if (hasMultiTurnEffect)
-            {
-                // This is the charge turn - mark as charging and return early
-                User.AddVolatileStatus(VolatileStatus.Charging);
-                User.SetChargingMove(Move.Name);
-                MoveInstance.Use(); // Deduct PP
-                var multiTurnEffect = Move.Effects.OfType<MultiTurnEffect>().First();
-                string chargeMessage = !string.IsNullOrEmpty(multiTurnEffect.ChargeMessage) 
-                    ? $"{User.Pokemon.DisplayName} {multiTurnEffect.ChargeMessage}"
-                    : $"{User.Pokemon.DisplayName} is charging!";
-                actions.Add(new MessageAction(chargeMessage));
-                return actions; // Don't execute damage on charge turn
-            }
+            var multiTurnResult = ProcessMultiTurnMove(actions, hasMultiTurnEffect);
+            if (multiTurnResult != null)
+                return multiTurnResult;
 
-            // 5. Check Focus Punch effect
+            // Process Focus Punch moves
             bool hasFocusPunchEffect = Move.Effects.Any(e => e is FocusPunchEffect);
-            
-            // Mark user as focusing at start of turn (before checking if hit)
-            // In a real battle, this would happen when actions are collected, but we do it here for simplicity
-            if (hasFocusPunchEffect)
-            {
-                User.AddVolatileStatus(VolatileStatus.Focusing);
-            }
+            var focusPunchResult = ProcessFocusPunchMove(actions, hasFocusPunchEffect);
+            if (focusPunchResult != null)
+                return focusPunchResult;
 
-            // Check if user was hit while focusing (must check after marking as focusing)
-            if (hasFocusPunchEffect && User.WasHitWhileFocusing)
-            {
-                // Deduct PP even if move fails
-                MoveInstance.Use();
-                actions.Add(new MessageAction(string.Format(GameMessages.MoveFocusLost, User.Pokemon.DisplayName)));
-                User.RemoveVolatileStatus(VolatileStatus.Focusing);
-                return actions;
-            }
-
-            // 6. Deduct PP
+            // Deduct PP and generate move message
             MoveInstance.Use();
+            actions.Add(new MessageAction(_messageFormatter.FormatMoveUsed(User.Pokemon, Move)));
 
-            // 7. Generate "X used Y!" message
-            actions.Add(new MessageAction($"{User.Pokemon.DisplayName} used {Move.Name}!"));
-
-            // 8. Show focusing message for Focus Punch (if not already failed)
+            // Show focusing message for Focus Punch (if not already failed)
             if (hasFocusPunchEffect)
             {
-                actions.Add(new MessageAction(string.Format(GameMessages.MoveFocusing, User.Pokemon.DisplayName)));
+                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveFocusing, User.Pokemon.DisplayName)));
             }
 
-            // 9. Check if target is protected (before accuracy check)
-            if (Target.HasVolatileStatus(VolatileStatus.Protected) && CanBeBlocked)
+            // Check protection and semi-invulnerable status
+            var protectionResult = CheckProtection(actions, hasFocusPunchEffect);
+            if (protectionResult != null)
+                return protectionResult;
+
+            var semiInvulnerableResult = CheckSemiInvulnerable(actions, hasFocusPunchEffect, hasMultiTurnEffect);
+            if (semiInvulnerableResult != null)
+                return semiInvulnerableResult;
+
+            // Check accuracy (skip if target is fainted - move still executes but deals no damage)
+            if (Target.IsActive())
             {
-                // Check if move bypasses Protect (e.g., Feint)
-                if (!Move.BypassesProtect)
-                {
-                    actions.Add(new MessageAction(string.Format(GameMessages.MoveProtected, Target.Pokemon.DisplayName)));
-                    // Remove focusing status if move was blocked
-                    if (hasFocusPunchEffect)
-                    {
-                        User.RemoveVolatileStatus(VolatileStatus.Focusing);
-                    }
-                    return actions;
-                }
+                var accuracyResult = CheckAccuracy(actions, field, hasFocusPunchEffect, hasMultiTurnEffect);
+                if (accuracyResult != null)
+                    return accuracyResult;
             }
 
-            // 9.5. Check if target is semi-invulnerable (before accuracy check)
-            if (Target.HasVolatileStatus(VolatileStatus.SemiInvulnerable))
-            {
-                // Check if move can hit semi-invulnerable target
-                bool canHit = CanHitSemiInvulnerable(Target.SemiInvulnerableMoveName);
-                if (!canHit)
-                {
-                    actions.Add(new MessageAction(GameMessages.MoveMissed));
-                    CleanupVolatileStatusesOnFailure(hasFocusPunchEffect, hasMultiTurnEffect);
-                    return actions;
-                }
-            }
-
-            // 10. Accuracy check
-            if (!AccuracyChecker.CheckHit(User, Target, Move, field))
-            {
-                actions.Add(new MessageAction(GameMessages.MoveMissed));
-                CleanupVolatileStatusesOnFailure(hasFocusPunchEffect, hasMultiTurnEffect);
-                return actions;
-            }
-
-            // 11. Remove focusing status if Focus Punch succeeds
+            // Remove focusing status if Focus Punch succeeds
             if (hasFocusPunchEffect)
             {
                 User.RemoveVolatileStatus(VolatileStatus.Focusing);
@@ -219,6 +180,141 @@ namespace PokemonUltimate.Combat.Actions
             // 12. Process move effects
             ProcessEffects(field, actions);
 
+            return actions;
+        }
+
+        /// <summary>
+        /// Processes Multi-Turn move effects (charge turn vs attack turn).
+        /// </summary>
+        /// <param name="actions">The actions list to add messages to.</param>
+        /// <param name="hasMultiTurnEffect">Whether the move has Multi-Turn effect.</param>
+        /// <returns>Null if execution should continue, or the actions list if charge turn (early return).</returns>
+        private List<BattleAction> ProcessMultiTurnMove(List<BattleAction> actions, bool hasMultiTurnEffect)
+        {
+            if (!hasMultiTurnEffect)
+                return null;
+
+            if (User.HasVolatileStatus(VolatileStatus.Charging) && User.ChargingMoveName == Move.Name)
+            {
+                // This is the attack turn - clear charging and proceed with normal execution
+                User.RemoveVolatileStatus(VolatileStatus.Charging);
+                User.ClearChargingMove();
+                return null;
+            }
+
+            // This is the charge turn - mark as charging and return early
+            User.AddVolatileStatus(VolatileStatus.Charging);
+            User.SetChargingMove(Move.Name);
+            MoveInstance.Use(); // Deduct PP
+            var multiTurnEffect = Move.Effects.OfType<MultiTurnEffect>().First();
+            string chargeMessage = !string.IsNullOrEmpty(multiTurnEffect.ChargeMessage)
+                ? $"{User.Pokemon.DisplayName} {multiTurnEffect.ChargeMessage}"
+                : $"{User.Pokemon.DisplayName} is charging!";
+            actions.Add(new MessageAction(chargeMessage));
+            return actions; // Don't execute damage on charge turn
+        }
+
+        /// <summary>
+        /// Processes Focus Punch move effects (focusing state and hit check).
+        /// </summary>
+        /// <param name="actions">The actions list to add messages to.</param>
+        /// <param name="hasFocusPunchEffect">Whether the move has Focus Punch effect.</param>
+        /// <returns>Null if execution should continue, or the actions list if focus was lost.</returns>
+        private List<BattleAction> ProcessFocusPunchMove(List<BattleAction> actions, bool hasFocusPunchEffect)
+        {
+            if (!hasFocusPunchEffect)
+                return null;
+
+            // Mark user as focusing at start of turn (before checking if hit)
+            // In a real battle, this would happen when actions are collected, but we do it here for simplicity
+            User.AddVolatileStatus(VolatileStatus.Focusing);
+
+            // Check if user was hit while focusing (must check after marking as focusing)
+            if (User.WasHitWhileFocusing)
+            {
+                // Deduct PP even if move fails
+                MoveInstance.Use();
+                actions.Add(new MessageAction(string.Format(GameMessages.MoveFocusLost, User.Pokemon.DisplayName)));
+                User.RemoveVolatileStatus(VolatileStatus.Focusing);
+                return actions;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if target is protected and handles protection logic.
+        /// </summary>
+        /// <param name="actions">The actions list to add messages to.</param>
+        /// <param name="hasFocusPunchEffect">Whether the move has Focus Punch effect.</param>
+        /// <returns>Null if execution should continue, or the actions list if move was blocked.</returns>
+        private List<BattleAction> CheckProtection(List<BattleAction> actions, bool hasFocusPunchEffect)
+        {
+            // Skip protection check if target is fainted (move still executes)
+            if (!Target.IsActive())
+                return null;
+
+            if (!Target.HasVolatileStatus(VolatileStatus.Protected) || !CanBeBlocked)
+                return null;
+
+            // Check if move bypasses Protect (e.g., Feint)
+            if (!Move.BypassesProtect)
+            {
+                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveProtected, Target.Pokemon.DisplayName)));
+                // Remove focusing status if move was blocked
+                if (hasFocusPunchEffect)
+                {
+                    User.RemoveVolatileStatus(VolatileStatus.Focusing);
+                }
+                return actions;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if target is semi-invulnerable and if this move can hit it.
+        /// </summary>
+        /// <param name="actions">The actions list to add messages to.</param>
+        /// <param name="hasFocusPunchEffect">Whether the move has Focus Punch effect.</param>
+        /// <param name="hasMultiTurnEffect">Whether the move has Multi-Turn effect.</param>
+        /// <returns>Null if execution should continue, or the actions list if move missed.</returns>
+        private List<BattleAction> CheckSemiInvulnerable(List<BattleAction> actions, bool hasFocusPunchEffect, bool hasMultiTurnEffect)
+        {
+            // Skip semi-invulnerable check if target is fainted (move still executes)
+            if (!Target.IsActive())
+                return null;
+
+            if (!Target.HasVolatileStatus(VolatileStatus.SemiInvulnerable))
+                return null;
+
+            // Check if move can hit semi-invulnerable target
+            bool canHit = CanHitSemiInvulnerable(Target.SemiInvulnerableMoveName);
+            if (!canHit)
+            {
+                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveMissed)));
+                CleanupVolatileStatusesOnFailure(hasFocusPunchEffect, hasMultiTurnEffect);
+                return actions;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks move accuracy and handles miss logic.
+        /// </summary>
+        /// <param name="actions">The actions list to add messages to.</param>
+        /// <param name="field">The battlefield for accuracy calculations.</param>
+        /// <param name="hasFocusPunchEffect">Whether the move has Focus Punch effect.</param>
+        /// <param name="hasMultiTurnEffect">Whether the move has Multi-Turn effect.</param>
+        /// <returns>Null if execution should continue, or the actions list if move missed.</returns>
+        private List<BattleAction> CheckAccuracy(List<BattleAction> actions, BattleField field, bool hasFocusPunchEffect, bool hasMultiTurnEffect)
+        {
+            if (_accuracyChecker.CheckHit(User, Target, Move, field))
+                return null;
+
+            actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveMissed)));
+            CleanupVolatileStatusesOnFailure(hasFocusPunchEffect, hasMultiTurnEffect);
             return actions;
         }
 
@@ -257,28 +353,90 @@ namespace PokemonUltimate.Combat.Actions
                 return true;
 
             // Check specific move combinations
-            switch (semiInvulnerableMoveName.ToLower())
+            var moveNameLower = semiInvulnerableMoveName.ToLower();
+
+            if (moveNameLower == "dig")
             {
-                case "dig":
-                    return Move.Name.Equals("Earthquake", StringComparison.OrdinalIgnoreCase) ||
-                           Move.Name.Equals("Magnitude", StringComparison.OrdinalIgnoreCase) ||
-                           Move.NeverMisses;
-                case "dive":
-                    return Move.Name.Equals("Surf", StringComparison.OrdinalIgnoreCase) ||
-                           Move.Name.Equals("Whirlpool", StringComparison.OrdinalIgnoreCase) ||
-                           Move.NeverMisses;
-                case "fly":
-                case "bounce":
-                    // Thunder hits Fly/Bounce in rain (handled by weather perfect accuracy)
-                    // For now, only always-hit moves can hit
-                    return Move.NeverMisses;
-                case "shadow force":
-                case "phantom force":
-                    // Only always-hit moves can hit
-                    return Move.NeverMisses;
-                default:
-                    return false;
+                return MoveConstants.DigCounterMoveNames.Contains(Move.Name) ||
+                       Move.NeverMisses;
             }
+
+            if (moveNameLower == "dive")
+            {
+                return MoveConstants.DiveCounterMoveNames.Contains(Move.Name) ||
+                       Move.NeverMisses;
+            }
+
+            if (moveNameLower == "fly" || moveNameLower == "bounce")
+            {
+                // Thunder hits Fly/Bounce in rain (handled by weather perfect accuracy)
+                // For now, only always-hit moves can hit
+                return Move.NeverMisses;
+            }
+
+            if (moveNameLower == "shadow force" || moveNameLower == "phantom force")
+            {
+                // Only always-hit moves can hit
+                return Move.NeverMisses;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Cancels conflicting move states (charging different move, semi-invulnerable with different move).
+        /// </summary>
+        private void CancelConflictingMoveStates()
+        {
+            // Cancel charging if using a different move
+            if (User.HasVolatileStatus(VolatileStatus.Charging) && User.ChargingMoveName != Move.Name)
+            {
+                User.RemoveVolatileStatus(VolatileStatus.Charging);
+                User.ClearChargingMove();
+            }
+
+            // Cancel semi-invulnerable if using a different move
+            bool hasSemiInvulnerableEffect = Move.Effects.Any(e => e is SemiInvulnerableEffect);
+            if (User.HasVolatileStatus(VolatileStatus.SemiInvulnerable) &&
+                User.SemiInvulnerableMoveName != Move.Name)
+            {
+                User.RemoveVolatileStatus(VolatileStatus.SemiInvulnerable);
+                User.ClearSemiInvulnerableMove();
+            }
+        }
+
+        /// <summary>
+        /// Validates move execution (PP, Flinch, Status conditions).
+        /// Returns null if validation passes, or a list of actions if validation fails.
+        /// </summary>
+        /// <param name="actions">The actions list to add validation failure messages to.</param>
+        /// <returns>Null if validation passes, or the actions list if validation fails.</returns>
+        private List<BattleAction> ValidateMoveExecution(List<BattleAction> actions)
+        {
+            // Check PP
+            if (!MoveInstance.HasPP)
+            {
+                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveNoPP, User.Pokemon.DisplayName)));
+                return actions;
+            }
+
+            // Check Flinch (volatile status)
+            if (User.HasVolatileStatus(VolatileStatus.Flinch))
+            {
+                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveFlinched, User.Pokemon.DisplayName)));
+                User.RemoveVolatileStatus(VolatileStatus.Flinch); // Consume flinch
+                return actions;
+            }
+
+            // Check persistent status conditions
+            var statusCheckResult = CheckStatusConditions();
+            if (statusCheckResult != null)
+            {
+                actions.Add(statusCheckResult);
+                return actions;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -291,17 +449,16 @@ namespace PokemonUltimate.Combat.Actions
             switch (pokemon.Status)
             {
                 case PersistentStatus.Sleep:
-                    return new MessageAction(string.Format(GameMessages.MoveAsleep, pokemon.DisplayName));
+                    return new MessageAction(_messageFormatter.Format(GameMessages.MoveAsleep, pokemon.DisplayName));
 
                 case PersistentStatus.Freeze:
                     return new MessageAction(string.Format(GameMessages.MoveFrozen, pokemon.DisplayName));
 
                 case PersistentStatus.Paralysis:
                     // 25% chance to be fully paralyzed
-                    var random = new Random();
-                    if (random.Next(100) < 25)
+                    if (_randomProvider.Next(100) < StatusConstants.ParalysisFullParalysisChance)
                     {
-                        return new MessageAction(string.Format(GameMessages.MoveParalyzed, pokemon.DisplayName));
+                        return new MessageAction(_messageFormatter.Format(GameMessages.MoveParalyzed, pokemon.DisplayName));
                     }
                     break;
             }
@@ -315,7 +472,6 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         private void ProcessEffects(BattleField field, List<BattleAction> actions)
         {
-            var random = new Random();
             int damageDealt = 0;
 
             // Check for Pursuit effect - doubles power if target is switching
@@ -323,20 +479,10 @@ namespace PokemonUltimate.Combat.Actions
             MoveData moveForDamage = Move;
             if (hasPursuitEffect && Target.HasVolatileStatus(VolatileStatus.SwitchingOut))
             {
-                // Create temporary MoveData with doubled power
-                moveForDamage = new MoveData
-                {
-                    Name = Move.Name,
-                    Power = Move.Power * 2,
-                    Accuracy = Move.Accuracy,
-                    Type = Move.Type,
-                    Category = Move.Category,
-                    MaxPP = Move.MaxPP,
-                    Priority = Move.Priority,
-                    TargetScope = Move.TargetScope,
-                    Effects = Move.Effects
-                };
-                actions.Add(new MessageAction($"{Target.Pokemon.DisplayName} is switching out! {User.Pokemon.DisplayName} used {Move.Name}!"));
+                // Apply power multiplier using MoveModifier
+                var pursuitModifier = MoveModifier.MultiplyPower(2.0f);
+                moveForDamage = pursuitModifier.ApplyModifications(Move);
+                actions.Add(new MessageAction(_messageFormatter.FormatMoveUsedDuringSwitch(Target.Pokemon, User.Pokemon, Move)));
             }
 
             // Check for Semi-Invulnerable effect - determine if charge or attack turn
@@ -345,7 +491,7 @@ namespace PokemonUltimate.Combat.Actions
             if (hasSemiInvulnerableEffect)
             {
                 // Check if user is already charging this move and ready to attack
-                if (User.HasVolatileStatus(VolatileStatus.SemiInvulnerable) && 
+                if (User.HasVolatileStatus(VolatileStatus.SemiInvulnerable) &&
                     User.SemiInvulnerableMoveName == Move.Name &&
                     !User.IsSemiInvulnerableCharging)
                 {
@@ -362,8 +508,8 @@ namespace PokemonUltimate.Combat.Actions
             }
 
             // First pass: Process damage effect to get damageDealt
-            // Skip damage on semi-invulnerable charge turn
-            if (!(hasSemiInvulnerableEffect && !isSemiInvulnerableAttackTurn))
+            // Skip damage on semi-invulnerable charge turn or if target is fainted
+            if (!(hasSemiInvulnerableEffect && !isSemiInvulnerableAttackTurn) && Target.IsActive())
             {
                 foreach (var effect in Move.Effects)
                 {
@@ -372,14 +518,13 @@ namespace PokemonUltimate.Combat.Actions
                         if (hasMultiHitEffect && multiHitEffect != null)
                         {
                             // Multi-hit move: hit multiple times
-                            int numHits = random.Next(multiHitEffect.MinHits, multiHitEffect.MaxHits + 1);
-                            
+                            int numHits = _randomProvider.Next(multiHitEffect.MinHits, multiHitEffect.MaxHits + 1);
+
                             for (int i = 0; i < numHits; i++)
                             {
                                 // Each hit has independent accuracy and damage calculation
-                                var pipeline = new DamagePipeline();
-                                var context = pipeline.Calculate(User, Target, moveForDamage, field);
-                                
+                                var context = _damagePipeline.Calculate(User, Target, moveForDamage, field);
+
                                 if (context.FinalDamage > 0)
                                 {
                                     var damageAction = new DamageAction(User, Target, context);
@@ -391,9 +536,8 @@ namespace PokemonUltimate.Combat.Actions
                         else
                         {
                             // Single-hit move: normal damage calculation
-                            var pipeline = new DamagePipeline();
-                            var context = pipeline.Calculate(User, Target, moveForDamage, field);
-                            
+                            var context = _damagePipeline.Calculate(User, Target, moveForDamage, field);
+
                             if (context.FinalDamage > 0)
                             {
                                 var damageAction = new DamageAction(User, Target, context);
@@ -417,8 +561,8 @@ namespace PokemonUltimate.Combat.Actions
                 if (effect is SemiInvulnerableEffect semiInvulnerableEffect)
                 {
                     // Check if this is the attack turn (user already charging this move)
-                    if (User.HasVolatileStatus(VolatileStatus.SemiInvulnerable) && 
-                        User.SemiInvulnerableMoveName == Move.Name && 
+                    if (User.HasVolatileStatus(VolatileStatus.SemiInvulnerable) &&
+                        User.SemiInvulnerableMoveName == Move.Name &&
                         !User.IsSemiInvulnerableCharging)
                     {
                         // This is turn 2 - execute attack and clear semi-invulnerable status
@@ -433,144 +577,51 @@ namespace PokemonUltimate.Combat.Actions
                         User.AddVolatileStatus(VolatileStatus.SemiInvulnerable);
                         User.SetSemiInvulnerableMove(Move.Name, isCharging: true);
                         // Message varies by move (e.g., "flew up high!" for Fly)
-                        string message;
-                        string moveNameLower = Move.Name.ToLower();
-                        if (moveNameLower == "fly")
-                            message = $"{User.Pokemon.DisplayName} flew up high!";
-                        else if (moveNameLower == "dig")
-                            message = $"{User.Pokemon.DisplayName} dug underground!";
-                        else if (moveNameLower == "dive")
-                            message = $"{User.Pokemon.DisplayName} dove underwater!";
-                        else if (moveNameLower == "bounce")
-                            message = $"{User.Pokemon.DisplayName} bounced up!";
-                        else if (moveNameLower == "shadow force" || moveNameLower == "phantom force")
-                            message = $"{User.Pokemon.DisplayName} vanished instantly!";
-                        else
-                            message = $"{User.Pokemon.DisplayName} used {Move.Name}!";
+                        string message = FormatSemiInvulnerableMessage(Move.Name, User.Pokemon);
                         actions.Add(new MessageAction(message));
                         // Charge turn handled - continue to process other effects if any
                         continue;
                     }
                 }
 
-                switch (effect)
+                // Try to process effect using registry
+                bool processed = _effectProcessorRegistry.Process(effect, User, Target, Move, field, damageDealt, actions);
+
+                // If not processed by registry, it's an effect type we don't have a processor for yet
+                // This allows for graceful handling of new effect types without breaking existing code
+                if (!processed)
                 {
-
-                    case StatusEffect statusEffect:
-                        // Check chance
-                        if (random.Next(100) < statusEffect.ChancePercent)
-                        {
-                            var targetSlot = statusEffect.TargetSelf ? User : Target;
-                            actions.Add(new ApplyStatusAction(User, targetSlot, statusEffect.Status));
-                        }
-                        break;
-
-                    case StatChangeEffect statChangeEffect:
-                        // Check chance
-                        if (random.Next(100) < statChangeEffect.ChancePercent)
-                        {
-                            var targetSlot = statChangeEffect.TargetSelf ? User : Target;
-                            actions.Add(new StatChangeAction(User, targetSlot, statChangeEffect.TargetStat, statChangeEffect.Stages));
-                        }
-                        break;
-
-                    case HealEffect healEffect:
-                        // Heal user by percentage of max HP
-                        var healAmount = (int)(User.Pokemon.MaxHP * healEffect.HealPercent / 100f);
-                        actions.Add(new HealAction(User, User, healAmount));
-                        break;
-
-                    case RecoilEffect recoilEffect:
-                        // Apply recoil damage to user (if damage was dealt)
-                        // Recoil always deals at least 1 HP if damage was dealt
-                        if (damageDealt > 0)
-                        {
-                            int recoilDamage = (int)(damageDealt * recoilEffect.RecoilPercent / 100f);
-                            recoilDamage = System.Math.Max(1, recoilDamage); // At least 1 HP
-                            
-                            // Create a simple damage context for recoil
-                            var recoilContext = new DamageContext(User, User, Move, field)
-                            {
-                                BaseDamage = recoilDamage,
-                                Multiplier = 1.0f,
-                                TypeEffectiveness = 1.0f
-                            };
-                            actions.Add(new DamageAction(User, User, recoilContext));
-                        }
-                        break;
-
-                    case DrainEffect drainEffect:
-                        // Heal user by percentage of damage dealt (if damage was dealt)
-                        // Drain always heals at least 1 HP if damage was dealt
-                        if (damageDealt > 0)
-                        {
-                            int drainHealAmount = (int)(damageDealt * drainEffect.DrainPercent / 100f);
-                            drainHealAmount = System.Math.Max(1, drainHealAmount); // At least 1 HP
-                            
-                            actions.Add(new HealAction(User, User, drainHealAmount));
-                        }
-                        break;
-
-                    case FlinchEffect flinchEffect:
-                        // Apply flinch to target (if chance succeeds)
-                        if (random.Next(100) < flinchEffect.ChancePercent)
-                        {
-                            Target.AddVolatileStatus(VolatileStatus.Flinch);
-                        }
-                        break;
-
-                    case ProtectEffect protectEffect:
-                        // Apply Protect: success rate halves with consecutive use (100%, 50%, 25%, 12.5%...)
-                        // Counter increments regardless of success (for tracking consecutive uses)
-                        int consecutiveUses = User.ProtectConsecutiveUses;
-                        int successRate = 100;
-                        for (int i = 0; i < consecutiveUses; i++)
-                        {
-                            successRate /= 2; // Halve each time
-                        }
-                        
-                        // Increment counter before checking success (tracks consecutive uses)
-                        User.IncrementProtectUses();
-                        
-                        if (random.Next(100) < successRate)
-                        {
-                            User.AddVolatileStatus(VolatileStatus.Protected);
-                            actions.Add(new MessageAction(string.Format(GameMessages.MoveProtected, User.Pokemon.DisplayName)));
-                        }
-                        else
-                        {
-                            actions.Add(new MessageAction(string.Format(GameMessages.MoveProtectFailed, User.Pokemon.DisplayName)));
-                        }
-                        break;
-
-                    case CounterEffect counterEffect:
-                        // Counter/Mirror Coat: returns 2x damage taken this turn
-                        int damageToReturn = 0;
-                        if (counterEffect.IsPhysicalCounter)
-                        {
-                            damageToReturn = User.PhysicalDamageTakenThisTurn * 2;
-                        }
-                        else
-                        {
-                            damageToReturn = User.SpecialDamageTakenThisTurn * 2;
-                        }
-
-                        if (damageToReturn > 0)
-                        {
-                            // Create damage context for counter damage
-                            var counterContext = new DamageContext(User, Target, Move, field)
-                            {
-                                BaseDamage = damageToReturn,
-                                Multiplier = 1.0f,
-                                TypeEffectiveness = 1.0f
-                            };
-                            actions.Add(new DamageAction(User, Target, counterContext));
-                            actions.Add(new MessageAction(string.Format(GameMessages.MoveCountered, User.Pokemon.DisplayName)));
-                        }
-                        // If no damage taken, Counter fails silently (no message)
-                        break;
+                    // Unknown effect type - log or handle as needed
+                    // For now, we silently skip it (could add logging in the future)
                 }
             }
+        }
+
+        /// <summary>
+        /// Formats a message for semi-invulnerable move charging.
+        /// </summary>
+        /// <param name="moveName">The name of the move.</param>
+        /// <param name="pokemon">The Pokemon using the move.</param>
+        /// <returns>The formatted message.</returns>
+        private string FormatSemiInvulnerableMessage(string moveName, PokemonInstance pokemon)
+        {
+            string moveNameLower = moveName.ToLower();
+            string action;
+
+            if (moveNameLower == "fly")
+                action = "flew up high!";
+            else if (moveNameLower == "dig")
+                action = "dug underground!";
+            else if (moveNameLower == "dive")
+                action = "dove underwater!";
+            else if (moveNameLower == "bounce")
+                action = "bounced up!";
+            else if (moveNameLower == "shadow force" || moveNameLower == "phantom force")
+                action = "vanished instantly!";
+            else
+                return _messageFormatter.FormatMoveUsed(pokemon, Move);
+
+            return $"{pokemon.DisplayName} {action}";
         }
 
         /// <summary>

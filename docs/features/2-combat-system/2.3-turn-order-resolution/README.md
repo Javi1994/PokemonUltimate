@@ -11,11 +11,11 @@
 Turn Order Resolution determines the order in which actions execute during a turn, considering:
 - **Priority**: Move priority (e.g., Quick Attack = +1)
 - **Speed**: Pokemon speed stat
-- **Random**: Random sorting for same priority/speed
+- **Random**: Random sorting for same priority/speed (via `IRandomProvider`, post-refactor)
 
 ## Current Status
 
-- ✅ **Implemented**: TurnOrderResolver with priority, speed, and random sorting
+- ✅ **Implemented**: TurnOrderResolver with priority, speed, and random sorting (instance-based with DI, post-refactor)
 - ✅ **Tested**: Comprehensive test coverage
 
 ## Documentation
@@ -40,5 +40,5 @@ Turn Order Resolution determines the order in which actions execute during a tur
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-05)
 

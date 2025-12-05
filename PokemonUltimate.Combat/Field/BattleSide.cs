@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -99,7 +100,7 @@ namespace PokemonUltimate.Combat
         /// <returns>Active (non-empty, non-fainted) slots.</returns>
         public IEnumerable<BattleSlot> GetActiveSlots()
         {
-            return _slots.Where(s => !s.IsEmpty && !s.HasFainted);
+            return _slots.Where(s => s.IsActive());
         }
 
         /// <summary>

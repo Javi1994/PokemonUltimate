@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Core.Constants;
 
 namespace PokemonUltimate.Combat
@@ -18,7 +19,6 @@ namespace PokemonUltimate.Combat
     /// </remarks>
     public class BattleQueue
     {
-        private const int MaxIterations = 1000;
 
         private readonly LinkedList<BattleAction> _queue;
 
@@ -113,7 +113,7 @@ namespace PokemonUltimate.Combat
 
             while (_queue.Count > 0)
             {
-                if (iterationCount++ > MaxIterations)
+                if (iterationCount++ > BattleConstants.MaxQueueIterations)
                 {
                     throw new InvalidOperationException(ErrorMessages.BattleQueueInfiniteLoop);
                 }

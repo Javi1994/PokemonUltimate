@@ -3,11 +3,12 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Content.Catalogs.Moves;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Moves;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Engine
 {
@@ -27,6 +28,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         private BattleSlot _enemySlot;
         private PokemonInstance _playerPokemon;
         private PokemonInstance _enemyPokemon;
+        private EndOfTurnProcessor _processor;
 
         [SetUp]
         public void SetUp()
@@ -40,6 +42,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             _enemySlot = _field.EnemySide.Slots[0];
             _playerPokemon = _playerSlot.Pokemon;
             _enemyPokemon = _enemySlot.Pokemon;
+
+            // Create processor instance with required dependencies
+            var damageContextFactory = new DamageContextFactory();
+            _processor = new EndOfTurnProcessor(damageContextFactory);
         }
 
         #region ProcessEffects Tests
@@ -54,7 +60,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamage = maxHP / 16; // 1/16 of Max HP
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Assert
             Assert.That(actions, Has.Count.GreaterThanOrEqualTo(1));
@@ -73,7 +79,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamage = maxHP / 8; // 1/8 of Max HP
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Assert
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
@@ -91,7 +97,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamageTurn1 = (1 * maxHP) / 16; // Counter 1
 
             // Act - Turn 1
-            var actions1 = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions1 = _processor.ProcessEffects(_field).ToList();
             var damageAction1 = actions1.OfType<DamageAction>().FirstOrDefault();
 
             // Assert - Turn 1
@@ -101,7 +107,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             // Act - Turn 2
             int expectedDamageTurn2 = (2 * maxHP) / 16; // Counter 2
-            var actions2 = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions2 = _processor.ProcessEffects(_field).ToList();
             var damageAction2 = actions2.OfType<DamageAction>().FirstOrDefault();
 
             // Assert - Turn 2
@@ -118,7 +124,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             _enemyPokemon.Status = PersistentStatus.Poison;
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Assert
             var damageActions = actions.OfType<DamageAction>().ToList();
@@ -135,7 +141,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             _enemyPokemon.Status = PersistentStatus.None;
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Assert
             Assert.That(actions, Is.Empty);
@@ -152,7 +158,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamage = _playerPokemon.MaxHP / 16;
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Assert
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
@@ -168,7 +174,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int expectedDamage = _playerPokemon.MaxHP / 8;
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Assert
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
@@ -184,7 +190,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             _playerPokemon.StatusTurnCounter = 1;
 
             // Act
-            EndOfTurnProcessor.ProcessEffects(_field);
+            _processor.ProcessEffects(_field);
 
             // Assert
             Assert.That(_playerPokemon.StatusTurnCounter, Is.EqualTo(2));
@@ -197,7 +203,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             _playerPokemon.Status = PersistentStatus.Burn;
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Assert
             var messageAction = actions.OfType<MessageAction>().FirstOrDefault();
@@ -212,7 +218,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             _playerPokemon.Status = PersistentStatus.Poison;
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Assert
             var messageAction = actions.OfType<MessageAction>().FirstOrDefault();

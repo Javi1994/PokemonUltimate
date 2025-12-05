@@ -4,11 +4,12 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Content.Catalogs.Field;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Field;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Engine
 {
@@ -26,6 +27,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         private BattleField _field;
         private BattleSlot _slot;
         private List<PokemonInstance> _party;
+        private EntryHazardProcessor _processor;
 
         [SetUp]
         public void SetUp()
@@ -38,6 +40,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             };
             _field.Initialize(rules, _party, new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) });
             _slot = _field.PlayerSide.Slots[0];
+
+            // Create processor instance with required dependencies
+            var damageContextFactory = new DamageContextFactory();
+            _processor = new EntryHazardProcessor(damageContextFactory);
         }
 
         #region Spikes Tests
@@ -53,7 +59,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int maxHP = pokemon.MaxHP;
             int expectedDamage = (int)(maxHP * 0.125f); // 12.5%
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
 
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
             Assert.That(damageAction, Is.Not.Null);
@@ -72,7 +78,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int maxHP = pokemon.MaxHP;
             int expectedDamage = (int)(maxHP * 0.25f); // 25% for 3 layers
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
 
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
             Assert.That(damageAction, Is.Not.Null);
@@ -87,7 +93,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var flyingPokemon = PokemonFactory.Create(PokemonCatalog.Charizard, 50); // Flying type
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, flyingPokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, flyingPokemon, _field, HazardCatalog.GetByType).ToList();
 
             // Flying types should not be affected by Spikes
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
@@ -108,7 +114,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int maxHP = pokemon.MaxHP;
             int expectedDamage = (int)(maxHP * 0.125f); // 12.5% base
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
 
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
             Assert.That(damageAction, Is.Not.Null);
@@ -125,7 +131,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             int maxHP = flyingPokemon.MaxHP;
             int expectedDamage = (int)(maxHP * 0.5f); // 50% (4x effectiveness: 2x * 2x)
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, flyingPokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, flyingPokemon, _field, HazardCatalog.GetByType).ToList();
 
             // Flying types ARE affected by Stealth Rock (and Fire/Flying gets 4x damage)
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
@@ -145,7 +151,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var pokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
 
             var statusAction = actions.OfType<ApplyStatusAction>().FirstOrDefault();
             Assert.That(statusAction, Is.Not.Null);
@@ -161,7 +167,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var pokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
 
             var statusAction = actions.OfType<ApplyStatusAction>().FirstOrDefault();
             Assert.That(statusAction, Is.Not.Null);
@@ -176,12 +182,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var poisonPokemon = PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50); // Grass/Poison type
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, poisonPokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, poisonPokemon, _field, HazardCatalog.GetByType).ToList();
 
             // Poison types absorb Toxic Spikes (no status applied, spikes removed)
             var statusAction = actions.OfType<ApplyStatusAction>().FirstOrDefault();
             Assert.That(statusAction, Is.Null);
-            
+
             // Spikes should be removed
             Assert.That(_field.EnemySide.HasHazard(HazardType.ToxicSpikes), Is.False);
         }
@@ -194,7 +200,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var flyingPokemon = PokemonFactory.Create(PokemonCatalog.Charizard, 50); // Flying type
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, flyingPokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, flyingPokemon, _field, HazardCatalog.GetByType).ToList();
 
             // Flying types should not be affected by Toxic Spikes
             var statusAction = actions.OfType<ApplyStatusAction>().FirstOrDefault();
@@ -213,7 +219,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var pokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
 
             var statChangeAction = actions.OfType<StatChangeAction>().FirstOrDefault();
             Assert.That(statChangeAction, Is.Not.Null);
@@ -229,7 +235,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var flyingPokemon = PokemonFactory.Create(PokemonCatalog.Charizard, 50); // Flying type
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, flyingPokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, flyingPokemon, _field, HazardCatalog.GetByType).ToList();
 
             // Flying types should not be affected by Sticky Web
             var statChangeAction = actions.OfType<StatChangeAction>().FirstOrDefault();
@@ -253,7 +259,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var pokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
 
             // Should have damage from Spikes and Stealth Rock, and Speed reduction from Sticky Web
             var damageActions = actions.OfType<DamageAction>().ToList();
@@ -275,7 +281,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
 
             var pokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
 
-            var actions = EntryHazardProcessor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
+            var actions = _processor.ProcessHazards(_slot, pokemon, _field, HazardCatalog.GetByType).ToList();
 
             Assert.That(actions.Count, Is.EqualTo(0));
         }

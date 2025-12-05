@@ -1,12 +1,13 @@
 using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Content.Catalogs.Weather;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Content.Catalogs.Weather;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Helpers
 {
@@ -24,6 +25,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
         private BattleField _field;
         private BattleSlot _userSlot;
         private BattleSlot _targetSlot;
+        private AccuracyChecker _accuracyChecker;
 
         [SetUp]
         public void SetUp()
@@ -37,6 +39,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
 
             _userSlot = _field.PlayerSide.Slots[0];
             _targetSlot = _field.EnemySide.Slots[0];
+
+            // Create accuracy checker instance with random provider
+            var randomProvider = new RandomProvider(42);
+            _accuracyChecker = new AccuracyChecker(randomProvider);
         }
 
         #region Rain Perfect Accuracy Tests
@@ -61,7 +67,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             // Test with multiple random values to ensure it always hits
             for (int i = 0; i < 10; i++)
             {
-                bool hit = AccuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 99.9f);
+                bool hit = _accuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 99.9f);
                 Assert.That(hit, Is.True, $"Thunder should always hit in Rain (test {i + 1})");
             }
         }
@@ -85,7 +91,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             // Hurricane should have 100% accuracy in Rain
             for (int i = 0; i < 10; i++)
             {
-                bool hit = AccuracyChecker.CheckHit(_userSlot, _targetSlot, hurricane, _field, fixedRandomValue: 99.9f);
+                bool hit = _accuracyChecker.CheckHit(_userSlot, _targetSlot, hurricane, _field, fixedRandomValue: 99.9f);
                 Assert.That(hit, Is.True, $"Hurricane should always hit in Rain (test {i + 1})");
             }
         }
@@ -107,7 +113,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             };
 
             // Tackle should use normal accuracy (100%)
-            bool hit = AccuracyChecker.CheckHit(_userSlot, _targetSlot, tackle, _field, fixedRandomValue: 50f);
+            bool hit = _accuracyChecker.CheckHit(_userSlot, _targetSlot, tackle, _field, fixedRandomValue: 50f);
             Assert.That(hit, Is.True);
         }
 
@@ -134,7 +140,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             // Blizzard should have 100% accuracy in Hail
             for (int i = 0; i < 10; i++)
             {
-                bool hit = AccuracyChecker.CheckHit(_userSlot, _targetSlot, blizzard, _field, fixedRandomValue: 99.9f);
+                bool hit = _accuracyChecker.CheckHit(_userSlot, _targetSlot, blizzard, _field, fixedRandomValue: 99.9f);
                 Assert.That(hit, Is.True, $"Blizzard should always hit in Hail (test {i + 1})");
             }
         }
@@ -161,11 +167,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
 
             // Without weather, Thunder should use normal accuracy (70%)
             // With fixedRandomValue 50%, should hit (50 < 70)
-            bool hit = AccuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 50f);
+            bool hit = _accuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 50f);
             Assert.That(hit, Is.True);
 
             // With fixedRandomValue 80%, should miss (80 >= 70)
-            bool miss = AccuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 80f);
+            bool miss = _accuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 80f);
             Assert.That(miss, Is.False);
         }
 
@@ -192,10 +198,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             // In Sun, Thunder uses normal accuracy (70%)
             // Note: Thunder accuracy reduction in Sun (50%) is not yet implemented
             // This test verifies normal accuracy behavior
-            bool hit = AccuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 50f);
+            bool hit = _accuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 50f);
             Assert.That(hit, Is.True);
 
-            bool miss = AccuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 80f);
+            bool miss = _accuracyChecker.CheckHit(_userSlot, _targetSlot, thunder, _field, fixedRandomValue: 80f);
             Assert.That(miss, Is.False);
         }
 

@@ -1,4 +1,6 @@
 using System;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Core.Constants;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {
@@ -16,7 +18,17 @@ namespace PokemonUltimate.Combat.Damage.Steps
         private const float MinFactor = 0.85f;
         private const float MaxFactor = 1.0f;
 
-        private static readonly Random _random = new Random();
+        private readonly IRandomProvider _randomProvider;
+
+        /// <summary>
+        /// Creates a new RandomFactorStep with a random provider.
+        /// </summary>
+        /// <param name="randomProvider">The random provider for generating random factors. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">If randomProvider is null.</exception>
+        public RandomFactorStep(IRandomProvider randomProvider)
+        {
+            _randomProvider = randomProvider ?? throw new ArgumentNullException(nameof(randomProvider), ErrorMessages.PokemonCannotBeNull);
+        }
 
         public void Process(DamageContext context)
         {
@@ -30,7 +42,7 @@ namespace PokemonUltimate.Combat.Damage.Steps
             else
             {
                 // Generate random factor between 0.85 and 1.0
-                randomFactor = MinFactor + ((float)_random.NextDouble() * (MaxFactor - MinFactor));
+                randomFactor = MinFactor + (_randomProvider.NextFloat() * (MaxFactor - MinFactor));
             }
 
             context.RandomFactor = randomFactor;

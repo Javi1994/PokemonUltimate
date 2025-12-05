@@ -6,9 +6,9 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Tests.Systems.Combat.Engine;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
@@ -26,7 +26,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
         [SetUp]
         public void SetUp()
         {
-            _engine = new CombatEngine();
+            _engine = CombatEngineTestHelper.CreateCombatEngine();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             _mockView = new MockBattleViewForIntegration();
         }
@@ -39,7 +39,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             // Arrange
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             var playerProvider = new PlayerInputProvider(_mockView);
             var enemyProvider = new TestActionProvider(new MessageAction("Pass"));
 
@@ -69,7 +69,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
                 PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
             };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             var playerProvider = new PlayerInputProvider(_mockView);
             var enemyProvider = new TestActionProvider(new MessageAction("Pass"));
 
@@ -94,7 +94,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             // Arrange
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             var playerProvider = new PlayerInputProvider(_mockView);
             var enemyProvider = new TestActionProvider(new MessageAction("Pass"));
 
@@ -121,7 +121,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             // Arrange
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             var playerProvider = new PlayerInputProvider(_mockView);
             var enemyProvider = new TestActionProvider(new MessageAction("Pass"));
 
@@ -143,7 +143,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             // Arrange
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             var playerProvider = new PlayerInputProvider(_mockView);
             var enemyProvider = new TestActionProvider(new MessageAction("Pass"));
 

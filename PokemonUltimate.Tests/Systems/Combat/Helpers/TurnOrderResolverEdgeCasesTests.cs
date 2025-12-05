@@ -5,10 +5,11 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Helpers
 {
@@ -19,6 +20,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
     public class TurnOrderResolverEdgeCasesTests
     {
         private BattleField _field;
+        private TurnOrderResolver _resolver;
 
         [SetUp]
         public void SetUp()
@@ -33,6 +35,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
                 PokemonFactory.Create(PokemonCatalog.Snorlax, 50)
             };
             _field.Initialize(BattleRules.Singles, playerParty, enemyParty);
+
+            // Create resolver instance with random provider
+            var randomProvider = new RandomProvider(42); // Fixed seed for reproducible tests
+            _resolver = new TurnOrderResolver(randomProvider);
         }
 
         #region Stat Stage Edge Cases
@@ -42,11 +48,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
         {
             var slot = _field.PlayerSide.Slots[0];
             var baseSpeed = slot.Pokemon.Speed;
-            
+
             // Try to go beyond +6 (should be clamped)
             slot.ModifyStatStage(Stat.Speed, 10); // Would be +10, clamped to +6
 
-            var effectiveSpeed = TurnOrderResolver.GetEffectiveSpeed(slot, _field);
+            var effectiveSpeed = _resolver.GetEffectiveSpeed(slot, _field);
 
             // +6 stages = 4x
             Assert.That(effectiveSpeed, Is.EqualTo(baseSpeed * 4.0f).Within(0.1f));
@@ -57,11 +63,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
         {
             var slot = _field.PlayerSide.Slots[0];
             var baseSpeed = slot.Pokemon.Speed;
-            
+
             // Try to go beyond -6 (should be clamped)
             slot.ModifyStatStage(Stat.Speed, -10); // Would be -10, clamped to -6
 
-            var effectiveSpeed = TurnOrderResolver.GetEffectiveSpeed(slot, _field);
+            var effectiveSpeed = _resolver.GetEffectiveSpeed(slot, _field);
 
             // -6 stages = 0.25x
             Assert.That(effectiveSpeed, Is.EqualTo(baseSpeed * 0.25f).Within(0.1f));
@@ -73,7 +79,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var slot = _field.PlayerSide.Slots[0];
             var baseSpeed = slot.Pokemon.Speed;
 
-            var effectiveSpeed = TurnOrderResolver.GetEffectiveSpeed(slot, _field);
+            var effectiveSpeed = _resolver.GetEffectiveSpeed(slot, _field);
 
             Assert.That(effectiveSpeed, Is.EqualTo(baseSpeed).Within(0.1f));
         }
@@ -91,7 +97,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var baseSpeed = slot.Pokemon.Speed;
             slot.ModifyStatStage(Stat.Speed, stages);
 
-            var effectiveSpeed = TurnOrderResolver.GetEffectiveSpeed(slot, _field);
+            var effectiveSpeed = _resolver.GetEffectiveSpeed(slot, _field);
 
             Assert.That(effectiveSpeed, Is.EqualTo(baseSpeed * expectedMultiplier).Within(0.1f));
         }
@@ -109,7 +115,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var baseSpeed = slot.Pokemon.Speed;
             slot.ModifyStatStage(Stat.Speed, stages);
 
-            var effectiveSpeed = TurnOrderResolver.GetEffectiveSpeed(slot, _field);
+            var effectiveSpeed = _resolver.GetEffectiveSpeed(slot, _field);
 
             // Use 1% tolerance for floating point comparison
             var expected = baseSpeed * expectedMultiplier;
@@ -133,7 +139,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var extremeAction = new TestAction(_field.EnemySide.Slots[0], priority: extremePriority);
             var actions = new List<BattleAction> { normalAction, extremeAction };
 
-            var sorted = TurnOrderResolver.SortActions(actions, _field);
+            var sorted = _resolver.SortActions(actions, _field);
 
             if (extremePriority > 0)
                 Assert.That(sorted[0], Is.SameAs(extremeAction));
@@ -150,7 +156,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var field = new BattleField();
             var p1 = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
             var p2 = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
-            field.Initialize(BattleRules.Singles, 
+            field.Initialize(BattleRules.Singles,
                 new List<PokemonInstance> { p1 },
                 new List<PokemonInstance> { p2 });
 
@@ -160,9 +166,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             // Run multiple times - should always complete without error
             for (int i = 0; i < 50; i++)
             {
-                var sorted = TurnOrderResolver.SortActions(
+                var resolver = new TurnOrderResolver(new RandomProvider(42));
+                var sorted = resolver.SortActions(
                     new List<BattleAction> { action1, action2 }, field);
-                
+
                 Assert.That(sorted.Count, Is.EqualTo(2));
                 Assert.That(sorted, Contains.Item(action1));
                 Assert.That(sorted, Contains.Item(action2));
@@ -181,7 +188,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var actions = new List<BattleAction> { normalAction, nullUserAction };
 
             // Should not throw
-            var sorted = TurnOrderResolver.SortActions(actions, _field);
+            var sorted = _resolver.SortActions(actions, _field);
 
             Assert.That(sorted.Count, Is.EqualTo(2));
         }
@@ -191,7 +198,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
         {
             var emptySlot = new BattleSlot(0);
 
-            var speed = TurnOrderResolver.GetEffectiveSpeed(emptySlot, _field);
+            var speed = _resolver.GetEffectiveSpeed(emptySlot, _field);
 
             Assert.That(speed, Is.EqualTo(0));
         }
@@ -206,14 +213,14 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var field = new BattleField();
             var playerParty = new List<PokemonInstance>();
             var enemyParty = new List<PokemonInstance>();
-            
+
             for (int i = 0; i < 3; i++)
             {
                 playerParty.Add(PokemonFactory.Create(PokemonCatalog.Pikachu, 50));
                 enemyParty.Add(PokemonFactory.Create(PokemonCatalog.Snorlax, 50));
             }
-            
-            field.Initialize(new BattleRules { PlayerSlots = 3, EnemySlots = 3 }, 
+
+            field.Initialize(new BattleRules { PlayerSlots = 3, EnemySlots = 3 },
                 playerParty, enemyParty);
 
             var actions = new List<BattleAction>();
@@ -223,14 +230,15 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
                 actions.Add(new TestAction(field.EnemySide.Slots[i], priority: i - 1));
             }
 
-            var sorted = TurnOrderResolver.SortActions(actions, field);
+            var resolver = new TurnOrderResolver(new RandomProvider(42));
+            var sorted = resolver.SortActions(actions, field);
 
             Assert.That(sorted.Count, Is.EqualTo(6));
-            
+
             // First two should be priority +1
             Assert.That(sorted[0].Priority, Is.EqualTo(1));
             Assert.That(sorted[1].Priority, Is.EqualTo(1));
-            
+
             // Last two should be priority -1
             Assert.That(sorted[4].Priority, Is.EqualTo(-1));
             Assert.That(sorted[5].Priority, Is.EqualTo(-1));
@@ -247,20 +255,21 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var field = new BattleField();
             var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
             var charmander = PokemonFactory.Create(PokemonCatalog.Charmander, 50);
-            
+
             field.Initialize(BattleRules.Singles,
                 new List<PokemonInstance> { pikachu },
                 new List<PokemonInstance> { charmander });
-            
+
             // Paralyze Pikachu (90 * 0.5 = 45 effective speed)
             pikachu.Status = PersistentStatus.Paralysis;
-            
+
             // Charmander has 65 speed, should be faster now
 
             var pikachuAction = new TestAction(field.PlayerSide.Slots[0], priority: 0);
             var charmanderAction = new TestAction(field.EnemySide.Slots[0], priority: 0);
 
-            var sorted = TurnOrderResolver.SortActions(
+            var resolver = new TurnOrderResolver(new RandomProvider(42));
+            var sorted = resolver.SortActions(
                 new List<BattleAction> { pikachuAction, charmanderAction }, field);
 
             // Charmander (65) should beat paralyzed Pikachu (45)
@@ -274,11 +283,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var field = new BattleField();
             var pikachu = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
             var snorlax = PokemonFactory.Create(PokemonCatalog.Snorlax, 50);
-            
+
             field.Initialize(BattleRules.Singles,
                 new List<PokemonInstance> { pikachu },
                 new List<PokemonInstance> { snorlax });
-            
+
             // Snorlax gets +4 speed stages (30 * 3.0 = 90)
             field.EnemySide.Slots[0].ModifyStatStage(Stat.Speed, 4);
 
@@ -286,8 +295,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Helpers
             var snorlaxAction = new TestAction(field.EnemySide.Slots[0], priority: 0);
 
             // Both should have similar speeds now (90 vs 90)
-            var pikachuSpeed = TurnOrderResolver.GetEffectiveSpeed(field.PlayerSide.Slots[0], field);
-            var snorlaxSpeed = TurnOrderResolver.GetEffectiveSpeed(field.EnemySide.Slots[0], field);
+            var resolver = new TurnOrderResolver(new RandomProvider(42));
+            var pikachuSpeed = resolver.GetEffectiveSpeed(field.PlayerSide.Slots[0], field);
+            var snorlaxSpeed = resolver.GetEffectiveSpeed(field.EnemySide.Slots[0], field);
 
             // Snorlax with +4 should be close to Pikachu's speed
             Assert.That(snorlaxSpeed, Is.GreaterThan(80)); // 30 * 3.0 = 90

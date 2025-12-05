@@ -2,12 +2,13 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Steps;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Content.Catalogs.Weather;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Content.Catalogs.Weather;
 using Steps = PokemonUltimate.Combat.Damage.Steps;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Damage
@@ -30,10 +31,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
         private PokemonInstance _attacker;
         private PokemonInstance _defender;
 
+        private IRandomProvider _randomProvider;
+
         [SetUp]
         public void SetUp()
         {
-            _pipeline = new DamagePipeline();
+            _randomProvider = new RandomProvider(42);
+            _pipeline = new DamagePipeline(_randomProvider);
             _field = new BattleField();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             _field.Initialize(
@@ -67,7 +71,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
 
             // Calculate with weather
             var contextWithWeather = _pipeline.Calculate(_attackerSlot, _defenderSlot, move, _field, fixedRandomValue: 1.0f);
-            
+
             // Calculate without weather (clear weather)
             _field.ClearWeather();
             var contextWithoutWeather = _pipeline.Calculate(_attackerSlot, _defenderSlot, move, _field, fixedRandomValue: 1.0f);
@@ -123,8 +127,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
             var contextWithoutWeather = new DamagePipeline(new IDamageStep[]
             {
                 new Steps.BaseDamageStep(),
-                new Steps.CriticalHitStep(),
-                new Steps.RandomFactorStep(),
+                new Steps.CriticalHitStep(_randomProvider),
+                new Steps.RandomFactorStep(_randomProvider),
                 new Steps.StabStep(),
                 new Steps.AttackerAbilityStep(),
                 new Steps.AttackerItemStep(),
@@ -159,7 +163,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
 
             // Calculate with weather
             var contextWithWeather = _pipeline.Calculate(_attackerSlot, _defenderSlot, move, _field, fixedRandomValue: 1.0f);
-            
+
             // Calculate without weather (clear weather)
             _field.ClearWeather();
             var contextWithoutWeather = _pipeline.Calculate(_attackerSlot, _defenderSlot, move, _field, fixedRandomValue: 1.0f);
@@ -218,8 +222,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
             var contextWithoutWeather = new DamagePipeline(new IDamageStep[]
             {
                 new Steps.BaseDamageStep(),
-                new Steps.CriticalHitStep(),
-                new Steps.RandomFactorStep(),
+                new Steps.CriticalHitStep(_randomProvider),
+                new Steps.RandomFactorStep(_randomProvider),
                 new Steps.StabStep(),
                 new Steps.AttackerAbilityStep(),
                 new Steps.AttackerItemStep(),
@@ -256,8 +260,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
             var contextWithoutWeather = new DamagePipeline(new IDamageStep[]
             {
                 new Steps.BaseDamageStep(),
-                new Steps.CriticalHitStep(),
-                new Steps.RandomFactorStep(),
+                new Steps.CriticalHitStep(_randomProvider),
+                new Steps.RandomFactorStep(_randomProvider),
                 new Steps.StabStep(),
                 new Steps.AttackerAbilityStep(),
                 new Steps.AttackerItemStep(),
@@ -290,7 +294,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
 
             // Calculate with weather
             var contextWithWeather = _pipeline.Calculate(_attackerSlot, _defenderSlot, move, _field, fixedRandomValue: 1.0f);
-            
+
             // Calculate without weather
             _field.ClearWeather();
             var contextWithoutWeather = _pipeline.Calculate(_attackerSlot, _defenderSlot, move, _field, fixedRandomValue: 1.0f);
@@ -299,9 +303,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
             // WeatherStep should multiply by 0, making multiplier 0
             // The multiplier with weather should be 0 (or very close to 0 due to floating point)
             Assert.That(contextWithWeather.Multiplier, Is.EqualTo(0f).Within(0.001f));
-            
+
             // FinalDamage has a minimum of 1, but when multiplier is 0, it should still be 0
-            // However, DamageContext applies Math.Max(1, BaseDamage * Multiplier), so if multiplier is 0, 
+            // However, DamageContext applies Math.Max(1, BaseDamage * Multiplier), so if multiplier is 0,
             // BaseDamage * 0 = 0, and Math.Max(1, 0) = 1. This is a limitation of the current implementation.
             // For now, we verify that the multiplier is 0, which is what WeatherStep should do.
             Assert.That(contextWithWeather.Multiplier, Is.LessThan(contextWithoutWeather.Multiplier));

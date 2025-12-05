@@ -57,6 +57,12 @@ namespace PokemonUltimate.Core.Enums
         SwitchingOut = 4096,
 
         /// <summary>Pokemon is tightening focus for Focus Punch.</summary>
-        Focusing = 8192
+        Focusing = 8192,
+
+        /// <summary>Redirects all single-target moves to this Pokemon (Follow Me).</summary>
+        FollowMe = 16384,
+
+        /// <summary>Redirects all single-target moves to this Pokemon (Rage Powder).</summary>
+        RagePowder = 32768
     }
 }

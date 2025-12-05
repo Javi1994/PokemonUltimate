@@ -3,9 +3,10 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Tests.Systems.Combat.Engine;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
 {
@@ -22,7 +23,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
         [SetUp]
         public void SetUp()
         {
-            _engine = new CombatEngine();
+            _engine = CombatEngineTestHelper.CreateCombatEngine();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             _view = new NullBattleView();
         }
@@ -133,7 +134,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             bool playerUsedMoves = playerPokemon.Moves.Any(m => m.CurrentPP < m.MaxPP);
             bool enemyUsedMoves = enemyPokemon.Moves.Any(m => m.CurrentPP < m.MaxPP);
 
-            Assert.That(playerUsedMoves || enemyUsedMoves, Is.True, 
+            Assert.That(playerUsedMoves || enemyUsedMoves, Is.True,
                 "At least one Pokemon should have used moves during battle");
         }
 
@@ -160,11 +161,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             Assert.That(result, Is.Not.Null);
             // Note: Battle may end as Ongoing if no active slots remain, but should complete
             Assert.That(result.TurnsTaken, Is.GreaterThan(0));
-            
+
             // At least one Pokemon should have fainted
             bool playerHasFainted = playerParty.Any(p => p.IsFainted);
             bool enemyHasFainted = enemyParty.Any(p => p.IsFainted);
-            Assert.That(playerHasFainted || enemyHasFainted, Is.True, 
+            Assert.That(playerHasFainted || enemyHasFainted, Is.True,
                 "At least one Pokemon should have fainted during battle");
         }
 

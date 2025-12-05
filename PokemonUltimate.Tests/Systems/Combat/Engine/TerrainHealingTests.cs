@@ -4,11 +4,12 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Content.Catalogs.Terrain;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Content.Catalogs.Terrain;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Engine
 {
@@ -27,13 +28,14 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         private List<PokemonInstance> _playerParty;
         private List<PokemonInstance> _enemyParty;
         private BattleRules _rules;
+        private EndOfTurnProcessor _processor;
 
         [SetUp]
         public void SetUp()
         {
             _field = new BattleField();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
-            
+
             _playerParty = new List<PokemonInstance>
             {
                 PokemonFactory.Create(PokemonCatalog.Pikachu, 50) // Grounded Pokemon
@@ -45,6 +47,10 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             };
 
             _field.Initialize(_rules, _playerParty, _enemyParty);
+
+            // Create processor instance with required dependencies
+            var damageContextFactory = new DamageContextFactory();
+            _processor = new EndOfTurnProcessor(damageContextFactory);
         }
 
         #region Grassy Terrain Healing Tests
@@ -62,12 +68,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             // Damage the Pokemon first
             pokemon.TakeDamage(maxHP / 2);
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Grassy Terrain should heal grounded Pokemon by 1/16 max HP
             var healAction = actions.OfType<HealAction>()
                 .FirstOrDefault(a => a.Target == slot);
-            
+
             Assert.That(healAction, Is.Not.Null);
             Assert.That(healAction.Amount, Is.EqualTo(expectedHealing));
         }
@@ -89,12 +95,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             // Damage the Pokemon first
             pokemon.TakeDamage(maxHP / 2);
 
-            var actions = EndOfTurnProcessor.ProcessEffects(field).ToList();
+            var processor = new EndOfTurnProcessor(new DamageContextFactory());
+            var actions = processor.ProcessEffects(field).ToList();
 
             // Flying types should not be healed by Grassy Terrain (not grounded)
             var healAction = actions.OfType<HealAction>()
                 .FirstOrDefault(a => a.Target == slot);
-            
+
             Assert.That(healAction, Is.Null);
         }
 
@@ -102,22 +109,22 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         public void ProcessTerrainHealing_GrassyTerrain_HealsAllGroundedPokemon()
         {
             _field.SetTerrain(Terrain.Grassy, 5, TerrainCatalog.GetByTerrain(Terrain.Grassy));
-            
+
             var playerSlot = _field.PlayerSide.Slots[0];
             var enemySlot = _field.EnemySide.Slots[0];
-            
+
             // Damage both Pokemon
             playerSlot.Pokemon.TakeDamage(playerSlot.Pokemon.MaxHP / 2);
             enemySlot.Pokemon.TakeDamage(enemySlot.Pokemon.MaxHP / 2);
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Both grounded Pokemon should be healed
             var playerHealAction = actions.OfType<HealAction>()
                 .FirstOrDefault(a => a.Target == playerSlot);
             var enemyHealAction = actions.OfType<HealAction>()
                 .FirstOrDefault(a => a.Target == enemySlot);
-            
+
             Assert.That(playerHealAction, Is.Not.Null);
             Assert.That(enemyHealAction, Is.Not.Null);
         }
@@ -132,12 +139,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             // Faint the Pokemon
             pokemon.TakeDamage(pokemon.MaxHP);
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Fainted Pokemon should not be healed
             var healAction = actions.OfType<HealAction>()
                 .FirstOrDefault(a => a.Target == slot);
-            
+
             Assert.That(healAction, Is.Null);
         }
 
@@ -151,12 +158,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             // Ensure Pokemon is at full HP
             pokemon.Heal(pokemon.MaxHP);
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Pokemon at full HP should not be healed (or healing should be 0)
             var healAction = actions.OfType<HealAction>()
                 .FirstOrDefault(a => a.Target == slot);
-            
+
             // Healing can still be generated, but amount should be 0 or action should not exist
             if (healAction != null)
             {
@@ -178,12 +185,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             // Damage the Pokemon
             pokemon.TakeDamage(pokemon.MaxHP / 2);
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // Electric Terrain does not heal
             var healAction = actions.OfType<HealAction>()
                 .FirstOrDefault(a => a.Target == slot);
-            
+
             Assert.That(healAction, Is.Null);
         }
 
@@ -197,12 +204,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             // Damage the Pokemon
             pokemon.TakeDamage(pokemon.MaxHP / 2);
 
-            var actions = EndOfTurnProcessor.ProcessEffects(_field).ToList();
+            var actions = _processor.ProcessEffects(_field).ToList();
 
             // No terrain should mean no healing
             var healAction = actions.OfType<HealAction>()
                 .FirstOrDefault(a => a.Target == slot);
-            
+
             Assert.That(healAction, Is.Null);
         }
 

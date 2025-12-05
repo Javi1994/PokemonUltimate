@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Instances;
@@ -48,7 +49,7 @@ namespace PokemonUltimate.Combat.Providers
                 throw new ArgumentNullException(nameof(mySlot), ErrorMessages.PokemonCannotBeNull);
 
             // Can't act if slot is empty or Pokemon is fainted
-            if (mySlot.IsEmpty || mySlot.HasFainted)
+            if (!mySlot.IsActive())
                 return null;
 
             // 1. Show action menu (Fight/Switch/Item/Run)
@@ -92,7 +93,8 @@ namespace PokemonUltimate.Combat.Providers
                 return null; // Player cancelled
 
             // 3. Get valid targets
-            var validTargets = TargetResolver.GetValidTargets(mySlot, moveInstance.Move, field);
+            var targetResolver = new TargetResolver();
+            var validTargets = targetResolver.GetValidTargets(mySlot, moveInstance.Move, field);
             if (validTargets.Count == 0)
                 return null; // No valid targets
 

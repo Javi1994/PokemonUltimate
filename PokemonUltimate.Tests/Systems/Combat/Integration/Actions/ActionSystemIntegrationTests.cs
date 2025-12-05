@@ -5,13 +5,13 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Content.Catalogs.Moves;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Moves;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
 {
@@ -261,7 +261,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
             int initialHP = _enemyPokemon.CurrentHP;
 
             // Act - Process end-of-turn effects
-            var endOfTurnActions = EndOfTurnProcessor.ProcessEffects(_field);
+            var processor = new EndOfTurnProcessor(new PokemonUltimate.Combat.Factories.DamageContextFactory());
+            var endOfTurnActions = processor.ProcessEffects(_field);
 
             // Assert
             Assert.That(endOfTurnActions, Is.Not.Empty);

@@ -13,11 +13,14 @@ Abilities & Items implements an event-driven system for ability and item trigger
 - **BattleTrigger**: Event types (OnSwitchIn, OnTurnEnd, etc.)
 - **AbilityListener**: Ability trigger handling
 - **ItemListener**: Item trigger handling
-- **BattleTriggerProcessor**: Coordinates trigger processing
+- **BattleTriggerProcessor**: Coordinates trigger processing (instance-based with DI, post-refactor)
+- **IBattleTriggerProcessor**: Processor interface for dependency injection
+- **IBattleEventBus**: Event bus interface for decoupled communication (post-refactor)
+- **BattleEventBus**: Event bus implementation (post-refactor)
 
 ## Current Status
 
-- ✅ **Implemented**: Event-driven system with basic triggers
+- ✅ **Implemented**: Event-driven system with basic triggers (refactored to instance-based with DI and Event Bus, 2024-12-05)
 - ✅ **Tested**: Comprehensive test coverage
 
 ## Documentation
@@ -42,5 +45,5 @@ Abilities & Items implements an event-driven system for ability and item trigger
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: January 2025 (Post-Refactoring: 2024-12-05)
 

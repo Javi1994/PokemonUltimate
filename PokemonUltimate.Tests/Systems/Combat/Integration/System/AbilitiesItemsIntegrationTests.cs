@@ -4,13 +4,13 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Events;
-using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Content.Builders;
+using PokemonUltimate.Content.Catalogs.Items;
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Items;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Tests.Systems.Combat.Engine;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
@@ -28,7 +28,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
         [SetUp]
         public void SetUp()
         {
-            _engine = new CombatEngine();
+            _engine = CombatEngineTestHelper.CreateCombatEngine();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             _view = new NullBattleView();
         }
@@ -136,9 +136,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
             int burnDamage = maxHP / 16; // 1/16 damage
             int leftoversHeal = maxHP / 16; // 1/16 heal
             int netChange = leftoversHeal - burnDamage; // Should be 0 or close to it
-            
+
             // HP should change by net effect (heal - damage)
-            Assert.That(finalHP, Is.EqualTo(initialHP + netChange), 
+            Assert.That(finalHP, Is.EqualTo(initialHP + netChange),
                 $"Net change should be {netChange} (heal {leftoversHeal} - damage {burnDamage})");
         }
 

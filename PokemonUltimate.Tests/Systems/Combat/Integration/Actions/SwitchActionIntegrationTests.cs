@@ -4,10 +4,10 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Tests.Systems.Combat.Engine;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
@@ -40,17 +40,17 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
         public async Task CombatEngine_SwitchAction_ExecutesInBattleFlow()
         {
             // Arrange
-            var engine = new CombatEngine();
+            var engine = CombatEngineTestHelper.CreateCombatEngine();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             var view = new NullBattleView();
-            
+
             var playerParty = new[]
             {
                 PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
                 PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
             };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             engine.Initialize(rules, playerParty, enemyParty,
                 new TestActionProvider(new MessageAction("Pass")),
                 new TestActionProvider(new MessageAction("Pass")),
@@ -76,17 +76,17 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
         public async Task CombatEngine_SwitchAction_HighestPriority_GoesFirst()
         {
             // Arrange
-            var engine = new CombatEngine();
+            var engine = CombatEngineTestHelper.CreateCombatEngine();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             var view = new NullBattleView();
-            
+
             var playerParty = new[]
             {
                 PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
                 PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
             };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             engine.Initialize(rules, playerParty, enemyParty,
                 new TestActionProvider(new MessageAction("Pass")),
                 new TestActionProvider(new MessageAction("Pass")),
@@ -94,7 +94,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
 
             var playerSlot = engine.Field.PlayerSide.Slots[0];
             var enemySlot = engine.Field.EnemySide.Slots[0];
-            
+
             var newPokemon = playerParty[1];
             var switchAction = new SwitchAction(playerSlot, newPokemon);
             var useMoveAction = new UseMoveAction(
@@ -118,29 +118,29 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
         public async Task CombatEngine_SwitchAction_ResetsBattleState_ForNewPokemon()
         {
             // Arrange
-            var engine = new CombatEngine();
+            var engine = CombatEngineTestHelper.CreateCombatEngine();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             var view = new NullBattleView();
-            
+
             var playerParty = new[]
             {
                 PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
                 PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
             };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             engine.Initialize(rules, playerParty, enemyParty,
                 new TestActionProvider(new MessageAction("Pass")),
                 new TestActionProvider(new MessageAction("Pass")),
                 view);
 
             var slot = engine.Field.PlayerSide.Slots[0];
-            
+
             // Modify stat stages before switch
             slot.ModifyStatStage(Stat.Attack, 2);
             slot.ModifyStatStage(Stat.Speed, -1);
             slot.Pokemon.VolatileStatus = VolatileStatus.Flinch;
-            
+
             var newPokemon = playerParty[1];
             var switchAction = new SwitchAction(slot, newPokemon);
             slot.ActionProvider = new TestActionProvider(switchAction);
@@ -158,17 +158,17 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
         public async Task CombatEngine_SwitchAction_ThenUseMoveAction_NewPokemonActs()
         {
             // Arrange
-            var engine = new CombatEngine();
+            var engine = CombatEngineTestHelper.CreateCombatEngine();
             var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             var view = new NullBattleView();
-            
+
             var playerParty = new[]
             {
                 PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
                 PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
             };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             engine.Initialize(rules, playerParty, enemyParty,
                 new TestActionProvider(new MessageAction("Pass")),
                 new TestActionProvider(new MessageAction("Pass")),
@@ -176,15 +176,15 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
 
             var playerSlot = engine.Field.PlayerSide.Slots[0];
             var enemySlot = engine.Field.EnemySide.Slots[0];
-            
+
             var newPokemon = playerParty[1];
             var switchAction = new SwitchAction(playerSlot, newPokemon);
-            
+
             // First turn: Switch
             playerSlot.ActionProvider = new TestActionProvider(switchAction);
             enemySlot.ActionProvider = new TestActionProvider(new MessageAction("Pass"));
             await engine.RunTurn();
-            
+
             // Verify switch happened
             Assert.That(playerSlot.Pokemon, Is.EqualTo(newPokemon));
 
@@ -193,7 +193,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
             var useMoveAction = new UseMoveAction(playerSlot, enemySlot, moveInstance);
             playerSlot.ActionProvider = new TestActionProvider(useMoveAction);
             enemySlot.ActionProvider = new TestActionProvider(new MessageAction("Pass"));
-            
+
             int initialEnemyHP = enemySlot.Pokemon.CurrentHP;
 
             // Act - New Pokemon uses move

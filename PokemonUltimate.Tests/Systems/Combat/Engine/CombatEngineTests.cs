@@ -5,9 +5,13 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 using static PokemonUltimate.Tests.Systems.Combat.Engine.TestActionProvider;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Engine
@@ -30,10 +34,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         [SetUp]
         public void SetUp()
         {
-            _engine = new CombatEngine();
+            _engine = CombatEngineTestHelper.CreateCombatEngine();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             _view = new NullBattleView();
         }
+
 
         [Test]
         public void Initialize_SetsUpFieldCorrectly()

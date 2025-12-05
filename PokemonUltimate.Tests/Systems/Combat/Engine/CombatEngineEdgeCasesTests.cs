@@ -3,9 +3,10 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Tests.Systems.Combat.Engine;
 using static PokemonUltimate.Tests.Systems.Combat.Engine.TestActionProvider;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Engine
@@ -23,7 +24,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
         [SetUp]
         public void SetUp()
         {
-            _engine = new CombatEngine();
+            _engine = CombatEngineTestHelper.CreateCombatEngine();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             _view = new NullBattleView();
         }
@@ -135,7 +136,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Engine
             // Arrange
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            
+
             // Create provider that returns null
             var nullProvider = new TestActionProvider((BattleAction)null);
             var enemyProvider = new TestActionProvider("Enemy action");

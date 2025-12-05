@@ -4,10 +4,10 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Tests.Systems.Combat.Engine;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Integration.Engine
@@ -25,10 +25,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Engine
         [SetUp]
         public void SetUp()
         {
-            _engine = new CombatEngine();
+            _engine = CombatEngineTestHelper.CreateCombatEngine();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
             _view = new NullBattleView();
         }
+
 
         #region CombatEngine Integration
 
@@ -153,7 +154,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Engine
             field.PlayerSide.Slots[0].Pokemon.Status = PersistentStatus.Burn;
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(field);
+            var processor = new EndOfTurnProcessor(new PokemonUltimate.Combat.Factories.DamageContextFactory());
+            var actions = processor.ProcessEffects(field);
 
             // Assert
             Assert.That(actions, Is.Not.Empty);
@@ -180,7 +182,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Engine
             int initialHP = slot.Pokemon.CurrentHP;
 
             // Act
-            var actions = EndOfTurnProcessor.ProcessEffects(field);
+            var processor = new EndOfTurnProcessor(new PokemonUltimate.Combat.Factories.DamageContextFactory());
+            var actions = processor.ProcessEffects(field);
             var damageAction = actions.OfType<DamageAction>().FirstOrDefault();
 
             // Assert

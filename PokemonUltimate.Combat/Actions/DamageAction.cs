@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
@@ -52,7 +53,7 @@ namespace PokemonUltimate.Combat.Actions
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
 
-            if (Target.IsEmpty || Target.HasFainted)
+            if (!Target.IsActive())
                 return Enumerable.Empty<BattleAction>();
 
             int damage = Context.FinalDamage;
@@ -66,7 +67,9 @@ namespace PokemonUltimate.Combat.Actions
 
             // Record damage taken for Counter/Mirror Coat
             // Also mark if target was hit while focusing (for Focus Punch)
-            if (actualDamage > 0 && Context.Move != null)
+            // Note: Context.Move is never null (validated in DamageContext constructor),
+            // but we check actualDamage > 0 to avoid recording zero damage
+            if (actualDamage > 0)
             {
                 if (Context.Move.Category == MoveCategory.Physical)
                 {
@@ -76,7 +79,7 @@ namespace PokemonUltimate.Combat.Actions
                 {
                     Target.RecordSpecialDamage(actualDamage);
                 }
-                
+
                 // Mark if target was hit while focusing
                 Target.MarkHitWhileFocusing();
             }
@@ -98,7 +101,7 @@ namespace PokemonUltimate.Combat.Actions
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
 
-            if (Target.IsEmpty || Target.HasFainted || Context.FinalDamage == 0)
+            if (!Target.IsActive() || Context.FinalDamage == 0)
                 return Task.CompletedTask;
 
             return Task.WhenAll(

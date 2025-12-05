@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -20,8 +21,20 @@ namespace PokemonUltimate.Combat.Engine
     /// **Sub-Feature**: 2.14: Hazards System
     /// **Documentation**: See `docs/features/2-combat-system/2.14-hazards-system/README.md`
     /// </remarks>
-    public static class EntryHazardProcessor
+    public class EntryHazardProcessor : IEntryHazardProcessor
     {
+        private readonly DamageContextFactory _damageContextFactory;
+
+        /// <summary>
+        /// Creates a new EntryHazardProcessor with a damage context factory.
+        /// </summary>
+        /// <param name="damageContextFactory">The factory for creating damage contexts. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">If damageContextFactory is null.</exception>
+        public EntryHazardProcessor(DamageContextFactory damageContextFactory)
+        {
+            _damageContextFactory = damageContextFactory ?? throw new ArgumentNullException(nameof(damageContextFactory), ErrorMessages.FieldCannotBeNull);
+        }
+
         /// <summary>
         /// Processes all entry hazards on the opposing side when a Pokemon switches in.
         /// </summary>
@@ -30,7 +43,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <param name="field">The battlefield.</param>
         /// <param name="getHazardData">Function to get HazardData by type. Cannot be null.</param>
         /// <returns>List of actions to execute for entry hazards.</returns>
-        public static List<BattleAction> ProcessHazards(BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData)
+        public List<BattleAction> ProcessHazards(BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData)
         {
             if (slot == null)
                 throw new ArgumentNullException(nameof(slot));
@@ -56,7 +69,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Processes Spikes hazard.
         /// </summary>
-        private static void ProcessSpikes(BattleSide side, BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData, List<BattleAction> actions)
+        private void ProcessSpikes(BattleSide side, BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData, List<BattleAction> actions)
         {
             if (!side.HasHazard(HazardType.Spikes))
                 return;
@@ -83,7 +96,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Processes Stealth Rock hazard.
         /// </summary>
-        private static void ProcessStealthRock(BattleSide side, BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData, List<BattleAction> actions)
+        private void ProcessStealthRock(BattleSide side, BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData, List<BattleAction> actions)
         {
             if (!side.HasHazard(HazardType.StealthRock))
                 return;
@@ -113,7 +126,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Processes Toxic Spikes hazard.
         /// </summary>
-        private static void ProcessToxicSpikes(BattleSide side, BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData, List<BattleAction> actions)
+        private void ProcessToxicSpikes(BattleSide side, BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData, List<BattleAction> actions)
         {
             if (!side.HasHazard(HazardType.ToxicSpikes))
                 return;
@@ -147,7 +160,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Processes Sticky Web hazard.
         /// </summary>
-        private static void ProcessStickyWeb(BattleSide side, BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData, List<BattleAction> actions)
+        private void ProcessStickyWeb(BattleSide side, BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData, List<BattleAction> actions)
         {
             if (!side.HasHazard(HazardType.StickyWeb))
                 return;
@@ -163,7 +176,7 @@ namespace PokemonUltimate.Combat.Engine
             if (hazardData.LowersStat)
             {
                 int stages = hazardData.StatStages;
-                
+
                 // Check for Contrary ability (reverses stat changes)
                 if (pokemon.Ability != null && pokemon.Ability.Name.Equals("Contrary", StringComparison.OrdinalIgnoreCase))
                 {
@@ -178,11 +191,11 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Calculates type effectiveness for a defending Pokemon.
         /// </summary>
-        private static float CalculateTypeEffectiveness(PokemonType attackingType, PokemonType primaryType, PokemonType? secondaryType)
+        private float CalculateTypeEffectiveness(PokemonType attackingType, PokemonType primaryType, PokemonType? secondaryType)
         {
             float effectiveness1 = TypeEffectiveness.GetEffectiveness(attackingType, primaryType);
-            float effectiveness2 = secondaryType.HasValue 
-                ? TypeEffectiveness.GetEffectiveness(attackingType, secondaryType.Value) 
+            float effectiveness2 = secondaryType.HasValue
+                ? TypeEffectiveness.GetEffectiveness(attackingType, secondaryType.Value)
                 : 1.0f;
 
             return effectiveness1 * effectiveness2;
@@ -191,7 +204,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Calculates hazard damage based on max HP and damage fraction.
         /// </summary>
-        private static int CalculateHazardDamage(int maxHP, float damageFraction)
+        private int CalculateHazardDamage(int maxHP, float damageFraction)
         {
             int damage = (int)(maxHP * damageFraction);
             return Math.Max(1, damage); // Minimum 1 damage
@@ -200,26 +213,9 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// Creates a DamageAction for hazard damage.
         /// </summary>
-        private static DamageAction CreateHazardDamageAction(BattleSlot slot, BattleField field, int damage)
+        private DamageAction CreateHazardDamageAction(BattleSlot slot, BattleField field, int damage)
         {
-            // Create a dummy move for hazard damage context
-            var dummyMove = new MoveData
-            {
-                Name = "Entry Hazard",
-                Power = 1, // Non-zero power so it's treated as a damaging move
-                Accuracy = 100,
-                Type = PokemonType.Normal,
-                Category = MoveCategory.Physical,
-                MaxPP = 0,
-                Priority = 0,
-                TargetScope = TargetScope.Self
-            };
-
-            var context = new DamageContext(slot, slot, dummyMove, field);
-            context.BaseDamage = damage; // Set base damage to the calculated hazard damage
-            context.Multiplier = 1.0f; // No additional multipliers
-            context.TypeEffectiveness = 1.0f; // Hazard damage is always effective
-
+            var context = _damageContextFactory.CreateForHazardDamage(slot, damage, field);
             return new DamageAction(null, slot, context); // null user = system action
         }
     }

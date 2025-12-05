@@ -1,4 +1,6 @@
 using System;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Core.Constants;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {
@@ -16,7 +18,17 @@ namespace PokemonUltimate.Combat.Damage.Steps
         private const float CriticalMultiplier = 1.5f;
         private const float BaseCritRate = 1f / 24f; // ~4.17% base crit rate (Gen 6+)
 
-        private static readonly Random _random = new Random();
+        private readonly IRandomProvider _randomProvider;
+
+        /// <summary>
+        /// Creates a new CriticalHitStep with a random provider.
+        /// </summary>
+        /// <param name="randomProvider">The random provider for critical hit rolls. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">If randomProvider is null.</exception>
+        public CriticalHitStep(IRandomProvider randomProvider)
+        {
+            _randomProvider = randomProvider ?? throw new ArgumentNullException(nameof(randomProvider), ErrorMessages.PokemonCannotBeNull);
+        }
 
         public void Process(DamageContext context)
         {
@@ -45,7 +57,7 @@ namespace PokemonUltimate.Combat.Damage.Steps
             float critChance = BaseCritRate;
 
             // Roll
-            float roll = (float)_random.NextDouble();
+            float roll = _randomProvider.NextFloat();
             return roll < critChance;
         }
     }

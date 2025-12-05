@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -19,6 +20,17 @@ namespace PokemonUltimate.Combat.Events
     public class ItemListener : IBattleListener
     {
         private readonly ItemData _itemData;
+
+        // Dictionary mapping BattleTrigger to ItemTrigger for efficient lookup
+        private static readonly Dictionary<BattleTrigger, Core.Enums.ItemTrigger?> TriggerMapping = new Dictionary<BattleTrigger, Core.Enums.ItemTrigger?>
+        {
+            { BattleTrigger.OnTurnEnd, Core.Enums.ItemTrigger.OnTurnEnd },
+            { BattleTrigger.OnDamageTaken, Core.Enums.ItemTrigger.OnContactReceived },
+            { BattleTrigger.OnAfterMove, Core.Enums.ItemTrigger.OnDamageDealt },
+            { BattleTrigger.OnWeatherChange, null }, // Items don't respond to weather changes
+            { BattleTrigger.OnSwitchIn, null }, // Items don't trigger on switch-in
+            { BattleTrigger.OnBeforeMove, null } // Items don't trigger before move (except Choice items, deferred)
+        };
 
         /// <summary>
         /// Creates a new item listener for the given item data.
@@ -53,26 +65,20 @@ namespace PokemonUltimate.Combat.Events
 
         /// <summary>
         /// Checks if this item should respond to the given trigger.
+        /// Uses dictionary lookup for efficient trigger mapping.
         /// </summary>
         private bool ShouldRespondToTrigger(BattleTrigger trigger)
         {
-            switch (trigger)
+            if (TriggerMapping.TryGetValue(trigger, out var itemTrigger))
             {
-                case BattleTrigger.OnTurnEnd:
-                    return _itemData.ListensTo(ItemTrigger.OnTurnEnd);
-                case BattleTrigger.OnDamageTaken:
-                    return _itemData.ListensTo(ItemTrigger.OnContactReceived);
-                case BattleTrigger.OnAfterMove:
-                    return _itemData.ListensTo(ItemTrigger.OnDamageDealt);
-                case BattleTrigger.OnWeatherChange:
-                    return false; // Items don't respond to weather changes
-                case BattleTrigger.OnSwitchIn:
-                    return false; // Items don't trigger on switch-in
-                case BattleTrigger.OnBeforeMove:
-                    return false; // Items don't trigger before move (except Choice items, deferred)
-                default:
+                // If mapping is null, item doesn't respond to this trigger
+                if (itemTrigger == null)
                     return false;
+
+                return _itemData.ListensTo(itemTrigger.Value);
             }
+
+            return false;
         }
 
         /// <summary>
@@ -94,7 +100,7 @@ namespace PokemonUltimate.Combat.Events
         private IEnumerable<BattleAction> ProcessEndOfTurnHealing(BattleSlot holder)
         {
             var pokemon = holder.Pokemon;
-            
+
             // Don't heal if already at full HP
             if (pokemon.CurrentHP >= pokemon.MaxHP)
                 yield break;
@@ -116,7 +122,7 @@ namespace PokemonUltimate.Combat.Events
             else
             {
                 // Default: Leftovers-style healing (1/16)
-                healAmount = pokemon.MaxHP / 16;
+                healAmount = pokemon.MaxHP / ItemConstants.LeftoversHealDivisor;
             }
 
             // Minimum 1 HP healed
