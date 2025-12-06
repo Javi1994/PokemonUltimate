@@ -745,7 +745,9 @@ namespace PokemonUltimate.Combat.Actions
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
 
-            if (User.IsEmpty || Target.IsEmpty)
+            // Don't play animation if user is not active (fainted, switched out, etc.)
+            // This prevents showing animations for moves that were queued but can't execute
+            if (!User.IsActive() || User.IsEmpty || Target.IsEmpty)
                 return Task.CompletedTask;
 
             return view.PlayMoveAnimation(User, Target, Move.Id);

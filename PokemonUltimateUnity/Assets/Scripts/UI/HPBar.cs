@@ -22,16 +22,30 @@ public class HPBar : MonoBehaviour
     /// <param name="max">Maximum HP value</param>
     public void UpdateHP(int current, int max)
     {
+        Debug.Log($"[UI] HPBar.UpdateHP() called - Updating UI: {current}/{max} ({(max > 0 ? (current * 100f / max) : 0):F1}%)");
+        
         if (fillImage != null)
         {
             float fillAmount = max > 0 ? (float)current / max : 0f;
             fillImage.fillAmount = Mathf.Clamp01(fillAmount);
+            Debug.Log($"[UI] HPBar - Fill image updated: fillAmount = {fillImage.fillAmount:F3}");
+        }
+        else
+        {
+            Debug.LogWarning("[UI] HPBar - fillImage is null, cannot update fill amount!");
         }
 
         if (hpText != null)
         {
             hpText.text = $"{current}/{max}";
+            Debug.Log($"[UI] HPBar - Text updated: \"{hpText.text}\"");
         }
+        else
+        {
+            Debug.LogWarning("[UI] HPBar - hpText is null, cannot update text!");
+        }
+        
+        Debug.Log($"[UI] HPBar.UpdateHP() completed - UI updated successfully");
     }
 }
 

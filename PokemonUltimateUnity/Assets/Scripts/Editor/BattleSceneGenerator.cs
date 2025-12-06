@@ -57,6 +57,17 @@ public class BattleSceneGenerator : EditorWindow
         
         canvasObj.AddComponent<GraphicRaycaster>();
         
+        // Add background color for better visibility (optional)
+        GameObject background = new GameObject("Background");
+        background.transform.SetParent(canvasObj.transform);
+        Image bgImage = background.AddComponent<Image>();
+        bgImage.color = new Color(0.1f, 0.1f, 0.15f, 1f); // Dark blue-gray background
+        RectTransform bgRect = background.GetComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero;
+        bgRect.anchorMax = Vector2.one;
+        bgRect.sizeDelta = Vector2.zero;
+        bgRect.anchoredPosition = Vector2.zero;
+        
         return canvasObj;
     }
 
@@ -70,6 +81,10 @@ public class BattleSceneGenerator : EditorWindow
         playerRect.pivot = new Vector2(0, 0);
         playerRect.anchoredPosition = new Vector2(20, 20);
         playerRect.sizeDelta = new Vector2(450, 160);
+        
+        // Add subtle background panel for player side
+        Image panelBg = playerSide.AddComponent<Image>();
+        panelBg.color = new Color(0.15f, 0.15f, 0.2f, 0.8f); // Semi-transparent dark blue
         
         // Create Player Pokemon Display
         GameObject playerDisplay = CreatePlayerPokemonDisplay(playerSide);
@@ -144,51 +159,59 @@ public class BattleSceneGenerator : EditorWindow
         hpBarRect.sizeDelta = new Vector2(-20, 30);
         hpBarRect.anchoredPosition = new Vector2(10, 10);
         
-        // Add Slider as base
-        Slider slider = hpBarObj.AddComponent<Slider>();
-        slider.minValue = 0;
-        slider.maxValue = 100;
-        slider.value = 100;
-        slider.interactable = false;
-        
-        // Create Background
+        // Create Background (must be first, so it's behind everything)
         GameObject background = CreateUIElement("Background", hpBarObj);
         Image bgImage = background.AddComponent<Image>();
-        bgImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+        bgImage.color = new Color(0.15f, 0.15f, 0.15f, 1f); // Darker background for better contrast
         RectTransform bgRect = background.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
         bgRect.anchorMax = Vector2.one;
         bgRect.sizeDelta = Vector2.zero;
-        slider.targetGraphic = bgImage;
+        // Set as first sibling so it renders behind
+        background.transform.SetAsFirstSibling();
         
-        // Create Fill Area
-        GameObject fillArea = CreateUIElement("Fill Area", hpBarObj);
+        // Create Fill Area (inside Background, so it's clipped)
+        GameObject fillArea = CreateUIElement("Fill Area", background);
         RectTransform fillAreaRect = fillArea.GetComponent<RectTransform>();
         fillAreaRect.anchorMin = Vector2.zero;
         fillAreaRect.anchorMax = Vector2.one;
         fillAreaRect.sizeDelta = Vector2.zero;
         fillAreaRect.anchoredPosition = Vector2.zero;
         
-        // Create Fill
+        // Create Fill (inside Fill Area)
         GameObject fill = CreateUIElement("Fill", fillArea);
         Image fillImage = fill.AddComponent<Image>();
-        fillImage.color = new Color(0.2f, 0.8f, 0.2f, 1f); // Green
+        fillImage.color = new Color(0.2f, 0.9f, 0.2f, 1f); // Bright green for player
         fillImage.type = Image.Type.Filled;
         fillImage.fillMethod = Image.FillMethod.Horizontal;
         RectTransform fillRect = fill.GetComponent<RectTransform>();
         fillRect.anchorMin = Vector2.zero;
         fillRect.anchorMax = new Vector2(1, 1);
         fillRect.sizeDelta = Vector2.zero;
-        slider.fillRect = fillRect;
+        
+        // Add border outline (on top of everything)
+        GameObject border = CreateUIElement("Border", hpBarObj);
+        Image borderImage = border.AddComponent<Image>();
+        borderImage.color = new Color(0.3f, 0.4f, 0.3f, 1f); // Light green-gray border for player
+        RectTransform borderRect = border.GetComponent<RectTransform>();
+        borderRect.anchorMin = Vector2.zero;
+        borderRect.anchorMax = Vector2.one;
+        borderRect.sizeDelta = new Vector2(-2, -2); // Slightly smaller for border effect
+        borderRect.anchoredPosition = Vector2.zero;
+        // Set as last sibling so it renders on top
+        border.transform.SetAsLastSibling();
         
         // Create HP Text
-        GameObject hpText = CreateTextElement("HPText", hpBarObj, "100/100", 18);
+        GameObject hpText = CreateTextElement("HPText", hpBarObj, "100/100", 20);
         RectTransform hpTextRect = hpText.GetComponent<RectTransform>();
         hpTextRect.anchorMin = new Vector2(0.5f, 0.5f);
         hpTextRect.anchorMax = new Vector2(0.5f, 0.5f);
-        hpTextRect.sizeDelta = new Vector2(120, 30);
+        hpTextRect.sizeDelta = new Vector2(140, 35);
         hpTextRect.anchoredPosition = Vector2.zero;
-        hpText.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Center;
+        TextMeshProUGUI hpTextComponent = hpText.GetComponent<TextMeshProUGUI>();
+        hpTextComponent.alignment = TextAlignmentOptions.Center;
+        hpTextComponent.fontStyle = FontStyles.Bold; // Bold for better visibility
+        hpTextComponent.color = new Color(1f, 1f, 0.9f, 1f); // Slightly warm white
         
         // Add HPBar component
         HPBar hpBar = hpBarObj.AddComponent<HPBar>();
@@ -208,6 +231,10 @@ public class BattleSceneGenerator : EditorWindow
         enemyRect.pivot = new Vector2(1, 1);
         enemyRect.anchoredPosition = new Vector2(-20, -20);
         enemyRect.sizeDelta = new Vector2(450, 160);
+        
+        // Add subtle background panel for enemy side
+        Image panelBg = enemySide.AddComponent<Image>();
+        panelBg.color = new Color(0.2f, 0.15f, 0.15f, 0.8f); // Semi-transparent dark red
         
         // Create Enemy Pokemon Display
         GameObject enemyDisplay = CreateEnemyPokemonDisplay(enemySide);
@@ -280,49 +307,58 @@ public class BattleSceneGenerator : EditorWindow
         hpBarRect.sizeDelta = new Vector2(-20, 30);
         hpBarRect.anchoredPosition = new Vector2(0, -10);
         
-        Slider slider = hpBarObj.AddComponent<Slider>();
-        slider.minValue = 0;
-        slider.maxValue = 100;
-        slider.value = 100;
-        slider.interactable = false;
-        
-        // Create Background
+        // Create Background (must be first, so it's behind everything)
         GameObject background = CreateUIElement("Background", hpBarObj);
         Image bgImage = background.AddComponent<Image>();
-        bgImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+        bgImage.color = new Color(0.15f, 0.15f, 0.15f, 1f); // Darker background for better contrast
         RectTransform bgRect = background.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
         bgRect.anchorMax = Vector2.one;
         bgRect.sizeDelta = Vector2.zero;
-        slider.targetGraphic = bgImage;
+        // Set as first sibling so it renders behind
+        background.transform.SetAsFirstSibling();
         
-        // Create Fill Area
-        GameObject fillArea = CreateUIElement("Fill Area", hpBarObj);
+        // Create Fill Area (inside Background, so it's clipped)
+        GameObject fillArea = CreateUIElement("Fill Area", background);
         RectTransform fillAreaRect = fillArea.GetComponent<RectTransform>();
         fillAreaRect.anchorMin = Vector2.zero;
         fillAreaRect.anchorMax = Vector2.one;
         fillAreaRect.sizeDelta = Vector2.zero;
         
-        // Create Fill
+        // Create Fill (inside Fill Area)
         GameObject fill = CreateUIElement("Fill", fillArea);
         Image fillImage = fill.AddComponent<Image>();
-        fillImage.color = new Color(0.8f, 0.2f, 0.2f, 1f); // Red for enemy
+        fillImage.color = new Color(0.9f, 0.2f, 0.2f, 1f); // Bright red for enemy
         fillImage.type = Image.Type.Filled;
         fillImage.fillMethod = Image.FillMethod.Horizontal;
         RectTransform fillRect = fill.GetComponent<RectTransform>();
         fillRect.anchorMin = Vector2.zero;
         fillRect.anchorMax = new Vector2(1, 1);
         fillRect.sizeDelta = Vector2.zero;
-        slider.fillRect = fillRect;
+        
+        // Add border outline (on top of everything)
+        GameObject border = CreateUIElement("Border", hpBarObj);
+        Image borderImage = border.AddComponent<Image>();
+        borderImage.color = new Color(0.4f, 0.3f, 0.3f, 1f); // Light red-gray border for enemy
+        RectTransform borderRect = border.GetComponent<RectTransform>();
+        borderRect.anchorMin = Vector2.zero;
+        borderRect.anchorMax = Vector2.one;
+        borderRect.sizeDelta = new Vector2(-2, -2); // Slightly smaller for border effect
+        borderRect.anchoredPosition = Vector2.zero;
+        // Set as last sibling so it renders on top
+        border.transform.SetAsLastSibling();
         
         // Create HP Text
-        GameObject hpText = CreateTextElement("HPText", hpBarObj, "100/100", 16);
+        GameObject hpText = CreateTextElement("HPText", hpBarObj, "100/100", 20);
         RectTransform hpTextRect = hpText.GetComponent<RectTransform>();
         hpTextRect.anchorMin = new Vector2(0.5f, 0.5f);
         hpTextRect.anchorMax = new Vector2(0.5f, 0.5f);
-        hpTextRect.sizeDelta = new Vector2(100, 30);
+        hpTextRect.sizeDelta = new Vector2(140, 35);
         hpTextRect.anchoredPosition = Vector2.zero;
-        hpText.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Center;
+        TextMeshProUGUI hpTextComponent = hpText.GetComponent<TextMeshProUGUI>();
+        hpTextComponent.alignment = TextAlignmentOptions.Center;
+        hpTextComponent.fontStyle = FontStyles.Bold; // Bold for better visibility
+        hpTextComponent.color = new Color(1f, 0.95f, 0.9f, 1f); // Slightly warm white
         
         HPBar hpBar = hpBarObj.AddComponent<HPBar>();
         SetPrivateField(hpBar, "fillImage", fillImage);
@@ -339,26 +375,37 @@ public class BattleSceneGenerator : EditorWindow
         dialogRect.anchorMax = new Vector2(0.5f, 0);
         dialogRect.pivot = new Vector2(0.5f, 0);
         dialogRect.anchoredPosition = new Vector2(0, 20);
-        dialogRect.sizeDelta = new Vector2(800, 100);
+        dialogRect.sizeDelta = new Vector2(800, 120); // Slightly taller for better readability
         
-        // Add background image
+        // Add background image with border effect
         Image bgImage = dialogBox.AddComponent<Image>();
-        bgImage.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+        bgImage.color = new Color(0.05f, 0.05f, 0.1f, 0.98f); // Darker, more opaque
+        
+        // Add border effect (optional - can be enhanced with 9-slice sprite later)
+        GameObject border = CreateUIElement("Border", dialogBox);
+        Image borderImage = border.AddComponent<Image>();
+        borderImage.color = new Color(0.3f, 0.3f, 0.4f, 1f); // Light border
+        RectTransform borderRect = border.GetComponent<RectTransform>();
+        borderRect.anchorMin = Vector2.zero;
+        borderRect.anchorMax = Vector2.one;
+        borderRect.sizeDelta = new Vector2(-4, -4); // Slightly smaller for border effect
+        borderRect.anchoredPosition = Vector2.zero;
         
         // Initially disabled
         dialogBox.SetActive(false);
         
         // Create Dialog Text
-        GameObject dialogText = CreateTextElement("DialogText", dialogBox, "", 24);
+        GameObject dialogText = CreateTextElement("DialogText", dialogBox, "", 26);
         RectTransform textRect = dialogText.GetComponent<RectTransform>();
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
-        textRect.sizeDelta = new Vector2(-40, -40);
+        textRect.sizeDelta = new Vector2(-50, -50); // More padding
         textRect.anchoredPosition = Vector2.zero;
         
         TextMeshProUGUI textComponent = dialogText.GetComponent<TextMeshProUGUI>();
         textComponent.alignment = TextAlignmentOptions.Left;
         textComponent.enableWordWrapping = true;
+        textComponent.color = new Color(1f, 1f, 0.95f, 1f); // Slightly warm white for better readability
         
         // Add BattleDialog component
         BattleDialog battleDialog = dialogBox.AddComponent<BattleDialog>();

@@ -214,7 +214,8 @@ namespace PokemonUltimate.Combat
             if (Field == null)
                 throw new InvalidOperationException("CombatEngine must be initialized before running turn.");
 
-            // 1. Collect actions from all active slots
+            // 1. Collect actions from all active slots (FASE DE SELECCIÓN)
+            // En Pokémon, ambos jugadores eligen simultáneamente antes de ejecutar
             var pendingActions = new List<BattleAction>();
             foreach (var slot in Field.GetAllActiveSlots())
             {
@@ -224,15 +225,26 @@ namespace PokemonUltimate.Combat
                     if (action != null)
                     {
                         pendingActions.Add(action);
-                        _logger.LogDebug($"Collected action: {action.GetType().Name} from slot {slot.SlotIndex}");
+                        _logger.LogDebug($"Collected action: {action.GetType().Name} from slot {slot.SlotIndex} (Priority: {action.Priority}, Speed: {_turnOrderResolver.GetEffectiveSpeed(slot, Field):F1})");
                     }
                 }
             }
 
-            // 2. Sort by turn order (priority, then speed)
+            // 2. Sort by turn order (priority, then speed) (FASE DE ORDENAMIENTO)
+            // Ahora se ordenan todas las acciones por prioridad y velocidad
             var sortedActions = _turnOrderResolver.SortActions(pendingActions, Field);
+            
+            // Log del orden final para debugging
+            _logger.LogDebug($"Actions sorted. Execution order:");
+            for (int i = 0; i < sortedActions.Count; i++)
+            {
+                var action = sortedActions[i];
+                var priority = action.Priority;
+                var speed = action.User != null ? _turnOrderResolver.GetEffectiveSpeed(action.User, Field) : 0;
+                _logger.LogDebug($"  {i + 1}. {action.User?.Pokemon?.DisplayName ?? "Unknown"} - Priority: {priority}, Speed: {speed:F1}");
+            }
 
-            // 3. Enqueue all actions in sorted order
+            // 3. Enqueue all actions in sorted order (FASE DE EJECUCIÓN)
             Queue.EnqueueRange(sortedActions);
 
             // 4. Process the queue

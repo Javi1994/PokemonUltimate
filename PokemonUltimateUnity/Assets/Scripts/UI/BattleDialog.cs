@@ -16,7 +16,6 @@ public class BattleDialog : MonoBehaviour
     [SerializeField] private GameObject dialogBox;
     
     [SerializeField] private float typewriterDelay = 0.03f; // Delay per character in seconds
-    private bool _waitingForInput = false;
 
     /// <summary>
     /// Shows a message in the dialog box with optional typewriter effect.
@@ -26,13 +25,21 @@ public class BattleDialog : MonoBehaviour
     /// <returns>Task that completes when message is shown (and input received if waitForInput is true)</returns>
     public async Task ShowMessage(string text, bool waitForInput = true)
     {
+        Debug.Log($"[UI] BattleDialog.ShowMessage() called - Processing message: \"{text}\" (waitForInput: {waitForInput})");
+        
         if (dialogBox != null)
         {
             dialogBox.SetActive(true);
+            Debug.Log("[UI] BattleDialog - Dialog box activated");
+        }
+        else
+        {
+            Debug.LogWarning("[UI] BattleDialog - dialogBox is null, cannot show dialog!");
         }
 
         if (dialogText != null)
         {
+            Debug.Log("[UI] BattleDialog - Starting typewriter effect...");
             // Typewriter effect
             dialogText.text = "";
             foreach (char c in text)
@@ -40,14 +47,21 @@ public class BattleDialog : MonoBehaviour
                 dialogText.text += c;
                 await Task.Delay((int)(typewriterDelay * 1000)); // Convert to milliseconds
             }
+            Debug.Log($"[UI] BattleDialog - Typewriter effect completed. Final text: \"{dialogText.text}\"");
+        }
+        else
+        {
+            Debug.LogWarning("[UI] BattleDialog - dialogText is null, cannot display text!");
         }
 
         if (waitForInput)
         {
-            _waitingForInput = true;
+            Debug.Log("[UI] BattleDialog - Waiting for player input (Space/Enter)...");
             await WaitForInput();
-            _waitingForInput = false;
+            Debug.Log("[UI] BattleDialog - Player input received");
         }
+        
+        Debug.Log("[UI] BattleDialog.ShowMessage() completed - Message displayed successfully");
     }
 
     /// <summary>

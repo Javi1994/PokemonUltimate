@@ -24,18 +24,30 @@ public class PokemonDisplay : MonoBehaviour
     {
         if (pokemon == null)
         {
-            Debug.LogWarning("PokemonDisplay: Cannot display null Pokemon");
+            Debug.LogWarning("[UI] PokemonDisplay.Display() - Cannot display null Pokemon");
             return;
         }
+
+        Debug.Log($"[UI] PokemonDisplay.Display() called - Updating UI for: {pokemon.DisplayName} Lv.{pokemon.Level}");
 
         if (nameText != null)
         {
             nameText.text = pokemon.DisplayName;
+            Debug.Log($"[UI] PokemonDisplay - Name text updated: \"{nameText.text}\"");
+        }
+        else
+        {
+            Debug.LogWarning("[UI] PokemonDisplay - nameText is null, cannot update name!");
         }
 
         if (levelText != null)
         {
             levelText.text = $"Lv. {pokemon.Level}";
+            Debug.Log($"[UI] PokemonDisplay - Level text updated: \"{levelText.text}\"");
+        }
+        else
+        {
+            Debug.LogWarning("[UI] PokemonDisplay - levelText is null, cannot update level!");
         }
 
         // TODO: Load sprite from Resources or Addressables
@@ -43,7 +55,14 @@ public class PokemonDisplay : MonoBehaviour
         if (spriteImage != null)
         {
             // spriteImage.sprite = LoadPokemonSprite(pokemon.Species.Name);
+            Debug.Log($"[UI] PokemonDisplay - Sprite image component found (sprite loading not yet implemented)");
         }
+        else
+        {
+            Debug.LogWarning("[UI] PokemonDisplay - spriteImage is null!");
+        }
+        
+        Debug.Log($"[UI] PokemonDisplay.Display() completed - UI updated successfully");
     }
 }
 
