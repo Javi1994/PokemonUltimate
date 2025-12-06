@@ -14,7 +14,7 @@
 | **Unity Integration**   | ✅ Basic Complete (2025-01-XX) - Phases 4.1-4.3 completed. DLL integration, UI Foundation (HPBar, PokemonDisplay, BattleDialog), IBattleView implementation (UnityBattleView, BattleManager), automated scene generator.                                                                                                                                                                                               |
 | **Combat Refactoring**  | ✅ Complete (2024-12-05) - Phases 0-13 completed (42/44 tasks, 95.5%). DI, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, Validation implemented.                                                                                                                               |
 | **Core Refactoring**    | ✅ Complete (2024-12-XX) - Phases 0-8 completed (21/22 tasks, 95.5%). DI, Strategy Pattern, Constants centralization, Extension methods, Validation, Move selection, Stat stage management, Stats caching implemented. See `PokemonUltimate.Core/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details. |
-| **Tests**               | 3,210+ passing (includes Phase 4: IVs/EVs System, Breeding System, Ownership/Tracking tests)                                                                                                                                                                                                     |
+| **Tests**               | 3,243+ passing (includes Phase 4: IVs/EVs System, Breeding System, Ownership/Tracking tests, Statistics System: 33 tests)                                                                                                                                                                                                     |
 | **Integration Tests**   | 90+ tests (system interactions, Advanced Abilities & Items)                                                                                                                                                                                                                                                                           |
 | **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed.                                                                                                                                                                         |
 | **Warnings**            | 0                                                                                                                                                                                                                                                                                                         |
@@ -60,6 +60,7 @@ PokemonUltimate/
 │   ├── Messages/   # IBattleMessageFormatter, BattleMessageFormatter
 │   ├── Validation/ # IBattleStateValidator, BattleStateValidator
 │   ├── Extensions/ # BattleSlotExtensions, DamageCalculationExtensions
+│   ├── Statistics/ # IBattleActionObserver, BattleStatisticsCollector, BattleStatistics, trackers (Sub-Feature 2.20)
 │   └── Constants/  # BattleConstants, StatusConstants, ItemConstants, MoveConstants
 │
 ├── Content/        # Game data definitions

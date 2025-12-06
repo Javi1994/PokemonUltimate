@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Constants;
+using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Core.Constants;
 
 namespace PokemonUltimate.Combat
@@ -11,6 +12,7 @@ namespace PokemonUltimate.Combat
     /// <summary>
     /// Manages the sequential processing of battle actions.
     /// Actions are processed in order: Logic (instant) -> Visual (async) -> Reactions (inserted at front).
+    /// Supports observers for statistics collection, logging, and debugging.
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
@@ -19,8 +21,8 @@ namespace PokemonUltimate.Combat
     /// </remarks>
     public class BattleQueue
     {
-
         private readonly LinkedList<BattleAction> _queue;
+        private readonly List<IBattleActionObserver> _observers = new List<IBattleActionObserver>();
 
         /// <summary>
         /// The number of actions currently in the queue.
@@ -100,6 +102,34 @@ namespace PokemonUltimate.Combat
         }
 
         /// <summary>
+        /// Adds an observer to receive notifications when actions are executed.
+        /// </summary>
+        /// <param name="observer">The observer to add.</param>
+        /// <exception cref="ArgumentNullException">If observer is null.</exception>
+        public void AddObserver(IBattleActionObserver observer)
+        {
+            if (observer == null)
+                throw new ArgumentNullException(nameof(observer));
+
+            if (!_observers.Contains(observer))
+            {
+                _observers.Add(observer);
+            }
+        }
+
+        /// <summary>
+        /// Removes an observer from receiving notifications.
+        /// </summary>
+        /// <param name="observer">The observer to remove.</param>
+        public void RemoveObserver(IBattleActionObserver observer)
+        {
+            if (observer != null)
+            {
+                _observers.Remove(observer);
+            }
+        }
+
+        /// <summary>
         /// Processes all actions in the queue until empty.
         /// Each action's Logic is executed first, then Visual.
         /// Reaction actions are inserted at the front of the queue.
@@ -124,6 +154,12 @@ namespace PokemonUltimate.Combat
 
                 // Phase 1: Execute Logic (instant)
                 var reactions = action.ExecuteLogic(field);
+
+                // Notify observers about action execution
+                foreach (var observer in _observers)
+                {
+                    observer.OnActionExecuted(action, field, reactions ?? Enumerable.Empty<BattleAction>());
+                }
 
                 // Phase 2: Execute Visual (async)
                 await action.ExecuteVisual(view);

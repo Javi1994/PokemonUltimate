@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
@@ -15,14 +16,76 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
 {
     public class MoveRunner
     {
+        /// <summary>
+        /// Move test statistics wrapper for compatibility with existing UI code.
+        /// Uses the new Statistics System internally.
+        /// </summary>
         public class MoveTestStatistics
         {
-            public List<int> DamageValues { get; set; } = new List<int>();
-            public int CriticalHits { get; set; }
-            public int Misses { get; set; }
-            public Dictionary<string, int> StatusEffectsCaused { get; set; } = new Dictionary<string, int>();
-            public Dictionary<string, int> VolatileStatusEffectsCaused { get; set; } = new Dictionary<string, int>();
-            public Dictionary<string, int> ActionsGenerated { get; set; } = new Dictionary<string, int>();
+            private readonly Combat.Statistics.BattleStatistics _internalStats;
+
+            public MoveTestStatistics(Combat.Statistics.BattleStatistics internalStats)
+            {
+                _internalStats = internalStats ?? throw new ArgumentNullException(nameof(internalStats));
+            }
+
+            public List<int> DamageValues
+            {
+                get
+                {
+                    // Aggregate all damage values from all Pokemon
+                    var allDamage = new List<int>();
+                    foreach (var damageList in _internalStats.DamageStats.Values)
+                    {
+                        allDamage.AddRange(damageList);
+                    }
+                    return allDamage;
+                }
+            }
+
+            public int CriticalHits => _internalStats.CriticalHits;
+            public int Misses => _internalStats.Misses;
+
+            public Dictionary<string, int> StatusEffectsCaused
+            {
+                get
+                {
+                    // Aggregate status effects from all Pokemon
+                    var aggregated = new Dictionary<string, int>();
+                    foreach (var pokemonStats in _internalStats.StatusEffectStats.Values)
+                    {
+                        foreach (var kvp in pokemonStats)
+                        {
+                            if (!aggregated.ContainsKey(kvp.Key))
+                                aggregated[kvp.Key] = 0;
+                            aggregated[kvp.Key] += kvp.Value;
+                        }
+                    }
+                    return aggregated;
+                }
+            }
+
+            public Dictionary<string, int> VolatileStatusEffectsCaused
+            {
+                get
+                {
+                    // Aggregate volatile status effects from all Pokemon
+                    var aggregated = new Dictionary<string, int>();
+                    foreach (var pokemonStats in _internalStats.VolatileStatusStats.Values)
+                    {
+                        foreach (var kvp in pokemonStats)
+                        {
+                            var key = $"Volatile_{kvp.Key}";
+                            if (!aggregated.ContainsKey(key))
+                                aggregated[key] = 0;
+                            aggregated[key] += kvp.Value;
+                        }
+                    }
+                    return aggregated;
+                }
+            }
+
+            public Dictionary<string, int> ActionsGenerated => _internalStats.ActionTypeStats;
         }
 
         public class MoveTestConfig
@@ -35,23 +98,21 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
             public bool DetailedOutput { get; set; } = false;
         }
 
-        public class SingleTestResult
-        {
-            public int Damage { get; set; }
-            public bool WasCritical { get; set; }
-            public bool WasMiss { get; set; }
-            public List<PersistentStatus> StatusEffects { get; set; } = new List<PersistentStatus>();
-            public List<VolatileStatus> VolatileStatusEffects { get; set; } = new List<VolatileStatus>();
-            public List<string> ActionsGenerated { get; set; } = new List<string>();
-        }
-
         public async Task<MoveTestStatistics> RunTestsAsync(MoveTestConfig config, IProgress<int>? progress = null)
         {
-            var stats = new MoveTestStatistics();
+            // Create statistics collector (shared across all tests)
+            var statisticsCollector = new BattleStatisticsCollector();
+            var internalStats = statisticsCollector.GetStatistics();
+            var stats = new MoveTestStatistics(internalStats);
+
+            // Reset statistics at the start of the batch
+            statisticsCollector.Reset();
 
             for (int i = 0; i < config.NumberOfTests; i++)
             {
-                var result = await RunSingleTestAsync(config, stats);
+                await RunSingleTestAsync(config, statisticsCollector);
+
+                // Statistics accumulate across all tests (not reset between tests)
 
                 // Actualizar progreso
                 progress?.Report((i + 1) * 100 / config.NumberOfTests);
@@ -63,7 +124,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
             return stats;
         }
 
-        private Task<SingleTestResult> RunSingleTestAsync(MoveTestConfig config, MoveTestStatistics stats)
+        private async Task RunSingleTestAsync(MoveTestConfig config, BattleStatisticsCollector statisticsCollector)
         {
             // Crear Pokemon
             var attacker = PokemonFactory.Create(config.AttackerPokemon, config.Level);
@@ -89,100 +150,22 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
             // Crear acción de usar movimiento
             var useMoveAction = new UseMoveAction(playerSlot, enemySlot, moveInstance);
 
-            // Capturar HP antes
-            var hpBefore = enemySlot.Pokemon.CurrentHP;
-            var volatileBefore = enemySlot.VolatileStatus;
+            // Create a temporary queue to use the statistics system
+            var queue = new BattleQueue();
+            queue.AddObserver(statisticsCollector);
+            
+            // Note: We don't call OnBattleStart here because it resets statistics
+            // Statistics will accumulate across all tests in the batch
+            // Reset() is called once at the start of RunTestsAsync
 
-            // Ejecutar la acción
-            var reactions = useMoveAction.ExecuteLogic(field);
-            var reactionList = reactions?.ToList() ?? new List<BattleAction>();
+            // Enqueue the action
+            queue.Enqueue(useMoveAction);
 
-            // Procesar reactions para encontrar daño y efectos
-            int damageDealt = 0;
-            bool wasCritical = false;
-            bool wasMiss = false;
-            var statusEffects = new List<PersistentStatus>();
-            var volatileStatusEffects = new List<VolatileStatus>();
-            var actionsGenerated = new List<string>();
+            // Process queue - statistics will be tracked automatically
+            await queue.ProcessQueue(field, NullBattleView.Instance);
 
-            foreach (var reaction in reactionList)
-            {
-                // Rastrear tipo de acción generada
-                var actionType = reaction.GetType().Name.Replace("Action", "");
-                actionsGenerated.Add(actionType);
-                
-                if (!stats.ActionsGenerated.ContainsKey(actionType))
-                {
-                    stats.ActionsGenerated[actionType] = 0;
-                }
-                stats.ActionsGenerated[actionType]++;
-
-                if (reaction is DamageAction damageAction)
-                {
-                    damageDealt = damageAction.Context?.FinalDamage ?? 0;
-                    wasCritical = damageAction.Context?.IsCritical ?? false;
-                    if (damageDealt > 0)
-                    {
-                        stats.DamageValues.Add(damageDealt);
-
-                        if (wasCritical)
-                        {
-                            stats.CriticalHits++;
-                        }
-                    }
-                }
-                else if (reaction is ApplyStatusAction statusAction && statusAction.Status != PersistentStatus.None)
-                {
-                    statusEffects.Add(statusAction.Status);
-                    var statusName = statusAction.Status.ToString();
-                    if (!stats.StatusEffectsCaused.ContainsKey(statusName))
-                    {
-                        stats.StatusEffectsCaused[statusName] = 0;
-                    }
-                    stats.StatusEffectsCaused[statusName]++;
-                }
-            }
-
-            // Verificar si fue un fallo
-            if (damageDealt == 0 && config.MoveToTest.Accuracy < 100)
-            {
-                if (config.MoveToTest.Category != MoveCategory.Status && config.MoveToTest.Power > 0)
-                {
-                    wasMiss = true;
-                    stats.Misses++;
-                }
-            }
-
-            // Verificar estados volátiles aplicados
-            var volatileAfter = enemySlot.VolatileStatus;
-            var newVolatileStatuses = volatileAfter & ~volatileBefore;
-
-            if (newVolatileStatuses != VolatileStatus.None)
-            {
-                foreach (VolatileStatus status in Enum.GetValues(typeof(VolatileStatus)))
-                {
-                    if (status != VolatileStatus.None && (newVolatileStatuses & status) != 0)
-                    {
-                        volatileStatusEffects.Add(status);
-                        var statusName = $"Volatile_{status}";
-                        if (!stats.VolatileStatusEffectsCaused.ContainsKey(statusName))
-                        {
-                            stats.VolatileStatusEffectsCaused[statusName] = 0;
-                        }
-                        stats.VolatileStatusEffectsCaused[statusName]++;
-                    }
-                }
-            }
-
-            return Task.FromResult(new SingleTestResult
-            {
-                Damage = damageDealt,
-                WasCritical = wasCritical,
-                WasMiss = wasMiss,
-                StatusEffects = statusEffects,
-                VolatileStatusEffects = volatileStatusEffects,
-                ActionsGenerated = actionsGenerated
-            });
+            // Remove observer after test to clean up
+            queue.RemoveObserver(statisticsCollector);
         }
     }
 }

@@ -6,6 +6,7 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Factories;
@@ -18,13 +19,39 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         private readonly Random _random = new Random();
         private readonly List<PokemonSpeciesData> _availablePokemon = PokemonCatalog.All.ToList();
 
+        /// <summary>
+        /// Battle statistics wrapper for compatibility with existing UI code.
+        /// Uses the new Statistics System internally.
+        /// </summary>
         public class BattleStatistics
         {
-            public int PlayerWins { get; set; }
-            public int EnemyWins { get; set; }
-            public int Draws { get; set; }
-            public Dictionary<string, Dictionary<string, int>> MoveUsageStats { get; set; } = new();
-            public Dictionary<string, Dictionary<string, int>> StatusEffectStats { get; set; } = new();
+            private readonly Combat.Statistics.BattleStatistics _internalStats;
+
+            public BattleStatistics(Combat.Statistics.BattleStatistics internalStats)
+            {
+                _internalStats = internalStats ?? throw new ArgumentNullException(nameof(internalStats));
+            }
+
+            public int PlayerWins
+            {
+                get => _internalStats.PlayerWins;
+                set => _internalStats.PlayerWins = value;
+            }
+
+            public int EnemyWins
+            {
+                get => _internalStats.EnemyWins;
+                set => _internalStats.EnemyWins = value;
+            }
+
+            public int Draws
+            {
+                get => _internalStats.Draws;
+                set => _internalStats.Draws = value;
+            }
+
+            public Dictionary<string, Dictionary<string, int>> MoveUsageStats => _internalStats.MoveUsageStats;
+            public Dictionary<string, Dictionary<string, int>> StatusEffectStats => _internalStats.StatusEffectStats;
         }
 
         public class BattleConfig
@@ -38,7 +65,13 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
 
         public async Task<BattleStatistics> RunBattlesAsync(BattleConfig config, IProgress<int>? progress = null)
         {
-            var stats = new BattleStatistics();
+            // Create statistics collector (shared across all battles)
+            var statisticsCollector = new BattleStatisticsCollector();
+            var internalStats = statisticsCollector.GetStatistics();
+            var stats = new BattleStatistics(internalStats);
+            
+            // Reset statistics at the start of the batch
+            statisticsCollector.Reset();
             
             // Seleccionar Pokemon aleatorios una sola vez si son null
             var selectedPlayerPokemon = config.PlayerPokemon ?? _availablePokemon[_random.Next(_availablePokemon.Count)];
@@ -46,21 +79,11 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
 
             for (int i = 0; i < config.NumberOfBattles; i++)
             {
-                var result = await RunSingleBattleAsync(selectedPlayerPokemon, selectedEnemyPokemon, config.Level, stats);
+                var result = await RunSingleBattleAsync(selectedPlayerPokemon, selectedEnemyPokemon, config.Level, statisticsCollector);
 
-                // Contar victorias
-                if (result.Outcome == BattleOutcome.Victory)
-                {
-                    stats.PlayerWins++;
-                }
-                else if (result.Outcome == BattleOutcome.Defeat)
-                {
-                    stats.EnemyWins++;
-                }
-                else
-                {
-                    stats.Draws++;
-                }
+                // Statistics are automatically tracked by the collector
+                // Outcome is tracked in OnBattleEnd
+                // Statistics accumulate across battles (not reset between battles)
 
                 // Actualizar progreso
                 progress?.Report((i + 1) * 100 / config.NumberOfBattles);
@@ -73,7 +96,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
             PokemonSpeciesData playerPokemon,
             PokemonSpeciesData enemyPokemon,
             int level,
-            BattleStatistics stats)
+            BattleStatisticsCollector statisticsCollector)
         {
             // Crear parties
             var playerParty = new[] { PokemonFactory.Create(playerPokemon, level) };
@@ -93,175 +116,25 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
             // Initialize
             engine.Initialize(rules, playerParty, enemyParty, playerAI, enemyAI, view);
 
-            // Ejecutar batalla con tracking
-            var result = await RunBattleWithTracking(engine, view, stats);
+            // Register statistics observer BEFORE battle starts
+            engine.Queue.AddObserver(statisticsCollector);
+            
+            // Note: We don't call OnBattleStart here because it resets statistics
+            // Statistics will accumulate across all battles in the batch
+            // Reset() is called once at the start of RunBattlesAsync
+
+            // Ejecutar batalla normalmente - statistics are tracked automatically
+            var result = await engine.RunBattle();
+
+            // Notify observer of battle end (tracks outcome)
+            statisticsCollector.OnBattleEnd(result.Outcome, engine.Field);
+
+            // Remove observer after battle to clean up
+            engine.Queue.RemoveObserver(statisticsCollector);
 
             return result;
         }
 
-        private async Task<BattleResult> RunBattleWithTracking(CombatEngine engine, IBattleView view, BattleStatistics stats)
-        {
-            int turnCount = 0;
-            const int maxTurns = 1000;
-            var outcome = BattleOutcome.Ongoing;
-
-            while (outcome == BattleOutcome.Ongoing && turnCount < maxTurns)
-            {
-                // Collect actions
-                var pendingActions = new List<BattleAction>();
-                foreach (var slot in engine.Field.GetAllActiveSlots())
-                {
-                    if (slot.ActionProvider != null)
-                    {
-                        var action = await slot.ActionProvider.GetAction(engine.Field, slot);
-                        if (action != null)
-                        {
-                            pendingActions.Add(action);
-                        }
-                    }
-                }
-
-                // Sort by turn order
-                var helpers = CombatEngineFactory.CreateHelpers();
-                var sortedActions = helpers.TurnOrderResolver.SortActions(pendingActions, engine.Field);
-
-                // Process actions with tracking
-                foreach (var action in sortedActions)
-                {
-                    // Track move usage
-                    if (action is UseMoveAction moveAction && moveAction.User?.Pokemon != null)
-                    {
-                        var pokemonName = moveAction.User.Pokemon.Species.Name;
-                        var moveName = moveAction.Move.Name;
-
-                        if (!stats.MoveUsageStats.ContainsKey(pokemonName))
-                        {
-                            stats.MoveUsageStats[pokemonName] = new Dictionary<string, int>();
-                        }
-
-                        if (!stats.MoveUsageStats[pokemonName].ContainsKey(moveName))
-                        {
-                            stats.MoveUsageStats[pokemonName][moveName] = 0;
-                        }
-
-                        stats.MoveUsageStats[pokemonName][moveName]++;
-                    }
-
-                    // Execute logic
-                    var reactions = action.ExecuteLogic(engine.Field);
-                    var reactionList = reactions?.ToList() ?? new List<BattleAction>();
-
-                    // Track status effects in reactions
-                    foreach (var reaction in reactionList)
-                    {
-                        if (reaction is ApplyStatusAction statusAction && statusAction.User?.Pokemon != null && statusAction.Status != PokemonUltimate.Core.Enums.PersistentStatus.None)
-                        {
-                            var pokemonName = statusAction.User.Pokemon.Species.Name;
-                            var statusName = statusAction.Status.ToString();
-
-                            if (!stats.StatusEffectStats.ContainsKey(pokemonName))
-                            {
-                                stats.StatusEffectStats[pokemonName] = new Dictionary<string, int>();
-                            }
-
-                            if (!stats.StatusEffectStats[pokemonName].ContainsKey(statusName))
-                            {
-                                stats.StatusEffectStats[pokemonName][statusName] = 0;
-                            }
-
-                            stats.StatusEffectStats[pokemonName][statusName]++;
-                        }
-                    }
-
-                    // Execute visual
-                    await action.ExecuteVisual(view);
-
-                    // Enqueue reactions
-                    foreach (var reaction in reactionList)
-                    {
-                        engine.Queue.Enqueue(reaction);
-                    }
-                }
-
-                // Process queue with tracking
-                await ProcessQueueWithTracking(engine.Queue, engine.Field, view, stats);
-
-                turnCount++;
-                outcome = BattleArbiter.CheckOutcome(engine.Field);
-            }
-
-            return new BattleResult
-            {
-                Outcome = outcome,
-                TurnsTaken = turnCount
-            };
-        }
-
-        private async Task ProcessQueueWithTracking(BattleQueue queue, BattleField field, IBattleView view, BattleStatistics stats)
-        {
-            int iterationCount = 0;
-            const int maxIterations = 1000;
-
-            // Use reflection to access private _queue field
-            var queueField = typeof(BattleQueue).GetField("_queue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (queueField == null)
-            {
-                await queue.ProcessQueue(field, view);
-                return;
-            }
-
-            var linkedList = queueField.GetValue(queue) as System.Collections.Generic.LinkedList<BattleAction>;
-            if (linkedList == null)
-            {
-                await queue.ProcessQueue(field, view);
-                return;
-            }
-
-            while (linkedList.Count > 0)
-            {
-                if (iterationCount++ > maxIterations)
-                {
-                    throw new InvalidOperationException("Battle queue infinite loop detected");
-                }
-
-                var action = linkedList.First.Value;
-                linkedList.RemoveFirst();
-
-                // Track ApplyStatusAction before executing
-                if (action is ApplyStatusAction statusAction && statusAction.User?.Pokemon != null && statusAction.Status != PokemonUltimate.Core.Enums.PersistentStatus.None)
-                {
-                    var pokemonName = statusAction.User.Pokemon.Species.Name;
-                    var statusName = statusAction.Status.ToString();
-
-                    if (!stats.StatusEffectStats.ContainsKey(pokemonName))
-                    {
-                        stats.StatusEffectStats[pokemonName] = new Dictionary<string, int>();
-                    }
-
-                    if (!stats.StatusEffectStats[pokemonName].ContainsKey(statusName))
-                    {
-                        stats.StatusEffectStats[pokemonName][statusName] = 0;
-                    }
-
-                    stats.StatusEffectStats[pokemonName][statusName]++;
-                }
-
-                // Execute logic
-                var reactions = action.ExecuteLogic(field);
-
-                // Execute visual
-                await action.ExecuteVisual(view);
-
-                // Insert reactions at front
-                if (reactions != null)
-                {
-                    foreach (var reaction in reactions.Reverse())
-                    {
-                        linkedList.AddFirst(reaction);
-                    }
-                }
-            }
-        }
     }
 }
 

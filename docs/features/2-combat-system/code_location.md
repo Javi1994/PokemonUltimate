@@ -176,6 +176,30 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 -   `BattleOutcome` - Outcome enum
 -   `BattleResult` - Detailed battle result
 
+### `PokemonUltimate.Combat.Statistics`
+
+**Purpose**: Event-driven statistics collection system (Sub-Feature 2.20)
+**Key Classes**:
+
+-   `IBattleActionObserver` - Interface for observing battle actions
+-   `IStatisticsTracker` - Interface for modular statistics trackers
+-   `IBattleStatisticsCollector` - Interface for statistics collection
+-   `BattleStatistics` - Statistics data model
+-   `BattleStatisticsCollector` - Main statistics collector implementation
+
+### `PokemonUltimate.Combat.Statistics.Trackers`
+
+**Purpose**: Modular statistics trackers (Sub-Feature 2.20)
+**Key Classes**:
+
+-   `ActionTypeTracker` - Tracks action type counts
+-   `MoveUsageTracker` - Tracks move usage per Pokemon
+-   `DamageTracker` - Tracks damage values, critical hits, misses
+-   `StatusEffectTracker` - Tracks persistent status applications
+-   `FieldEffectTracker` - Tracks weather, terrain, side conditions
+-   `HealingTracker` - Tracks healing amounts
+-   `StatChangeTracker` - Tracks stat stage modifications
+
 ### `PokemonUltimate.Combat.Factories`
 
 **Purpose**: Factory pattern for object creation (post-refactor)
@@ -434,11 +458,16 @@ PokemonUltimate.Combat/
 **Namespace**: `PokemonUltimate.Combat`
 **File**: `PokemonUltimate.Combat/Engine/BattleQueue.cs`
 **Purpose**: Manages sequential processing of battle actions
+**Extended Features** (Sub-Feature 2.20):
+- Observer pattern support - `AddObserver(IBattleActionObserver)`, `RemoveObserver(IBattleActionObserver)`
+- Notifies observers when actions are executed
 **Key Methods**:
 
 -   `Enqueue(BattleAction)` - Add action to queue
 -   `EnqueueRange(IEnumerable<BattleAction>)` - Add multiple actions
 -   `ProcessQueue(BattleField, IBattleView)` - Process all actions
+-   `AddObserver(IBattleActionObserver)` - Register observer for action notifications
+-   `RemoveObserver(IBattleActionObserver)` - Unregister observer
 
 ### BattleAction
 

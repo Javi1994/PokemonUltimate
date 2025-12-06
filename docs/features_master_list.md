@@ -109,6 +109,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 -   **2.17**: Advanced Abilities - Complex ability interactions (Planned)
 -   **2.18**: Advanced Items - Complex item interactions (Planned)
 -   **2.19**: Battle Formats - Doubles, Triples, Rotation (Planned)
+-   **2.20**: Statistics System - Event-driven statistics collection system 🎯 In Progress
 
 **Related Roadmap**: `docs/features/2-combat-system/roadmap.md`
 

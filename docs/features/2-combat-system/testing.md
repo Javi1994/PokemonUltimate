@@ -14,7 +14,7 @@ The combat system uses a comprehensive three-phase testing approach:
 -   **Edge Case Tests** - Boundary conditions, invalid inputs, special cases
 -   **Integration Tests** - System interactions and cascading effects
 
-**Coverage**: 2,528+ passing tests covering all combat phases (2.1-2.14, 2.16)
+**Coverage**: 2,561+ passing tests covering all combat phases (2.1-2.14, 2.16, 2.20)
 
 > **📋 Post-Refactoring Note (2024-12-05)**: After the comprehensive refactoring, all components now use Dependency Injection, making them highly testable. Mock implementations can be easily injected for testing (e.g., `NullBattleLogger`, `NullBattleView`). The refactoring improved testability significantly by removing static dependencies and direct object creation. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for refactoring details.
 
@@ -91,12 +91,14 @@ PokemonUltimate.Tests/
 
 - **[UnifiedDebuggerUI](../../../PokemonUltimate.UnifiedDebuggerUI/)** - Integrated debugger application
   - **Battle Debugger Tab**: Run multiple battles and analyze statistics
+    - Uses new Statistics System (Sub-Feature 2.20) for automatic tracking
     - Move usage statistics (most used moves per Pokemon)
     - Status effect statistics (effects caused per Pokemon)
     - Win/loss/draw rates
     - Progress tracking during execution
     - Results displayed in tables and formatted text
   - **Move Debugger Tab**: Test moves multiple times and collect statistics
+    - Uses new Statistics System (Sub-Feature 2.20) for automatic tracking
     - Damage statistics (average, min, max, median)
     - Critical hit rates
     - Miss rates

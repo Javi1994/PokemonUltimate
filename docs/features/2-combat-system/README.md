@@ -69,6 +69,10 @@ This feature implements the core Pokemon battle system, including:
 -   **[2.18: Advanced Items](2.18-advanced-items/)** - Complex item interactions ⏳
 -   **[2.19: Battle Formats](2.19-battle-formats/)** - Doubles, Triples, Horde, Raid 🚧
 
+### In Progress (2.20)
+
+-   **[2.20: Statistics System](2.20-statistics-system/)** - Event-driven statistics collection system 🎯
+
 ## Related Features
 
 -   **[Feature 1: Game Data](../1-game-data/)** - Pokemon instances used in battles

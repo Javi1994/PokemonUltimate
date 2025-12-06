@@ -1,0 +1,67 @@
+using System.Collections.Generic;
+using PokemonUltimate.Combat.Actions;
+
+namespace PokemonUltimate.Combat.Statistics.Trackers
+{
+    /// <summary>
+    /// Tracks stat stage modifications.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.20: Statistics System
+    /// **Documentation**: See `docs/features/2-combat-system/2.20-statistics-system/architecture.md`
+    /// </remarks>
+    internal class StatChangeTracker : IStatisticsTracker
+    {
+        public void TrackAction(BattleAction action, BattleField field, IEnumerable<BattleAction> reactions, BattleStatistics stats)
+        {
+            if (action == null || stats == null || field == null)
+                return;
+
+            // Track stat changes from StatChangeAction
+            if (action is StatChangeAction statAction && statAction.Target?.Pokemon != null)
+            {
+                var pokemonName = statAction.Target.Pokemon.Species.Name;
+                var statName = statAction.Stat.ToString();
+                var stageChange = statAction.Change;
+
+                if (stageChange != 0)
+                {
+                    if (!stats.StatChangeStats.ContainsKey(pokemonName))
+                        stats.StatChangeStats[pokemonName] = new Dictionary<string, List<int>>();
+
+                    if (!stats.StatChangeStats[pokemonName].ContainsKey(statName))
+                        stats.StatChangeStats[pokemonName][statName] = new List<int>();
+
+                    stats.StatChangeStats[pokemonName][statName].Add(stageChange);
+                }
+            }
+
+            // Also check reactions for stat changes
+            if (reactions != null)
+            {
+                foreach (var reaction in reactions)
+                {
+                    if (reaction is StatChangeAction reactionStat && reactionStat.Target?.Pokemon != null)
+                    {
+                        var pokemonName = reactionStat.Target.Pokemon.Species.Name;
+                        var statName = reactionStat.Stat.ToString();
+                        var stageChange = reactionStat.Change;
+
+                        if (stageChange != 0)
+                        {
+                            if (!stats.StatChangeStats.ContainsKey(pokemonName))
+                                stats.StatChangeStats[pokemonName] = new Dictionary<string, List<int>>();
+
+                            if (!stats.StatChangeStats[pokemonName].ContainsKey(statName))
+                                stats.StatChangeStats[pokemonName][statName] = new List<int>();
+
+                            stats.StatChangeStats[pokemonName][statName].Add(stageChange);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

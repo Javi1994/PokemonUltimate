@@ -19,8 +19,9 @@ The Action Queue System implements the core philosophy: "Everything is an Action
 
 ## Current Status
 
--   ✅ **Implemented**: BattleQueue and BattleAction base system
+-   ✅ **Implemented**: BattleQueue and BattleAction base system with observer support
 -   ✅ **Tested**: Comprehensive test coverage
+-   ✅ **Extended**: Observer pattern support for statistics collection (Sub-Feature 2.20)
 
 ## Documentation
 
@@ -36,6 +37,7 @@ The Action Queue System implements the core philosophy: "Everything is an Action
 
 -   **[2.5: Combat Actions](../2.5-combat-actions/)** - Action implementations
 -   **[2.6: Combat Engine](../2.6-combat-engine/)** - Uses BattleQueue for battle execution
+-   **[2.20: Statistics System](../2.20-statistics-system/)** - Uses BattleQueue observers for statistics collection
 
 ## Quick Links
 
