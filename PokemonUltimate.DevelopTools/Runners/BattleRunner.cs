@@ -12,7 +12,7 @@ using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Runners
+namespace PokemonUltimate.DevelopTools.Runners
 {
     public class BattleRunner
     {

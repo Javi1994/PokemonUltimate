@@ -13,11 +13,13 @@ This feature provides unified Windows Forms debugger applications for testing, a
 
 ## Current Status
 
-- ✅ **Existing Debuggers**: Battle Debugger, Move Debugger, Type Matchup Debugger
+- ✅ **Battle Debugger**: Complete (6.5)
+- ✅ **Move Debugger**: Complete (6.6)
+- ✅ **Type Matchup Debugger**: Complete (existing)
 - ✅ **Stat Calculator Debugger**: Complete (6.1)
 - ✅ **Damage Calculator Debugger**: Complete (6.2)
 - ✅ **Status Effect Debugger**: Complete (6.3)
-- ⏳ **Planned**: Turn Order Debugger (6.4)
+- ✅ **Turn Order Debugger**: Complete (6.4)
 
 ## Documentation
 
@@ -31,10 +33,16 @@ This feature provides unified Windows Forms debugger applications for testing, a
 
 ## Sub-Features
 
+### Complete (6.5)
+
+- **[6.5: Battle Debugger](6.5-battle-debugger/)** - Run multiple battles and analyze statistics ✅
+
+### Complete (6.6)
+
+- **[6.6: Move Debugger](6.6-move-debugger/)** - Test moves multiple times and collect statistics ✅
+
 ### Existing (Implemented)
 
-- **Battle Debugger** - Run multiple battles and analyze statistics ✅
-- **Move Debugger** - Test moves multiple times and collect statistics ✅
 - **Type Matchup Debugger** - Calculate type effectiveness combinations ✅
 
 ### Complete (6.1)
@@ -47,8 +55,8 @@ This feature provides unified Windows Forms debugger applications for testing, a
 ### Complete (6.3)
 - **[6.3: Status Effect Debugger](6.3-status-effect-debugger/)** - Test status effects and their interactions ✅
 
-### Planned (6.4)
-- **[6.4: Turn Order Debugger](6.4-turn-order-debugger/)** - Visualize turn order determination with speed and priority 🎯
+### Complete (6.4)
+- **[6.4: Turn Order Debugger](6.4-turn-order-debugger/)** - Visualize turn order determination with speed and priority ✅
 
 ## Related Features
 
@@ -59,9 +67,8 @@ This feature provides unified Windows Forms debugger applications for testing, a
 
 ## Quick Links
 
-- **Unified Debugger**: `PokemonUltimate.UnifiedDebuggerUI` - Single Windows Forms application
-- **Existing Tabs**: Battle Debugger, Move Debugger, Type Matchup
-- **New Tabs**: Stat Calculator, Damage Calculator, Status Effect, Turn Order (in progress)
+- **Develop Tools**: `PokemonUltimate.DevelopTools` - Single Windows Forms application
+- **Complete Tabs**: Battle Debugger (6.5), Move Debugger (6.6), Type Matchup, Stat Calculator (6.1), Damage Calculator (6.2), Status Effect (6.3), Turn Order (6.4)
 
 ---
 

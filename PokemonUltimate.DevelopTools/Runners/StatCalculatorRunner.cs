@@ -5,7 +5,7 @@ using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Runners
+namespace PokemonUltimate.DevelopTools.Runners
 {
     /// <summary>
     /// Calculates Pokemon stats with different configurations for the Stat Calculator Debugger.
@@ -22,7 +22,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         /// </summary>
         public class StatCalculationConfig
         {
-            public PokemonSpeciesData PokemonSpecies { get; set; }
+            public PokemonSpeciesData PokemonSpecies { get; set; } = null!;
             public int Level { get; set; } = 50;
             public Nature Nature { get; set; } = Nature.Hardy;
             public int IV_HP { get; set; } = CoreConstants.DefaultIV;
@@ -62,12 +62,12 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         /// </summary>
         public class StatCalculationResult
         {
-            public StatBreakdown HP { get; set; }
-            public StatBreakdown Attack { get; set; }
-            public StatBreakdown Defense { get; set; }
-            public StatBreakdown SpAttack { get; set; }
-            public StatBreakdown SpDefense { get; set; }
-            public StatBreakdown Speed { get; set; }
+            public StatBreakdown HP { get; set; } = null!;
+            public StatBreakdown Attack { get; set; } = null!;
+            public StatBreakdown Defense { get; set; } = null!;
+            public StatBreakdown SpAttack { get; set; } = null!;
+            public StatBreakdown SpDefense { get; set; } = null!;
+            public StatBreakdown Speed { get; set; } = null!;
             public int TotalEVs { get; set; }
             public bool IsValidEVTotal => TotalEVs <= CoreConstants.MaxTotalEV;
         }

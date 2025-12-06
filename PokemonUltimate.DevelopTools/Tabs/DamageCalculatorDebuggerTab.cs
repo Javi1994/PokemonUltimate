@@ -5,9 +5,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.UnifiedDebuggerUI.Runners;
+using PokemonUltimate.DevelopTools.Runners;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
+namespace PokemonUltimate.DevelopTools.Tabs
 {
     /// <summary>
     /// Debugger tab for step-by-step damage calculation pipeline visualization.
@@ -19,22 +19,22 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
     /// </remarks>
     public partial class DamageCalculatorDebuggerTab : UserControl
     {
-        private ComboBox comboAttacker;
-        private ComboBox comboDefender;
-        private ComboBox comboMove;
-        private NumericUpDown numericLevel;
-        private CheckBox chkForceCritical;
-        private CheckBox chkFixedRandom;
-        private NumericUpDown numericFixedRandom;
-        private Button btnCalculate;
-        private TabControl tabResults;
-        private TabPage tabSummary;
-        private TabPage tabPipelineSteps;
-        private TabPage tabDamageRange;
-        private RichTextBox txtSummary;
-        private DataGridView dgvPipelineSteps;
-        private RichTextBox txtDamageRange;
-        private DamageCalculatorRunner _runner;
+        private ComboBox comboAttacker = null!;
+        private ComboBox comboDefender = null!;
+        private ComboBox comboMove = null!;
+        private NumericUpDown numericLevel = null!;
+        private CheckBox chkForceCritical = null!;
+        private CheckBox chkFixedRandom = null!;
+        private NumericUpDown numericFixedRandom = null!;
+        private Button btnCalculate = null!;
+        private TabControl tabResults = null!;
+        private TabPage tabSummary = null!;
+        private TabPage tabPipelineSteps = null!;
+        private TabPage tabDamageRange = null!;
+        private RichTextBox txtSummary = null!;
+        private DataGridView dgvPipelineSteps = null!;
+        private RichTextBox txtDamageRange = null!;
+        private DamageCalculatorRunner _runner = null!;
 
         public DamageCalculatorDebuggerTab()
         {

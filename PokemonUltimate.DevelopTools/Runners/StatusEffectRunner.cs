@@ -7,7 +7,7 @@ using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Runners
+namespace PokemonUltimate.DevelopTools.Runners
 {
     /// <summary>
     /// Tests status effects and their interactions for the Status Effect Debugger.
@@ -24,7 +24,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         /// </summary>
         public class StatusEffectConfig
         {
-            public PokemonSpeciesData PokemonSpecies { get; set; }
+            public PokemonSpeciesData PokemonSpecies { get; set; } = null!;
             public int Level { get; set; } = 50;
             public PersistentStatus PersistentStatus { get; set; } = PersistentStatus.None;
             public VolatileStatus VolatileStatus { get; set; } = VolatileStatus.None;
@@ -39,7 +39,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
             public int BaseValue { get; set; }
             public int ModifiedValue { get; set; }
             public float Multiplier { get; set; }
-            public string Description { get; set; }
+            public string Description { get; set; } = string.Empty;
         }
 
         /// <summary>
@@ -47,12 +47,12 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         /// </summary>
         public class DamagePerTurn
         {
-            public string StatusName { get; set; }
+            public string StatusName { get; set; } = string.Empty;
             public float DamageFraction { get; set; }
             public int DamageAmount { get; set; }
             public int MaxHP { get; set; }
             public bool Escalates { get; set; }
-            public string Description { get; set; }
+            public string Description { get; set; } = string.Empty;
         }
 
         /// <summary>
@@ -60,11 +60,11 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         /// </summary>
         public class StatusInteraction
         {
-            public string StatusName { get; set; }
+            public string StatusName { get; set; } = string.Empty;
             public bool CanApplyWithCurrentStatus { get; set; }
-            public string Reason { get; set; }
+            public string Reason { get; set; } = string.Empty;
             public bool IsImmune { get; set; }
-            public string ImmuneReason { get; set; }
+            public string ImmuneReason { get; set; } = string.Empty;
         }
 
         /// <summary>
@@ -72,10 +72,10 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         /// </summary>
         public class StatusEffectResult
         {
-            public PokemonInstance Pokemon { get; set; }
+            public PokemonInstance Pokemon { get; set; } = null!;
             public PersistentStatus CurrentPersistentStatus { get; set; }
             public VolatileStatus CurrentVolatileStatus { get; set; }
-            public StatusEffectData PersistentStatusData { get; set; }
+            public StatusEffectData PersistentStatusData { get; set; } = null!;
             public List<StatusEffectData> VolatileStatusDataList { get; set; } = new List<StatusEffectData>();
             public List<StatModification> StatModifications { get; set; } = new List<StatModification>();
             public List<DamagePerTurn> DamagePerTurnList { get; set; } = new List<DamagePerTurn>();

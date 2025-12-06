@@ -1,25 +1,27 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using PokemonUltimate.UnifiedDebuggerUI.Tabs;
+using PokemonUltimate.DevelopTools.Tabs;
 
-namespace PokemonUltimate.UnifiedDebuggerUI
+namespace PokemonUltimate.DevelopTools
 {
     public partial class MainForm : Form
     {
-        private TabControl mainTabControl;
-        private TabPage tabBattle;
-        private TabPage tabMove;
-        private TabPage tabTypeMatchup;
-        private TabPage tabStatCalculator;
-        private TabPage tabDamageCalculator;
-        private TabPage tabStatusEffect;
-        private BattleDebuggerTab battleDebuggerTab;
-        private MoveDebuggerTab moveDebuggerTab;
-        private TypeMatchupDebuggerTab typeMatchupDebuggerTab;
-        private StatCalculatorDebuggerTab statCalculatorDebuggerTab;
-        private DamageCalculatorDebuggerTab damageCalculatorDebuggerTab;
-        private StatusEffectDebuggerTab statusEffectDebuggerTab;
+        private TabControl mainTabControl = null!;
+        private TabPage tabBattle = null!;
+        private TabPage tabMove = null!;
+        private TabPage tabTypeMatchup = null!;
+        private TabPage tabStatCalculator = null!;
+        private TabPage tabDamageCalculator = null!;
+        private TabPage tabStatusEffect = null!;
+        private TabPage tabTurnOrder = null!;
+        private BattleDebuggerTab battleDebuggerTab = null!;
+        private MoveDebuggerTab moveDebuggerTab = null!;
+        private TypeMatchupDebuggerTab typeMatchupDebuggerTab = null!;
+        private StatCalculatorDebuggerTab statCalculatorDebuggerTab = null!;
+        private DamageCalculatorDebuggerTab damageCalculatorDebuggerTab = null!;
+        private StatusEffectDebuggerTab statusEffectDebuggerTab = null!;
+        private TurnOrderDebuggerTab turnOrderDebuggerTab = null!;
 
         public MainForm()
         {
@@ -35,17 +37,19 @@ namespace PokemonUltimate.UnifiedDebuggerUI
             this.tabStatCalculator = new TabPage();
             this.tabDamageCalculator = new TabPage();
             this.tabStatusEffect = new TabPage();
+            this.tabTurnOrder = new TabPage();
             this.battleDebuggerTab = new BattleDebuggerTab();
             this.moveDebuggerTab = new MoveDebuggerTab();
             this.typeMatchupDebuggerTab = new TypeMatchupDebuggerTab();
             this.statCalculatorDebuggerTab = new StatCalculatorDebuggerTab();
             this.damageCalculatorDebuggerTab = new DamageCalculatorDebuggerTab();
             this.statusEffectDebuggerTab = new StatusEffectDebuggerTab();
+            this.turnOrderDebuggerTab = new TurnOrderDebuggerTab();
 
             this.SuspendLayout();
 
             // Form
-            this.Text = "Pokemon Ultimate - Unified Debugger";
+            this.Text = "Pokemon Ultimate - Develop Tools";
             this.Size = new Size(1400, 900);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MinimumSize = new Size(1000, 600);
@@ -91,6 +95,12 @@ namespace PokemonUltimate.UnifiedDebuggerUI
             this.statusEffectDebuggerTab.Dock = DockStyle.Fill;
             this.tabStatusEffect.Controls.Add(this.statusEffectDebuggerTab);
 
+            // Turn Order Tab
+            this.tabTurnOrder.Text = "Turn Order";
+            this.tabTurnOrder.Padding = new Padding(5);
+            this.turnOrderDebuggerTab.Dock = DockStyle.Fill;
+            this.tabTurnOrder.Controls.Add(this.turnOrderDebuggerTab);
+
             // Add tabs to TabControl
             this.mainTabControl.TabPages.AddRange(new TabPage[] {
                 this.tabBattle,
@@ -98,7 +108,8 @@ namespace PokemonUltimate.UnifiedDebuggerUI
                 this.tabTypeMatchup,
                 this.tabStatCalculator,
                 this.tabDamageCalculator,
-                this.tabStatusEffect
+                this.tabStatusEffect,
+                this.tabTurnOrder
             });
 
             // Add TabControl to Form

@@ -12,7 +12,7 @@ using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Runners
+namespace PokemonUltimate.DevelopTools.Runners
 {
     public class MoveRunner
     {
@@ -90,9 +90,9 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
 
         public class MoveTestConfig
         {
-            public MoveData MoveToTest { get; set; }
-            public PokemonSpeciesData AttackerPokemon { get; set; }
-            public PokemonSpeciesData TargetPokemon { get; set; }
+            public MoveData MoveToTest { get; set; } = null!;
+            public PokemonSpeciesData AttackerPokemon { get; set; } = null!;
+            public PokemonSpeciesData TargetPokemon { get; set; } = null!;
             public int Level { get; set; } = 50;
             public int NumberOfTests { get; set; } = 100;
             public bool DetailedOutput { get; set; } = false;

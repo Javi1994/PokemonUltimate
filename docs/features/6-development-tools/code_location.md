@@ -8,12 +8,12 @@
 
 ## Overview
 
-The development tools are organized in a single Windows Forms project: `PokemonUltimate.UnifiedDebuggerUI`.
+The development tools are organized in a single Windows Forms project: `PokemonUltimate.DevelopTools`.
 
 ## Project Structure
 
 ```
-PokemonUltimate.UnifiedDebuggerUI/
+PokemonUltimate.DevelopTools/
 ├── MainForm.cs                    # Main form with TabControl
 ├── Program.cs                     # Application entry point
 ├── Runners/
@@ -35,7 +35,7 @@ PokemonUltimate.UnifiedDebuggerUI/
 
 ## Namespaces
 
-### `PokemonUltimate.UnifiedDebuggerUI`
+### `PokemonUltimate.DevelopTools`
 
 **Purpose**: Main application namespace
 
@@ -43,37 +43,37 @@ PokemonUltimate.UnifiedDebuggerUI/
 - `MainForm` - Main application window
 - `Program` - Application entry point
 
-### `PokemonUltimate.UnifiedDebuggerUI.Runners`
+### `PokemonUltimate.DevelopTools.Runners`
 
 **Purpose**: Reusable logic for executing tests and collecting statistics
 
 **Key Classes**:
-- `BattleRunner` - Executes battles and collects statistics ✅
-- `MoveRunner` - Tests moves and collects statistics ✅
+- `BattleRunner` - Executes battles and collects statistics ✅ (6.5)
+- `MoveRunner` - Tests moves and collects statistics ✅ (6.6)
 - `StatCalculatorRunner` - Calculates stats with different configurations ✅ (6.1)
 - `DamageCalculatorRunner` - Visualizes damage pipeline step-by-step ✅ (6.2)
-- `StatusEffectRunner` - Tests status effects and interactions (6.3)
-- `TurnOrderRunner` - Calculates turn order with different configurations (6.4)
+- `StatusEffectRunner` - Tests status effects and interactions ✅ (6.3)
+- `TurnOrderRunner` - Calculates turn order with different configurations ✅ (6.4)
 
-### `PokemonUltimate.UnifiedDebuggerUI.Tabs`
+### `PokemonUltimate.DevelopTools.Tabs`
 
 **Purpose**: UserControl-based tabs for each debugger
 
 **Key Classes**:
-- `BattleDebuggerTab` - Battle debugger UI ✅
-- `MoveDebuggerTab` - Move debugger UI ✅
+- `BattleDebuggerTab` - Battle debugger UI ✅ (6.5)
+- `MoveDebuggerTab` - Move debugger UI ✅ (6.6)
 - `TypeMatchupDebuggerTab` - Type matchup UI ✅
 - `StatCalculatorDebuggerTab` - Stat calculator UI ✅ (6.1)
 - `DamageCalculatorDebuggerTab` - Damage calculator UI ✅ (6.2)
-- `StatusEffectDebuggerTab` - Status effect UI (6.3)
-- `TurnOrderDebuggerTab` - Turn order UI (6.4)
+- `StatusEffectDebuggerTab` - Status effect UI ✅ (6.3)
+- `TurnOrderDebuggerTab` - Turn order UI ✅ (6.4)
 
 ## Key Classes
 
 ### MainForm
 
-**Namespace**: `PokemonUltimate.UnifiedDebuggerUI`
-**File**: `PokemonUltimate.UnifiedDebuggerUI/MainForm.cs`
+**Namespace**: `PokemonUltimate.DevelopTools`
+**File**: `PokemonUltimate.DevelopTools/MainForm.cs`
 **Purpose**: Main application window with tabbed interface
 
 **Key Properties**:
@@ -83,28 +83,32 @@ PokemonUltimate.UnifiedDebuggerUI/
 **Key Methods**:
 - `InitializeComponent()` - Sets up UI with all tabs
 
-### BattleRunner
+### BattleRunner (6.5)
 
-**Namespace**: `PokemonUltimate.UnifiedDebuggerUI.Runners`
-**File**: `PokemonUltimate.UnifiedDebuggerUI/Runners/BattleRunner.cs`
+**Namespace**: `PokemonUltimate.DevelopTools.Runners`
+**File**: `PokemonUltimate.DevelopTools/Runners/BattleRunner.cs`
 **Purpose**: Executes battles and collects statistics
 
 **Key Methods**:
 - `RunBattles(...)` - Runs multiple battles and collects statistics
 
-### MoveRunner
+**See**: [`6.5-battle-debugger/README.md`](6.5-battle-debugger/README.md) for complete documentation
 
-**Namespace**: `PokemonUltimate.UnifiedDebuggerUI.Runners`
-**File**: `PokemonUltimate.UnifiedDebuggerUI/Runners/MoveRunner.cs`
+### MoveRunner (6.6)
+
+**Namespace**: `PokemonUltimate.DevelopTools.Runners`
+**File**: `PokemonUltimate.DevelopTools/Runners/MoveRunner.cs`
 **Purpose**: Tests moves and collects statistics
 
 **Key Methods**:
 - `RunTests(...)` - Tests moves multiple times and collects statistics
 
+**See**: [`6.6-move-debugger/README.md`](6.6-move-debugger/README.md) for complete documentation
+
 ### StatCalculatorRunner (6.1)
 
-**Namespace**: `PokemonUltimate.UnifiedDebuggerUI.Runners`
-**File**: `PokemonUltimate.UnifiedDebuggerUI/Runners/StatCalculatorRunner.cs`
+**Namespace**: `PokemonUltimate.DevelopTools.Runners`
+**File**: `PokemonUltimate.DevelopTools/Runners/StatCalculatorRunner.cs`
 **Purpose**: Calculates stats with different configurations
 
 **Key Methods**:
@@ -113,8 +117,8 @@ PokemonUltimate.UnifiedDebuggerUI/
 
 ### DamageCalculatorRunner (6.2) ✅
 
-**Namespace**: `PokemonUltimate.UnifiedDebuggerUI.Runners`
-**File**: `PokemonUltimate.UnifiedDebuggerUI/Runners/DamageCalculatorRunner.cs`
+**Namespace**: `PokemonUltimate.DevelopTools.Runners`
+**File**: `PokemonUltimate.DevelopTools/Runners/DamageCalculatorRunner.cs`
 **Purpose**: Visualizes damage pipeline step-by-step
 
 **Key Methods**:
@@ -123,8 +127,8 @@ PokemonUltimate.UnifiedDebuggerUI/
 
 ### StatusEffectRunner (6.3)
 
-**Namespace**: `PokemonUltimate.UnifiedDebuggerUI.Runners`
-**File**: `PokemonUltimate.UnifiedDebuggerUI/Runners/StatusEffectRunner.cs`
+**Namespace**: `PokemonUltimate.DevelopTools.Runners`
+**File**: `PokemonUltimate.DevelopTools/Runners/StatusEffectRunner.cs`
 **Purpose**: Tests status effects and interactions
 
 **Key Methods**:
@@ -132,15 +136,15 @@ PokemonUltimate.UnifiedDebuggerUI/
 - `GetStatModifications(...)` - Gets stat modifications from status
 - `GetDamagePerTurn(...)` - Gets damage per turn from status
 
-### TurnOrderRunner (6.4)
+### TurnOrderRunner (6.4) ✅
 
-**Namespace**: `PokemonUltimate.UnifiedDebuggerUI.Runners`
-**File**: `PokemonUltimate.UnifiedDebuggerUI/Runners/TurnOrderRunner.cs`
+**Namespace**: `PokemonUltimate.DevelopTools.Runners`
+**File**: `PokemonUltimate.DevelopTools/Runners/TurnOrderRunner.cs`
 **Purpose**: Calculates turn order with different configurations
 
 **Key Methods**:
-- `CalculateTurnOrder(...)` - Calculates turn order for given actions
-- `GetEffectiveSpeed(...)` - Gets effective speed with modifiers
+- `CalculateTurnOrder(...)` - Calculates turn order for given Pokemon configurations
+- Returns `TurnOrderResult` with speed calculations, priority info, and final turn order
 
 ## Integration Points
 

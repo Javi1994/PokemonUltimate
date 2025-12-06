@@ -5,18 +5,18 @@ using System.Windows.Forms;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
+namespace PokemonUltimate.DevelopTools.Tabs
 {
     public partial class TypeMatchupDebuggerTab : UserControl
     {
-        private ComboBox comboAttackingType;
-        private ComboBox comboDefenderPrimaryType;
-        private ComboBox comboDefenderSecondaryType;
-        private Button btnCalculate;
-        private Label lblResult;
-        private RichTextBox txtBreakdown;
-        private DataGridView dgvTypeChart;
-        private Label lblTitle;
+        private ComboBox comboAttackingType = null!;
+        private ComboBox comboDefenderPrimaryType = null!;
+        private ComboBox comboDefenderSecondaryType = null!;
+        private Button btnCalculate = null!;
+        private Label lblResult = null!;
+        private RichTextBox txtBreakdown = null!;
+        private DataGridView dgvTypeChart = null!;
+        private Label lblTitle = null!;
 
         public TypeMatchupDebuggerTab()
         {

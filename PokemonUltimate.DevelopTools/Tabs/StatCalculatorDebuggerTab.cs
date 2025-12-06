@@ -7,9 +7,9 @@ using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.UnifiedDebuggerUI.Runners;
+using PokemonUltimate.DevelopTools.Runners;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
+namespace PokemonUltimate.DevelopTools.Tabs
 {
     /// <summary>
     /// Debugger tab for calculating and visualizing Pokemon stats with different configurations.
@@ -21,29 +21,29 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
     /// </remarks>
     public partial class StatCalculatorDebuggerTab : UserControl
     {
-        private ComboBox comboPokemon;
-        private NumericUpDown numericLevel;
-        private ComboBox comboNature;
-        private NumericUpDown numericIV_HP;
-        private NumericUpDown numericIV_Attack;
-        private NumericUpDown numericIV_Defense;
-        private NumericUpDown numericIV_SpAttack;
-        private NumericUpDown numericIV_SpDefense;
-        private NumericUpDown numericIV_Speed;
-        private NumericUpDown numericEV_HP;
-        private NumericUpDown numericEV_Attack;
-        private NumericUpDown numericEV_Defense;
-        private NumericUpDown numericEV_SpAttack;
-        private NumericUpDown numericEV_SpDefense;
-        private NumericUpDown numericEV_Speed;
-        private Label lblTotalEVs;
-        private Button btnCalculate;
-        private TabControl tabResults;
-        private TabPage tabSummary;
-        private TabPage tabStatsTable;
-        private RichTextBox txtSummary;
-        private DataGridView dgvStatsTable;
-        private StatCalculatorRunner _runner;
+        private ComboBox comboPokemon = null!;
+        private NumericUpDown numericLevel = null!;
+        private ComboBox comboNature = null!;
+        private NumericUpDown numericIV_HP = null!;
+        private NumericUpDown numericIV_Attack = null!;
+        private NumericUpDown numericIV_Defense = null!;
+        private NumericUpDown numericIV_SpAttack = null!;
+        private NumericUpDown numericIV_SpDefense = null!;
+        private NumericUpDown numericIV_Speed = null!;
+        private NumericUpDown numericEV_HP = null!;
+        private NumericUpDown numericEV_Attack = null!;
+        private NumericUpDown numericEV_Defense = null!;
+        private NumericUpDown numericEV_SpAttack = null!;
+        private NumericUpDown numericEV_SpDefense = null!;
+        private NumericUpDown numericEV_Speed = null!;
+        private Label lblTotalEVs = null!;
+        private Button btnCalculate = null!;
+        private TabControl tabResults = null!;
+        private TabPage tabSummary = null!;
+        private TabPage tabStatsTable = null!;
+        private RichTextBox txtSummary = null!;
+        private DataGridView dgvStatsTable = null!;
+        private StatCalculatorRunner _runner = null!;
 
         public StatCalculatorDebuggerTab()
         {
@@ -413,7 +413,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
                 {
                     selectedNature = natureByIndex;
                 }
-                else if (Enum.TryParse<Nature>(item.ToString(), out var parsedNature))
+                else if (item != null && Enum.TryParse<Nature>(item.ToString(), out var parsedNature))
                 {
                     selectedNature = parsedNature;
                 }

@@ -12,7 +12,9 @@ This document describes all use cases for the development tools and debuggers.
 
 ## Existing Debuggers ✅
 
-### Battle Debugger
+### 6.5: Battle Debugger
+
+**See**: [`6.5-battle-debugger/README.md`](6.5-battle-debugger/README.md) for complete documentation
 
 **UC-6.0.1**: Run multiple battles between two Pokemon
 - **Actor**: Developer
@@ -41,7 +43,9 @@ This document describes all use cases for the development tools and debuggers.
   2. View "Status Effects" tab
   3. See status effect counts and percentages per Pokemon
 
-### Move Debugger
+### 6.6: Move Debugger
+
+**See**: [`6.6-move-debugger/README.md`](6.6-move-debugger/README.md) for complete documentation
 
 **UC-6.0.4**: Test move damage ranges
 - **Actor**: Developer

@@ -382,7 +382,7 @@ PokemonUltimate/
 │
 ├── BattleDemo/       # Visual AI vs AI battle simulator
 │
-└── UnifiedDebuggerUI/     # Unified debugger application with tabbed interface (Windows Forms)
+└── DevelopTools/           # Development tools application with tabbed interface (Windows Forms)
 │
 └── PokemonUltimateUnity/  # Unity project
     ├── Assets/
@@ -419,8 +419,8 @@ dotnet test
 # Run battle demo (AI vs AI battles)
 dotnet run --project PokemonUltimate.BattleDemo
 
-# Run unified debugger (Windows Forms application with all debuggers)
-dotnet run --project PokemonUltimate.UnifiedDebuggerUI
+# Run development tools (Windows Forms application with all debuggers)
+dotnet run --project PokemonUltimate.DevelopTools
 
 # Build DLLs for Unity (optional)
 dotnet build -c Release
@@ -487,7 +487,7 @@ See detailed roadmaps for implementation plans:
 
 The project includes specialized Windows Forms applications for testing and debugging different aspects of the battle system:
 
-### Unified Debugger
+### Development Tools
 
 **Single Windows Forms application** with tabbed interface integrating all debuggers:
 
@@ -499,8 +499,8 @@ The project includes specialized Windows Forms applications for testing and debu
 
 **Usage**:
 ```bash
-# Run unified debugger (opens with all three tabs)
-dotnet run --project PokemonUltimate.UnifiedDebuggerUI
+# Run development tools (opens with all debugger tabs)
+dotnet run --project PokemonUltimate.DevelopTools
 ```
 
 ### Debugger Tabs

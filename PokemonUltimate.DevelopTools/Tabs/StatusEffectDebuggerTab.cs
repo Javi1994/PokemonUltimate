@@ -6,9 +6,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.UnifiedDebuggerUI.Runners;
+using PokemonUltimate.DevelopTools.Runners;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
+namespace PokemonUltimate.DevelopTools.Tabs
 {
     /// <summary>
     /// Debugger tab for testing status effects and their interactions.
@@ -20,21 +20,21 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
     /// </remarks>
     public partial class StatusEffectDebuggerTab : UserControl
     {
-        private ComboBox comboPokemon;
-        private NumericUpDown numericLevel;
-        private ComboBox comboPersistentStatus;
-        private CheckedListBox chkListVolatileStatus;
-        private Button btnApply;
-        private TabControl tabResults;
-        private TabPage tabSummary;
-        private TabPage tabStatModifications;
-        private TabPage tabDamagePerTurn;
-        private TabPage tabInteractions;
-        private RichTextBox txtSummary;
-        private DataGridView dgvStatModifications;
-        private DataGridView dgvDamagePerTurn;
-        private DataGridView dgvInteractions;
-        private StatusEffectRunner _runner;
+        private ComboBox comboPokemon = null!;
+        private NumericUpDown numericLevel = null!;
+        private ComboBox comboPersistentStatus = null!;
+        private CheckedListBox chkListVolatileStatus = null!;
+        private Button btnApply = null!;
+        private TabControl tabResults = null!;
+        private TabPage tabSummary = null!;
+        private TabPage tabStatModifications = null!;
+        private TabPage tabDamagePerTurn = null!;
+        private TabPage tabInteractions = null!;
+        private RichTextBox txtSummary = null!;
+        private DataGridView dgvStatModifications = null!;
+        private DataGridView dgvDamagePerTurn = null!;
+        private DataGridView dgvInteractions = null!;
+        private StatusEffectRunner _runner = null!;
 
         public StatusEffectDebuggerTab()
         {
@@ -134,9 +134,9 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
             yPos += 25;
             this.chkListVolatileStatus.Location = new Point(leftMargin, yPos);
             this.chkListVolatileStatus.Width = controlWidth;
-            this.chkListVolatileStatus.Height = 150;
+            this.chkListVolatileStatus.Height = 220; // Increased from 150 to 220 for better visibility
             this.chkListVolatileStatus.CheckOnClick = true;
-            yPos += 155;
+            yPos += 225; // Updated to match new height
 
             // Apply button
             this.btnApply = new Button

@@ -6,31 +6,32 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.UnifiedDebuggerUI.Runners;
+using PokemonUltimate.DevelopTools.Runners;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
+namespace PokemonUltimate.DevelopTools.Tabs
 {
     public partial class BattleDebuggerTab : UserControl
     {
-        private ComboBox comboPlayerPokemon;
-        private ComboBox comboEnemyPokemon;
-        private NumericUpDown numericLevel;
-        private NumericUpDown numericBattles;
-        private CheckBox checkDetailedOutput;
-        private Button btnRun;
-        private TabControl tabResults;
-        private TabPage tabSummary;
-        private TabPage tabMoveUsage;
-        private TabPage tabStatusEffects;
-        private RichTextBox txtSummary;
-        private DataGridView dgvMoveUsage;
-        private DataGridView dgvStatusEffects;
-        private ProgressBar progressBar;
-        private Label lblStatus;
+        private ComboBox comboPlayerPokemon = null!;
+        private ComboBox comboEnemyPokemon = null!;
+        private NumericUpDown numericLevel = null!;
+        private NumericUpDown numericBattles = null!;
+        private CheckBox checkDetailedOutput = null!;
+        private Button btnRun = null!;
+        private TabControl tabResults = null!;
+        private TabPage tabSummary = null!;
+        private TabPage tabMoveUsage = null!;
+        private TabPage tabStatusEffects = null!;
+        private RichTextBox txtSummary = null!;
+        private DataGridView dgvMoveUsage = null!;
+        private DataGridView dgvStatusEffects = null!;
+        private ProgressBar progressBar = null!;
+        private Label lblStatus = null!;
 
         public BattleDebuggerTab()
         {
             InitializeComponent();
+
             LoadPokemonList();
         }
 
@@ -51,7 +52,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
             this.dgvStatusEffects = new DataGridView();
             this.progressBar = new ProgressBar();
             this.lblStatus = new Label();
-            
+
             this.SuspendLayout();
 
             // UserControl
@@ -93,11 +94,11 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
             };
             yPos += 40;
 
-            var lblPlayerPokemon = new Label 
-            { 
-                Text = "Player Pokemon:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblPlayerPokemon = new Label
+            {
+                Text = "Player Pokemon:",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.comboPlayerPokemon.Location = new Point(leftMargin, yPos);
@@ -106,11 +107,11 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
             this.comboPlayerPokemon.Height = 25;
             yPos += spacing;
 
-            var lblEnemyPokemon = new Label 
-            { 
-                Text = "Enemy Pokemon:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblEnemyPokemon = new Label
+            {
+                Text = "Enemy Pokemon:",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.comboEnemyPokemon.Location = new Point(leftMargin, yPos);
@@ -119,11 +120,11 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
             this.comboEnemyPokemon.Height = 25;
             yPos += spacing;
 
-            var lblLevel = new Label 
-            { 
-                Text = "Level:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblLevel = new Label
+            {
+                Text = "Level:",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.numericLevel.Location = new Point(leftMargin, yPos);
@@ -133,11 +134,11 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
             this.numericLevel.Value = 50;
             yPos += spacing;
 
-            var lblBattles = new Label 
-            { 
-                Text = "Number of Battles:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblBattles = new Label
+            {
+                Text = "Number of Battles:",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.numericBattles.Location = new Point(leftMargin, yPos);
@@ -237,10 +238,10 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
         private void LoadPokemonList()
         {
             var pokemonList = PokemonCatalog.All.OrderBy(p => p.Name).ToList();
-            
+
             this.comboPlayerPokemon.Items.Add("(Random)");
             this.comboEnemyPokemon.Items.Add("(Random)");
-            
+
             foreach (var pokemon in pokemonList)
             {
                 this.comboPlayerPokemon.Items.Add(pokemon.Name);
@@ -251,7 +252,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
             this.comboEnemyPokemon.SelectedIndex = 0;
         }
 
-        private async void BtnRun_Click(object sender, EventArgs e)
+        private async void BtnRun_Click(object? sender, EventArgs e)
         {
             this.btnRun.Enabled = false;
             this.progressBar.Value = 0;

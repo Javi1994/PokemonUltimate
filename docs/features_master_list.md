@@ -192,11 +192,13 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 **Sub-Features**:
 
-- **Existing**: Battle Debugger, Move Debugger, Type Matchup Debugger ✅ Complete
+- **6.5**: Battle Debugger - Run multiple battles and analyze statistics ✅ Complete
+- **6.6**: Move Debugger - Test moves multiple times and collect statistics ✅ Complete
+- **Existing**: Type Matchup Debugger ✅ Complete
 - **6.1**: Stat Calculator Debugger - Calculate and visualize Pokemon stats with different configurations ✅ Complete
 - **6.2**: Damage Calculator Debugger - Step-by-step damage calculation pipeline visualization ✅ Complete
 - **6.3**: Status Effect Debugger - Test status effects and their interactions ✅ Complete
-- **6.4**: Turn Order Debugger - Visualize turn order determination with speed and priority ⏳ Planned
+- **6.4**: Turn Order Debugger - Visualize turn order determination with speed and priority ✅ Complete
 
 **Related Roadmap**: `docs/features/6-development-tools/roadmap.md`
 

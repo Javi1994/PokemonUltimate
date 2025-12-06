@@ -9,7 +9,7 @@ using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Runners
+namespace PokemonUltimate.DevelopTools.Runners
 {
     /// <summary>
     /// Calculates damage and visualizes the damage pipeline step-by-step for the Damage Calculator Debugger.
@@ -26,9 +26,9 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         /// </summary>
         public class DamageCalculationConfig
         {
-            public PokemonSpeciesData AttackerSpecies { get; set; }
-            public PokemonSpeciesData DefenderSpecies { get; set; }
-            public MoveData Move { get; set; }
+            public PokemonSpeciesData AttackerSpecies { get; set; } = null!;
+            public PokemonSpeciesData DefenderSpecies { get; set; } = null!;
+            public MoveData Move { get; set; } = null!;
             public int Level { get; set; } = 50;
             public bool ForceCritical { get; set; } = false;
             public float? FixedRandomValue { get; set; } = null;
@@ -39,8 +39,8 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
         /// </summary>
         public class PipelineStep
         {
-            public string StepName { get; set; }
-            public string Description { get; set; }
+            public string StepName { get; set; } = string.Empty;
+            public string Description { get; set; } = string.Empty;
             public float MultiplierBefore { get; set; }
             public float MultiplierAfter { get; set; }
             public float MultiplierChange { get; set; }
@@ -50,7 +50,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Runners
             public float RandomFactor { get; set; }
             public float TypeEffectiveness { get; set; }
             public bool IsStab { get; set; }
-            public string Details { get; set; }
+            public string Details { get; set; } = string.Empty;
         }
 
         /// <summary>

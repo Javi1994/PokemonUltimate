@@ -8,30 +8,30 @@ using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Factories;
-using PokemonUltimate.UnifiedDebuggerUI.Runners;
+using PokemonUltimate.DevelopTools.Runners;
 
-namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
+namespace PokemonUltimate.DevelopTools.Tabs
 {
     public partial class MoveDebuggerTab : UserControl
     {
-        private ComboBox comboMove;
-        private ComboBox comboAttackerPokemon;
-        private ComboBox comboTargetPokemon;
-        private NumericUpDown numericLevel;
-        private NumericUpDown numericTests;
-        private CheckBox checkDetailedOutput;
-        private Button btnRun;
-        private TabControl tabResults;
-        private TabPage tabSummary;
-        private TabPage tabDamage;
-        private TabPage tabStatusEffects;
-        private TabPage tabActions;
-        private RichTextBox txtSummary;
-        private DataGridView dgvDamage;
-        private DataGridView dgvStatusEffects;
-        private DataGridView dgvActions;
-        private ProgressBar progressBar;
-        private Label lblStatus;
+        private ComboBox comboMove = null!;
+        private ComboBox comboAttackerPokemon = null!;
+        private ComboBox comboTargetPokemon = null!;
+        private NumericUpDown numericLevel = null!;
+        private NumericUpDown numericTests = null!;
+        private CheckBox checkDetailedOutput = null!;
+        private Button btnRun = null!;
+        private TabControl tabResults = null!;
+        private TabPage tabSummary = null!;
+        private TabPage tabDamage = null!;
+        private TabPage tabStatusEffects = null!;
+        private TabPage tabActions = null!;
+        private RichTextBox txtSummary = null!;
+        private DataGridView dgvDamage = null!;
+        private DataGridView dgvStatusEffects = null!;
+        private DataGridView dgvActions = null!;
+        private ProgressBar progressBar = null!;
+        private Label lblStatus = null!;
 
         public MoveDebuggerTab()
         {
@@ -303,7 +303,7 @@ namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
             }
         }
 
-        private async void BtnRun_Click(object sender, EventArgs e)
+        private async void BtnRun_Click(object? sender, EventArgs e)
         {
             this.btnRun.Enabled = false;
             this.progressBar.Value = 0;

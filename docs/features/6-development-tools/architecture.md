@@ -8,14 +8,14 @@
 
 ## Overview
 
-The Development Tools feature provides a unified Windows Forms application (`PokemonUltimate.UnifiedDebuggerUI`) that integrates multiple debugger tabs for testing and analyzing different aspects of the Pokemon battle system.
+The Development Tools feature provides a unified Windows Forms application (`PokemonUltimate.DevelopTools`) that integrates multiple debugger tabs for testing and analyzing different aspects of the Pokemon battle system.
 
 ## Architecture
 
 ### Unified Application Structure
 
 ```
-PokemonUltimate.UnifiedDebuggerUI/
+PokemonUltimate.DevelopTools/
 ├── MainForm.cs                    # Main form with TabControl
 ├── Program.cs                     # Application entry point
 ├── Runners/

@@ -89,7 +89,7 @@ PokemonUltimate.Tests/
 
 **Unified Debugger Application** - Single Windows Forms application with tabbed interface:
 
-- **[UnifiedDebuggerUI](../../../PokemonUltimate.UnifiedDebuggerUI/)** - Integrated debugger application
+- **[DevelopTools](../../../PokemonUltimate.DevelopTools/)** - Integrated debugger application
   - **Battle Debugger Tab**: Run multiple battles and analyze statistics
     - Uses new Statistics System (Sub-Feature 2.20) for automatic tracking
     - Move usage statistics (most used moves per Pokemon)
@@ -114,7 +114,7 @@ PokemonUltimate.Tests/
 
 **Usage**:
 ```bash
-dotnet run --project PokemonUltimate.UnifiedDebuggerUI
+dotnet run --project PokemonUltimate.DevelopTools
 ```
 
 See [`../../../docs/DEBUGGERS.md`](../../../docs/DEBUGGERS.md) for complete debugger documentation.
