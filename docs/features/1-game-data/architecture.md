@@ -54,14 +54,14 @@ It follows the **Testability First** guideline by separating the Data (POCO) fro
 -   **1.14: Enums & Constants** - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages, NatureData
 -   ⚠️ **Builders**: Moved to **[Feature 3.9: Builders](../3-content-expansion/3.9-builders/)** - Used primarily for content creation
 -   **1.16: Factories & Calculators** - StatCalculator, PokemonFactory, PokemonInstanceBuilder
--   **1.16: Registry System** - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
+-   **1.17: Registry System** - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
 
 ### Grupo E: Planned Features (1.18-1.19)
 
 **Features futuras**
 
 -   **1.18: Variants System** - Mega/Dinamax/Terracristalización (Planned)
--   **1.19: Pokedex Fields** - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
+-   **1.19: Pokedex Fields** - Description, Category, Height, Weight, Color, Shape, Habitat ✅ Complete
 
 ---
 
@@ -792,9 +792,9 @@ var CharizardTeraFire = Pokemon.Define("Charizard Tera Fire", 6)
 
 ---
 
-## 9. Pokedex Fields ⏳ PLANNED
+## 9. Pokedex Fields ✅ COMPLETE
 
-**See**: `docs/features/1-game-data/roadmap.md` Phase 3 for complete specification.
+**See**: `docs/features/1-game-data/roadmap.md` Phase 2 for complete specification.
 
 ### Overview
 
@@ -826,7 +826,7 @@ var Charizard = Pokemon.Define("Charizard", 6)
     .Build();
 ```
 
-**Status**: ⏳ **PLANNED** - See `docs/features/1-game-data/roadmap.md` Phase 3 for implementation details.
+**Status**: ✅ **COMPLETE** - See `docs/features/1-game-data/roadmap.md` Phase 2 for implementation details. All fields implemented with PokedexDataProvider system.
 
 ---
 

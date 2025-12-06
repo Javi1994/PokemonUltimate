@@ -13,8 +13,8 @@ This document defines the implementation roadmap for **all game data structures*
 -   **Core Entity Data** (1.1-1.4): Pokemon, Moves, Abilities, Items
 -   **Field & Status Data** (1.5-1.10): Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
 -   **Supporting Systems** (1.11-1.12): Evolution System, Type Effectiveness Table
--   **Infrastructure** (1.13-1.14, 1.16-1.17): Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
--   **Planned Features** (1.18-1.19): Variants System, Pokedex Fields
+-   **Infrastructure** (1.13-1.14, 1.16-1.17): Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9, was 1.15)
+-   **Planned Features** (1.18-1.19): Variants System (Planned), Pokedex Fields ✅ Complete
 
 **Goal**: Ensure all data structures are complete and well-organized before expanding content, preventing future refactoring.
 
@@ -22,13 +22,13 @@ This document defines the implementation roadmap for **all game data structures*
 
 ## Current Status Summary
 
-| Group                            | Sub-Features | Status           | Completion |
-| -------------------------------- | ------------ | ---------------- | ---------- |
-| **Grupo A: Core Entity Data**    | 1.1-1.4      | ✅ Core Complete | 100%       |
-| **Grupo B: Field & Status Data** | 1.5-1.10     | ✅ Core Complete | 100%       |
-| **Grupo C: Supporting Systems**  | 1.11-1.12    | ✅ Core Complete | 100%       |
-| **Grupo D: Infrastructure**      | 1.13-1.17    | ✅ Core Complete | 100%       |
-| **Grupo E: Planned Features**    | 1.18-1.19    | ⏳ Planned       | 0%         |
+| Group                            | Sub-Features         | Status           | Completion |
+| -------------------------------- | -------------------- | ---------------- | ---------- |
+| **Grupo A: Core Entity Data**    | 1.1-1.4              | ✅ Core Complete | 100%       |
+| **Grupo B: Field & Status Data** | 1.5-1.10             | ✅ Core Complete | 100%       |
+| **Grupo C: Supporting Systems**  | 1.11-1.12            | ✅ Core Complete | 100%       |
+| **Grupo D: Infrastructure**      | 1.13-1.14, 1.16-1.17 | ✅ Core Complete | 100%       |
+| **Grupo E: Planned Features**    | 1.18-1.19            | 🎯 In Progress   | 50%        |
 
 ---
 
@@ -268,7 +268,7 @@ This document defines the implementation roadmap for **all game data structures*
 
 ---
 
-#### 1.15: Factories & Calculators ✅ CORE COMPLETE
+#### 1.16: Factories & Calculators ✅ CORE COMPLETE
 
 **Status**: Core structure complete, refactored (2024-12-XX)  
 **Components**: IStatCalculator/StatCalculator, ITypeEffectiveness/TypeEffectiveness, PokemonFactory, PokemonInstanceBuilder, IMoveSelector/MoveSelector
@@ -289,11 +289,11 @@ This document defines the implementation roadmap for **all game data structures*
 -   Validation centralization (CoreValidators)
 -   Improved testability and maintainability
 
-**Related**: [Sub-Feature 1.15 Documentation](1.15-factories-calculators/)
+**Related**: [Sub-Feature 1.16 Documentation](1.16-factories-calculators/)
 
 ---
 
-#### 1.16: Registry System ✅ CORE COMPLETE
+#### 1.17: Registry System ✅ CORE COMPLETE
 
 **Status**: Core structure complete  
 **Components**: IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
@@ -326,17 +326,19 @@ This document defines the implementation roadmap for **all game data structures*
 
 ---
 
-#### 1.19: Pokedex Fields ⏳ PLANNED
+#### 1.19: Pokedex Fields ✅ COMPLETE
 
-**Status**: Planned  
+**Status**: Complete  
 **Components**: Description, Category, Height, Weight, Color, Shape, Habitat
 
-**⏳ Planned**:
+**✅ Implemented**:
 
 -   Description field (Pokedex entry text)
 -   Category field (Classification)
 -   Height and Weight fields (Physical measurements)
 -   Color, Shape, Habitat enums and fields
+-   PokedexDataProvider system for centralized data management
+-   Extension method `WithPokedexData()` for easy application
 
 **Related**: [Sub-Feature 1.19 Documentation](1.19-pokedex-fields/)
 
@@ -415,7 +417,7 @@ public int CatchRate { get; set; } = 45;
 public int BaseFriendship { get; set; } = 70;
 ```
 
-**Builder Support**: Add `.BaseFriendship(int)` method to PokemonBuilder (Sub-Feature 1.15)  
+**Builder Support**: Add `.BaseFriendship(int)` method to PokemonBuilder (Sub-Feature 3.9)  
 **Update PokemonInstance**: Use `Species.BaseFriendship` instead of hardcoded `70`  
 **Default Values**: Most = 70, Starters/Hatched = 120, Some legendaries = 0  
 **Tests**: Verify PokemonInstance uses BaseFriendship correctly  
@@ -472,7 +474,7 @@ public string Description { get; set; } = string.Empty;  // Pokedex entry text
 public string Category { get; set; } = string.Empty;     // Classification (e.g., "Flame Pokemon")
 ```
 
-**Builder Support**: Add `.Description(string)` and `.Category(string)` methods (Sub-Feature 1.15)  
+**Builder Support**: Add `.Description(string)` and `.Category(string)` methods (Sub-Feature 3.9)  
 **Default Values**: Use official Pokemon data from Bulbapedia
 
 ---
@@ -489,7 +491,7 @@ public float Height { get; set; } = 0f;   // Height in meters
 public float Weight { get; set; } = 0f;   // Weight in kilograms
 ```
 
-**Builder Support**: Add `.Height(float)` and `.Weight(float)` methods (Sub-Feature 1.15)  
+**Builder Support**: Add `.Height(float)` and `.Weight(float)` methods (Sub-Feature 3.9)  
 **Default Values**: Use official Pokemon data
 
 ---
@@ -512,7 +514,7 @@ public PokemonShape Shape { get; set; } = PokemonShape.Unknown;
 public PokemonHabitat Habitat { get; set; } = PokemonHabitat.Unknown;
 ```
 
-**Builder Support**: Add `.Color()`, `.Shape()`, `.Habitat()` methods (Sub-Feature 1.15)  
+**Builder Support**: Add `.Color()`, `.Shape()`, `.Habitat()` methods (Sub-Feature 3.9)  
 **Default Values**: Use official Pokemon data
 
 ---
@@ -544,7 +546,7 @@ public bool IsVariant => VariantType != PokemonVariantType.None;
 public bool IsBaseForm => VariantType == PokemonVariantType.None;
 ```
 
-**Builder Support**: Add `.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()` methods (Sub-Feature 1.15)  
+**Builder Support**: Add `.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()` methods (Sub-Feature 3.9)  
 **Tests**: Verify variant relationships and validation  
 **Related**: [Sub-Feature 1.18 Architecture](1.18-variants-system/architecture.md)
 

@@ -59,13 +59,13 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 -   **1.13**: Interfaces Base - IIdentifiable
 -   **1.14**: Enums & Constants - Enums (20 main + 7 in Effects), ErrorMessages, GameMessages, CoreConstants, CoreValidators, Extensions, NatureData (post-refactor)
 -   ⚠️ **Builders**: Moved to Feature 3.9 (see Feature 3 below)
--   **1.15**: Factories & Calculators - IStatCalculator/StatCalculator, ITypeEffectiveness/TypeEffectiveness, PokemonFactory, PokemonInstanceBuilder, IMoveSelector/MoveSelector (post-refactor)
--   **1.16**: Registry System - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
+-   **1.16**: Factories & Calculators - IStatCalculator/StatCalculator, ITypeEffectiveness/TypeEffectiveness, PokemonFactory, PokemonInstanceBuilder, IMoveSelector/MoveSelector (post-refactor)
+-   **1.17**: Registry System - IDataRegistry<T>, GameDataRegistry<T>, PokemonRegistry, MoveRegistry
 
 #### Grupo E: Planned Features
 
 -   **1.18**: Variants System - Mega/Dinamax/Terracristalización as separate species (Planned)
--   **1.19**: Pokedex Fields - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
+-   **1.19**: Pokedex Fields - Description, Category, Height, Weight, Color, Shape, Habitat ✅ Complete
 
 **Related Roadmap**: `docs/features/1-game-data/roadmap.md`
 
@@ -144,6 +144,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 -   **4.6**: Audio System - Sound effects, battle music
 -   **4.7**: Post-Battle UI - Results, rewards, level ups display
 -   **4.8**: Transitions - Battle start/end transitions, scene management
+-   **4.9**: Localization System - Multi-language text management and translation ⏳ Planned
 
 **Related Roadmap**: `docs/features/4-unity-integration/roadmap.md`
 

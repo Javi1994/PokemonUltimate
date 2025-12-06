@@ -9,42 +9,49 @@
 ## Overview
 
 Content expansion code is organized in the `PokemonUltimate.Content` project:
-- **Catalogs** - Static content definitions (Pokemon, Moves, Items, Abilities)
-- **Builders** - Fluent APIs for creating content
+
+-   **Catalogs** - Static content definitions (Pokemon, Moves, Items, Abilities)
+-   **Builders** - Fluent APIs for creating content
+-   **Providers** - Centralized data providers (PokedexDataProvider, LearnsetProvider)
+-   **Extensions** - Extension methods for applying provider data
 
 ## Namespaces
 
 ### `PokemonUltimate.Content.Catalogs`
+
 **Purpose**: Static catalogs of game content
 **Key Classes**:
-- `PokemonCatalog` - Pokemon species catalog (partial classes by generation)
-- `MoveCatalog` - Moves catalog (partial classes by type)
-- `AbilityCatalog` - Abilities catalog (partial classes by category)
-- `ItemCatalog` - Items catalog (partial classes by category)
-- `StatusCatalog` - Status effects catalog
-- `WeatherCatalog` - Weather conditions catalog
-- `TerrainCatalog` - Terrain conditions catalog
-- `HazardCatalog` - Hazard catalog
-- `SideConditionCatalog` - Side condition catalog
-- `FieldEffectCatalog` - Field effect catalog
+
+-   `PokemonCatalog` - Pokemon species catalog (partial classes by generation)
+-   `MoveCatalog` - Moves catalog (partial classes by type)
+-   `AbilityCatalog` - Abilities catalog (partial classes by category)
+-   `ItemCatalog` - Items catalog (partial classes by category)
+-   `StatusCatalog` - Status effects catalog
+-   `WeatherCatalog` - Weather conditions catalog
+-   `TerrainCatalog` - Terrain conditions catalog
+-   `HazardCatalog` - Hazard catalog
+-   `SideConditionCatalog` - Side condition catalog
+-   `FieldEffectCatalog` - Field effect catalog
 
 ### `PokemonUltimate.Content.Builders`
+
 **Purpose**: Fluent builders for creating content  
 **Sub-Feature**: [3.9: Builders](3.9-builders/)  
 **Key Classes**:
-- `PokemonBuilder` - Builder for `PokemonSpeciesData`
-- `MoveBuilder` - Builder for `MoveData`
-- `AbilityBuilder` - Builder for `AbilityData`
-- `ItemBuilder` - Builder for `ItemData`
-- `StatusEffectBuilder` - Builder for `StatusEffectData`
-- `SideConditionBuilder` - Builder for `SideConditionData`
-- `FieldEffectBuilder` - Builder for `FieldEffectData`
-- `HazardBuilder` - Builder for `HazardData`
-- `WeatherBuilder` - Builder for `WeatherData`
-- `TerrainBuilder` - Builder for `TerrainData`
-- `EffectBuilder` - Builder for move effects
-- `LearnsetBuilder` - Builder for Pokemon learnsets
-- `EvolutionBuilder` - Builder for evolution conditions
+
+-   `PokemonBuilder` - Builder for `PokemonSpeciesData`
+-   `MoveBuilder` - Builder for `MoveData`
+-   `AbilityBuilder` - Builder for `AbilityData`
+-   `ItemBuilder` - Builder for `ItemData`
+-   `StatusEffectBuilder` - Builder for `StatusEffectData`
+-   `SideConditionBuilder` - Builder for `SideConditionData`
+-   `FieldEffectBuilder` - Builder for `FieldEffectData`
+-   `HazardBuilder` - Builder for `HazardData`
+-   `WeatherBuilder` - Builder for `WeatherData`
+-   `TerrainBuilder` - Builder for `TerrainData`
+-   `EffectBuilder` - Builder for move effects
+-   `LearnsetBuilder` - Builder for Pokemon learnsets
+-   `EvolutionBuilder` - Builder for evolution conditions
 
 ## Project Structure
 
@@ -94,6 +101,15 @@ PokemonUltimate.Content/
 │   │   ├── SideConditionCatalog.cs     # Side conditions (10)
 │   │   └── FieldEffectCatalog.cs       # Field effects (8)
 │   │
+├── Providers/
+│   ├── PokedexDataProvider.cs          # Centralized Pokedex data (Description, Category, Height, Weight, Color, Shape, Habitat)
+│   ├── PokedexData.cs                  # Pokedex data structure
+│   ├── LearnsetProvider.cs             # Centralized learnset data (moves Pokemon can learn)
+│   └── LearnsetData.cs                 # Learnset data structure
+│
+├── Extensions/
+│   └── PokemonSpeciesDataExtensions.cs # Extension methods: WithPokedexData(), WithLearnset()
+│
 └── Builders/ (Sub-Feature 3.9)
     ├── PokemonBuilder.cs               # Pokemon.Define(...)
     ├── MoveBuilder.cs                  # Move.Define(...)
@@ -113,80 +129,147 @@ PokemonUltimate.Content/
 ## Key Classes
 
 ### PokemonCatalog
+
 **Namespace**: `PokemonUltimate.Content.Catalogs`
 **File**: `PokemonUltimate.Content/Catalogs/Pokemon/PokemonCatalog.cs` (+ partial classes)
 **Purpose**: Static catalog of all Pokemon species
 **Structure**: Partial classes organized by generation
-- `PokemonCatalog.cs` - Main catalog class (All, Count, RegisterAll)
-- `PokemonCatalog.Gen1.cs` - Gen 1 Pokemon (26 implemented)
+
+-   `PokemonCatalog.cs` - Main catalog class (All, Count, RegisterAll)
+-   `PokemonCatalog.Gen1.cs` - Gen 1 Pokemon (26 implemented)
 
 **Usage**:
+
 ```csharp
 var pikachu = PokemonCatalog.Pikachu;  // Returns PokemonSpeciesData
 var allGen1 = PokemonCatalog.GetAllGen1();  // Returns all Gen 1 Pokemon
 ```
 
 **Key Methods**:
-- `GetAllGen1()` - Get all Gen 1 Pokemon
-- `GetByPokedexNumber(int)` - Get Pokemon by Pokedex number
-- `RegisterAll(IPokemonRegistry)` - Register all Pokemon to registry
+
+-   `GetAllGen1()` - Get all Gen 1 Pokemon
+-   `GetByPokedexNumber(int)` - Get Pokemon by Pokedex number
+-   `RegisterAll(IPokemonRegistry)` - Register all Pokemon to registry
 
 ### MoveCatalog
+
 **Namespace**: `PokemonUltimate.Content.Catalogs`
 **File**: `PokemonUltimate.Content/Catalogs/Moves/MoveCatalog.cs` (+ partial classes)
 **Purpose**: Static catalog of all moves
 **Structure**: Partial classes organized by type
-- `MoveCatalog.cs` - Main catalog class
-- `MoveCatalog.Fire.cs` - Fire-type moves
-- `MoveCatalog.Water.cs` - Water-type moves
-- etc.
+
+-   `MoveCatalog.cs` - Main catalog class
+-   `MoveCatalog.Fire.cs` - Fire-type moves
+-   `MoveCatalog.Water.cs` - Water-type moves
+-   etc.
 
 **Usage**:
+
 ```csharp
 var flamethrower = MoveCatalog.Flamethrower;  // Returns MoveData
 var fireMoves = MoveCatalog.GetAllByType(PokemonType.Fire);  // Returns all Fire moves
 ```
 
 **Key Methods**:
-- `GetAllByType(PokemonType)` - Get all moves of a type
-- `RegisterAll(IMoveRegistry)` - Register all moves to registry
+
+-   `GetAllByType(PokemonType)` - Get all moves of a type
+-   `RegisterAll(IMoveRegistry)` - Register all moves to registry
 
 ### AbilityCatalog
+
 **Namespace**: `PokemonUltimate.Content.Catalogs`
 **File**: `PokemonUltimate.Content/Catalogs/Abilities/AbilityCatalog.cs` (+ partial classes)
 **Purpose**: Static catalog of all abilities
 **Structure**: Partial classes organized by category
-- `AbilityCatalog.cs` - Main catalog class
-- `AbilityCatalog.Gen3.cs` - Gen 3 abilities
-- `AbilityCatalog.Additional.cs` - Additional abilities
+
+-   `AbilityCatalog.cs` - Main catalog class
+-   `AbilityCatalog.Gen3.cs` - Gen 3 abilities
+-   `AbilityCatalog.Additional.cs` - Additional abilities
 
 **Usage**:
+
 ```csharp
 var blaze = AbilityCatalog.Blaze;  // Returns AbilityData
 var all = AbilityCatalog.GetAll();  // Returns all abilities
 ```
 
 ### ItemCatalog
+
 **Namespace**: `PokemonUltimate.Content.Catalogs`
 **File**: `PokemonUltimate.Content/Catalogs/Items/ItemCatalog.cs` (+ partial classes)
 **Purpose**: Static catalog of all items
 **Structure**: Partial classes organized by category
-- `ItemCatalog.cs` - Main catalog class
-- `ItemCatalog.HeldItems.cs` - Held items
-- `ItemCatalog.Berries.cs` - Berries
+
+-   `ItemCatalog.cs` - Main catalog class
+-   `ItemCatalog.HeldItems.cs` - Held items
+-   `ItemCatalog.Berries.cs` - Berries
 
 **Usage**:
+
 ```csharp
 var leftovers = ItemCatalog.Leftovers;  // Returns ItemData
 ```
 
+## Providers
+
+### PokedexDataProvider
+
+**Namespace**: `PokemonUltimate.Content.Providers`
+**File**: `PokemonUltimate.Content/Providers/PokedexDataProvider.cs`
+**Purpose**: Centralized source for Pokedex data (Description, Category, Height, Weight, Color, Shape, Habitat)
+**Usage**:
+
+```csharp
+var pokedexData = PokedexDataProvider.GetData("Pikachu");
+var hasData = PokedexDataProvider.HasData("Pikachu");
+```
+
+**Extension Method**:
+
+```csharp
+var pokemon = Pokemon.Define("Pikachu", 25)
+    .Type(PokemonType.Electric)
+    .Build()
+    .WithPokedexData(); // Applies Pokedex data from provider
+```
+
+### LearnsetProvider
+
+**Namespace**: `PokemonUltimate.Content.Providers`
+**File**: `PokemonUltimate.Content/Providers/LearnsetProvider.cs`
+**Purpose**: Centralized source for Pokemon learnset data (moves they can learn)
+**Usage**:
+
+```csharp
+var learnset = LearnsetProvider.GetLearnset("Pikachu");
+var hasLearnset = LearnsetProvider.HasLearnset("Pikachu");
+```
+
+**Extension Method**:
+
+```csharp
+var pokemon = Pokemon.Define("Pikachu", 25)
+    .Type(PokemonType.Electric)
+    .Build()
+    .WithLearnset(); // Applies learnset data from provider
+```
+
+**Benefits**:
+
+-   Reduces code verbosity in PokemonCatalog
+-   Centralizes learnset data for easier maintenance
+-   Allows gradual data population
+-   Follows SOLID principles (SRP, OCP)
+
 ## Factories & Builders
 
 ### PokemonBuilder
+
 **Namespace**: `PokemonUltimate.Content.Builders`
 **File**: `PokemonUltimate.Content/Builders/PokemonBuilder.cs`
 **Purpose**: Fluent builder for creating `PokemonSpeciesData`
 **Usage**:
+
 ```csharp
 public static readonly PokemonSpeciesData Pikachu = Pokemon.Define("Pikachu", 25)
     .Type(PokemonType.Electric)
@@ -200,20 +283,23 @@ public static readonly PokemonSpeciesData Pikachu = Pokemon.Define("Pikachu", 25
 ```
 
 **Key Methods**:
-- `Define(string name, int pokedexNumber)` - Start defining a Pokemon
-- `Type(PokemonType)` - Set mono-type
-- `Types(PokemonType, PokemonType)` - Set dual-type
-- `Stats(...)` - Set base stats
-- `Ability(AbilityData)` - Set abilities
-- `Learnset(...)` - Add learnable moves
-- `Evolves(...)` - Add evolution paths
-- `Build()` - Create the `PokemonSpeciesData`
+
+-   `Define(string name, int pokedexNumber)` - Start defining a Pokemon
+-   `Type(PokemonType)` - Set mono-type
+-   `Types(PokemonType, PokemonType)` - Set dual-type
+-   `Stats(...)` - Set base stats
+-   `Ability(AbilityData)` - Set abilities
+-   `Learnset(...)` - Add learnable moves
+-   `Evolves(...)` - Add evolution paths
+-   `Build()` - Create the `PokemonSpeciesData`
 
 ### MoveBuilder
+
 **Namespace**: `PokemonUltimate.Content.Builders`
 **File**: `PokemonUltimate.Content/Builders/MoveBuilder.cs`
 **Purpose**: Fluent builder for creating `MoveData`
 **Usage**:
+
 ```csharp
 public static readonly MoveData Flamethrower = Move.Define("Flamethrower")
     .Description("The target is scorched with an intense blast of fire.")
@@ -226,82 +312,93 @@ public static readonly MoveData Flamethrower = Move.Define("Flamethrower")
 ```
 
 **Key Methods**:
-- `Define(string name)` - Start defining a move
-- `Type(PokemonType)` - Set move type
-- `Physical(int power, int accuracy, int pp)` - Set as physical move
-- `Special(int power, int accuracy, int pp)` - Set as special move
-- `WithEffects(...)` - Add move effects
-- `Build()` - Create the `MoveData`
+
+-   `Define(string name)` - Start defining a move
+-   `Type(PokemonType)` - Set move type
+-   `Physical(int power, int accuracy, int pp)` - Set as physical move
+-   `Special(int power, int accuracy, int pp)` - Set as special move
+-   `WithEffects(...)` - Add move effects
+-   `Build()` - Create the `MoveData`
 
 ## Current Content Status
 
 ### Pokemon
-- **Gen 1**: 26/151 implemented
-- **Location**: `Catalogs/Pokemon/PokemonCatalog.Gen1.cs`
+
+-   **Gen 1**: 26/151 implemented
+-   **Location**: `Catalogs/Pokemon/PokemonCatalog.Gen1.cs`
 
 ### Moves
-- **Total**: 36 moves across 12 types
-- **Location**: `Catalogs/Moves/MoveCatalog.[Type].cs`
+
+-   **Total**: 36 moves across 12 types
+-   **Location**: `Catalogs/Moves/MoveCatalog.[Type].cs`
 
 ### Abilities
-- **Total**: 35 abilities
-- **Gen 3**: 25 abilities
-- **Additional**: 10 abilities
-- **Location**: `Catalogs/Abilities/AbilityCatalog.[Category].cs`
+
+-   **Total**: 35 abilities
+-   **Gen 3**: 25 abilities
+-   **Additional**: 10 abilities
+-   **Location**: `Catalogs/Abilities/AbilityCatalog.[Category].cs`
 
 ### Items
-- **Total**: 23 items
-- **Held Items**: 15 items
-- **Berries**: 8 items
-- **Location**: `Catalogs/Items/ItemCatalog.[Category].cs`
+
+-   **Total**: 23 items
+-   **Held Items**: 15 items
+-   **Berries**: 8 items
+-   **Location**: `Catalogs/Items/ItemCatalog.[Category].cs`
 
 ### Status Effects
-- **Total**: 15 statuses
-- **Persistent**: 6 statuses
-- **Volatile**: 9 statuses
-- **Location**: `Catalogs/Status/StatusCatalog.cs`
+
+-   **Total**: 15 statuses
+-   **Persistent**: 6 statuses
+-   **Volatile**: 9 statuses
+-   **Location**: `Catalogs/Status/StatusCatalog.cs`
 
 ### Weather
-- **Total**: 9 weather conditions
-- **Location**: `Catalogs/Weather/WeatherCatalog.cs`
+
+-   **Total**: 9 weather conditions
+-   **Location**: `Catalogs/Weather/WeatherCatalog.cs`
 
 ### Terrain
-- **Total**: 4 terrain conditions
-- **Location**: `Catalogs/Terrain/TerrainCatalog.cs`
+
+-   **Total**: 4 terrain conditions
+-   **Location**: `Catalogs/Terrain/TerrainCatalog.cs`
 
 ### Hazards
-- **Total**: 4 hazard types
-- **Location**: `Catalogs/Field/HazardCatalog.cs`
+
+-   **Total**: 4 hazard types
+-   **Location**: `Catalogs/Field/HazardCatalog.cs`
 
 ### Side Conditions
-- **Total**: 10 side conditions
-- **Location**: `Catalogs/Field/SideConditionCatalog.cs`
+
+-   **Total**: 10 side conditions
+-   **Location**: `Catalogs/Field/SideConditionCatalog.cs`
 
 ### Field Effects
-- **Total**: 8 field effects
-- **Location**: `Catalogs/Field/FieldEffectCatalog.cs`
+
+-   **Total**: 8 field effects
+-   **Location**: `Catalogs/Field/FieldEffectCatalog.cs`
 
 ## Test Location
 
 **Tests**: `PokemonUltimate.Tests/Data/`
-- **Pokemon**: `Data/Pokemon/[Pokemon]Tests.cs` (one file per Pokemon)
-- **Moves**: `Data/Moves/[Move]Tests.cs` (one file per Move)
-- **Catalogs**: `Data/Catalogs/[Catalog]ValidationTests.cs` (general catalog tests)
-- **Validation**: `Data/Validation/` (validation against official data)
+
+-   **Pokemon**: `Data/Pokemon/[Pokemon]Tests.cs` (one file per Pokemon)
+-   **Moves**: `Data/Moves/[Move]Tests.cs` (one file per Move)
+-   **Catalogs**: `Data/Catalogs/[Catalog]ValidationTests.cs` (general catalog tests)
+-   **Validation**: `Data/Validation/` (validation against official data)
 
 See **[Testing](testing.md)** for complete test organization.
 
 ## Related Documents
 
-- **[Feature README](README.md)** - Overview of Content Expansion
-- **[Architecture](architecture.md)** - Technical design of catalog system
-- **[Use Cases](use_cases.md)** - Scenarios for adding content
-- **[Roadmap](roadmap.md)** - Content expansion phases
-- **[Testing](testing.md)** - Testing strategy and test locations
-- **[Feature 1: Game Data](../1-game-data/architecture.md)** - Data structure for content
-- **[Feature 2: Combat System](../2-combat-system/code_location.md)** - How content is used in combat
+-   **[Feature README](README.md)** - Overview of Content Expansion
+-   **[Architecture](architecture.md)** - Technical design of catalog system
+-   **[Use Cases](use_cases.md)** - Scenarios for adding content
+-   **[Roadmap](roadmap.md)** - Content expansion phases
+-   **[Testing](testing.md)** - Testing strategy and test locations
+-   **[Feature 1: Game Data](../1-game-data/architecture.md)** - Data structure for content
+-   **[Feature 2: Combat System](../2-combat-system/code_location.md)** - How content is used in combat
 
 ---
 
 **Last Updated**: 2025-01-XX
-

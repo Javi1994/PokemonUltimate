@@ -71,7 +71,7 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 ### Grupo E: Planned Features
 
 -   **[1.18: Variants System](1.18-variants-system/)** - Mega/Dinamax/Terracristalización as separate species (Planned)
--   **[1.19: Pokedex Fields](1.19-pokedex-fields/)** - Description, Category, Height, Weight, Color, Shape, Habitat (Planned)
+-   **[1.19: Pokedex Fields](1.19-pokedex-fields/)** - Description, Category, Height, Weight, Color, Shape, Habitat ✅ Complete
 
 ## Related Features
 
@@ -86,7 +86,7 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 -   **Current Status**: Core data structures complete, infrastructure complete
 -   **Key Classes**: See [code location](code_location.md) for implementation details
 -   **Tests**: See [testing](testing.md) for test organization
--   **Sub-Feature Architecture**: Detailed technical specs available for complex sub-features (1.1, 1.2, 1.11, 1.15, 1.17, 1.18)
+-   **Sub-Feature Architecture**: Detailed technical specs available for complex sub-features (1.1, 1.2, 1.11, 1.16, 1.17, 1.18)
 
 ---
 

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using PokemonUltimate.Combat;
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Content.Catalogs.Terrain;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Content.Catalogs.Terrain;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Field
 {
@@ -30,7 +30,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
         {
             _field = new BattleField();
             _rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
-            
+
             _playerParty = new List<PokemonInstance>
             {
                 PokemonFactory.Create(PokemonCatalog.Pikachu, 25)
@@ -56,9 +56,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.SetTerrain(Terrain.Electric, 5, terrainData);
 
             // Assert
-            Assert.AreEqual(Terrain.Electric, _field.Terrain);
-            Assert.AreEqual(5, _field.TerrainDuration);
-            Assert.AreEqual(terrainData, _field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.Electric));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(5));
+            Assert.That(_field.TerrainData, Is.EqualTo(terrainData));
         }
 
         [Test]
@@ -71,9 +71,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.SetTerrain(Terrain.Grassy, 5, terrainData);
 
             // Assert
-            Assert.AreEqual(Terrain.Grassy, _field.Terrain);
-            Assert.AreEqual(5, _field.TerrainDuration);
-            Assert.AreEqual(terrainData, _field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.Grassy));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(5));
+            Assert.That(_field.TerrainData, Is.EqualTo(terrainData));
         }
 
         [Test]
@@ -86,9 +86,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.SetTerrain(Terrain.Psychic, 5, terrainData);
 
             // Assert
-            Assert.AreEqual(Terrain.Psychic, _field.Terrain);
-            Assert.AreEqual(5, _field.TerrainDuration);
-            Assert.AreEqual(terrainData, _field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.Psychic));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(5));
+            Assert.That(_field.TerrainData, Is.EqualTo(terrainData));
         }
 
         [Test]
@@ -101,9 +101,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.SetTerrain(Terrain.Misty, 5, terrainData);
 
             // Assert
-            Assert.AreEqual(Terrain.Misty, _field.Terrain);
-            Assert.AreEqual(5, _field.TerrainDuration);
-            Assert.AreEqual(terrainData, _field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.Misty));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(5));
+            Assert.That(_field.TerrainData, Is.EqualTo(terrainData));
         }
 
         [Test]
@@ -117,9 +117,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.SetTerrain(Terrain.None, 0, null);
 
             // Assert
-            Assert.AreEqual(Terrain.None, _field.Terrain);
-            Assert.AreEqual(0, _field.TerrainDuration);
-            Assert.IsNull(_field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.None));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(0));
+            Assert.That(_field.TerrainData, Is.Null);
         }
 
         [Test]
@@ -133,9 +133,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.ClearTerrain();
 
             // Assert
-            Assert.AreEqual(Terrain.None, _field.Terrain);
-            Assert.AreEqual(0, _field.TerrainDuration);
-            Assert.IsNull(_field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.None));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(0));
+            Assert.That(_field.TerrainData, Is.Null);
         }
 
         #endregion
@@ -150,13 +150,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.SetTerrain(Terrain.Electric, 5, terrainData);
 
             // Act & Assert
-            Assert.AreEqual(5, _field.TerrainDuration);
-            
+            Assert.That(_field.TerrainDuration, Is.EqualTo(5));
+
             _field.DecrementTerrainDuration();
-            Assert.AreEqual(4, _field.TerrainDuration);
-            
+            Assert.That(_field.TerrainDuration, Is.EqualTo(4));
+
             _field.DecrementTerrainDuration();
-            Assert.AreEqual(3, _field.TerrainDuration);
+            Assert.That(_field.TerrainDuration, Is.EqualTo(3));
         }
 
         [Test]
@@ -171,9 +171,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.DecrementTerrainDuration();
 
             // Assert
-            Assert.AreEqual(Terrain.None, _field.Terrain);
-            Assert.AreEqual(0, _field.TerrainDuration);
-            Assert.IsNull(_field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.None));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(0));
+            Assert.That(_field.TerrainData, Is.Null);
         }
 
         [Test]
@@ -188,9 +188,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.DecrementTerrainDuration();
 
             // Assert
-            Assert.AreEqual(Terrain.Psychic, _field.Terrain);
-            Assert.AreEqual(0, _field.TerrainDuration); // Still 0 (infinite)
-            Assert.AreEqual(terrainData, _field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.Psychic));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(0)); // Still 0 (infinite)
+            Assert.That(_field.TerrainData, Is.EqualTo(terrainData));
         }
 
         [Test]
@@ -202,8 +202,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             _field.DecrementTerrainDuration();
 
             // Assert
-            Assert.AreEqual(Terrain.None, _field.Terrain);
-            Assert.AreEqual(0, _field.TerrainDuration);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.None));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(0));
         }
 
         #endregion
@@ -216,9 +216,9 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
             // Act - Already done in SetUp
 
             // Assert
-            Assert.AreEqual(Terrain.None, _field.Terrain);
-            Assert.AreEqual(0, _field.TerrainDuration);
-            Assert.IsNull(_field.TerrainData);
+            Assert.That(_field.Terrain, Is.EqualTo(Terrain.None));
+            Assert.That(_field.TerrainDuration, Is.EqualTo(0));
+            Assert.That(_field.TerrainData, Is.Null);
         }
 
         #endregion

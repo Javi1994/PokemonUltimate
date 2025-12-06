@@ -14,7 +14,7 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   **Grupo B: Field & Status Data** (1.5-1.10) - Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
 -   **Grupo C: Supporting Systems** (1.11-1.12) - Evolution System, Type Effectiveness Table
 -   **Grupo D: Infrastructure** (1.13-1.14, 1.16-1.17) - Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
--   **Grupo E: Planned Features** (1.18-1.19) - Variants System, Pokedex Fields
+-   **Grupo E: Planned Features** (1.18-1.19) - Variants System (Planned), Pokedex Fields ✅ Complete
 -   **Content** - Data definitions in `PokemonUltimate.Content` (Feature 3: Content Expansion)
 
 **See**: [Sub-Features Overview](../1-game-data/README.md) for complete sub-feature list.
@@ -211,9 +211,9 @@ Game data is organized into logical groups matching the sub-feature structure:
 **Namespace**: `PokemonUltimate.Content.Builders`  
 **Note**: Builders moved to Feature 3 as they are primarily used for content creation
 
-#### 1.15: Factories & Calculators
+#### 1.16: Factories & Calculators
 
-**Sub-Feature**: [1.15: Factories & Calculators](1.15-factories-calculators/)  
+**Sub-Feature**: [1.16: Factories & Calculators](1.16-factories-calculators/)  
 **Namespace**: `PokemonUltimate.Core.Factories`
 
 **Key Classes**:
@@ -228,9 +228,9 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `MoveSelector` - Move selection with strategies (post-refactor)
 -   `MoveSelection/Strategies/` - Move selection strategies (RandomMoveStrategy, StabMoveStrategy, PowerMoveStrategy, OptimalMoveStrategy)
 
-#### 1.16: Registry System
+#### 1.17: Registry System
 
-**Sub-Feature**: [1.16: Registry System](1.16-registry-system/)  
+**Sub-Feature**: [1.17: Registry System](1.17-registry-system/)  
 **Namespace**: `PokemonUltimate.Core.Registry`
 
 **Key Classes**:
@@ -241,6 +241,8 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `PokemonRegistry`, `MoveRegistry` - Specialized implementations
 
 ### Grupo E: Planned Features (Sub-Features 1.18-1.19)
+
+**Note**: 1.19 (Pokedex Fields) is now complete. Only 1.18 (Variants System) remains planned.
 
 #### 1.18: Variants System
 
@@ -254,17 +256,41 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `TeraType` - Tera type for Terracristalización variants
 -   `Variants` - List of all variant forms
 
-#### 1.19: Pokedex Fields
+#### 1.19: Pokedex Fields ✅ COMPLETE
 
-**Sub-Feature**: [1.19: Pokedex Fields](1.19-pokedex-fields/) ⏳ Planned  
-**Namespace**: `PokemonUltimate.Core.Blueprints` (extensions to PokemonSpeciesData), `PokemonUltimate.Core.Enums`
+**Sub-Feature**: [1.19: Pokedex Fields](1.19-pokedex-fields/) ✅ Complete  
+**Namespace**: `PokemonUltimate.Core.Blueprints`, `PokemonUltimate.Content.Providers`, `PokemonUltimate.Content.Extensions`, `PokemonUltimate.Core.Enums`
 
-**Planned Fields**:
+**Files**:
+
+-   `PokemonUltimate.Core/Blueprints/PokemonSpeciesData.cs` - Fields in PokemonSpeciesData
+-   `PokemonUltimate.Content/Providers/PokedexDataProvider.cs` - Centralized Pokedex data provider
+-   `PokemonUltimate.Content/Providers/PokedexData.cs` - Pokedex data structure
+-   `PokemonUltimate.Content/Extensions/PokemonSpeciesDataExtensions.cs` - Extension method `WithPokedexData()`
+-   `PokemonUltimate.Core/Enums/PokemonColor.cs` - Color enum
+-   `PokemonUltimate.Core/Enums/PokemonShape.cs` - Shape enum
+-   `PokemonUltimate.Core/Enums/PokemonHabitat.cs` - Habitat enum
+
+**Fields** (in PokemonSpeciesData):
 
 -   `Description` - Pokedex entry text
--   `Category` - Classification
--   `Height`, `Weight` - Physical measurements
--   `Color`, `Shape`, `Habitat` - Classification enums
+-   `Category` - Classification (e.g., "Seed Pokemon", "Flame Pokemon")
+-   `Height` - Height in meters
+-   `Weight` - Weight in kilograms
+-   `Color` - Pokedex color category (enum)
+-   `Shape` - Body shape category (enum)
+-   `Habitat` - Preferred habitat/biome (enum)
+
+**Usage**:
+
+```csharp
+// Apply Pokedex data automatically
+var pikachu = Pokemon.Define("Pikachu", 25)
+    .Type(PokemonType.Electric)
+    .Stats(35, 55, 40, 50, 50, 90)
+    .Build()
+    .WithPokedexData(); // Applies data from PokedexDataProvider
+```
 
 ---
 

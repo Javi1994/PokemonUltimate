@@ -524,7 +524,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.15: Factories & Calculators
+#### Sub-Feature 1.16: Factories & Calculators
 
 ### UC-035: Calculate Pokemon Stats
 
@@ -554,7 +554,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.16: Registry System
+#### Sub-Feature 1.17: Registry System
 
 ### UC-037: Register Data in Registry
 
@@ -618,7 +618,7 @@ This document covers all use cases for **all game data structures** organized by
 
 ---
 
-#### Sub-Feature 1.19: Pokedex Fields ⏳ Planned
+#### Sub-Feature 1.19: Pokedex Fields ✅ Complete
 
 ### UC-043: Display Pokedex Entry
 
@@ -710,10 +710,10 @@ This document covers all use cases for **all game data structures** organized by
 **Description**: Adding new content using the data structures
 **Steps**:
 
-1. Define new Pokemon species using `PokemonBuilder` (Sub-Feature 1.15)
-2. Define new moves using `MoveBuilder` (Sub-Feature 1.15)
-3. Define new abilities using `AbilityBuilder` (Sub-Feature 1.15)
-4. Define new items using `ItemBuilder` (Sub-Feature 1.15)
+1. Define new Pokemon species using `PokemonBuilder` (Sub-Feature 3.9)
+2. Define new moves using `MoveBuilder` (Sub-Feature 3.9)
+3. Define new abilities using `AbilityBuilder` (Sub-Feature 3.9)
+4. Define new items using `ItemBuilder` (Sub-Feature 3.9)
 5. Add to catalogs as partial classes (Feature 3)
 6. New content available throughout game
    **Status**: ✅ Implemented (26 Gen 1 Pokemon, moves, abilities, items)
@@ -809,7 +809,7 @@ This document covers all use cases for **all game data structures** organized by
 **Description**: Builders used to create all game data
 **Steps**:
 
-1. Use builders (Sub-Feature 1.15) to create Pokemon, Moves, Abilities, Items, Field Conditions
+1. Use builders (Sub-Feature 3.9) to create Pokemon, Moves, Abilities, Items, Field Conditions
 2. Builders provide fluent API for data creation
 3. All data created consistently
    **Status**: ✅ Implemented

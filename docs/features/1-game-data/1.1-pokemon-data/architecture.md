@@ -9,16 +9,17 @@
 ## Overview
 
 This sub-feature defines the complete data structure for Pokemon, including:
-- **PokemonSpeciesData** (Blueprint): Immutable species data shared by all Pokemon of the same kind
-- **PokemonInstance** (Runtime): Mutable instance data for individual Pokemon
-- **BaseStats**: Base stat values structure
-- **LearnableMove**: Move learning information structure
+
+-   **PokemonSpeciesData** (Blueprint): Immutable species data shared by all Pokemon of the same kind
+-   **PokemonInstance** (Runtime): Mutable instance data for individual Pokemon
+-   **BaseStats**: Base stat values structure
+-   **LearnableMove**: Move learning information structure
 
 ## Design Principles
 
-- **Blueprint/Instance Separation**: Blueprints are immutable, instances are mutable
-- **Composition over Inheritance**: Pokemon are composed of stats, moves, abilities, not subclassed
-- **Testability First**: Pure C# classes, no Unity dependencies
+-   **Blueprint/Instance Separation**: Blueprints are immutable, instances are mutable
+-   **Composition over Inheritance**: Pokemon are composed of stats, moves, abilities, not subclassed
+-   **Testability First**: Pure C# classes, no Unity dependencies
 
 ---
 
@@ -38,25 +39,25 @@ public class PokemonSpeciesData : IIdentifiable
     public string Name { get; set; }              // "Charizard"
     public int PokedexNumber { get; set; }        // 6
     public string Id => Name;                     // IIdentifiable implementation
-    
+
     // Types
     public PokemonType PrimaryType { get; set; }   // Required: Fire
     public PokemonType? SecondaryType { get; set; } // Optional: Flying (null if mono-type)
-    
+
     // Base Stats
     public BaseStats BaseStats { get; set; }      // HP, Attack, Defense, SpAttack, SpDefense, Speed
-    
+
     // Gender Ratio
     public float GenderRatio { get; set; }        // 0-100 = % male, -1 = genderless
-    
+
     // Abilities
     public AbilityData Ability1 { get; set; }      // Primary ability
     public AbilityData Ability2 { get; set; }     // Secondary ability (optional)
     public AbilityData HiddenAbility { get; set; } // Hidden ability (optional)
-    
+
     // Learnset
     public List<LearnableMove> Learnset { get; set; } // Moves this species can learn
-    
+
     // Evolution paths
     public List<Evolution> Evolutions { get; set; } // Possible evolutions
 }
@@ -87,11 +88,11 @@ public bool CanLearn(MoveData move);
 
 ### Gender Ratio Values
 
-- `50.0f` = 50% male, 50% female (most Pokemon)
-- `87.5f` = 87.5% male (starters like Charmander)
-- `100.0f` = male only (Tauros)
-- `0.0f` = female only (Chansey)
-- `-1.0f` = genderless (Magnemite, Ditto)
+-   `50.0f` = 50% male, 50% female (most Pokemon)
+-   `87.5f` = 87.5% male (starters like Charmander)
+-   `100.0f` = male only (Tauros)
+-   `0.0f` = female only (Chansey)
+-   `-1.0f` = genderless (Magnemite, Ditto)
 
 ---
 
@@ -111,12 +112,12 @@ public class BaseStats
     public int SpAttack { get; set; }      // Special attack
     public int SpDefense { get; set; }     // Special defense
     public int Speed { get; set; }         // Speed
-    
+
     public int Total { get; }              // Sum of all stats (BST - Base Stat Total)
-    
+
     // Validation
     public void Validate();                // Ensures all stats are non-negative
-    
+
     // Helpers
     public int GetStat(Stat stat);        // Get stat by enum
     public Stat HighestStat { get; }      // Highest base stat
@@ -161,11 +162,12 @@ public enum LearnMethod
 ## 4. PokemonInstance (Runtime)
 
 **Namespace**: `PokemonUltimate.Core.Instances`  
-**Files**: 
-- `PokemonInstance.cs` (Core)
-- `PokemonInstance.Battle.cs` (Battle state)
-- `PokemonInstance.LevelUp.cs` (Level-up logic)
-- `PokemonInstance.Evolution.cs` (Evolution tracking)
+**Files**:
+
+-   `PokemonInstance.cs` (Core)
+-   `PokemonInstance.Battle.cs` (Battle state)
+-   `PokemonInstance.LevelUp.cs` (Level-up logic)
+-   `PokemonInstance.Evolution.cs` (Evolution tracking)
 
 Mutable runtime instance of a Pokemon. Created from a PokemonSpeciesData blueprint via PokemonFactory.
 
@@ -179,11 +181,11 @@ public partial class PokemonInstance
     public string InstanceId { get; }                        // Unique identifier
     public string Nickname { get; set; }                     // Optional nickname
     public string DisplayName => Nickname ?? Species.Name;   // Display name
-    
+
     // Level & Experience
     public int Level { get; private set; }                   // 1-100
     public int CurrentExp { get; set; }                      // Current experience points
-    
+
     // Stats (calculated from base stats, level, IVs, EVs, nature)
     public int MaxHP { get; private set; }
     public int CurrentHP { get; set; }
@@ -192,17 +194,17 @@ public partial class PokemonInstance
     public int SpAttack { get; private set; }
     public int SpDefense { get; private set; }
     public int Speed { get; private set; }
-    
+
     // Personal Characteristics
     public Gender Gender { get; }
     public Nature Nature { get; }
     public int Friendship { get; set; }                       // 0-255
     public bool IsShiny { get; }
-    
+
     // Abilities & Items
     public AbilityData Ability { get; set; }                 // Assigned ability
     public ItemData HeldItem { get; set; }                   // Held item
-    
+
     // Moves
     public List<MoveInstance> Moves { get; set; }           // Known moves (max 4)
 }
@@ -216,7 +218,7 @@ public partial class PokemonInstance
     // Status Effects
     public PersistentStatus Status { get; set; }             // Persistent status (Burn, Paralysis, etc.)
     public HashSet<VolatileStatus> VolatileStatuses { get; set; } // Volatile statuses
-    
+
     // Stat Stages (-6 to +6)
     public int AttackStage { get; set; }
     public int DefenseStage { get; set; }
@@ -225,12 +227,12 @@ public partial class PokemonInstance
     public int SpeedStage { get; set; }
     public int AccuracyStage { get; set; }
     public int EvasionStage { get; set; }
-    
+
     // Battle Helpers
     public bool IsFainted => CurrentHP <= 0;
     public float HPPercentage => MaxHP > 0 ? (float)CurrentHP / MaxHP : 0f;
     public bool HasStatus => Status != PersistentStatus.None;
-    
+
     // Stat calculation with stages
     public int GetEffectiveStat(Stat stat);
     public int GetEffectiveSpeed();
@@ -246,7 +248,7 @@ public partial class PokemonInstance
     public void AddExperience(int exp);
     public void LevelUp();
     public void LearnMovesAtLevel(int level);
-    
+
     // Move Learning
     public bool CanLearnMove(MoveData move);
     public void LearnMove(MoveData move, int slot = -1);  // -1 = auto-find slot
@@ -263,7 +265,7 @@ public partial class PokemonInstance
     public bool CanEvolve();
     public PokemonInstance Evolve(PokemonSpeciesData targetSpecies);
     public List<PokemonSpeciesData> GetAvailableEvolutions();
-    
+
     // Friendship helpers
     public bool HasHighFriendship => Friendship >= 220;
     public bool HasMaxFriendship => Friendship >= 255;
@@ -277,23 +279,26 @@ public partial class PokemonInstance
 Stats are calculated using Gen 3+ formulas with IVs, EVs, and Nature modifiers.
 
 **HP Formula**:
+
 ```
 HP = floor((2 * Base + IV + floor(EV/4)) * Level / 100) + Level + 10
 ```
 
 **Other Stats Formula**:
+
 ```
 Stat = floor((floor((2 * Base + IV + floor(EV/4)) * Level / 100) + 5) * Nature)
 ```
 
 Where:
-- **Base**: Base stat from PokemonSpeciesData
-- **IV**: Individual Value (0-31, randomly generated)
-- **EV**: Effort Value (0-255 per stat, 510 total)
-- **Level**: Pokemon's level (1-100)
-- **Nature**: Multiplier (0.9, 1.0, or 1.1)
 
-See **[Sub-Feature 1.15: Factories & Calculators](../1.15-factories-calculators/)** for `StatCalculator` implementation.
+-   **Base**: Base stat from PokemonSpeciesData
+-   **IV**: Individual Value (0-31, randomly generated)
+-   **EV**: Effort Value (0-255 per stat, 510 total)
+-   **Level**: Pokemon's level (1-100)
+-   **Nature**: Multiplier (0.9, 1.0, or 1.1)
+
+See **[Sub-Feature 1.16: Factories & Calculators](../1.16-factories-calculators/)** for `StatCalculator` implementation.
 
 ---
 
@@ -340,21 +345,20 @@ var pikachu = new PokemonInstanceBuilder(pikachuSpecies, 50)
 
 ## 7. Related Sub-Features
 
-- **[1.2: Move Data](../1.2-move-data/)** - Moves referenced in Learnset
-- **[1.3: Ability Data](../1.3-ability-data/)** - Abilities assigned to species
-- **[1.11: Evolution System](../1.11-evolution-system/)** - Evolution paths
-- **[1.16: Factories & Calculators](../1.16-factories-calculators/)** - StatCalculator, PokemonFactory, PokemonInstanceBuilder
-- **[1.16: Registry System](../1.16-registry-system/)** - PokemonRegistry for storing/retrieving species
+-   **[1.2: Move Data](../1.2-move-data/)** - Moves referenced in Learnset
+-   **[1.3: Ability Data](../1.3-ability-data/)** - Abilities assigned to species
+-   **[1.11: Evolution System](../1.11-evolution-system/)** - Evolution paths
+-   **[1.16: Factories & Calculators](../1.16-factories-calculators/)** - StatCalculator, PokemonFactory, PokemonInstanceBuilder
+-   **[1.17: Registry System](../1.17-registry-system/)** - PokemonRegistry for storing/retrieving species
 
 ---
 
 ## Related Documents
 
-- **[Parent Architecture](../architecture.md#11-pokemon-data)** - Feature-level technical specification
-- **[Parent Code Location](../code_location.md#grupo-a-core-entity-data)** - Code organization
-- **[Sub-Feature README](README.md)** - Overview and quick navigation
+-   **[Parent Architecture](../architecture.md#11-pokemon-data)** - Feature-level technical specification
+-   **[Parent Code Location](../code_location.md#grupo-a-core-entity-data)** - Code organization
+-   **[Sub-Feature README](README.md)** - Overview and quick navigation
 
 ---
 
 **Last Updated**: 2025-01-XX
-

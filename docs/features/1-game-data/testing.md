@@ -1863,12 +1863,12 @@ public void Habitats_AreValid()
 
     - See **[Feature 3.9: Builders](../3-content-expansion/3.9-builders/)** for builder tests
 
-12. **1.15: Factories & Calculators**
+12. **1.16: Factories & Calculators**
 
     - `Systems/Core/Factories/StatCalculatorTests.cs` - Stat calculation tests
     - `Systems/Core/Factories/PokemonFactoryTests.cs` - Factory tests
 
-13. **1.16: Registry System**
+13. **1.17: Registry System**
     - `Systems/Core/Registry/GameDataRegistryTests.cs` - Generic registry tests
     - `Systems/Core/Registry/PokemonRegistryTests.cs` - Pokemon registry tests
     - `Systems/Core/Registry/MoveRegistryTests.cs` - Move registry tests
@@ -1879,7 +1879,7 @@ public void Habitats_AreValid()
 
     -   Variants validation tests (when implemented)
 
-15. **1.19: Pokedex Fields** ⏳ Planned
+15. **1.19: Pokedex Fields** ✅ Complete
     -   Pokedex fields validation tests (when implemented)
 
 **Additional Test Categories** (Sub-Feature 1.1):

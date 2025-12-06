@@ -1,9 +1,11 @@
 using NUnit.Framework;
+using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Catalogs.Items;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Providers;
+using PokemonBuilder = PokemonUltimate.Content.Builders.PokemonBuilder;
 
 namespace PokemonUltimate.Tests.Systems.Core.Instances
 {
@@ -24,7 +26,7 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
         public void Create_PokemonWithNoAbilitiesDefined_AbilityIsNull()
         {
             // Arrange - Create a species without abilities using the builder
-            var speciesWithoutAbilities = Content.Builders.Pokemon.Define("TestMon", 9999)
+            var speciesWithoutAbilities = PokemonBuilder.Define("TestMon", 9999)
                 .Type(PokemonUltimate.Core.Enums.PokemonType.Normal)
                 .Stats(50, 50, 50, 50, 50, 50)
                 .Build();
@@ -54,7 +56,7 @@ namespace PokemonUltimate.Tests.Systems.Core.Instances
         public void HasAbilityNamed_WhenAbilityIsNull_ReturnsFalse()
         {
             // Arrange
-            var speciesWithoutAbilities = Content.Builders.Pokemon.Define("TestMon", 9998)
+            var speciesWithoutAbilities = PokemonBuilder.Define("TestMon", 9998)
                 .Type(PokemonUltimate.Core.Enums.PokemonType.Normal)
                 .Stats(50, 50, 50, 50, 50, 50)
                 .Build();

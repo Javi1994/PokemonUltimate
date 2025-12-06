@@ -14,59 +14,86 @@ Pokemon Expansion focuses on systematically adding Pokemon species to the game c
 
 ## Current Status
 
-- ✅ **Implemented**: 26 Gen 1 Pokemon
-- 🎯 **In Progress**: Completing Gen 1 (151 Pokemon)
-- ⏳ **Planned**: Gen 2+ expansion
+-   ✅ **Implemented**: 26 Gen 1 Pokemon
+-   🎯 **In Progress**: Completing Gen 1 (151 Pokemon)
+-   ⏳ **Planned**: Gen 2+ expansion
 
 ## Documentation
 
-| Document | Purpose |
-|----------|---------|
-| **[Architecture](../../architecture.md)** | Catalog system design |
-| **[Use Cases](../../use_cases.md#uc-001-add-new-pokemon-species)** | Pokemon addition scenarios |
-| **[Roadmap](../../roadmap.md#phase-31-pokemon-expansion)** | Expansion phases and goals |
-| **[Testing](../../testing.md)** | Content testing strategy |
-| **[Code Location](../../code_location.md)** | Where Pokemon catalog code lives |
+| Document                                                           | Purpose                          |
+| ------------------------------------------------------------------ | -------------------------------- |
+| **[Architecture](../../architecture.md)**                          | Catalog system design            |
+| **[Use Cases](../../use_cases.md#uc-001-add-new-pokemon-species)** | Pokemon addition scenarios       |
+| **[Roadmap](../../roadmap.md#phase-31-pokemon-expansion)**         | Expansion phases and goals       |
+| **[Testing](../../testing.md)**                                    | Content testing strategy         |
+| **[Code Location](../../code_location.md)**                        | Where Pokemon catalog code lives |
 
 ## Related Sub-Features
 
-- **[3.5: Status Effect Expansion](../3.5-status-effect-expansion/)** - Status effects catalog
-- **[3.6: Field Conditions Expansion](../3.6-field-conditions-expansion/)** - Field conditions catalogs
-- **[3.7: Content Validation](../3.7-content-validation/)** - Validates new Pokemon data
-- **[3.8: Content Organization](../3.8-content-organization/)** - Organizes Pokemon in catalog
+-   **[3.5: Status Effect Expansion](../3.5-status-effect-expansion/)** - Status effects catalog
+-   **[3.6: Field Conditions Expansion](../3.6-field-conditions-expansion/)** - Field conditions catalogs
+-   **[3.7: Content Validation](../3.7-content-validation/)** - Validates new Pokemon data
+-   **[3.8: Content Organization](../3.8-content-organization/)** - Organizes Pokemon in catalog
 
 ## Related Features
 
-- **[Feature 1: Game Data](../../1-game-data/)** - Uses game data structure
+-   **[Feature 1: Game Data](../../1-game-data/)** - Uses game data structure
 
 **⚠️ Always use numbered feature paths**: `../../[N]-[feature-name]/` instead of `../../feature-name/`
 
 ## Related Documents
 
-- **[Parent Feature README](../README.md)** - Overview of Content Expansion
-- **[Parent Architecture](../architecture.md)** - Catalog system design
-- **[Parent Use Cases](../use_cases.md#uc-001-add-new-pokemon-species)** - Pokemon addition scenarios
-- **[Parent Roadmap](../roadmap.md#phase-31-complete-gen-1-pokemon-in-progress)** - Expansion phases and goals
-- **[Parent Testing](../testing.md)** - Content testing strategy
-- **[Parent Code Location](../code_location.md)** - Where Pokemon catalog code lives
+-   **[Parent Feature README](../README.md)** - Overview of Content Expansion
+-   **[Parent Architecture](../architecture.md)** - Catalog system design
+-   **[Parent Use Cases](../use_cases.md#uc-001-add-new-pokemon-species)** - Pokemon addition scenarios
+-   **[Parent Roadmap](../roadmap.md#phase-31-complete-gen-1-pokemon-in-progress)** - Expansion phases and goals
+-   **[Parent Testing](../testing.md)** - Content testing strategy
+-   **[Parent Code Location](../code_location.md)** - Where Pokemon catalog code lives
 
 ## Quality Standards
 
-- All required fields present
-- Base stats match official data
-- Types match official data
-- Abilities match official data
-- Learnset includes signature moves
-- Evolution conditions match official data
+-   All required fields present
+-   Base stats match official data
+-   Types match official data
+-   Abilities match official data
+-   Learnset includes signature moves (can use `LearnsetProvider` for centralized data)
+-   Evolution conditions match official data
+
+## Data Providers
+
+### LearnsetProvider
+
+**Purpose**: Centralized learnset data for Pokemon species
+**Location**: `PokemonUltimate.Content/Providers/LearnsetProvider.cs`
+**Usage**: Use `.WithLearnset()` extension method to apply learnset data from provider
+
+**Example**:
+
+```csharp
+public static readonly PokemonSpeciesData Pikachu = Pokemon.Define("Pikachu", 25)
+    .Type(PokemonType.Electric)
+    .Stats(35, 55, 40, 50, 50, 90)
+    .Build()
+    .WithLearnset(); // Applies learnset from LearnsetProvider
+```
+
+**Benefits**:
+
+-   Reduces code verbosity in PokemonCatalog
+-   Centralizes learnset data for easier maintenance
+-   Allows gradual data population
+-   Follows SOLID principles
+
+**Status**: ✅ Complete - 18 Gen 1 Pokemon have learnset data, catalog updated to use providers
 
 ## Quick Links
 
-- **Current Count**: 26 Pokemon (Gen 1)
-- **Target**: 151 Pokemon (Complete Gen 1)
-- **Key Classes**: `PokemonCatalog`, `PokemonBuilder`
-- **Status**: 🎯 In Progress
+-   **Current Count**: 26 Pokemon (Gen 1)
+-   **Target**: 151 Pokemon (Complete Gen 1)
+-   **Key Classes**: `PokemonCatalog`, `PokemonBuilder`, `LearnsetProvider`, `PokedexDataProvider`
+-   **Status**: 🎯 In Progress
+-   **Data Providers**: ✅ LearnsetProvider implemented, catalog refactored to use providers
 
 ---
 
 **Last Updated**: 2025-01-XX
-
