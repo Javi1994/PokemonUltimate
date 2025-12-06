@@ -89,20 +89,23 @@ PokemonUltimate.Tests/
 
 Specialized console applications for testing and debugging combat mechanics:
 
-- **[BattleDebugger](../../../PokemonUltimate.BattleDebugger/)** - Run multiple battles with statistics
+- **[BattleDebuggerUI](../../../PokemonUltimate.BattleDebuggerUI/)** - Windows Forms application for battle statistics
+  - Visual interface with dropdowns and controls
   - Move usage statistics (most used moves per Pokemon)
   - Status effect statistics (effects caused per Pokemon)
   - Win/loss/draw rates
-  - Configurable Pokemon, level, and number of battles
-  - Detailed or summary output modes
+  - Progress tracking during execution
+  - Results displayed in tables and formatted text
 
-- **[MoveDebugger](../../../PokemonUltimate.MoveDebugger/)** - Test moves multiple times with statistics
+- **[MoveDebuggerUI](../../../PokemonUltimate.MoveDebuggerUI/)** - Windows Forms application for move testing statistics
+  - Visual interface with dropdowns and controls
   - Damage statistics (average, min, max, median)
   - Critical hit rates
   - Miss rates
   - Status effect application rates
   - Action generation tracking (what actions the move creates)
-  - Configurable move, attacker, target, level, and number of tests
+  - Progress tracking during execution
+  - Results displayed in tables and formatted text
 
 - **[TypeMatchupDebugger](../../../PokemonUltimate.TypeMatchupDebugger/)** - Test type effectiveness
   - Type chart verification
