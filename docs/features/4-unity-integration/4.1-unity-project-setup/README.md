@@ -1,52 +1,114 @@
-# Sub-Feature 4.1: Unity Project Setup
+# Sub-Feature 4.1: Unity Project Setup & DLL Integration
 
-> DLL integration, project structure - Unity project setup and DLL integration.
+> Setting up Unity project and integrating PokemonUltimate battle engine DLLs.
 
-**Sub-Feature Number**: 4.1  
-**Parent Feature**: Feature 4: Unity Integration  
-**See**: [`../../features_master_list.md`](../../features_master_list.md) for feature numbering standards.
+**Feature**: 4: Unity Integration  
+**Sub-Feature**: 4.1  
+**Status**: ⏳ Planned  
+**Dependencies**: Combat System complete, DLLs built
 
 ## Overview
 
-Unity Project Setup establishes the foundation for Unity integration:
+This sub-feature covers the initial setup required to integrate the PokemonUltimate battle engine with Unity:
+
 - Unity project creation and configuration
-- DLL integration (Core, Combat, Content DLLs)
-- Project structure organization
-- Build configuration
+- Building battle engine DLLs
+- Importing DLLs into Unity
+- Basic verification and testing
 
-## Current Status
+## Goals
 
-- ⏳ **Planned**: Unity project setup not yet started
+- ✅ Unity project created and configured
+- ✅ All DLLs imported successfully
+- ✅ No import errors in Unity console
+- ✅ Can create `PokemonInstance` from Unity script
+- ✅ Build script created for automated workflow
 
-## Documentation
+## Components
 
-| Document | Purpose |
-|----------|---------|
-| **[Architecture](../../architecture.md#step-1-build-the-dlls)** | Technical integration guide |
-| **[Use Cases](../../use_cases.md#uc-001-set-up-unity-project-with-dlls)** | Setup scenarios |
-| **[Roadmap](../../roadmap.md#phase-41-unity-project-setup--dll-integration)** | Implementation plan |
-| **[Testing](../../testing.md)** | Testing strategy |
-| **[Code Location](../../code_location.md)** | Where Unity code will be located |
+### Build Script
 
-## Related Sub-Features
+**File**: `ai_workflow/scripts/build-dlls-for-unity.ps1`
 
-- **[4.2: UI Foundation](../4.2-ui-foundation/)** - Builds on project setup
-- **[4.3: IBattleView Implementation](../4.3-ibattleview-implementation/)** - Uses DLLs
+Automated PowerShell script that:
+- Builds all PokemonUltimate DLLs in Release configuration
+- Copies DLLs to Unity project `Assets/Plugins/` folder
+- Verifies DLLs were created successfully
+
+**Usage**:
+```powershell
+# Build only
+.\ai_workflow\scripts\build-dlls-for-unity.ps1
+
+# Build and copy to Unity project
+.\ai_workflow\scripts\build-dlls-for-unity.ps1 -UnityProjectPath "C:\Path\To\UnityProject"
+```
+
+### DLLs Required
+
+- `PokemonUltimate.Core.dll` - Core game logic
+- `PokemonUltimate.Combat.dll` - Battle engine
+- `PokemonUltimate.Content.dll` - Game content (Pokemon, Moves, etc.)
+
+### Unity Configuration
+
+- **API Compatibility**: `.NET Standard 2.1`
+- **Platform**: Any Platform
+- **Location**: `Assets/Plugins/`
+
+## Workflow
+
+1. **Create Unity Project** (2D URP template)
+2. **Build DLLs** using build script or `dotnet build -c Release`
+3. **Copy DLLs** to `Assets/Plugins/` folder
+4. **Configure DLLs** in Unity Inspector (API Compatibility Level)
+5. **Create Test Script** to verify integration
+6. **Run Test** and verify no errors
+
+## Quick Start
+
+See **[GETTING_STARTED.md](GETTING_STARTED.md)** for step-by-step instructions.
+
+## Tests
+
+### Unity Editor Tests
+
+```csharp
+Tests/EditMode/DLLIntegration/
+├── DLLs_LoadWithoutErrors.cs
+├── Namespaces_AreAccessible.cs
+└── CoreTypes_CanBeInstantiated.cs
+```
+
+**Test Goals**:
+- Verify DLLs load without errors
+- Verify namespaces are accessible
+- Verify core types can be instantiated
+
+## Completion Checklist
+
+- [ ] Unity project created and configured
+- [ ] Build script created and tested
+- [ ] All DLLs built successfully
+- [ ] DLLs copied to Unity project
+- [ ] DLLs configured correctly (API Compatibility Level)
+- [ ] No import errors in Unity console
+- [ ] Test script created and runs successfully
+- [ ] Can create `PokemonInstance` from Unity
+- [ ] Unity editor tests pass
+
+## Estimated Effort
+
+- **Time**: 2-4 hours
+- **Tests**: 3-5 Unity editor tests
 
 ## Related Documents
 
-- **[Parent Feature README](../README.md)** - Overview of Unity Integration
-- **[Parent Architecture](../architecture.md)** - Technical integration guide
-- **[Parent Use Cases](../use_cases.md#uc-001-set-up-unity-project-with-dlls)** - Setup scenarios
-- **[Parent Roadmap](../roadmap.md#phase-41-unity-project-setup--dll-integration)** - Implementation plan
-- **[Parent Testing](../testing.md)** - Testing strategy
-- **[Parent Code Location](../code_location.md)** - Where Unity code will be located
-
-## Quick Links
-
-- **Status**: ⏳ Planned (Phase 4.1)
+- **[GETTING_STARTED.md](GETTING_STARTED.md)** - Step-by-step setup guide
+- **[Roadmap](../roadmap.md)** - Complete Unity integration phases
+- **[Architecture](../architecture.md)** - Technical integration guide
+- **[Code Location](../code_location.md)** - Where Unity code will live
 
 ---
 
 **Last Updated**: 2025-01-XX
-

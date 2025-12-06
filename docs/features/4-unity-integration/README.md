@@ -33,6 +33,7 @@ This feature covers integrating the core battle engine (DLL) with Unity:
 | **[Roadmap](roadmap.md)** | Integration phases (4.1-4.8) |
 | **[Testing](testing.md)** | Testing strategy for Unity integration |
 | **[Code Location](code_location.md)** | Where Unity code will be located |
+| **[Workflow Guide](WORKFLOW_UNITY.md)** ⭐ | **How to work with both projects simultaneously** |
 
 ## Sub-Features
 

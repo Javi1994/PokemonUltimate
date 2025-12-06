@@ -230,12 +230,12 @@ Tests/Unity/UI/
    ```
 
 2. **Implement Core Methods**
-   - `ShowMessage()` - Use dialog system
-   - `UpdateHPBar()` - Update HP bar component
-   - `ShowStatusIcon()` - Display status effects
-   - `ShowStatChangeEffect()` - Visual feedback for stat changes
+   - `ShowMessage(string message)` - Use dialog system (message is pre-formatted)
+   - `UpdateHPBar(BattleSlot slot)` - Update HP bar component (reads HP from slot.Pokemon)
+   - `PlayStatusAnimation(BattleSlot slot, string statusName)` - Display status effects
+   - `ShowStatChange(BattleSlot slot, string statName, int stages)` - Visual feedback for stat changes
 
-3. **Create Localization System**
+3. **Create Localization System** (Optional)
    ```csharp
    public static class LocalizationManager
    {
@@ -244,9 +244,16 @@ Tests/Unity/UI/
        public static string Get(string key, params object[] args)
        {
            // Load from JSON/CSV, format with args
+           // Note: IBattleView.ShowMessage() receives pre-formatted strings
+           // Localization can be done in Unity before calling ShowMessage()
        }
    }
    ```
+   
+   **Note**: `IBattleView.ShowMessage()` takes a pre-formatted string. Localization can be handled:
+   - In Unity before calling `ShowMessage()`
+   - Via BattleActions that format messages before creating MessageAction
+   - Or Unity can implement its own localization layer
 
 4. **Bind Battle State to UI**
    - Subscribe to `BattleSlot` events
@@ -355,10 +362,10 @@ Tests/Unity/View/
    ```
 
 5. **Integrate with IBattleView**
-   - Implement `SelectActionType()`
-   - Implement `SelectMove()`
-   - Implement `SelectTarget()`
-   - Implement `SelectSwitch()`
+   - Implement `SelectActionType(BattleSlot slot)` - Returns `Task<BattleActionType>`
+   - Implement `SelectMove(IReadOnlyList<MoveInstance> moves)` - Returns `Task<MoveInstance>`
+   - Implement `SelectTarget(IReadOnlyList<BattleSlot> validTargets)` - Returns `Task<BattleSlot>`
+   - Implement `SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon)` - Returns `Task<PokemonInstance>`
 
 ### Tests to Write
 
@@ -552,9 +559,10 @@ Tests/Unity/Animations/
    - Music volume slider
    - SFX volume slider
 
-6. **Integrate with IBattleView**
-   - Implement `PlaySound()`
-   - Implement `PlayMusic()`
+6. **Integrate Audio with Battle Actions**
+   - Audio handled via custom BattleActions (not IBattleView methods)
+   - Create `PlaySoundAction` and `PlayMusicAction` BattleActions
+   - Unity implementation handles audio playback in action execution
 
 ### Tests to Write
 

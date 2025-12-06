@@ -109,6 +109,11 @@ build_log.txt
 # Unity generated meta files (only relevant in Unity context)
 # *.meta
 
+# Unity DLLs (generated, don't version)
+PokemonUltimateUnity/Assets/Plugins/*.dll
+PokemonUltimateUnity/Assets/Plugins/*.pdb
+!PokemonUltimateUnity/Assets/Plugins/.gitkeep
+
 # =========================
 # Security
 # =========================
