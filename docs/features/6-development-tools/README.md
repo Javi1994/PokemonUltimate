@@ -16,7 +16,8 @@ This feature provides unified Windows Forms debugger applications for testing, a
 - ✅ **Existing Debuggers**: Battle Debugger, Move Debugger, Type Matchup Debugger
 - ✅ **Stat Calculator Debugger**: Complete (6.1)
 - ✅ **Damage Calculator Debugger**: Complete (6.2)
-- ⏳ **Planned**: Status Effect Debugger (6.3), Turn Order Debugger (6.4)
+- ✅ **Status Effect Debugger**: Complete (6.3)
+- ⏳ **Planned**: Turn Order Debugger (6.4)
 
 ## Documentation
 
@@ -43,8 +44,10 @@ This feature provides unified Windows Forms debugger applications for testing, a
 ### Complete (6.2)
 - **[6.2: Damage Calculator Debugger](6.2-damage-calculator-debugger/)** - Step-by-step damage calculation pipeline visualization ✅
 
-### Planned (6.3-6.4)
-- **[6.3: Status Effect Debugger](6.3-status-effect-debugger/)** - Test status effects and their interactions 🎯
+### Complete (6.3)
+- **[6.3: Status Effect Debugger](6.3-status-effect-debugger/)** - Test status effects and their interactions ✅
+
+### Planned (6.4)
 - **[6.4: Turn Order Debugger](6.4-turn-order-debugger/)** - Visualize turn order determination with speed and priority 🎯
 
 ## Related Features

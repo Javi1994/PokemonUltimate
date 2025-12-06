@@ -13,11 +13,13 @@ namespace PokemonUltimate.UnifiedDebuggerUI
         private TabPage tabTypeMatchup;
         private TabPage tabStatCalculator;
         private TabPage tabDamageCalculator;
+        private TabPage tabStatusEffect;
         private BattleDebuggerTab battleDebuggerTab;
         private MoveDebuggerTab moveDebuggerTab;
         private TypeMatchupDebuggerTab typeMatchupDebuggerTab;
         private StatCalculatorDebuggerTab statCalculatorDebuggerTab;
         private DamageCalculatorDebuggerTab damageCalculatorDebuggerTab;
+        private StatusEffectDebuggerTab statusEffectDebuggerTab;
 
         public MainForm()
         {
@@ -32,11 +34,13 @@ namespace PokemonUltimate.UnifiedDebuggerUI
             this.tabTypeMatchup = new TabPage();
             this.tabStatCalculator = new TabPage();
             this.tabDamageCalculator = new TabPage();
+            this.tabStatusEffect = new TabPage();
             this.battleDebuggerTab = new BattleDebuggerTab();
             this.moveDebuggerTab = new MoveDebuggerTab();
             this.typeMatchupDebuggerTab = new TypeMatchupDebuggerTab();
             this.statCalculatorDebuggerTab = new StatCalculatorDebuggerTab();
             this.damageCalculatorDebuggerTab = new DamageCalculatorDebuggerTab();
+            this.statusEffectDebuggerTab = new StatusEffectDebuggerTab();
 
             this.SuspendLayout();
 
@@ -81,13 +85,20 @@ namespace PokemonUltimate.UnifiedDebuggerUI
             this.damageCalculatorDebuggerTab.Dock = DockStyle.Fill;
             this.tabDamageCalculator.Controls.Add(this.damageCalculatorDebuggerTab);
 
+            // Status Effect Tab
+            this.tabStatusEffect.Text = "Status Effect";
+            this.tabStatusEffect.Padding = new Padding(5);
+            this.statusEffectDebuggerTab.Dock = DockStyle.Fill;
+            this.tabStatusEffect.Controls.Add(this.statusEffectDebuggerTab);
+
             // Add tabs to TabControl
             this.mainTabControl.TabPages.AddRange(new TabPage[] {
                 this.tabBattle,
                 this.tabMove,
                 this.tabTypeMatchup,
                 this.tabStatCalculator,
-                this.tabDamageCalculator
+                this.tabDamageCalculator,
+                this.tabStatusEffect
             });
 
             // Add TabControl to Form
