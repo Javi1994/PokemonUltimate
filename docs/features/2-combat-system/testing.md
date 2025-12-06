@@ -83,6 +83,34 @@ PokemonUltimate.Tests/
 -   `Engine_TurnOrderResolver_Priority_SortsActionsCorrectly`
 -   `System_CombatEngine_FullBattle_EndsWithVictory`
 
+## Debugging Tools
+
+### Battle Debuggers
+
+Specialized console applications for testing and debugging combat mechanics:
+
+- **[BattleDebugger](../../../PokemonUltimate.BattleDebugger/)** - Run multiple battles with statistics
+  - Move usage statistics (most used moves per Pokemon)
+  - Status effect statistics (effects caused per Pokemon)
+  - Win/loss/draw rates
+  - Configurable Pokemon, level, and number of battles
+  - Detailed or summary output modes
+
+- **[MoveDebugger](../../../PokemonUltimate.MoveDebugger/)** - Test moves multiple times with statistics
+  - Damage statistics (average, min, max, median)
+  - Critical hit rates
+  - Miss rates
+  - Status effect application rates
+  - Action generation tracking (what actions the move creates)
+  - Configurable move, attacker, target, level, and number of tests
+
+- **[TypeMatchupDebugger](../../../PokemonUltimate.TypeMatchupDebugger/)** - Test type effectiveness
+  - Type chart verification
+  - Dual-type effectiveness
+  - Immunity checks
+
+See [`../../../docs/DEBUGGERS.md`](../../../docs/DEBUGGERS.md) for complete debugger documentation.
+
 ## Coverage by Component
 
 ### Battle Foundation (Phase 2.1)
@@ -336,6 +364,144 @@ dotnet test --filter "FullyQualifiedName~CombatIntegration"
 ```bash
 dotnet test --filter "FullyQualifiedName~CombatEngineTests"
 ```
+
+## Future Testing Enhancements ⏳
+
+> **Status**: Planned - Ideas documented for future implementation
+
+The following testing systems are planned to enhance test coverage with real-world battle scenarios and gameplay validation:
+
+### Real Battle Scenario Tests
+
+**Goal**: Test specific real-world battle scenarios with actual Pokemon matchups.
+
+**Proposed Structure**:
+```
+Tests/Systems/Combat/Integration/Scenarios/
+├── RealBattleScenariosTests.cs
+├── MoveEffectivenessTests.cs
+├── TypeMatchupScenariosTests.cs
+├── STABScenariosTests.cs
+├── DualTypeScenariosTests.cs
+└── DamageValidationTests.cs
+```
+
+**Proposed Tests**:
+
+#### RealBattleScenariosTests.cs
+- `Pikachu_Thunderbolt_Against_Charmander_IsSuperEffective()`
+- `Squirtle_WaterGun_Against_Charmander_IsSuperEffective()`
+- `Bulbasaur_VineWhip_Against_Squirtle_IsSuperEffective()`
+- `Pikachu_Thunderbolt_Against_Bulbasaur_IsSuperEffective()`
+- `Charmander_Ember_Against_Bulbasaur_IsSuperEffective()`
+- `NormalMove_Against_Ghost_IsImmune()`
+- `GroundMove_Against_Flying_IsImmune()`
+
+#### MoveEffectivenessTests.cs
+- `Thunderbolt_Against_Pikachu_IsNormalEffective()` // Electric vs Electric
+- `Thunderbolt_Against_Gyarados_IsSuperEffective()` // Electric vs Water/Flying
+- `Ember_Against_Bulbasaur_IsSuperEffective()` // Fire vs Grass/Poison
+- `VineWhip_Against_Rhydon_IsSuperEffective()` // Grass vs Ground/Rock
+
+#### TypeMatchupScenariosTests.cs
+- `Electric_Against_Water_IsSuperEffective()`
+- `Electric_Against_Ground_IsImmune()`
+- `Fire_Against_Water_IsNotVeryEffective()`
+- `Water_Against_Fire_IsSuperEffective()`
+- `Grass_Against_Fire_IsNotVeryEffective()`
+- Complete coverage for all 18 types
+
+#### STABScenariosTests.cs
+- `Pikachu_Thunderbolt_HasSTAB()` // Electric Pokemon using Electric move
+- `Charmander_Ember_HasSTAB()` // Fire Pokemon using Fire move
+- `Pikachu_Tackle_NoSTAB()` // Electric Pokemon using Normal move
+
+#### DualTypeScenariosTests.cs
+- `Bulbasaur_GrassPoison_Against_Fire_IsSuperEffective()` // 2x weakness
+- `Bulbasaur_GrassPoison_Against_Water_IsNormalEffective()` // Resist + Weak = Normal
+- `Gyarados_WaterFlying_Against_Electric_IsSuperEffective()` // 4x weakness
+
+#### DamageValidationTests.cs
+- `Pikachu_Thunderbolt_Against_Charmander_DamageRange()`
+- `SuperEffective_Move_Deals_AtLeast_2x_Damage()`
+- `NotVeryEffective_Move_Deals_AtMost_0_5x_Damage()`
+- `STAB_Move_Deals_1_5x_More_Damage()`
+
+### Enhanced Battle Demo Project
+
+**Goal**: Expand `PokemonUltimate.BattleDemo` with more real-world scenarios.
+
+**Proposed Enhancements**:
+
+#### New Scenarios
+- `RunScenario5_TypeEffectivenessShowcase()` - Demonstrates all type effectiveness combinations
+- `RunScenario6_STABDemonstration()` - Shows STAB bonus in action
+- `RunScenario7_DualTypeMatchups()` - Shows Pokemon with dual types
+- `RunScenario8_ImmunityShowcase()` - Shows type immunities
+- `RunScenario9_CriticalHits()` - Shows critical hit mechanics
+- `RunScenario10_StatusEffects()` - Shows status effect mechanics
+
+#### BattleScenarioLibrary.cs
+Create a library of pre-defined battle scenarios:
+```csharp
+public static class BattleScenarioLibrary
+{
+    public static BattleScenario PikachuVsCharmander { get; }
+    public static BattleScenario TypeAdvantage_WaterVsFire { get; }
+    public static BattleScenario TypeDisadvantage_FireVsWater { get; }
+    public static BattleScenario Immunity_NormalVsGhost { get; }
+    public static BattleScenario STAB_Showcase { get; }
+    // ... more scenarios
+}
+```
+
+### Battle Flow Validation Tests
+
+**Proposed Tests**:
+- `Battle_PikachuVsCharmander_CompletesInReasonableTurns()`
+- `Battle_TypeAdvantage_WinnerIsFavored()`
+- `Battle_StatusEffect_AppliesCorrectly()`
+- `Battle_StatChanges_WorkCorrectly()`
+
+### Known Battle Scenarios Tests
+
+**Proposed Tests**:
+- `Ash_Pikachu_Vs_Brock_Onix()` // Low level vs high level
+- `Starter_Triangle_Matchups()` // Fire vs Water vs Grass
+- `Legendary_Battle_Scenario()` // When legendaries are added
+
+### Performance Battle Tests
+
+**Proposed Tests**:
+- `Run1000Battles_CompletesWithoutErrors()`
+- `Battle_Completes_In_Reasonable_Time()`
+- `Memory_Usage_Stable_After_Many_Battles()`
+
+### Implementation Priority
+
+**High Priority**:
+1. `RealBattleScenariosTests.cs` - Basic real-world cases (Pikachu vs Charmander, etc.)
+2. `MoveEffectivenessTests.cs` - Specific move effectiveness verification
+3. Expand `BattleDemo` - More visual scenarios
+
+**Medium Priority**:
+4. `TypeMatchupScenariosTests.cs` - Complete type coverage
+5. `STABScenariosTests.cs` - STAB verification
+6. `DualTypeScenariosTests.cs` - Dual-type Pokemon
+
+**Low Priority**:
+7. Performance tests
+8. Known battle scenario regression tests
+
+### Notes
+
+- These tests focus on **real-world gameplay scenarios** rather than technical unit tests
+- Tests verify **actual Pokemon matchups** and **expected effectiveness** from player perspective
+- Each test should be **deterministic** where possible (fixed levels, moves, stats)
+- Tests should validate **gameplay correctness** (e.g., "Pikachu's Thunderbolt should be super effective against Charmander")
+- Integration with `BattleDemo` provides **visual validation** of scenarios
+
+---
 
 ## Related Documents
 
