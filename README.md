@@ -347,6 +347,7 @@ PokemonUltimate is a battle-focused Pokémon game engine built with clean archit
 - ✅ **AI vs AI Battles** - Built-in AI providers for automated testing and demos
 - ✅ **Unity Integration** - Basic UI foundation and IBattleView implementation complete
 - ✅ **Visual Debuggers** - Windows Forms tools for battle statistics, move testing, and type effectiveness
+- ✅ **Data Viewer** - Windows Forms application for visually browsing all game data (Pokemon, Moves, Items, Abilities, Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects)
 - ✅ **Content System** - 26 Pokemon, 36 Moves, 35 Abilities, 23 Items cataloged
 
 ---
@@ -382,7 +383,9 @@ PokemonUltimate/
 │
 ├── BattleDemo/       # Visual AI vs AI battle simulator
 │
-└── DevelopTools/           # Development tools application with tabbed interface (Windows Forms)
+├── DeveloperTools/   # Development tools application with tabbed interface (Windows Forms)
+│
+├── DataViewer/       # Data viewer application for browsing game data (Windows Forms)
 │
 └── PokemonUltimateUnity/  # Unity project
     ├── Assets/
@@ -420,7 +423,10 @@ dotnet test
 dotnet run --project PokemonUltimate.BattleDemo
 
 # Run development tools (Windows Forms application with all debuggers)
-dotnet run --project PokemonUltimate.DevelopTools
+dotnet run --project PokemonUltimate.DeveloperTools
+
+# Run data viewer (Windows Forms application for browsing game data)
+dotnet run --project PokemonUltimate.DataViewer
 
 # Build DLLs for Unity (optional)
 dotnet build -c Release
@@ -500,7 +506,7 @@ The project includes specialized Windows Forms applications for testing and debu
 **Usage**:
 ```bash
 # Run development tools (opens with all debugger tabs)
-dotnet run --project PokemonUltimate.DevelopTools
+dotnet run --project PokemonUltimate.DeveloperTools
 ```
 
 ### Debugger Tabs

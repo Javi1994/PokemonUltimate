@@ -5,7 +5,7 @@ using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 
-namespace PokemonUltimate.DevelopTools.Runners
+namespace PokemonUltimate.DeveloperTools.Runners
 {
     /// <summary>
     /// Calculates Pokemon stats with different configurations for the Stat Calculator Debugger.

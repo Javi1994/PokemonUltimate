@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.DevelopTools.Runners;
+using PokemonUltimate.DeveloperTools.Runners;
 
-namespace PokemonUltimate.DevelopTools.Tabs
+namespace PokemonUltimate.DeveloperTools.Tabs
 {
     public partial class BattleDebuggerTab : UserControl
     {

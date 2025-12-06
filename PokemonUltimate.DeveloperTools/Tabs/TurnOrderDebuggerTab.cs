@@ -6,9 +6,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.DevelopTools.Runners;
+using PokemonUltimate.DeveloperTools.Runners;
 
-namespace PokemonUltimate.DevelopTools.Tabs
+namespace PokemonUltimate.DeveloperTools.Tabs
 {
     /// <summary>
     /// Debugger tab for visualizing turn order determination with speed and priority.

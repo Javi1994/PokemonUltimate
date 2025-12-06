@@ -19,6 +19,7 @@ This roadmap outlines the implementation phases for new debugger tabs in the uni
 - ✅ **Phase 6.2**: Damage Calculator Debugger - Complete
 - ✅ **Phase 6.3**: Status Effect Debugger - Complete
 - ✅ **Phase 6.4**: Turn Order Debugger - Complete
+- ✅ **Phase 6.7**: Data Viewer - Complete
 
 ## Phase 6.5: Battle Debugger ✅ Complete
 
@@ -309,6 +310,74 @@ This roadmap outlines the implementation phases for new debugger tabs in the uni
 - Functional: Calculate turn order with different speeds/priorities (ready for manual testing)
 - Edge Cases: Speed ties, priority differences, modifiers (ready for manual testing)
 - Integration: Verify calculations match TurnOrderResolver (ready for manual testing)
+
+---
+
+## Phase 6.7: Data Viewer ✅ Complete
+
+**Goal**: Create Windows Forms application for visually viewing game data from catalogs.
+
+**Dependencies**: Feature 1: Game Data, Feature 3: Content Expansion
+
+### Components
+
+| Component | File | Description |
+|-----------|------|-------------|
+| `Program` | `Program.cs` | Application entry point ✅ |
+| `MainForm` | `MainForm.cs` | Main form with TabControl ✅ |
+| `PokemonDataTab` | `Tabs/PokemonDataTab.cs` | Pokemon data display tab ✅ |
+| `MoveDataTab` | `Tabs/MoveDataTab.cs` | Move data display tab ✅ |
+| `ItemDataTab` | `Tabs/ItemDataTab.cs` | Item data display tab ✅ |
+| `AbilityDataTab` | `Tabs/AbilityDataTab.cs` | Ability data display tab ✅ |
+| `StatusDataTab` | `Tabs/StatusDataTab.cs` | Status Effect data display tab ✅ |
+| `WeatherDataTab` | `Tabs/WeatherDataTab.cs` | Weather data display tab ✅ |
+| `TerrainDataTab` | `Tabs/TerrainDataTab.cs` | Terrain data display tab ✅ |
+| `HazardDataTab` | `Tabs/HazardDataTab.cs` | Hazard data display tab ✅ |
+| `SideConditionDataTab` | `Tabs/SideConditionDataTab.cs` | Side Condition data display tab ✅ |
+| `FieldEffectDataTab` | `Tabs/FieldEffectDataTab.cs` | Field Effect data display tab ✅ |
+
+### UI Features
+
+**Main Form**:
+- TabControl with 10 tabs: Pokemon, Moves, Items, Abilities, Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
+- Each tab follows same pattern as Developer Tools tabs
+
+**Each Tab**:
+- **Left Panel**: DataGridView showing all items in table format
+- **Right Panel**: RichTextBox showing detailed information for selected item
+- **Interactive**: Click any row to see detailed information
+- **Count Display**: Shows total number of items in catalog
+
+### Usage
+
+```bash
+# Run the application
+dotnet run --project PokemonUltimate.DataViewer
+
+# Or build and run
+dotnet build PokemonUltimate.DataViewer
+dotnet run --project PokemonUltimate.DataViewer
+```
+
+The application opens a Windows Forms window with tabs for each data type. Click on any row in the data grid to see detailed information in the right panel.
+
+### Implementation Steps
+
+1. ✅ Create feature documentation
+2. ✅ Create project structure
+3. ✅ Create viewer classes (Pokemon, Move, Item, Ability)
+4. ✅ Create Program.cs with command handling
+5. ✅ Add project to solution
+6. ✅ Test data display (compiles and runs successfully)
+7. ✅ Update documentation
+
+### Tests
+
+- Functional: Display all catalogs (ready for manual testing)
+- Edge Cases: Empty catalogs, missing data (ready for manual testing)
+- Integration: Verify data matches catalogs (ready for manual testing)
+
+**See**: [`6.7-data-viewer/README.md`](6.7-data-viewer/README.md) for complete documentation
 
 ---
 

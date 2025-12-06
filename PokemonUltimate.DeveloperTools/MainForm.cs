@@ -1,9 +1,9 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using PokemonUltimate.DevelopTools.Tabs;
+using PokemonUltimate.DeveloperTools.Tabs;
 
-namespace PokemonUltimate.DevelopTools
+namespace PokemonUltimate.DeveloperTools
 {
     public partial class MainForm : Form
     {
@@ -49,7 +49,7 @@ namespace PokemonUltimate.DevelopTools
             this.SuspendLayout();
 
             // Form
-            this.Text = "Pokemon Ultimate - Develop Tools";
+            this.Text = "Pokemon Ultimate - Developer Tools";
             this.Size = new Size(1400, 900);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MinimumSize = new Size(1000, 600);

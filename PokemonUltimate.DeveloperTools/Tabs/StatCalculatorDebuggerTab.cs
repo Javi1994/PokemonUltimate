@@ -7,9 +7,9 @@ using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
-using PokemonUltimate.DevelopTools.Runners;
+using PokemonUltimate.DeveloperTools.Runners;
 
-namespace PokemonUltimate.DevelopTools.Tabs
+namespace PokemonUltimate.DeveloperTools.Tabs
 {
     /// <summary>
     /// Debugger tab for calculating and visualizing Pokemon stats with different configurations.

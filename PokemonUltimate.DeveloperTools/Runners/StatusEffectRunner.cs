@@ -7,7 +7,7 @@ using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.DevelopTools.Runners
+namespace PokemonUltimate.DeveloperTools.Runners
 {
     /// <summary>
     /// Tests status effects and their interactions for the Status Effect Debugger.

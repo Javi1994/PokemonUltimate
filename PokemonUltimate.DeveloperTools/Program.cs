@@ -1,4 +1,4 @@
-namespace PokemonUltimate.DevelopTools;
+namespace PokemonUltimate.DeveloperTools;
 
 static class Program
 {

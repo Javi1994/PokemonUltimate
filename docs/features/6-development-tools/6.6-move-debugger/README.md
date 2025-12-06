@@ -9,7 +9,7 @@
 
 ## Overview
 
-The Move Debugger is a debugger tab in the `PokemonUltimate.DevelopTools` application that allows developers to test moves multiple times and collect comprehensive statistics including damage ranges, critical hit rates, miss rates, and status effect application rates.
+The Move Debugger is a debugger tab in the `PokemonUltimate.DeveloperTools` application that allows developers to test moves multiple times and collect comprehensive statistics including damage ranges, critical hit rates, miss rates, and status effect application rates.
 
 ## Purpose
 
@@ -77,9 +77,9 @@ The Move Debugger is a debugger tab in the `PokemonUltimate.DevelopTools` applic
 
 ## Code Location
 
-**Namespace**: `PokemonUltimate.DevelopTools.Runners`  
+**Namespace**: `PokemonUltimate.DeveloperTools.Runners`  
 **Runner**: `MoveRunner.cs`  
-**Tab**: `PokemonUltimate.DevelopTools.Tabs.MoveDebuggerTab.cs`
+**Tab**: `PokemonUltimate.DeveloperTools.Tabs.MoveDebuggerTab.cs`
 
 ### Key Classes
 

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 
-namespace PokemonUltimate.DevelopTools.Tabs
+namespace PokemonUltimate.DeveloperTools.Tabs
 {
     public partial class TypeMatchupDebuggerTab : UserControl
     {

@@ -9,7 +9,7 @@
 
 ## Overview
 
-The Battle Debugger is a debugger tab in the `PokemonUltimate.DevelopTools` application that allows developers to run multiple battles and analyze comprehensive statistics including move usage, status effects, and win/loss/draw rates.
+The Battle Debugger is a debugger tab in the `PokemonUltimate.DeveloperTools` application that allows developers to run multiple battles and analyze comprehensive statistics including move usage, status effects, and win/loss/draw rates.
 
 ## Purpose
 
@@ -63,9 +63,9 @@ The Battle Debugger is a debugger tab in the `PokemonUltimate.DevelopTools` appl
 
 ## Code Location
 
-**Namespace**: `PokemonUltimate.DevelopTools.Runners`  
+**Namespace**: `PokemonUltimate.DeveloperTools.Runners`  
 **Runner**: `BattleRunner.cs`  
-**Tab**: `PokemonUltimate.DevelopTools.Tabs.BattleDebuggerTab.cs`
+**Tab**: `PokemonUltimate.DeveloperTools.Tabs.BattleDebuggerTab.cs`
 
 ### Key Classes
 

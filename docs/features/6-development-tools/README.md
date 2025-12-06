@@ -20,6 +20,7 @@ This feature provides unified Windows Forms debugger applications for testing, a
 - ✅ **Damage Calculator Debugger**: Complete (6.2)
 - ✅ **Status Effect Debugger**: Complete (6.3)
 - ✅ **Turn Order Debugger**: Complete (6.4)
+- ✅ **Data Viewer**: Complete (6.7)
 
 ## Documentation
 
@@ -58,6 +59,9 @@ This feature provides unified Windows Forms debugger applications for testing, a
 ### Complete (6.4)
 - **[6.4: Turn Order Debugger](6.4-turn-order-debugger/)** - Visualize turn order determination with speed and priority ✅
 
+### Complete (6.7)
+- **[6.7: Data Viewer](6.7-data-viewer/)** - Simple console application for quickly viewing game data ✅
+
 ## Related Features
 
 - **[Feature 1: Game Data](../1-game-data/)** - Pokemon data, stats, types used by debuggers
@@ -67,8 +71,10 @@ This feature provides unified Windows Forms debugger applications for testing, a
 
 ## Quick Links
 
-- **Develop Tools**: `PokemonUltimate.DevelopTools` - Single Windows Forms application
+- **Developer Tools**: `PokemonUltimate.DeveloperTools` - Single Windows Forms application with debugger tabs
+- **Data Viewer**: `PokemonUltimate.DataViewer` - Windows Forms application for viewing game data visually
 - **Complete Tabs**: Battle Debugger (6.5), Move Debugger (6.6), Type Matchup, Stat Calculator (6.1), Damage Calculator (6.2), Status Effect (6.3), Turn Order (6.4)
+- **Complete Tools**: Data Viewer (6.7) - Visual data browser with tabs for Pokemon, Moves, Items, and Abilities
 
 ---
 

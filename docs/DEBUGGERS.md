@@ -4,7 +4,9 @@
 
 ## Overview
 
-The **PokemonUltimate.DevelopTools** is a unified Windows Forms application that combines all debuggers into a single interface with tabbed navigation. This provides a more consistent experience and easier maintenance compared to separate applications.
+The **PokemonUltimate.DeveloperTools** is a unified Windows Forms application that combines all debuggers into a single interface with tabbed navigation. This provides a more consistent experience and easier maintenance compared to separate applications.
+
+Additionally, **PokemonUltimate.DataViewer** is a separate Windows Forms application for visually browsing all game data catalogs (Pokemon, Moves, Items, Abilities, Status Effects, Weather, Terrain, Hazards, Side Conditions, and Field Effects).
 
 ## Quick Start
 
@@ -12,7 +14,7 @@ The **PokemonUltimate.DevelopTools** is a unified Windows Forms application that
 
 ```bash
 # Run the unified debugger application
-dotnet run --project PokemonUltimate.DevelopTools
+dotnet run --project PokemonUltimate.DeveloperTools
 ```
 
 The application opens with four tabs:
@@ -84,7 +86,7 @@ The application opens with four tabs:
 ## Architecture
 
 ```
-PokemonUltimate.DevelopTools/
+PokemonUltimate.DeveloperTools/
 ├── MainForm.cs                    # Main form with TabControl
 ├── Program.cs                     # Application entry point
 ├── Runners/
@@ -169,6 +171,24 @@ All debugger tabs provide:
 - Testing different builds (IVs/EVs/Nature combinations)
 - Validating stat calculations
 - Comparing stat values at different levels
+
+## Data Viewer Application
+
+**PokemonUltimate.DataViewer** is a Windows Forms application for quickly viewing and browsing all game data.
+
+**Quick Start**:
+```bash
+dotnet run --project PokemonUltimate.DataViewer
+```
+
+**Features**:
+- ✅ 10 data tabs: Pokemon, Moves, Items, Abilities, Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
+- ✅ DataGridView tables showing all items in each catalog
+- ✅ Detailed information panel showing selected item details
+- ✅ Consistent visual interface matching Developer Tools style
+- ✅ Interactive selection - click any row to see details
+
+**See**: [`docs/features/6-development-tools/6.7-data-viewer/README.md`](docs/features/6-development-tools/6.7-data-viewer/README.md) for complete documentation
 
 ## Future Enhancements
 

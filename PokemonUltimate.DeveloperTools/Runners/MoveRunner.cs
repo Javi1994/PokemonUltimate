@@ -12,7 +12,7 @@ using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.DevelopTools.Runners
+namespace PokemonUltimate.DeveloperTools.Runners
 {
     public class MoveRunner
     {

@@ -8,12 +8,12 @@
 
 ## Overview
 
-The development tools are organized in a single Windows Forms project: `PokemonUltimate.DevelopTools`.
+The development tools are organized in a single Windows Forms project: `PokemonUltimate.DeveloperTools`.
 
 ## Project Structure
 
 ```
-PokemonUltimate.DevelopTools/
+PokemonUltimate.DeveloperTools/
 ├── MainForm.cs                    # Main form with TabControl
 ├── Program.cs                     # Application entry point
 ├── Runners/
@@ -31,11 +31,26 @@ PokemonUltimate.DevelopTools/
     ├── DamageCalculatorDebuggerTab.cs # Damage calculator UserControl ✅ (6.2)
     ├── StatusEffectDebuggerTab.cs # Status effect UserControl (6.3)
     └── TurnOrderDebuggerTab.cs   # Turn order UserControl (6.4)
+
+PokemonUltimate.DataViewer/
+├── Program.cs                     # Application entry point ✅ (6.7)
+├── MainForm.cs                    # Main form with TabControl ✅ (6.7)
+└── Tabs/
+    ├── PokemonDataTab.cs         # Pokemon data display tab ✅ (6.7)
+    ├── MoveDataTab.cs            # Move data display tab ✅ (6.7)
+    ├── ItemDataTab.cs            # Item data display tab ✅ (6.7)
+    ├── AbilityDataTab.cs         # Ability data display tab ✅ (6.7)
+    ├── StatusDataTab.cs          # Status Effect data display tab ✅ (6.7)
+    ├── WeatherDataTab.cs         # Weather data display tab ✅ (6.7)
+    ├── TerrainDataTab.cs         # Terrain data display tab ✅ (6.7)
+    ├── HazardDataTab.cs          # Hazard data display tab ✅ (6.7)
+    ├── SideConditionDataTab.cs   # Side Condition data display tab ✅ (6.7)
+    └── FieldEffectDataTab.cs     # Field Effect data display tab ✅ (6.7)
 ```
 
 ## Namespaces
 
-### `PokemonUltimate.DevelopTools`
+### `PokemonUltimate.DeveloperTools`
 
 **Purpose**: Main application namespace
 
@@ -43,7 +58,7 @@ PokemonUltimate.DevelopTools/
 - `MainForm` - Main application window
 - `Program` - Application entry point
 
-### `PokemonUltimate.DevelopTools.Runners`
+### `PokemonUltimate.DeveloperTools.Runners`
 
 **Purpose**: Reusable logic for executing tests and collecting statistics
 
@@ -55,7 +70,7 @@ PokemonUltimate.DevelopTools/
 - `StatusEffectRunner` - Tests status effects and interactions ✅ (6.3)
 - `TurnOrderRunner` - Calculates turn order with different configurations ✅ (6.4)
 
-### `PokemonUltimate.DevelopTools.Tabs`
+### `PokemonUltimate.DeveloperTools.Tabs`
 
 **Purpose**: UserControl-based tabs for each debugger
 
@@ -72,8 +87,8 @@ PokemonUltimate.DevelopTools/
 
 ### MainForm
 
-**Namespace**: `PokemonUltimate.DevelopTools`
-**File**: `PokemonUltimate.DevelopTools/MainForm.cs`
+**Namespace**: `PokemonUltimate.DeveloperTools`
+**File**: `PokemonUltimate.DeveloperTools/MainForm.cs`
 **Purpose**: Main application window with tabbed interface
 
 **Key Properties**:
@@ -85,8 +100,8 @@ PokemonUltimate.DevelopTools/
 
 ### BattleRunner (6.5)
 
-**Namespace**: `PokemonUltimate.DevelopTools.Runners`
-**File**: `PokemonUltimate.DevelopTools/Runners/BattleRunner.cs`
+**Namespace**: `PokemonUltimate.DeveloperTools.Runners`
+**File**: `PokemonUltimate.DeveloperTools/Runners/BattleRunner.cs`
 **Purpose**: Executes battles and collects statistics
 
 **Key Methods**:
@@ -96,8 +111,8 @@ PokemonUltimate.DevelopTools/
 
 ### MoveRunner (6.6)
 
-**Namespace**: `PokemonUltimate.DevelopTools.Runners`
-**File**: `PokemonUltimate.DevelopTools/Runners/MoveRunner.cs`
+**Namespace**: `PokemonUltimate.DeveloperTools.Runners`
+**File**: `PokemonUltimate.DeveloperTools/Runners/MoveRunner.cs`
 **Purpose**: Tests moves and collects statistics
 
 **Key Methods**:
@@ -107,8 +122,8 @@ PokemonUltimate.DevelopTools/
 
 ### StatCalculatorRunner (6.1)
 
-**Namespace**: `PokemonUltimate.DevelopTools.Runners`
-**File**: `PokemonUltimate.DevelopTools/Runners/StatCalculatorRunner.cs`
+**Namespace**: `PokemonUltimate.DeveloperTools.Runners`
+**File**: `PokemonUltimate.DeveloperTools/Runners/StatCalculatorRunner.cs`
 **Purpose**: Calculates stats with different configurations
 
 **Key Methods**:
@@ -117,8 +132,8 @@ PokemonUltimate.DevelopTools/
 
 ### DamageCalculatorRunner (6.2) ✅
 
-**Namespace**: `PokemonUltimate.DevelopTools.Runners`
-**File**: `PokemonUltimate.DevelopTools/Runners/DamageCalculatorRunner.cs`
+**Namespace**: `PokemonUltimate.DeveloperTools.Runners`
+**File**: `PokemonUltimate.DeveloperTools/Runners/DamageCalculatorRunner.cs`
 **Purpose**: Visualizes damage pipeline step-by-step
 
 **Key Methods**:
@@ -127,8 +142,8 @@ PokemonUltimate.DevelopTools/
 
 ### StatusEffectRunner (6.3)
 
-**Namespace**: `PokemonUltimate.DevelopTools.Runners`
-**File**: `PokemonUltimate.DevelopTools/Runners/StatusEffectRunner.cs`
+**Namespace**: `PokemonUltimate.DeveloperTools.Runners`
+**File**: `PokemonUltimate.DeveloperTools/Runners/StatusEffectRunner.cs`
 **Purpose**: Tests status effects and interactions
 
 **Key Methods**:
@@ -138,13 +153,41 @@ PokemonUltimate.DevelopTools/
 
 ### TurnOrderRunner (6.4) ✅
 
-**Namespace**: `PokemonUltimate.DevelopTools.Runners`
-**File**: `PokemonUltimate.DevelopTools/Runners/TurnOrderRunner.cs`
+**Namespace**: `PokemonUltimate.DeveloperTools.Runners`
+**File**: `PokemonUltimate.DeveloperTools/Runners/TurnOrderRunner.cs`
 **Purpose**: Calculates turn order with different configurations
 
 **Key Methods**:
 - `CalculateTurnOrder(...)` - Calculates turn order for given Pokemon configurations
 - Returns `TurnOrderResult` with speed calculations, priority info, and final turn order
+
+### Data Viewer (6.7) ✅
+
+**Namespace**: `PokemonUltimate.DataViewer`
+**File**: `PokemonUltimate.DataViewer/Program.cs`, `MainForm.cs`
+**Purpose**: Windows Forms application for viewing game data visually
+
+**Key Classes**:
+- `Program` - Application entry point
+- `MainForm` - Main form with TabControl containing all data tabs
+- `PokemonDataTab` - UserControl tab displaying Pokemon data in DataGridView
+- `MoveDataTab` - UserControl tab displaying Move data in DataGridView
+- `ItemDataTab` - UserControl tab displaying Item data in DataGridView
+- `AbilityDataTab` - UserControl tab displaying Ability data in DataGridView
+- `StatusDataTab` - UserControl tab displaying Status Effect data in DataGridView
+- `WeatherDataTab` - UserControl tab displaying Weather data in DataGridView
+- `TerrainDataTab` - UserControl tab displaying Terrain data in DataGridView
+- `HazardDataTab` - UserControl tab displaying Hazard data in DataGridView
+- `SideConditionDataTab` - UserControl tab displaying Side Condition data in DataGridView
+- `FieldEffectDataTab` - UserControl tab displaying Field Effect data in DataGridView
+
+**Key Features**:
+- Visual Windows Forms interface with tabs
+- DataGridView controls for tabular data display
+- RichTextBox for detailed information display
+- Interactive selection - click rows to see details
+
+**See**: [`6.7-data-viewer/README.md`](6.7-data-viewer/README.md) for complete documentation
 
 ## Integration Points
 

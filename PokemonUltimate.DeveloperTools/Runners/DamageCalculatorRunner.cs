@@ -9,7 +9,7 @@ using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.DevelopTools.Runners
+namespace PokemonUltimate.DeveloperTools.Runners
 {
     /// <summary>
     /// Calculates damage and visualizes the damage pipeline step-by-step for the Damage Calculator Debugger.
