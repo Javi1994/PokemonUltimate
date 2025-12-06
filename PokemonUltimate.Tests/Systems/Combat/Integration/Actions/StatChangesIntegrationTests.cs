@@ -113,18 +113,18 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
                 Effects = new List<IMoveEffect> { new DamageEffect() }
             };
 
-            // Calculate damage WITHOUT stat change (baseline)
+            // Calculate damage WITHOUT stat change (baseline) - use fixed random for consistency
             var pipelineWithoutStatChange = new DamagePipeline();
-            var contextWithoutStatChange = pipelineWithoutStatChange.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field);
+            var contextWithoutStatChange = pipelineWithoutStatChange.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field, fixedRandomValue: 1.0f);
             float damageWithoutStatChange = contextWithoutStatChange.FinalDamage;
 
             // Apply Defense +2 stat change to defender
             var statChangeAction = new StatChangeAction(_defenderSlot, _defenderSlot, Stat.Defense, 2);
             statChangeAction.ExecuteLogic(_field);
 
-            // Act - Calculate damage WITH stat change
+            // Act - Calculate damage WITH stat change - use same fixed random
             var pipelineWithStatChange = new DamagePipeline();
-            var contextWithStatChange = pipelineWithStatChange.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field);
+            var contextWithStatChange = pipelineWithStatChange.Calculate(_attackerSlot, _defenderSlot, physicalMove, _field, fixedRandomValue: 1.0f);
             float damageWithStatChange = contextWithStatChange.FinalDamage;
 
             // Assert - Defense +2 should reduce damage

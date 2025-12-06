@@ -52,12 +52,7 @@
 - [ ] All enemies share level penalty
 - [ ] Spread moves hit all 5
 
-### 1.5 Rotation (3v3 rotation)
-- [ ] Three Pokemon, one active at a time
-- [ ] Can rotate without using turn
-- [ ] Hidden rotation adds mind games
-
-### 1.6 Multi Battle (2v2 with 2 trainers per side)
+### 1.5 Multi Battle (2v2 with 2 trainers per side)
 - [ ] Each trainer controls 1 Pokemon
 - [ ] Limited communication between partners
 

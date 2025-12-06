@@ -3,12 +3,15 @@ using NUnit.Framework;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Tests.Systems.Combat.Helpers;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Actions
 {
@@ -63,9 +66,14 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
         public void UseMoveAction_Fly_ChargeTurn_SemiInvulnerable()
         {
             // Arrange
+            // Create AccuracyChecker that always hits (for deterministic testing)
+            var alwaysHitAccuracyChecker = TestHelpers.CreateAlwaysHitAccuracyChecker();
+            var fixedRandom = TestHelpers.CreateFixedRandomProvider(42);
 
-            // Act - First use (charge turn)
-            var flyAction = new UseMoveAction(_userSlot, _targetSlot, _flyMove);
+            // Act - First use (charge turn) - use AccuracyChecker that always hits
+            var flyAction = new UseMoveAction(_userSlot, _targetSlot, _flyMove, 
+                randomProvider: fixedRandom, 
+                accuracyChecker: alwaysHitAccuracyChecker);
             var reactions = flyAction.ExecuteLogic(_field).ToList();
 
             // Assert
@@ -96,8 +104,14 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
             // Simulate end of turn (marks as ready for attack)
             _userSlot.SetSemiInvulnerableReady();
 
-            // Act - Second use (attack turn)
-            var flyAction = new UseMoveAction(_userSlot, _targetSlot, _flyMove);
+            // Create AccuracyChecker that always hits (for deterministic testing)
+            var alwaysHitAccuracyChecker = TestHelpers.CreateAlwaysHitAccuracyChecker();
+            var fixedRandom = TestHelpers.CreateFixedRandomProvider(42);
+
+            // Act - Second use (attack turn) - use AccuracyChecker that always hits
+            var flyAction = new UseMoveAction(_userSlot, _targetSlot, _flyMove,
+                randomProvider: fixedRandom,
+                accuracyChecker: alwaysHitAccuracyChecker);
             var reactions = flyAction.ExecuteLogic(_field).ToList();
 
             // Assert

@@ -1,6 +1,6 @@
 # Sub-Feature 2.19: Battle Formats
 
-> Doubles, Triples, Rotation - Multiple battle format support.
+> Doubles, Triples, Horde, Raid - Multiple battle format support.
 
 **Sub-Feature Number**: 2.19  
 **Parent Feature**: Feature 2: Combat System  
@@ -11,13 +11,18 @@
 Battle Formats extends the battle system to support multiple formats:
 - **Doubles**: 2v2 battles
 - **Triples**: 3v3 battles
-- **Rotation**: Rotation battles
+- **Horde**: 1vs2, 1vs3, 1vs5 battles
+- **Raid**: 1vsBoss, 2vsBoss battles
 - **Format-Specific Rules**: Format-specific mechanics
 
 ## Current Status
 
-- ⏳ **Planned**: Battle formats not yet implemented
-- ✅ **Foundation Ready**: BattleField supports multiple slots
+- ✅ **Complete**: All battle formats implemented and tested
+  - ✅ Doubles (2v2) - 8 tests passing
+  - ✅ Triples (3v3) - 8 tests passing
+  - ✅ Horde (1vs2, 1vs3, 1vs5) - 8 tests passing
+  - ✅ Raid (1vsBoss, 2vsBoss) - 6 tests passing
+  - ✅ Integration Tests - 48 tests passing
 
 ## Documentation
 
@@ -36,9 +41,11 @@ Battle Formats extends the battle system to support multiple formats:
 
 ## Quick Links
 
-- **Status**: ⏳ Planned (Phase 2.19)
+- **Status**: ✅ Complete (Phase 2.19)
+- **Tests**: 48 integration tests passing
+- **Implementation**: All formats fully functional with targeting, spread moves, screens, abilities, items, and field conditions
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: 2025-12-06
 

@@ -170,7 +170,15 @@ namespace PokemonUltimate.Combat
 
             for (int i = 0; i < side.Slots.Count && i < healthyPokemon.Count; i++)
             {
-                side.Slots[i].SetPokemon(healthyPokemon[i]);
+                var pokemon = healthyPokemon[i];
+                
+                // Apply Boss multipliers if this is a Boss battle and it's an enemy Pokemon
+                if (_rules.IsBossBattle && !side.IsPlayer)
+                {
+                    pokemon.ApplyBossMultipliers(_rules.BossMultiplier, _rules.BossStatMultiplier);
+                }
+                
+                side.Slots[i].SetPokemon(pokemon);
             }
         }
 

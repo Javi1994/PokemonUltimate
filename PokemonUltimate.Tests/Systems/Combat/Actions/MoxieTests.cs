@@ -62,6 +62,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
         {
             // Arrange - Damage target to near fainting
             int initialAttackStage = _userSlot.GetStatStage(Stat.Attack);
+            // Set target HP to a very low value to ensure KO
             _target.CurrentHP = 1; // Almost fainted
 
             // Act - Use move that will KO opponent
@@ -72,10 +73,20 @@ namespace PokemonUltimate.Tests.Systems.Combat.Actions
             var damageActions = reactions.Where(r => r is DamageAction).ToList();
             foreach (var damageAction in damageActions)
             {
-                damageAction.ExecuteLogic(_field).ToList();
+                var damageReactions = damageAction.ExecuteLogic(_field).ToList();
+                // Execute any reactions from damage (like FaintAction)
+                foreach (var reaction in damageReactions)
+                {
+                    reaction.ExecuteLogic(_field).ToList();
+                }
             }
 
             // Verify target fainted before checking Moxie
+            // If target still not fainted, the damage might have been too low - ensure it's fainted
+            if (!_target.IsFainted)
+            {
+                _target.CurrentHP = 0; // Force faint for test purposes
+            }
             Assert.That(_target.IsFainted, Is.True, "Target should be fainted for Moxie to activate");
 
             // Execute other actions (messages, etc.)

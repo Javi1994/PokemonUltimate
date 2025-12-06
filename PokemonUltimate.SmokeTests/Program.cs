@@ -1831,6 +1831,177 @@ class Program
         }
 
         // ═══════════════════════════════════════════════════════
+        // SECTION 44: BATTLE FORMATS
+        // ═══════════════════════════════════════════════════════
+        PrintSection("BATTLE FORMATS");
+
+        // Test BattleRules static factories
+        Test("BattleRules.Singles exists", () => BattleRules.Singles != null);
+        Test("BattleRules.Singles is 1v1", () => 
+            BattleRules.Singles.PlayerSlots == 1 && BattleRules.Singles.EnemySlots == 1);
+        
+        Test("BattleRules.Doubles exists", () => BattleRules.Doubles != null);
+        Test("BattleRules.Doubles is 2v2", () => 
+            BattleRules.Doubles.PlayerSlots == 2 && BattleRules.Doubles.EnemySlots == 2);
+        
+        Test("BattleRules.Triples exists", () => BattleRules.Triples != null);
+        Test("BattleRules.Triples is 3v3", () => 
+            BattleRules.Triples.PlayerSlots == 3 && BattleRules.Triples.EnemySlots == 3);
+        
+        Test("BattleRules.Horde1v2 exists", () => BattleRules.Horde1v2 != null);
+        Test("BattleRules.Horde1v2 is 1v2", () => 
+            BattleRules.Horde1v2.PlayerSlots == 1 && BattleRules.Horde1v2.EnemySlots == 2);
+        
+        Test("BattleRules.Horde1v3 exists", () => BattleRules.Horde1v3 != null);
+        Test("BattleRules.Horde1v3 is 1v3", () => 
+            BattleRules.Horde1v3.PlayerSlots == 1 && BattleRules.Horde1v3.EnemySlots == 3);
+        
+        Test("BattleRules.Horde1v5 exists", () => BattleRules.Horde1v5 != null);
+        Test("BattleRules.Horde1v5 is 1v5", () => 
+            BattleRules.Horde1v5.PlayerSlots == 1 && BattleRules.Horde1v5.EnemySlots == 5);
+        
+        Test("BattleRules.Raid1vBoss exists", () => BattleRules.Raid1vBoss != null);
+        Test("BattleRules.Raid1vBoss is 1v1", () => 
+            BattleRules.Raid1vBoss.PlayerSlots == 1 && BattleRules.Raid1vBoss.EnemySlots == 1);
+        Test("BattleRules.Raid1vBoss is boss battle", () => BattleRules.Raid1vBoss.IsBossBattle);
+        Test("BattleRules.Raid1vBoss has boss multiplier", () => BattleRules.Raid1vBoss.BossMultiplier > 1.0f);
+        
+        Test("BattleRules.Raid2vBoss exists", () => BattleRules.Raid2vBoss != null);
+        Test("BattleRules.Raid2vBoss is 2v1", () => 
+            BattleRules.Raid2vBoss.PlayerSlots == 2 && BattleRules.Raid2vBoss.EnemySlots == 1);
+        Test("BattleRules.Raid2vBoss is boss battle", () => BattleRules.Raid2vBoss.IsBossBattle);
+
+        // Test Doubles format initialization
+        var doublesField = new BattleField();
+        var doublesPlayerParty = new[]
+        {
+            PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
+            PokemonFactory.Create(PokemonCatalog.Charmander, 50)
+        };
+        var doublesEnemyParty = new[]
+        {
+            PokemonFactory.Create(PokemonCatalog.Squirtle, 50),
+            PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
+        };
+        doublesField.Initialize(BattleRules.Doubles, doublesPlayerParty, doublesEnemyParty);
+        
+        Test("Doubles field has 2 player slots", () => doublesField.PlayerSide.Slots.Count == 2);
+        Test("Doubles field has 2 enemy slots", () => doublesField.EnemySide.Slots.Count == 2);
+        Test("Doubles field has active Pokemon in slots", () => 
+            doublesField.PlayerSide.Slots[0].Pokemon != null && doublesField.PlayerSide.Slots[1].Pokemon != null);
+
+        // Test Triples format initialization
+        var triplesField = new BattleField();
+        var triplesPlayerParty = new[]
+        {
+            PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
+            PokemonFactory.Create(PokemonCatalog.Charmander, 50),
+            PokemonFactory.Create(PokemonCatalog.Squirtle, 50)
+        };
+        var triplesEnemyParty = new[]
+        {
+            PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50),
+            PokemonFactory.Create(PokemonCatalog.Eevee, 50),
+            PokemonFactory.Create(PokemonCatalog.Geodude, 50)
+        };
+        triplesField.Initialize(BattleRules.Triples, triplesPlayerParty, triplesEnemyParty);
+        
+        Test("Triples field has 3 player slots", () => triplesField.PlayerSide.Slots.Count == 3);
+        Test("Triples field has 3 enemy slots", () => triplesField.EnemySide.Slots.Count == 3);
+        Test("Triples field has active Pokemon in all slots", () => 
+            triplesField.PlayerSide.Slots.All(s => s.Pokemon != null));
+
+        // Test Horde format initialization
+        var hordeField = new BattleField();
+        var hordePlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var hordeEnemyParty = new[]
+        {
+            PokemonFactory.Create(PokemonCatalog.Squirtle, 30),
+            PokemonFactory.Create(PokemonCatalog.Bulbasaur, 30),
+            PokemonFactory.Create(PokemonCatalog.Charmander, 30)
+        };
+        hordeField.Initialize(BattleRules.Horde1v3, hordePlayerParty, hordeEnemyParty);
+        
+        Test("Horde field has 1 player slot", () => hordeField.PlayerSide.Slots.Count == 1);
+        Test("Horde field has 3 enemy slots", () => hordeField.EnemySide.Slots.Count == 3);
+        Test("Horde field has active Pokemon in enemy slots", () => 
+            hordeField.EnemySide.Slots.All(s => s.Pokemon != null));
+
+        // Test Raid format initialization
+        var raidField = new BattleField();
+        var raidPlayerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+        var raidBossParty = new[] { PokemonFactory.Create(PokemonCatalog.Mewtwo, 50) };
+        raidField.Initialize(BattleRules.Raid1vBoss, raidPlayerParty, raidBossParty);
+        
+        Test("Raid field has 1 player slot", () => raidField.PlayerSide.Slots.Count == 1);
+        Test("Raid field has 1 enemy slot", () => raidField.EnemySide.Slots.Count == 1);
+        Test("Raid field rules indicate boss battle", () => raidField.Rules.IsBossBattle);
+        Test("Raid boss has increased HP", () => 
+            raidField.EnemySide.Slots[0].Pokemon.MaxHP > PokemonFactory.Create(PokemonCatalog.Mewtwo, 50).MaxHP);
+
+        // Test spread moves in Doubles
+        var doublesSpreadField = new BattleField();
+        doublesSpreadField.Initialize(BattleRules.Doubles, doublesPlayerParty, doublesEnemyParty);
+        var doublesUserSlot = doublesSpreadField.PlayerSide.Slots[0];
+        var doublesTargetSlot = doublesSpreadField.EnemySide.Slots[0];
+        var surfMove = MoveCatalog.Surf; // AllEnemies target
+        
+        var doublesHelpers = CombatEngineFactory.CreateHelpers();
+        var doublesTargetResolver = doublesHelpers.TargetResolver;
+        var doublesValidTargets = doublesTargetResolver.GetValidTargets(doublesUserSlot, surfMove, doublesSpreadField);
+        Test("Spread move in Doubles targets all enemies", () => doublesValidTargets.Count >= 2);
+        Test("Spread move in Doubles includes both enemy slots", () => 
+            doublesValidTargets.Contains(doublesSpreadField.EnemySide.Slots[0]) && 
+            doublesValidTargets.Contains(doublesSpreadField.EnemySide.Slots[1]));
+
+        // Test spread moves in Triples
+        var triplesSpreadField = new BattleField();
+        triplesSpreadField.Initialize(BattleRules.Triples, triplesPlayerParty, triplesEnemyParty);
+        var triplesUserSlot = triplesSpreadField.PlayerSide.Slots[0];
+        var triplesValidTargets = doublesTargetResolver.GetValidTargets(triplesUserSlot, surfMove, triplesSpreadField);
+        Test("Spread move in Triples targets all enemies", () => triplesValidTargets.Count >= 3);
+        Test("Spread move in Triples includes all three enemy slots", () => 
+            triplesValidTargets.Contains(triplesSpreadField.EnemySide.Slots[0]) && 
+            triplesValidTargets.Contains(triplesSpreadField.EnemySide.Slots[1]) &&
+            triplesValidTargets.Contains(triplesSpreadField.EnemySide.Slots[2]));
+
+        // Test CombatEngine with Doubles format
+        var doublesEngine = CombatEngineFactory.Create();
+        var doublesEnginePlayerParty = new[]
+        {
+            PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
+            PokemonFactory.Create(PokemonCatalog.Charmander, 50)
+        };
+        var doublesEngineEnemyParty = new[]
+        {
+            PokemonFactory.Create(PokemonCatalog.Squirtle, 50),
+            PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
+        };
+        var doublesPlayerAI = new AlwaysAttackAI();
+        var doublesEnemyAI = new AlwaysAttackAI();
+        
+        doublesEngine.Initialize(BattleRules.Doubles, doublesEnginePlayerParty, doublesEngineEnemyParty,
+            doublesPlayerAI, doublesEnemyAI, new NullBattleView());
+        
+        Test("CombatEngine initializes Doubles format", () => doublesEngine.Field != null);
+        Test("CombatEngine Doubles has correct slot count", () => 
+            doublesEngine.Field.PlayerSide.Slots.Count == 2 && doublesEngine.Field.EnemySide.Slots.Count == 2);
+        
+        // Run a turn to verify it works
+        doublesEngine.RunTurn().Wait();
+        Test("CombatEngine runs turn in Doubles format", () => 
+            doublesEngine.Outcome == BattleOutcome.Ongoing || 
+            doublesEngine.Outcome == BattleOutcome.Victory || 
+            doublesEngine.Outcome == BattleOutcome.Defeat);
+
+        PrintInfo($"Battle Formats: Singles, Doubles, Triples, Horde, Raid all functional");
+        PrintInfo($"Doubles: 2v2 battles with spread moves and multi-target support");
+        PrintInfo($"Triples: 3v3 battles with extended targeting");
+        PrintInfo($"Horde: 1vs2, 1vs3, 1vs5 battles");
+        PrintInfo($"Raid: 1vsBoss, 2vsBoss with boss multipliers");
+        PrintInfo($"All formats integrate correctly with CombatEngine");
+
+        // ═══════════════════════════════════════════════════════
         // FINAL RESULTS
         // ═══════════════════════════════════════════════════════
         PrintResults();

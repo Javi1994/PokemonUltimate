@@ -377,14 +377,22 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
             var fireMove = MoveCatalog.Ember;
             var pipeline = new DamagePipeline();
             
-            var context = pipeline.Calculate(_attackerSlot, _defenderSlot, fireMove, _field);
+            // Use fixed random value (1.0f) for deterministic comparison
+            var context = pipeline.Calculate(_attackerSlot, _defenderSlot, fireMove, _field, false, 1.0f);
             
-            // Remove ability and compare
+            // Remove ability and compare with same fixed random value
             pokemon.SetAbility(null);
-            var contextWithoutAbility = pipeline.Calculate(_attackerSlot, _defenderSlot, fireMove, _field);
+            var contextWithoutAbility = pipeline.Calculate(_attackerSlot, _defenderSlot, fireMove, _field, false, 1.0f);
             
             // Blaze should increase Fire damage by 50% when HP is low
-            Assert.That(context.FinalDamage, Is.GreaterThan(contextWithoutAbility.FinalDamage));
+            // Use GreaterThan with explicit message showing actual values
+            Assert.That(context.FinalDamage, Is.GreaterThan(contextWithoutAbility.FinalDamage),
+                $"Blaze should increase Fire damage. With Blaze: {context.FinalDamage}, Without Blaze: {contextWithoutAbility.FinalDamage}");
+            
+            // Also verify the increase is significant (at least 1.4x multiplier, accounting for rounding)
+            float damageRatio = (float)context.FinalDamage / contextWithoutAbility.FinalDamage;
+            Assert.That(damageRatio, Is.GreaterThan(1.4f),
+                $"Blaze should increase damage by at least 40%. Actual ratio: {damageRatio:F2}, With Blaze: {context.FinalDamage}, Without: {contextWithoutAbility.FinalDamage}");
         }
 
         [Test]

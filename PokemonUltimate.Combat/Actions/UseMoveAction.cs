@@ -37,6 +37,7 @@ namespace PokemonUltimate.Combat.Actions
         private readonly Effects.MoveEffectProcessorRegistry _effectProcessorRegistry;
         private readonly IBattleMessageFormatter _messageFormatter;
         private readonly IBattleTriggerProcessor _battleTriggerProcessor;
+        private readonly ITargetResolver _targetResolver;
 
         /// <summary>
         /// The target slot for this move.
@@ -75,6 +76,7 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="effectProcessorRegistry">The effect processor registry. If null, creates a temporary one.</param>
         /// <param name="messageFormatter">The message formatter. If null, creates a default one.</param>
         /// <param name="battleTriggerProcessor">The battle trigger processor. If null, creates a temporary one.</param>
+        /// <param name="targetResolver">The target resolver. If null, creates a temporary one.</param>
         /// <exception cref="ArgumentNullException">If user, target, or moveInstance is null.</exception>
         public UseMoveAction(
             BattleSlot user,
@@ -85,7 +87,8 @@ namespace PokemonUltimate.Combat.Actions
             IDamagePipeline damagePipeline = null,
             Effects.MoveEffectProcessorRegistry effectProcessorRegistry = null,
             IBattleMessageFormatter messageFormatter = null,
-            IBattleTriggerProcessor battleTriggerProcessor = null) : base(user)
+            IBattleTriggerProcessor battleTriggerProcessor = null,
+            ITargetResolver targetResolver = null) : base(user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user), ErrorMessages.PokemonCannotBeNull);
@@ -107,6 +110,9 @@ namespace PokemonUltimate.Combat.Actions
 
             // Create BattleMessageFormatter if not provided
             _messageFormatter = messageFormatter ?? new BattleMessageFormatter();
+
+            // Create TargetResolver if not provided
+            _targetResolver = targetResolver ?? new TargetResolver();
 
             // Create BattleTriggerProcessor if not provided (temporary until full DI refactoring)
             _battleTriggerProcessor = battleTriggerProcessor ?? new BattleTriggerProcessor();
@@ -428,6 +434,8 @@ namespace PokemonUltimate.Combat.Actions
             }
 
             // Cancel semi-invulnerable if using a different move
+            // Note: If using the same move with SemiInvulnerableEffect, we don't cancel here
+            // because ProcessEffects will handle it (either charge turn or attack turn)
             bool hasSemiInvulnerableEffect = Move.Effects.Any(e => e is SemiInvulnerableEffect);
             if (User.HasVolatileStatus(VolatileStatus.SemiInvulnerable) &&
                 User.SemiInvulnerableMoveName != Move.Name)
@@ -435,6 +443,7 @@ namespace PokemonUltimate.Combat.Actions
                 User.RemoveVolatileStatus(VolatileStatus.SemiInvulnerable);
                 User.ClearSemiInvulnerableMove();
             }
+            // If using the same move with SemiInvulnerableEffect, don't cancel - ProcessEffects will handle it
         }
 
         /// <summary>
@@ -540,8 +549,12 @@ namespace PokemonUltimate.Combat.Actions
             }
 
             // First pass: Process damage effect to get damageDealt
-            // Skip damage on semi-invulnerable charge turn or if target is fainted
-            if (!(hasSemiInvulnerableEffect && !isSemiInvulnerableAttackTurn) && Target.IsActive())
+            // Skip damage on semi-invulnerable charge turn
+            // For spread moves, check if there are any valid active targets
+            var potentialTargets = _targetResolver.GetValidTargets(User, Move, field);
+            bool hasActiveTargets = Target.IsActive() || potentialTargets.Any(t => t.IsActive());
+            
+            if (!(hasSemiInvulnerableEffect && !isSemiInvulnerableAttackTurn) && hasActiveTargets)
             {
                 foreach (var effect in Move.Effects)
                 {
@@ -567,14 +580,50 @@ namespace PokemonUltimate.Combat.Actions
                         }
                         else
                         {
-                            // Single-hit move: normal damage calculation
-                            var context = _damagePipeline.Calculate(User, Target, moveForDamage, field);
+                            // Check if this is a spread move (hits multiple targets)
+                            var validTargets = _targetResolver.GetValidTargets(User, Move, field);
+                            bool isSpreadMove = IsSpreadMove(Move, field, validTargets.Count);
 
-                            if (context.FinalDamage > 0)
+                            if (isSpreadMove && validTargets.Count > 1)
                             {
-                                var damageAction = new DamageAction(User, Target, context);
-                                actions.Add(damageAction);
-                                damageDealt = context.FinalDamage;
+                                // Spread move: hit all valid targets with 75% damage in doubles/triples
+                                bool isMultiTargetFormat = field.Rules.PlayerSlots > 1 || field.Rules.EnemySlots > 1;
+                                float spreadMultiplier = isMultiTargetFormat ? 0.75f : 1.0f;
+
+                                int totalDamage = 0;
+                                foreach (var target in validTargets)
+                                {
+                                    if (!target.IsActive())
+                                        continue;
+
+                                    var context = _damagePipeline.Calculate(User, target, moveForDamage, field);
+                                    
+                                    // Apply spread move damage reduction
+                                    if (spreadMultiplier < 1.0f)
+                                    {
+                                        context.Multiplier *= spreadMultiplier;
+                                    }
+
+                                    if (context.FinalDamage > 0)
+                                    {
+                                        var damageAction = new DamageAction(User, target, context);
+                                        actions.Add(damageAction);
+                                        totalDamage += context.FinalDamage;
+                                    }
+                                }
+                                damageDealt = totalDamage;
+                            }
+                            else
+                            {
+                                // Single-target move: normal damage calculation
+                                var context = _damagePipeline.Calculate(User, Target, moveForDamage, field);
+
+                                if (context.FinalDamage > 0)
+                                {
+                                    var damageAction = new DamageAction(User, Target, context);
+                                    actions.Add(damageAction);
+                                    damageDealt = context.FinalDamage;
+                                }
                             }
                         }
                         break; // Only process first DamageEffect
@@ -626,6 +675,38 @@ namespace PokemonUltimate.Combat.Actions
                     // Unknown effect type - log or handle as needed
                     // For now, we silently skip it (could add logging in the future)
                 }
+            }
+        }
+
+        /// <summary>
+        /// Determines if a move is a spread move (hits multiple targets).
+        /// </summary>
+        /// <param name="move">The move to check.</param>
+        /// <param name="field">The battlefield.</param>
+        /// <param name="validTargetCount">The number of valid targets.</param>
+        /// <returns>True if the move is a spread move.</returns>
+        private bool IsSpreadMove(MoveData move, BattleField field, int validTargetCount)
+        {
+            // A move is a spread move if:
+            // 1. It can target multiple Pokemon (based on TargetScope)
+            // 2. There are multiple valid targets
+            if (validTargetCount <= 1)
+                return false;
+
+            switch (move.TargetScope)
+            {
+                case TargetScope.AllEnemies:
+                case TargetScope.AllAdjacent:
+                case TargetScope.AllAdjacentEnemies:
+                case TargetScope.AllOthers:
+                    return true;
+
+                case TargetScope.AllAllies:
+                    // Only spread if there are multiple allies (excluding self)
+                    return validTargetCount > 1;
+
+                default:
+                    return false;
             }
         }
 

@@ -67,7 +67,7 @@ This feature implements the core Pokemon battle system, including:
 
 -   **[2.17: Advanced Abilities](2.17-advanced-abilities/)** - Complex ability interactions ⏳
 -   **[2.18: Advanced Items](2.18-advanced-items/)** - Complex item interactions ⏳
--   **[2.19: Battle Formats](2.19-battle-formats/)** - Doubles, Triples, Rotation ⏳
+-   **[2.19: Battle Formats](2.19-battle-formats/)** - Doubles, Triples, Horde, Raid 🚧
 
 ## Related Features
 

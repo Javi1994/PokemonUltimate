@@ -83,9 +83,26 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Engine
             var engine = CombatEngineTestHelper.CreateCombatEngine();
             var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
             var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
-            var playerProvider = new TestActionProvider(new UseMoveAction(_playerSlot, _enemySlot, _playerSlot.Pokemon.Moves[0]));
-            var enemyProvider = new TestActionProvider(new UseMoveAction(_enemySlot, _playerSlot, _enemySlot.Pokemon.Moves[0]));
             var view = new NullBattleView();
+
+            // Create a helper provider that will create actions using the correct slots after initialization
+            IActionProvider playerProvider = null;
+            IActionProvider enemyProvider = null;
+
+            // Create providers that will use the engine's field slots
+            playerProvider = new TestActionProvider((field, slot) =>
+            {
+                var playerSlot = field.PlayerSide.Slots[0];
+                var enemySlot = field.EnemySide.Slots[0];
+                return new UseMoveAction(playerSlot, enemySlot, playerSlot.Pokemon.Moves[0]);
+            });
+
+            enemyProvider = new TestActionProvider((field, slot) =>
+            {
+                var playerSlot = field.PlayerSide.Slots[0];
+                var enemySlot = field.EnemySide.Slots[0];
+                return new UseMoveAction(enemySlot, playerSlot, enemySlot.Pokemon.Moves[0]);
+            });
 
             engine.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
                 playerParty, enemyParty, playerProvider, enemyProvider, view);

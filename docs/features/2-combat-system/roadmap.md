@@ -75,8 +75,8 @@ The Combat System is divided into **multiple phases**, each building on the prev
 | 2.16 Field Conditions     | ✅ Complete | 40+      | Screens, Tailwind, Safeguard, Mist                     |
 | 2.17 Advanced Abilities   | ✅ ~95% Complete | 29      | Truant, Speed Boost, Static, Rough Skin, Swift Swim, Chlorophyll, Moxie |
 | 2.18 Advanced Items       | ✅ Complete | 21      | Life Orb, Focus Sash, Rocky Helmet, Black Sludge       |
-| 2.19 Battle Formats       | ⏳ Planned  | ~50      | Doubles, Triples, Rotation                              |
-| **Future Total**          | **7/8**     | **~250** | Extended features (1 pending)                          |
+| 2.19 Battle Formats       | ✅ Complete | 48      | Doubles ✅, Horde ✅, Raid ✅, Triples ✅, Integration Tests ✅ |
+| **Future Total**          | **8/8**     | **~298** | Extended features (all complete)                          |
 
 ---
 
