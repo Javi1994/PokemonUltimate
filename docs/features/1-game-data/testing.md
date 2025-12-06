@@ -15,6 +15,7 @@ This document defines how to organize and create tests for **all game data struc
 -   **Grupo C: Supporting Systems** (1.11-1.12) - Evolution System, Type Effectiveness
 -   **Grupo D: Infrastructure** (1.13-1.14, 1.16-1.17) - Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
 -   **Grupo E: Planned Features** (1.18-1.19) - Variants System, Pokedex Fields
+-   **Phase 4 Fields** (1.1 extensions) - IV/EV storage on instances, breeding fields (EggGroups/EggCycles), ownership fields (OT, TrainerId, Met*). Logic for EV gain and breeding compatibility pending.
 
 **See**: [Sub-Features Overview](README.md) for complete sub-feature list.
 

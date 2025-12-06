@@ -9,17 +9,17 @@ using PokemonUltimate.Core.Managers;
 
 namespace PokemonUltimate.Core.Instances
 {
-    /// <summary>
-    /// Runtime instance of a Pokemon with mutable state.
-    /// Created from a PokemonSpeciesData blueprint via PokemonFactory.
-    /// Tracks level, HP, stats, moves, status, and battle state.
-    ///
-    /// This is a partial class split across multiple files:
-    /// - PokemonInstance.cs: Core properties and constructor
-    /// - PokemonInstance.Battle.cs: Battle-related methods
-    /// - PokemonInstance.LevelUp.cs: Level up and move learning
-    /// - PokemonInstance.Evolution.cs: Evolution system
-    /// </summary>
+        /// <summary>
+        /// Runtime instance of a Pokemon with mutable state.
+        /// Created from a PokemonSpeciesData blueprint via PokemonFactory.
+        /// Tracks level, HP, stats, moves, status, and battle state.
+        ///
+        /// This is a partial class split across multiple files:
+        /// - PokemonInstance.cs: Core properties and constructor
+        /// - PokemonInstance.Battle.cs: Battle-related methods
+        /// - PokemonInstance.LevelUp.cs: Level up and move learning
+        /// - PokemonInstance.Evolution.cs: Evolution system
+        /// </summary>
     /// <remarks>
     /// **Feature**: 1: Game Data
     /// **Sub-Feature**: 1.1: Pokemon Data
@@ -102,6 +102,45 @@ namespace PokemonUltimate.Core.Instances
         /// Speed stat (calculated from base stats, level, and nature).
         /// </summary>
         public int Speed { get; private set; }
+
+        /// <summary>
+        /// Individual Values (0-31 per stat) used for stat calculation.
+        /// </summary>
+        public IVSet IVs { get; }
+
+        /// <summary>
+        /// Effort Values (0-252 per stat). In this game they remain at maximum.
+        /// </summary>
+        public EVSet EVs { get; }
+
+        #region Ownership Tracking
+
+        /// <summary>
+        /// Original trainer name (if any).
+        /// </summary>
+        public string OriginalTrainer { get; set; }
+
+        /// <summary>
+        /// Trainer ID (if any).
+        /// </summary>
+        public int? TrainerId { get; set; }
+
+        /// <summary>
+        /// Level when this Pokemon was met (if known).
+        /// </summary>
+        public int? MetLevel { get; set; }
+
+        /// <summary>
+        /// Location where this Pokemon was met (if known).
+        /// </summary>
+        public string MetLocation { get; set; }
+
+        /// <summary>
+        /// Date when this Pokemon was met (if known).
+        /// </summary>
+        public DateTime? MetDate { get; set; }
+
+        #endregion
 
         #endregion
 
@@ -281,11 +320,15 @@ namespace PokemonUltimate.Core.Instances
             int? friendship = null,
             bool isShiny = false,
             AbilityData ability = null,
-            ItemData heldItem = null)
+            ItemData heldItem = null,
+            IVSet ivs = null,
+            EVSet evs = null)
         {
             Species = species ?? throw new ArgumentNullException(nameof(species));
             InstanceId = Guid.NewGuid().ToString();
             Level = level;
+            IVs = ivs ?? IVSet.Perfect;
+            EVs = evs ?? EVSet.Max;
 
             // Stats
             MaxHP = maxHP;
@@ -295,9 +338,6 @@ namespace PokemonUltimate.Core.Instances
             SpAttack = spAttack;
             SpDefense = spDefense;
             Speed = speed;
-
-            // Initialize cache with initial stats
-            _statsCache.SetStats(level, nature, species, maxHP, attack, defense, spAttack, spDefense, speed);
 
             // Personal
             Nature = nature;
@@ -313,6 +353,13 @@ namespace PokemonUltimate.Core.Instances
             // Ability & Item
             Ability = ability ?? species.Ability1;
             HeldItem = heldItem;
+
+            // Ownership
+            OriginalTrainer = null;
+            TrainerId = null;
+            MetLevel = null;
+            MetLocation = null;
+            MetDate = null;
 
             // Battle state - initialize to defaults
             Status = PersistentStatus.None;

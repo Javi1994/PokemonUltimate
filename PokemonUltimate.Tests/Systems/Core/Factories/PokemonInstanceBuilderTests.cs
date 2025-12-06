@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using NUnit.Framework;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
@@ -726,9 +728,143 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
             // ((2*35 + 31 + 63) * 50 / 100) + 50 + 10 = 82 + 60 = 142
             var pokemon = Pokemon.Create(_pikachu, 50)
                 .WithNeutralNature()
+                .WithPerfectIVs()
                 .Build();
 
             Assert.That(pokemon.MaxHP, Is.EqualTo(142));
+        }
+
+        #endregion
+
+        #region IVs and EVs
+
+        [Test]
+        public void Build_Should_Generate_IVs_In_Valid_Range()
+        {
+            Pokemon.SetSeed(1234);
+            var pokemon = Pokemon.Create(_pikachu, 25).Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.IVs.HP, Is.InRange(0, CoreConstants.MaxIV));
+                Assert.That(pokemon.IVs.Attack, Is.InRange(0, CoreConstants.MaxIV));
+                Assert.That(pokemon.IVs.Defense, Is.InRange(0, CoreConstants.MaxIV));
+                Assert.That(pokemon.IVs.SpAttack, Is.InRange(0, CoreConstants.MaxIV));
+                Assert.That(pokemon.IVs.SpDefense, Is.InRange(0, CoreConstants.MaxIV));
+                Assert.That(pokemon.IVs.Speed, Is.InRange(0, CoreConstants.MaxIV));
+            });
+        }
+
+        [Test]
+        public void WithIVs_Should_Set_Specific_Values()
+        {
+            var pokemon = Pokemon.Create(_pikachu, 25)
+                .WithIVs(31, 30, 29, 28, 27, 26)
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.IVs.HP, Is.EqualTo(31));
+                Assert.That(pokemon.IVs.Attack, Is.EqualTo(30));
+                Assert.That(pokemon.IVs.Defense, Is.EqualTo(29));
+                Assert.That(pokemon.IVs.SpAttack, Is.EqualTo(28));
+                Assert.That(pokemon.IVs.SpDefense, Is.EqualTo(27));
+                Assert.That(pokemon.IVs.Speed, Is.EqualTo(26));
+            });
+        }
+
+        [Test]
+        public void Stats_Should_Use_IVs_And_EVs_From_Instance()
+        {
+            const int level = 50;
+            const int zeroIV = 0;
+
+            var pokemon = Pokemon.Create(_pikachu, level)
+                .WithNeutralNature()
+                .WithIVs(zeroIV, zeroIV, zeroIV, zeroIV, zeroIV, zeroIV)
+                .Build();
+
+            int expectedAttack = StatCalculator.CalculateStat(
+                _pikachu.BaseStats.Attack, level, pokemon.Nature, Stat.Attack, zeroIV, CoreConstants.DefaultEV);
+
+            Assert.That(pokemon.Attack, Is.EqualTo(expectedAttack));
+        }
+
+        [Test]
+        public void EVs_Should_Default_To_Maximum()
+        {
+            var pokemon = Pokemon.Create(_pikachu, 25).Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.EVs.HP, Is.EqualTo(CoreConstants.DefaultEV));
+                Assert.That(pokemon.EVs.Attack, Is.EqualTo(CoreConstants.DefaultEV));
+                Assert.That(pokemon.EVs.Defense, Is.EqualTo(CoreConstants.DefaultEV));
+                Assert.That(pokemon.EVs.SpAttack, Is.EqualTo(CoreConstants.DefaultEV));
+                Assert.That(pokemon.EVs.SpDefense, Is.EqualTo(CoreConstants.DefaultEV));
+                Assert.That(pokemon.EVs.Speed, Is.EqualTo(CoreConstants.DefaultEV));
+            });
+        }
+
+        [Test]
+        public void WithEVs_Should_Throw_If_Not_Max()
+        {
+            var evs = new EVSet(0, 0, 0, 0, 0, 0);
+
+            Assert.That(() => Pokemon.Create(_pikachu, 25).WithEVs(evs), Throws.ArgumentException);
+        }
+
+        #endregion
+
+        #region Ownership
+
+        [Test]
+        public void Ownership_Fields_Default_To_Null()
+        {
+            var pokemon = Pokemon.Create(_pikachu, 25).Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.OriginalTrainer, Is.Null);
+                Assert.That(pokemon.TrainerId, Is.Null);
+                Assert.That(pokemon.MetLevel, Is.Null);
+                Assert.That(pokemon.MetLocation, Is.Null);
+                Assert.That(pokemon.MetDate, Is.Null);
+            });
+        }
+
+        [Test]
+        public void WithOwnershipFields_Should_Set_Values()
+        {
+            var date = new DateTime(2025, 1, 2);
+            var pokemon = Pokemon.Create(_pikachu, 25)
+                .WithOriginalTrainer("Ash")
+                .WithTrainerId(12345)
+                .WithMetLevel(5)
+                .WithMetLocation("Pallet Town")
+                .WithMetDate(date)
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.OriginalTrainer, Is.EqualTo("Ash"));
+                Assert.That(pokemon.TrainerId, Is.EqualTo(12345));
+                Assert.That(pokemon.MetLevel, Is.EqualTo(5));
+                Assert.That(pokemon.MetLocation, Is.EqualTo("Pallet Town"));
+                Assert.That(pokemon.MetDate, Is.EqualTo(date));
+            });
+        }
+
+        [Test]
+        public void WithTrainerId_Should_Throw_When_Negative()
+        {
+            Assert.That(() => Pokemon.Create(_pikachu, 25).WithTrainerId(-1), Throws.ArgumentException);
+        }
+
+        [Test]
+        public void WithMetLevel_Should_Throw_When_Invalid()
+        {
+            Assert.That(() => Pokemon.Create(_pikachu, 25).WithMetLevel(0), Throws.ArgumentException);
         }
 
         #endregion

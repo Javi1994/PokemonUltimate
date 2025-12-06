@@ -218,7 +218,7 @@ Before merging, verify:
 - [ ] Edge cases covered
 - [ ] No magic strings/numbers (use constants)
 - [ ] XML documentation on public APIs
-- [ ] Follows project guidelines (`docs/project_guidelines.md`)
+- [ ] Follows current rules (`.ai/context.md`, `docs/ai/anti-patterns.md`, checklists)
 
 ---
 
@@ -283,7 +283,7 @@ git tag -a v0.1.0 -m "Description"
 
 | What | Where |
 |------|-------|
-| Coding rules | `docs/project_guidelines.md` |
+| Coding rules | `docs/ai/anti-patterns.md` |
 | Anti-patterns | `docs/anti-patterns.md` |
 | Unity setup | `docs/unity_integration.md` |
 | Current state | `.ai/context.md` |

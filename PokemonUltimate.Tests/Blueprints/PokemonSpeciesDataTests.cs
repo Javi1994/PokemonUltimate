@@ -189,6 +189,48 @@ namespace PokemonUltimate.Tests.Blueprints
 
         #endregion
 
+        #region Breeding Fields
+
+        [Test]
+        public void EggGroups_Default_Is_Empty_List()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.EggGroups, Is.Empty);
+        }
+
+        [Test]
+        public void EggGroups_Can_Be_Assigned()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                EggGroups = new List<EggGroup> { EggGroup.Field, EggGroup.Monster }
+            };
+
+            CollectionAssert.AreEquivalent(new[] { EggGroup.Field, EggGroup.Monster }, pokemon.EggGroups);
+        }
+
+        [Test]
+        public void EggCycles_Default_Is_Zero()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.EggCycles, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void EggCycles_Can_Be_Assigned()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                EggCycles = 20
+            };
+
+            Assert.That(pokemon.EggCycles, Is.EqualTo(20));
+        }
+
+        #endregion
+
         #region IIdentifiable Tests
 
         [Test]

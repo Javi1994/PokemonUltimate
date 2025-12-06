@@ -24,6 +24,9 @@ namespace PokemonUltimate.Core.Constants
         public const string StatCannotBeNegative = "Stat cannot be negative";
         public const string IVMustBeBetween = "IV must be between 0 and {0}";
         public const string EVMustBeBetween = "EV must be between 0 and {0}";
+        public const string EVsMustBeMax = "EVs must remain at maximum in this game";
+        public const string TrainerIdCannotBeNegative = "TrainerId cannot be negative";
+        public const string EggCyclesCannotBeNegative = "Egg cycles cannot be negative";
 
         #endregion
 

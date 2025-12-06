@@ -68,8 +68,8 @@ It follows the **Testability First** guideline by separating the Data (POCO) fro
 **Sub-Feature 1.1: Pokemon Data (extensions)**
 
 -   **IVs/EVs System** - Individual Values and Effort Values tracking per Pokemon instance ⏳ Planned
--   **Breeding System** - Egg Groups, Egg Cycles, breeding compatibility ⏳ Planned
--   **Ownership/Tracking Fields** - OriginalTrainer, TrainerId, MetLevel, MetLocation, MetDate ⏳ Planned
+-   **Breeding System** - Egg Groups, Egg Cycles, breeding compatibility ⏳ Fields added (EggGroups, EggCycles); breeding logic pending
+-   **Ownership/Tracking Fields** - OriginalTrainer, TrainerId, MetLevel, MetLocation, MetDate ✅ Fields added (tracking only)
 
 **See**: [`roadmap.md`](roadmap.md#phase-4-optional-enhancements-low-priority) for complete details.
 

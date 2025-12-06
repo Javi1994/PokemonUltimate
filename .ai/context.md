@@ -19,7 +19,7 @@
 | **Warnings**            | 0                                                                                                                                                                                                                                                                                                         |
 | **Pokemon Catalog**     | 26 Pokemon (Gen1)                                                                                                                                                                                                                                                                                         |
 | **Move Catalog**        | 36 Moves (12 types)                                                                                                                                                                                                                                                                                       |
-| **Last Updated**        | January 2025 (Post-Refactoring)                                                                                                                                                                                                                                                                           |
+| **Last Updated**        | January 2025 (Post-Refactoring) — Updated Game Data Phase 4 (IV/EV storage, breeding fields, ownership fields; EVs fixed to max)                                                                                                                                                                          |
 
 ---
 
@@ -259,7 +259,7 @@ See `docs/features/3-content-expansion/roadmap.md` for full details.
 | Document                                                                   | Purpose                                    |
 | -------------------------------------------------------------------------- | ------------------------------------------ |
 | `docs/features_master_list.md`                                             | **📋 Feature numbering and naming**        |
-| `docs/ai/guidelines/project_guidelines.md`                                 | 24+ coding rules                           |
+| `docs/ai/anti-patterns.md`                                                 | What NOT to do                             |
 | `.cursorrules`                                                             | **AI workflow rules**                      |
 | `docs/implementation_plan.md`                                              | Technical roadmap                          |
 | `docs/features/2-combat-system/roadmap.md`                                 | **Combat phases**                          |

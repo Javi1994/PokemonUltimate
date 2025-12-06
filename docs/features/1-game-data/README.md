@@ -25,6 +25,7 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 -   ✅ **Gameplay Fields Complete (2025-01-XX)**: BaseExperienceYield, CatchRate, BaseFriendship, GrowthRate implemented
 -   ✅ **Pokedex Fields Complete (2025-01-XX)**: Description, Category, Height, Weight, Color, Shape, Habitat implemented
 -   ✅ **Variants System Complete (2025-01-XX)**: Mega/Dinamax/Terracristalización/Regional/Cosmetic variants as separate species, VariantProvider
+-   ⏳ **Phase 4 Extensions (Data) Added**: IV/EV storage on instances, breeding fields (EggGroups, EggCycles), ownership tracking fields (OT, TrainerId, MetLevel/MetLocation/MetDate). EVs stay at max by design; breeding/ownership behaviors remain pending.
 -   ⚠️ **Note**: Builders moved to Feature 3 (Sub-Feature 3.9) as they are primarily used for content creation
 -   ⏳ **Pending Extensions (Phase 4 - LOW Priority)**: IVs/EVs System, Breeding System, Ownership/Tracking Fields
 

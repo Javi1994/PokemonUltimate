@@ -29,7 +29,9 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         public static PokemonInstance Create(PokemonSpeciesData species, int level)
         {
-            return Pokemon.Create(species, level).Build();
+            return Pokemon.Create(species, level)
+                .WithPerfectIVs()
+                .Build();
         }
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace PokemonUltimate.Core.Factories
         {
             return Pokemon.Create(species, level)
                 .WithNature(nature)
+                .WithPerfectIVs()
                 .Build();
         }
 
@@ -50,6 +53,7 @@ namespace PokemonUltimate.Core.Factories
             return Pokemon.Create(species, level)
                 .WithNature(nature)
                 .WithGender(gender)
+                .WithPerfectIVs()
                 .Build();
         }
 

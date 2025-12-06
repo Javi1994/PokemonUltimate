@@ -169,12 +169,12 @@ namespace PokemonUltimate.Core.Instances
             }
 
             // Cache invalid or missing - recalculate
-            int maxHP = StatCalculator.CalculateHP(Species.BaseStats.HP, Level);
-            int attack = StatCalculator.CalculateStat(Species.BaseStats.Attack, Level, Nature, Stat.Attack);
-            int defense = StatCalculator.CalculateStat(Species.BaseStats.Defense, Level, Nature, Stat.Defense);
-            int spAttack = StatCalculator.CalculateStat(Species.BaseStats.SpAttack, Level, Nature, Stat.SpAttack);
-            int spDefense = StatCalculator.CalculateStat(Species.BaseStats.SpDefense, Level, Nature, Stat.SpDefense);
-            int speed = StatCalculator.CalculateStat(Species.BaseStats.Speed, Level, Nature, Stat.Speed);
+            int maxHP = StatCalculator.CalculateHP(Species.BaseStats.HP, Level, IVs.HP, EVs.HP);
+            int attack = StatCalculator.CalculateStat(Species.BaseStats.Attack, Level, Nature, Stat.Attack, IVs.Attack, EVs.Attack);
+            int defense = StatCalculator.CalculateStat(Species.BaseStats.Defense, Level, Nature, Stat.Defense, IVs.Defense, EVs.Defense);
+            int spAttack = StatCalculator.CalculateStat(Species.BaseStats.SpAttack, Level, Nature, Stat.SpAttack, IVs.SpAttack, EVs.SpAttack);
+            int spDefense = StatCalculator.CalculateStat(Species.BaseStats.SpDefense, Level, Nature, Stat.SpDefense, IVs.SpDefense, EVs.SpDefense);
+            int speed = StatCalculator.CalculateStat(Species.BaseStats.Speed, Level, Nature, Stat.Speed, IVs.Speed, EVs.Speed);
 
             // Update properties
             MaxHP = maxHP;

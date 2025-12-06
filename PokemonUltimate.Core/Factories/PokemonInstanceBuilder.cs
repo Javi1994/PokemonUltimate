@@ -47,6 +47,14 @@ namespace PokemonUltimate.Core.Factories
         private bool _prioritizeStab;
         private bool _prioritizePower;
         private int _moveCount = 4;
+        private IVSet _ivs;
+        private EVSet _evs;
+        private bool _useRandomIVs = true;
+        private string _originalTrainer;
+        private int? _trainerId;
+        private int? _metLevel;
+        private string _metLocation;
+        private DateTime? _metDate;
 
         // Friendship and Shiny
         private int _friendship = CoreConstants.DefaultWildFriendship; // Default for wild Pokemon
@@ -365,6 +373,64 @@ namespace PokemonUltimate.Core.Factories
 
         #endregion
 
+        #region IVs and EVs Configuration
+
+        /// <summary>
+        /// Set explicit IVs for all six stats.
+        /// </summary>
+        public PokemonInstanceBuilder WithIVs(int hp, int attack, int defense, int spAttack, int spDefense, int speed)
+        {
+            _ivs = new IVSet(hp, attack, defense, spAttack, spDefense, speed);
+            _useRandomIVs = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Use perfect IVs (31 in every stat).
+        /// </summary>
+        public PokemonInstanceBuilder WithPerfectIVs()
+        {
+            _ivs = IVSet.Perfect;
+            _useRandomIVs = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Use randomized IVs (default behavior).
+        /// </summary>
+        public PokemonInstanceBuilder WithRandomIVs()
+        {
+            _useRandomIVs = true;
+            _ivs = null;
+            return this;
+        }
+
+        /// <summary>
+        /// Set explicit EVs for all six stats. EVs remain at maximum in this game by default.
+        /// </summary>
+        public PokemonInstanceBuilder WithEVs(EVSet evs)
+        {
+            if (evs == null)
+                throw new ArgumentNullException(nameof(evs));
+
+            if (!IsMaxEVSet(evs))
+                throw new ArgumentException(ErrorMessages.EVsMustBeMax, nameof(evs));
+
+            _evs = EVSet.Max;
+            return this;
+        }
+
+        /// <summary>
+        /// Use maximum EVs on every stat (default behavior).
+        /// </summary>
+        public PokemonInstanceBuilder WithMaxEVs()
+        {
+            _evs = EVSet.Max;
+            return this;
+        }
+
+        #endregion
+
         #region HP Configuration
 
         /// <summary>
@@ -508,6 +574,61 @@ namespace PokemonUltimate.Core.Factories
         public PokemonInstanceBuilder WithExperience(int exp)
         {
             _experience = exp;
+            return this;
+        }
+
+        #endregion
+
+        #region Ownership Configuration
+
+        /// <summary>
+        /// Set the original trainer name.
+        /// </summary>
+        public PokemonInstanceBuilder WithOriginalTrainer(string originalTrainer)
+        {
+            _originalTrainer = originalTrainer;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the trainer ID (must be non-negative).
+        /// </summary>
+        public PokemonInstanceBuilder WithTrainerId(int? trainerId)
+        {
+            if (trainerId.HasValue && trainerId.Value < 0)
+                throw new ArgumentException(ErrorMessages.TrainerIdCannotBeNegative, nameof(trainerId));
+
+            _trainerId = trainerId;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the met level (1-100).
+        /// </summary>
+        public PokemonInstanceBuilder WithMetLevel(int? metLevel)
+        {
+            if (metLevel.HasValue)
+                CoreValidators.ValidateLevel(metLevel.Value, nameof(metLevel));
+
+            _metLevel = metLevel;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the met location text.
+        /// </summary>
+        public PokemonInstanceBuilder WithMetLocation(string metLocation)
+        {
+            _metLocation = metLocation;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the met date.
+        /// </summary>
+        public PokemonInstanceBuilder WithMetDate(DateTime? metDate)
+        {
+            _metDate = metDate;
             return this;
         }
 
@@ -747,8 +868,12 @@ namespace PokemonUltimate.Core.Factories
             // Determine gender
             Gender gender = DetermineGender();
 
+            // Determine IVs/EVs
+            IVSet ivs = ResolveIVs();
+            EVSet evs = ResolveEVs();
+
             // Calculate stats
-            var stats = CalculateStats(nature);
+            var stats = CalculateStats(nature, ivs, evs);
 
             // Select moves
             List<MoveInstance> moves = SelectMoves();
@@ -763,7 +888,7 @@ namespace PokemonUltimate.Core.Factories
             var pokemon = new PokemonInstance(
                 _species, _level, stats.HP, stats.Attack, stats.Defense,
                 stats.SpAttack, stats.SpDefense, stats.Speed, nature, gender, moves,
-                _friendship, isShiny, ability, _heldItem);
+                _friendship, isShiny, ability, _heldItem, ivs, evs);
 
             // Apply optional configurations
             ApplyOptionalConfigurations(pokemon);
@@ -875,16 +1000,57 @@ namespace PokemonUltimate.Core.Factories
         /// <summary>
         /// Calculates all stats for the Pokemon instance.
         /// </summary>
-        private (int HP, int Attack, int Defense, int SpAttack, int SpDefense, int Speed) CalculateStats(Nature nature)
+        private (int HP, int Attack, int Defense, int SpAttack, int SpDefense, int Speed) CalculateStats(
+            Nature nature,
+            IVSet ivs,
+            EVSet evs)
         {
-            int hp = _overrideMaxHP ?? StatCalculator.CalculateHP(_species.BaseStats.HP, _level);
-            int attack = _overrideAttack ?? StatCalculator.CalculateStat(_species.BaseStats.Attack, _level, nature, Stat.Attack);
-            int defense = _overrideDefense ?? StatCalculator.CalculateStat(_species.BaseStats.Defense, _level, nature, Stat.Defense);
-            int spAttack = _overrideSpAttack ?? StatCalculator.CalculateStat(_species.BaseStats.SpAttack, _level, nature, Stat.SpAttack);
-            int spDefense = _overrideSpDefense ?? StatCalculator.CalculateStat(_species.BaseStats.SpDefense, _level, nature, Stat.SpDefense);
-            int speed = _overrideSpeed ?? StatCalculator.CalculateStat(_species.BaseStats.Speed, _level, nature, Stat.Speed);
+            int hp = _overrideMaxHP ?? StatCalculator.CalculateHP(_species.BaseStats.HP, _level, ivs.HP, evs.HP);
+            int attack = _overrideAttack ?? StatCalculator.CalculateStat(_species.BaseStats.Attack, _level, nature, Stat.Attack, ivs.Attack, evs.Attack);
+            int defense = _overrideDefense ?? StatCalculator.CalculateStat(_species.BaseStats.Defense, _level, nature, Stat.Defense, ivs.Defense, evs.Defense);
+            int spAttack = _overrideSpAttack ?? StatCalculator.CalculateStat(_species.BaseStats.SpAttack, _level, nature, Stat.SpAttack, ivs.SpAttack, evs.SpAttack);
+            int spDefense = _overrideSpDefense ?? StatCalculator.CalculateStat(_species.BaseStats.SpDefense, _level, nature, Stat.SpDefense, ivs.SpDefense, evs.SpDefense);
+            int speed = _overrideSpeed ?? StatCalculator.CalculateStat(_species.BaseStats.Speed, _level, nature, Stat.Speed, ivs.Speed, evs.Speed);
 
             return (hp, attack, defense, spAttack, spDefense, speed);
+        }
+
+        private IVSet ResolveIVs()
+        {
+            if (_ivs != null)
+                return _ivs;
+
+            if (_useRandomIVs)
+                return GenerateRandomIVs();
+
+            return IVSet.Perfect;
+        }
+
+        private EVSet ResolveEVs()
+        {
+            return _evs ?? EVSet.Max;
+        }
+
+        private IVSet GenerateRandomIVs()
+        {
+            int hp = _randomProvider.Next(CoreConstants.MaxIV + 1);
+            int attack = _randomProvider.Next(CoreConstants.MaxIV + 1);
+            int defense = _randomProvider.Next(CoreConstants.MaxIV + 1);
+            int spAttack = _randomProvider.Next(CoreConstants.MaxIV + 1);
+            int spDefense = _randomProvider.Next(CoreConstants.MaxIV + 1);
+            int speed = _randomProvider.Next(CoreConstants.MaxIV + 1);
+
+            return new IVSet(hp, attack, defense, spAttack, spDefense, speed);
+        }
+
+        private static bool IsMaxEVSet(EVSet evs)
+        {
+            return evs.HP == CoreConstants.DefaultEV &&
+                   evs.Attack == CoreConstants.DefaultEV &&
+                   evs.Defense == CoreConstants.DefaultEV &&
+                   evs.SpAttack == CoreConstants.DefaultEV &&
+                   evs.SpDefense == CoreConstants.DefaultEV &&
+                   evs.Speed == CoreConstants.DefaultEV;
         }
 
         /// <summary>
@@ -916,6 +1082,18 @@ namespace PokemonUltimate.Core.Factories
 
             if (_experience > 0)
                 pokemon.CurrentExp = _experience;
+
+            // Ownership
+            if (_originalTrainer != null)
+                pokemon.OriginalTrainer = _originalTrainer;
+            if (_trainerId.HasValue)
+                pokemon.TrainerId = _trainerId;
+            if (_metLevel.HasValue)
+                pokemon.MetLevel = _metLevel;
+            if (_metLocation != null)
+                pokemon.MetLocation = _metLocation;
+            if (_metDate.HasValue)
+                pokemon.MetDate = _metDate;
         }
 
         private Gender DetermineGender()

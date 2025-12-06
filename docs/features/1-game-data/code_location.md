@@ -32,9 +32,12 @@ Game data is organized into logical groups matching the sub-feature structure:
 **Key Classes**:
 
 -   `PokemonSpeciesData` - Pokemon species blueprint (types, stats, abilities, learnset)
+-   `EggGroup` (enum) - Breeding group classification
 -   `PokemonInstance` - Individual Pokemon instance (level, HP, status, moves)
 -   `BaseStats` - Base stat values (HP, Attack, Defense, SpAttack, SpDefense, Speed)
 -   `LearnableMove` - Move learning information (move, method, level)
+-   `IVSet` - Individual Values per stat (stored on `PokemonInstance`)
+-   `EVSet` - Effort Values per stat (stored on `PokemonInstance`, maxed by design)
 
 #### 1.2: Move Data
 

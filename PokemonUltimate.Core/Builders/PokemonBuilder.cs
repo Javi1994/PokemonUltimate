@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -269,6 +270,31 @@ namespace PokemonUltimate.Content.Builders
 
         #endregion
 
+        #region Breeding Fields
+
+        /// <summary>
+        /// Set egg groups for breeding compatibility.
+        /// </summary>
+        public PokemonBuilder EggGroups(params EggGroup[] eggGroups)
+        {
+            _pokemon.EggGroups = eggGroups?.ToList() ?? new List<EggGroup>();
+            return this;
+        }
+
+        /// <summary>
+        /// Set egg cycles required for hatching.
+        /// </summary>
+        public PokemonBuilder EggCycles(int eggCycles)
+        {
+            if (eggCycles < 0)
+                throw new ArgumentException(ErrorMessages.EggCyclesCannotBeNegative, nameof(eggCycles));
+
+            _pokemon.EggCycles = eggCycles;
+            return this;
+        }
+
+        #endregion
+
         #region Variant Methods
 
         /// <summary>
@@ -291,7 +317,7 @@ namespace PokemonUltimate.Content.Builders
             _pokemon.TeraType = null;
             _pokemon.RegionalForm = string.Empty;
 
-            // Note: The bidirectional relationship (adding to baseForm.Variants) 
+            // Note: The bidirectional relationship (adding to baseForm.Variants)
             // should be handled by the caller or a separate relationship manager
             // to maintain Single Responsibility Principle
 
@@ -317,7 +343,7 @@ namespace PokemonUltimate.Content.Builders
             _pokemon.TeraType = null;
             _pokemon.RegionalForm = string.Empty;
 
-            // Note: The bidirectional relationship (adding to baseForm.Variants) 
+            // Note: The bidirectional relationship (adding to baseForm.Variants)
             // should be handled by the caller or a separate relationship manager
             // to maintain Single Responsibility Principle
 
@@ -344,7 +370,7 @@ namespace PokemonUltimate.Content.Builders
             _pokemon.TeraType = teraType;
             _pokemon.RegionalForm = string.Empty;
 
-            // Note: The bidirectional relationship (adding to baseForm.Variants) 
+            // Note: The bidirectional relationship (adding to baseForm.Variants)
             // should be handled by the caller or a separate relationship manager
             // to maintain Single Responsibility Principle
 
@@ -375,7 +401,7 @@ namespace PokemonUltimate.Content.Builders
             _pokemon.RegionalForm = region;
             _pokemon.TeraType = null;
 
-            // Note: The bidirectional relationship (adding to baseForm.Variants) 
+            // Note: The bidirectional relationship (adding to baseForm.Variants)
             // should be handled by the caller or a separate relationship manager
             // to maintain Single Responsibility Principle
 
@@ -392,13 +418,13 @@ namespace PokemonUltimate.Content.Builders
         {
             _pokemon.Learnset = _learnset;
             _pokemon.Evolutions = _evolutions;
-            
+
             // Establish bidirectional relationship for variants (SRP: Build handles finalization)
             if (_pokemon.IsVariant && _pokemon.BaseForm != null)
             {
                 EstablishVariantRelationship(_pokemon, _pokemon.BaseForm);
             }
-            
+
             return _pokemon;
         }
 

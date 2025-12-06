@@ -148,6 +148,20 @@ namespace PokemonUltimate.Core.Blueprints
 
         #endregion
 
+        #region Breeding Fields
+
+        /// <summary>
+        /// Egg groups used for breeding compatibility.
+        /// </summary>
+        public List<EggGroup> EggGroups { get; set; } = new List<EggGroup>();
+
+        /// <summary>
+        /// Egg cycles required for hatching. 0 if unspecified.
+        /// </summary>
+        public int EggCycles { get; set; }
+
+        #endregion
+
         #region Variant Fields
 
         /// <summary>

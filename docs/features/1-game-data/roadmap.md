@@ -651,34 +651,18 @@ public IEnumerable<PokemonSpeciesData> MegaVariants => Variants.Where(v => v.IsM
 
 **Sub-Feature 1.1: Pokemon Data (extensions)**
 
-**Status**: ⏳ **Not Implemented** - These are optional extensions for advanced features (competitive play, breeding, ownership tracking).
+**Status**: ⏳ **Partially Implemented** - Data fields for IVs/EVs, Breeding, and Ownership are in place. Breeding compatibility logic and EV gain remain pending (EVs stay at max by design).
 
 **Pending Items**:
 
--   [ ] **IVs/EVs System** - Individual Values and Effort Values tracking per Pokemon instance
-    -   Create `IVSet` class to store IVs per stat (HP, Attack, Defense, SpAttack, SpDefense, Speed)
-    -   Create `EVSet` class to store EVs per stat (0-252 per stat, 510 total)
-    -   Add `IVs` and `EVs` properties to `PokemonInstance`
-    -   Update `StatCalculator` to use stored IVs/EVs instead of defaults
-    -   Add methods to gain EVs from battles
-    -   **Note**: Currently uses max IVs/EVs (31/252) by default for roguelike experience
+-   [x] **IVs/EVs System (Data)** - `IVSet`, `EVSet`, `PokemonInstance.IVs/EVs` added; `StatCalculator` consumes stored IV/EV values. EVs remain max (no EV gain system needed now).
+-   [ ] **EV Gain Mechanics** - Methods to earn EVs from battles (not required while EVs stay max).
 
--   [ ] **Breeding System** - Breeding compatibility and egg hatching
-    -   Create `EggGroup` enum (Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered)
-    -   Add `EggGroups` property to `PokemonSpeciesData` (list of EggGroup)
-    -   Add `EggCycles` property to `PokemonSpeciesData` (cycles to hatch egg)
-    -   Implement breeding compatibility logic
-    -   Implement IV inheritance from parents
-    -   Implement egg move inheritance
-    -   **Note**: Currently only `BaseFriendship` has default 120 for "hatched from egg"
+-   [x] **Breeding Fields (Data)** - `EggGroup` enum, `PokemonSpeciesData.EggGroups`, `PokemonSpeciesData.EggCycles` added.
+-   [ ] **Breeding System Logic** - Compatibility checks, IV inheritance, egg moves.
 
--   [ ] **Ownership/Tracking Fields** - Track Pokemon origin and ownership
-    -   Add `OriginalTrainer` (string?) to `PokemonInstance`
-    -   Add `TrainerId` (int?) to `PokemonInstance`
-    -   Add `MetLevel` (int?) to `PokemonInstance`
-    -   Add `MetLocation` (string?) to `PokemonInstance`
-    -   Add `MetDate` (DateTime?) to `PokemonInstance`
-    -   **Note**: Useful for tracking Pokemon origin, trading, and ownership
+-   [x] **Ownership/Tracking Fields (Data)** - `OriginalTrainer`, `TrainerId`, `MetLevel`, `MetLocation`, `MetDate` added to `PokemonInstance` and builder.
+-   [ ] **Ownership Behaviors** - Trading/OT effects.
 
 -   [ ] **Advanced Pokedex Features** (if needed)
     -   Multiple Pokedex entries by generation
