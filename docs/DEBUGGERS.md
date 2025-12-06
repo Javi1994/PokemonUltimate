@@ -10,7 +10,8 @@ The debugger suite consists of multiple specialized projects, each focused on te
 |----------|---------|------------|
 | **[BattleDebuggerUI](../PokemonUltimate.BattleDebuggerUI/)** | Windows Forms | Visual interface for battle statistics (move usage, status effects) |
 | **[MoveDebuggerUI](../PokemonUltimate.MoveDebuggerUI/)** | Windows Forms | Visual interface for move testing statistics (damage, effects, actions) |
-| **[TypeMatchupDebugger](../PokemonUltimate.TypeMatchupDebugger/)** | Console | Type chart, dual types, immunities |
+| **[TypeMatchupDebuggerUI](../PokemonUltimate.TypeMatchupDebuggerUI/)** | Windows Forms | Visual interface for type effectiveness testing (type chart, dual types, immunities) |
+| **[TypeMatchupDebugger](../PokemonUltimate.TypeMatchupDebugger/)** | Console | Type chart, dual types, immunities (legacy console version) |
 
 ## Quick Start
 
@@ -23,7 +24,10 @@ dotnet run --project PokemonUltimate.BattleDebuggerUI
 # Visual move testing with statistics
 dotnet run --project PokemonUltimate.MoveDebuggerUI
 
-# Test type effectiveness (console)
+# Visual type effectiveness testing
+dotnet run --project PokemonUltimate.TypeMatchupDebuggerUI
+
+# Test type effectiveness (console - legacy)
 dotnet run --project PokemonUltimate.TypeMatchupDebugger
 ```
 
@@ -47,11 +51,13 @@ dotnet run --project PokemonUltimate.TypeMatchupDebugger
 - ✅ Analyzing what actions a move generates
 - ✅ You prefer visual interfaces with easy configuration
 
-### Use TypeMatchupDebugger When:
+### Use TypeMatchupDebuggerUI When:
 - ✅ Verifying type chart correctness
 - ✅ Testing dual-type effectiveness
 - ✅ Checking immunities
 - ✅ Validating super effective combinations
+- ✅ Viewing complete type chart for any attacking type
+- ✅ You prefer visual interfaces with easy configuration
 
 ## Shared Components
 
@@ -83,8 +89,12 @@ PokemonUltimate.MoveDebuggerUI/
 ├── MoveRunner.cs            # Reusable move testing logic
 └── README.md
 
-PokemonUltimate.TypeMatchupDebugger/
-├── DebugBattleView.cs      # Shared debug view
+PokemonUltimate.TypeMatchupDebuggerUI/
+├── MainForm.cs              # Windows Forms UI
+├── Program.cs                # Application entry point
+└── README.md
+
+PokemonUltimate.TypeMatchupDebugger/ (legacy console version)
 ├── Program.cs               # Type effectiveness tests
 └── README.md
 ```
