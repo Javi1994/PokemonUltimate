@@ -19,61 +19,30 @@ Unity integration testing focuses on:
 
 ## Test Structure
 
-Unity uses Unity Test Framework (UTF) with two test modes:
+**Note**: Unity tests are not used in this project. All tests are in the C# project (`PokemonUltimate.Tests`).
 
-```
-Unity Project/
-└── Tests/
-    ├── EditMode/                       # Editor tests (no runtime)
-    │   ├── DLLs_LoadWithoutErrors.cs
-    │   ├── Namespaces_AreAccessible.cs
-    │   └── CoreTypes_CanBeInstantiated.cs
-    │
-    └── PlayMode/                       # Runtime tests
-        ├── UnityBattleView/
-        │   ├── UnityBattleView_ShowsMessages.cs
-        │   ├── UnityBattleView_UpdatesHPBars.cs
-        │   └── UnityBattleView_ShowsStatusIcons.cs
-        │
-        ├── UI/
-        │   ├── HPBar_UpdatesCorrectly.cs
-        │   ├── PokemonDisplay_ShowsCorrectData.cs
-        │   └── Dialog_DisplaysText.cs
-        │
-        ├── Input/
-        │   ├── BattleInputHandler_ConvertsInputToActions.cs
-        │   └── ActionMenu_HandlesSelection.cs
-        │
-        ├── Animation/
-        │   └── MoveAnimationPlayer_PlaysAnimations.cs
-        │
-        └── Audio/
-            └── BattleAudioController_PlaysSounds.cs
-```
+Unity integration is tested via:
+- **C# Unit Tests**: Test battle engine logic in `PokemonUltimate.Tests`
+- **Manual Testing**: Test Unity UI and integration manually in Unity Editor
+- **Smoke Tests**: Use `PokemonUltimate.SmokeTests` for integration validation
 
-## Test Types
+## Test Strategy
 
-### EditMode Tests
-**Location**: `Tests/EditMode/`
-**Purpose**: Test DLL integration and static code
-**When to Run**: In Unity Editor, no play mode required
+**All tests are in the C# project** (`PokemonUltimate.Tests`), not in Unity.
 
-**Examples**:
-- DLL loading without errors
-- Namespace accessibility
-- Type instantiation
-- Static method calls
+### C# Unit Tests
+- Test battle engine logic
+- Test IBattleView implementations (using mocks)
+- Test integration between systems
 
-### PlayMode Tests
-**Location**: `Tests/PlayMode/`
-**Purpose**: Test runtime behavior and UI interactions
-**When to Run**: In Unity Editor play mode or CI/CD
+### Manual Testing in Unity
+- Test UI components visually
+- Test battle flow end-to-end
+- Test animations and audio
 
-**Examples**:
-- UI component updates
-- Input handling
-- Animation playback
-- Audio playback
+### Smoke Tests
+- Use `PokemonUltimate.SmokeTests` for integration validation
+- Can be run from Unity or standalone
 
 ## Coverage by Phase
 

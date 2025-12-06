@@ -67,7 +67,7 @@ Unity Project/
 │       ├── SFX/                         # Sound effects
 │       └── Music/                       # Battle music
 │
-└── Tests/                               # Unity tests
+└── (No Tests/)                          # No Unity tests - all tests in C# project
     ├── EditMode/
     │   ├── DLLs_LoadWithoutErrors.cs
     │   └── Namespaces_AreAccessible.cs
@@ -142,9 +142,10 @@ Unity Project/
 
 ## Test Location (Planned)
 
-**Tests**: `Tests/` (Unity Test Framework)
-- **EditMode**: `Tests/EditMode/` - Editor tests
-- **PlayMode**: `Tests/PlayMode/` - Runtime tests
+**Tests**: No Unity tests - all tests in `PokemonUltimate.Tests`
+- **Manual Testing**: Test UI components visually in Unity Editor
+- **C# Tests**: Test battle engine logic in C# project
+- **Smoke Tests**: Use `PokemonUltimate.SmokeTests` for integration validation
 
 **Test Categories**:
 - DLL integration tests

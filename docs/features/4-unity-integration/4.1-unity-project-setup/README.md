@@ -76,7 +76,7 @@ See **[GETTING_STARTED.md](GETTING_STARTED.md)** for step-by-step instructions.
 ### Unity Editor Tests
 
 ```csharp
-Tests/EditMode/DLLIntegration/
+(No Unity tests - all tests in C# project)
 ├── DLLs_LoadWithoutErrors.cs
 ├── Namespaces_AreAccessible.cs
 └── CoreTypes_CanBeInstantiated.cs

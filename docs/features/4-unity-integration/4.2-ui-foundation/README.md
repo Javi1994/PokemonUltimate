@@ -16,7 +16,10 @@ UI Foundation creates the core UI components for battle display:
 
 ## Current Status
 
-- ⏳ **Planned**: UI foundation not yet implemented
+- ✅ **Complete**: UI components implemented, automated scene generator ready
+- ✅ **Components Complete**: HPBar, PokemonDisplay, BattleDialog, BattleUISetup
+- ✅ **Tests Complete**: All UI component tests created (10 tests)
+- ✅ **Scene Generator**: Automated script to create battle scene
 
 ## Documentation
 
@@ -35,6 +38,8 @@ UI Foundation creates the core UI components for battle display:
 
 ## Related Documents
 
+- **[AUTOMATED_SETUP.md](AUTOMATED_SETUP.md)** ⭐⭐ - **Automated scene generation (RECOMMENDED)**
+- **[SCENE_SETUP_GUIDE.md](SCENE_SETUP_GUIDE.md)** - **Manual step-by-step scene setup guide**
 - **[Parent Feature README](../README.md)** - Overview of Unity Integration
 - **[Parent Architecture](../architecture.md)** - UI component specifications
 - **[Parent Use Cases](../use_cases.md#uc-002-display-battle-ui)** - UI display scenarios

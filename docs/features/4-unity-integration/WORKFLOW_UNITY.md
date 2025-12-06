@@ -21,7 +21,7 @@ PokemonUltimate/                    # Repo principal
 ├── PokemonUltimate.Core/          # Proyectos .NET
 ├── PokemonUltimate.Combat/
 ├── PokemonUltimate.Content/
-├── PokemonUltimate.Tests/
+├── PokemonUltimate.Tests/              # All tests here (no Unity tests)
 ├── docs/                          # Documentación (incluye Feature 4)
 │   └── features/
 │       └── 4-unity-integration/
@@ -30,7 +30,7 @@ PokemonUltimate/                    # Repo principal
     │   ├── Plugins/               # DLLs (gitignored, generados)
     │   └── Scripts/               # Código Unity
     ├── Scenes/
-    └── Tests/
+    └── (No Tests/)                    # No Unity tests
 ```
 
 **Ventajas**:

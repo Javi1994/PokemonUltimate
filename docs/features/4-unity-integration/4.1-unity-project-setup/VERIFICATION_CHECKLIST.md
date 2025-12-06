@@ -36,7 +36,7 @@ For each DLL (`PokemonUltimate.Core.dll`, `PokemonUltimate.Combat.dll`, `Pokemon
 
 ## 3. Unity Tests (Optional but Recommended) ✅
 
-**Location**: `Assets/Tests/EditMode/DLLIntegration/`
+**Note**: No Unity tests - verify DLL integration manually or via C# tests
 
 - [ ] Open **Test Runner** (Window → General → Test Runner)
 - [ ] Switch to **EditMode** tab

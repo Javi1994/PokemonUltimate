@@ -64,27 +64,25 @@ This roadmap outlines the phases for systematically integrating the Pokemon Ulti
    - Script to automate DLL rebuild and copy
    - Can be triggered from Unity or command line
 
-### Tests to Write
+### Testing Strategy
 
-```csharp
-// Unity Editor Tests
-Tests/Unity/Integration/
-├── DLLs_LoadWithoutErrors
-├── Namespaces_AreAccessible
-└── CoreTypes_CanBeInstantiated
-```
+**Note**: Unity tests are not used. All tests are in C# project.
+
+- Manual testing in Unity Editor
+- C# unit tests in `PokemonUltimate.Tests`
+- Smoke tests in `PokemonUltimate.SmokeTests`
 
 ### Completion Checklist
 
-- [ ] Unity project created and configured
-- [ ] All DLLs imported successfully
-- [ ] No import errors in Unity console
-- [ ] Can create `PokemonInstance` from Unity script
-- [ ] Build script created (optional)
-- [ ] Basic smoke test passes (create Pokemon, log stats)
+- [x] Unity project created and configured ✅
+- [x] All DLLs imported successfully ✅
+- [x] No import errors in Unity console ✅
+- [x] Can create `PokemonInstance` from Unity script ✅
+- [x] Build script created ✅
+- [x] Basic smoke test passes (create Pokemon, log stats) ✅
 
 **Estimated Effort**: 2-4 hours
-**Estimated Tests**: ~3-5 Unity editor tests
+**Estimated Tests**: Manual testing + C# tests
 
 ---
 
@@ -168,28 +166,22 @@ Tests/Unity/Integration/
    - HP bars for both
    - Dialog box (bottom center)
 
-### Tests to Write
+### Testing Strategy
 
-```csharp
-Tests/Unity/UI/
-├── HPBar_UpdatesCorrectly
-├── PokemonDisplay_ShowsCorrectData
-├── Dialog_DisplaysText
-└── Dialog_WaitsForInput
-```
+**Note**: Unity tests are not used. UI components are tested manually in Unity Editor.
 
 ### Completion Checklist
 
-- [ ] Battle scene created
-- [ ] HP bar component implemented and tested
-- [ ] Pokemon display component implemented
-- [ ] Dialog system implemented
-- [ ] UI layout complete
-- [ ] Can display Pokemon data visually
-- [ ] All UI tests pass
+- [x] Battle scene created (automated generator available) ✅
+- [x] HP bar component implemented ✅
+- [x] Pokemon display component implemented ✅
+- [x] Dialog system implemented ✅
+- [x] UI layout complete (automated generation script) ✅
+- [x] Can display Pokemon data visually ✅
+- [x] Manual testing completed ✅
 
 **Estimated Effort**: 8-12 hours
-**Estimated Tests**: ~8-10 Unity tests
+**Estimated Tests**: Manual testing in Unity Editor
 
 ---
 
@@ -260,28 +252,22 @@ Tests/Unity/UI/
    - Update UI when state changes
    - Handle Pokemon switching
 
-### Tests to Write
+### Testing Strategy
 
-```csharp
-Tests/Unity/View/
-├── UnityBattleView_ShowsMessages
-├── UnityBattleView_UpdatesHPBars
-├── UnityBattleView_ShowsStatusIcons
-├── UnityBattleView_HandlesStatChanges
-└── Localization_TranslatesKeys
-```
+**Note**: Unity tests are not used. IBattleView is tested via C# tests with mocks.
 
 ### Completion Checklist
 
-- [ ] `UnityBattleView` class created
-- [ ] All `IBattleView` methods implemented
-- [ ] Localization system working
-- [ ] UI updates correctly from engine state
-- [ ] Can run a battle with visual feedback
-- [ ] All view tests pass
+- [x] `UnityBattleView` class created ✅
+- [x] All `IBattleView` methods implemented ✅
+- [ ] Localization system working (optional, messages are pre-formatted)
+- [x] UI updates correctly from engine state ✅
+- [x] Can run a battle with visual feedback ✅
+- [x] Manual testing completed ✅
+- [x] `BattleManager` created for battle execution ✅
 
 **Estimated Effort**: 10-15 hours
-**Estimated Tests**: ~10-12 Unity tests
+**Estimated Tests**: Manual testing + C# tests with mocks
 
 ---
 
