@@ -12,10 +12,12 @@ namespace PokemonUltimate.UnifiedDebuggerUI
         private TabPage tabMove;
         private TabPage tabTypeMatchup;
         private TabPage tabStatCalculator;
+        private TabPage tabDamageCalculator;
         private BattleDebuggerTab battleDebuggerTab;
         private MoveDebuggerTab moveDebuggerTab;
         private TypeMatchupDebuggerTab typeMatchupDebuggerTab;
         private StatCalculatorDebuggerTab statCalculatorDebuggerTab;
+        private DamageCalculatorDebuggerTab damageCalculatorDebuggerTab;
 
         public MainForm()
         {
@@ -29,10 +31,12 @@ namespace PokemonUltimate.UnifiedDebuggerUI
             this.tabMove = new TabPage();
             this.tabTypeMatchup = new TabPage();
             this.tabStatCalculator = new TabPage();
+            this.tabDamageCalculator = new TabPage();
             this.battleDebuggerTab = new BattleDebuggerTab();
             this.moveDebuggerTab = new MoveDebuggerTab();
             this.typeMatchupDebuggerTab = new TypeMatchupDebuggerTab();
             this.statCalculatorDebuggerTab = new StatCalculatorDebuggerTab();
+            this.damageCalculatorDebuggerTab = new DamageCalculatorDebuggerTab();
 
             this.SuspendLayout();
 
@@ -71,12 +75,19 @@ namespace PokemonUltimate.UnifiedDebuggerUI
             this.statCalculatorDebuggerTab.Dock = DockStyle.Fill;
             this.tabStatCalculator.Controls.Add(this.statCalculatorDebuggerTab);
 
+            // Damage Calculator Tab
+            this.tabDamageCalculator.Text = "Damage Calculator";
+            this.tabDamageCalculator.Padding = new Padding(5);
+            this.damageCalculatorDebuggerTab.Dock = DockStyle.Fill;
+            this.tabDamageCalculator.Controls.Add(this.damageCalculatorDebuggerTab);
+
             // Add tabs to TabControl
             this.mainTabControl.TabPages.AddRange(new TabPage[] {
                 this.tabBattle,
                 this.tabMove,
                 this.tabTypeMatchup,
-                this.tabStatCalculator
+                this.tabStatCalculator,
+                this.tabDamageCalculator
             });
 
             // Add TabControl to Form
