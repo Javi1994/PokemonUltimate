@@ -80,6 +80,74 @@ namespace PokemonUltimate.Core.Blueprints
 
         #endregion
 
+        #region Gameplay Fields
+
+        /// <summary>
+        /// Base experience yield when this Pokemon is defeated.
+        /// Used in Gen 3+ EXP formula: (BaseExp * Level * WildMultiplier) / (7 * Participants)
+        /// Typical range: 50-300 (legendaries can be 300+)
+        /// </summary>
+        public int BaseExperienceYield { get; set; } = 0;
+
+        /// <summary>
+        /// Catch rate (3-255). Lower values = harder to catch.
+        /// Typical values: 45 (common), 3 (legendaries), 255 (guaranteed catch)
+        /// </summary>
+        public int CatchRate { get; set; } = 45;
+
+        /// <summary>
+        /// Base friendship value (0-255) when Pokemon is first obtained.
+        /// Default: 70 (wild Pokemon), 120 (hatched from egg), 0 (some legendaries)
+        /// </summary>
+        public int BaseFriendship { get; set; } = 70;
+
+        /// <summary>
+        /// Experience growth rate curve for this Pokemon.
+        /// Determines EXP needed per level.
+        /// </summary>
+        public GrowthRate GrowthRate { get; set; } = GrowthRate.MediumFast;
+
+        #endregion
+
+        #region Pokedex Fields
+
+        /// <summary>
+        /// Pokedex entry description text.
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Pokemon classification (e.g., "Flame Pokemon", "Mouse Pokemon").
+        /// </summary>
+        public string Category { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Height in meters.
+        /// </summary>
+        public float Height { get; set; } = 0f;
+
+        /// <summary>
+        /// Weight in kilograms.
+        /// </summary>
+        public float Weight { get; set; } = 0f;
+
+        /// <summary>
+        /// Pokemon color classification.
+        /// </summary>
+        public PokemonColor Color { get; set; } = PokemonColor.Unknown;
+
+        /// <summary>
+        /// Pokemon shape classification.
+        /// </summary>
+        public PokemonShape Shape { get; set; } = PokemonShape.Unknown;
+
+        /// <summary>
+        /// Pokemon habitat classification.
+        /// </summary>
+        public PokemonHabitat Habitat { get; set; } = PokemonHabitat.Unknown;
+
+        #endregion
+
         /// <summary>
         /// IIdentifiable implementation - Name serves as the unique ID.
         /// </summary>

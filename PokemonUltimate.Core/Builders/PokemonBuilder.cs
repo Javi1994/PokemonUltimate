@@ -158,6 +158,116 @@ namespace PokemonUltimate.Content.Builders
             return this;
         }
 
+        #region Gameplay Fields
+
+        /// <summary>
+        /// Set the base experience yield when this Pokemon is defeated.
+        /// Used in Gen 3+ EXP formula: (BaseExp * Level * WildMultiplier) / (7 * Participants)
+        /// </summary>
+        public PokemonBuilder BaseExp(int baseExp)
+        {
+            _pokemon.BaseExperienceYield = baseExp;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the catch rate (3-255). Lower values = harder to catch.
+        /// Typical values: 45 (common), 3 (legendaries), 255 (guaranteed catch)
+        /// </summary>
+        public PokemonBuilder CatchRate(int catchRate)
+        {
+            _pokemon.CatchRate = catchRate;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the base friendship value (0-255) when Pokemon is first obtained.
+        /// Default: 70 (wild Pokemon), 120 (hatched from egg), 0 (some legendaries)
+        /// </summary>
+        public PokemonBuilder BaseFriendship(int baseFriendship)
+        {
+            _pokemon.BaseFriendship = baseFriendship;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the experience growth rate curve.
+        /// </summary>
+        public PokemonBuilder GrowthRate(Core.Enums.GrowthRate growthRate)
+        {
+            _pokemon.GrowthRate = growthRate;
+            return this;
+        }
+
+        #endregion
+
+        #region Pokedex Fields
+
+        /// <summary>
+        /// Set the Pokedex entry description text.
+        /// </summary>
+        public PokemonBuilder Description(string description)
+        {
+            _pokemon.Description = description;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the Pokemon classification (e.g., "Flame Pokemon", "Mouse Pokemon").
+        /// </summary>
+        public PokemonBuilder Category(string category)
+        {
+            _pokemon.Category = category;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the Pokemon's height in meters.
+        /// </summary>
+        public PokemonBuilder Height(float height)
+        {
+            _pokemon.Height = height;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the Pokemon's weight in kilograms.
+        /// </summary>
+        public PokemonBuilder Weight(float weight)
+        {
+            _pokemon.Weight = weight;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the Pokemon color classification.
+        /// </summary>
+        public PokemonBuilder Color(Core.Enums.PokemonColor color)
+        {
+            _pokemon.Color = color;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the Pokemon shape classification.
+        /// </summary>
+        public PokemonBuilder Shape(Core.Enums.PokemonShape shape)
+        {
+            _pokemon.Shape = shape;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the Pokemon habitat classification.
+        /// </summary>
+        public PokemonBuilder Habitat(Core.Enums.PokemonHabitat habitat)
+        {
+            _pokemon.Habitat = habitat;
+            return this;
+        }
+
+        #endregion
+
         /// <summary>
         /// Build the final PokemonSpeciesData instance.
         /// </summary>

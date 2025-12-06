@@ -1,7 +1,7 @@
-using NUnit.Framework;
-using PokemonUltimate.Core.Enums;
 using System.Linq;
+using NUnit.Framework;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Enums;
 using MoveCatalog = PokemonUltimate.Content.Catalogs.Moves.MoveCatalog;
 
 namespace PokemonUltimate.Tests.Blueprints
@@ -588,6 +588,240 @@ namespace PokemonUltimate.Tests.Blueprints
             var pokemon = new PokemonSpeciesData { GenderRatio = ratio };
 
             Assert.That(pokemon.HasBothGenders, Is.True);
+        }
+
+        #endregion
+
+        #region Gameplay Fields Tests
+
+        [Test]
+        public void Test_BaseExperienceYield_Default_Is_Zero()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.BaseExperienceYield, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Test_BaseExperienceYield_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                BaseExperienceYield = 112 // Pikachu's base EXP
+            };
+
+            Assert.That(pokemon.BaseExperienceYield, Is.EqualTo(112));
+        }
+
+        [Test]
+        public void Test_CatchRate_Default_Is_45()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.CatchRate, Is.EqualTo(45));
+        }
+
+        [Test]
+        public void Test_CatchRate_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                CatchRate = 3 // Legendary catch rate
+            };
+
+            Assert.That(pokemon.CatchRate, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void Test_BaseFriendship_Default_Is_70()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.BaseFriendship, Is.EqualTo(70));
+        }
+
+        [Test]
+        public void Test_BaseFriendship_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                BaseFriendship = 120 // Starter/hatched Pokemon
+            };
+
+            Assert.That(pokemon.BaseFriendship, Is.EqualTo(120));
+        }
+
+        [Test]
+        public void Test_GrowthRate_Default_Is_MediumFast()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.GrowthRate, Is.EqualTo(GrowthRate.MediumFast));
+        }
+
+        [Test]
+        public void Test_GrowthRate_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                GrowthRate = GrowthRate.Fast // Pikachu's growth rate
+            };
+
+            Assert.That(pokemon.GrowthRate, Is.EqualTo(GrowthRate.Fast));
+        }
+
+        [Test]
+        [TestCase(GrowthRate.Fast)]
+        [TestCase(GrowthRate.MediumFast)]
+        [TestCase(GrowthRate.MediumSlow)]
+        [TestCase(GrowthRate.Slow)]
+        [TestCase(GrowthRate.Erratic)]
+        [TestCase(GrowthRate.Fluctuating)]
+        public void Test_All_GrowthRates_Can_Be_Set(GrowthRate rate)
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                GrowthRate = rate
+            };
+
+            Assert.That(pokemon.GrowthRate, Is.EqualTo(rate));
+        }
+
+        #endregion
+
+        #region Pokedex Fields Tests
+
+        [Test]
+        public void Test_Description_Default_Is_Empty()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.Description, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void Test_Description_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Description = "When it releases pent-up energy in a burst, the power is equal to a lightning bolt."
+            };
+
+            Assert.That(pokemon.Description, Is.Not.Empty);
+        }
+
+        [Test]
+        public void Test_Category_Default_Is_Empty()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.Category, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void Test_Category_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Category = "Mouse Pokemon"
+            };
+
+            Assert.That(pokemon.Category, Is.EqualTo("Mouse Pokemon"));
+        }
+
+        [Test]
+        public void Test_Height_Default_Is_Zero()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.Height, Is.EqualTo(0f));
+        }
+
+        [Test]
+        public void Test_Height_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Height = 0.4f // Pikachu's height in meters
+            };
+
+            Assert.That(pokemon.Height, Is.EqualTo(0.4f));
+        }
+
+        [Test]
+        public void Test_Weight_Default_Is_Zero()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.Weight, Is.EqualTo(0f));
+        }
+
+        [Test]
+        public void Test_Weight_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Weight = 6.0f // Pikachu's weight in kilograms
+            };
+
+            Assert.That(pokemon.Weight, Is.EqualTo(6.0f));
+        }
+
+        [Test]
+        public void Test_Color_Default_Is_Unknown()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.Color, Is.EqualTo(PokemonColor.Unknown));
+        }
+
+        [Test]
+        public void Test_Color_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Color = PokemonColor.Yellow
+            };
+
+            Assert.That(pokemon.Color, Is.EqualTo(PokemonColor.Yellow));
+        }
+
+        [Test]
+        public void Test_Shape_Default_Is_Unknown()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.Shape, Is.EqualTo(PokemonShape.Unknown));
+        }
+
+        [Test]
+        public void Test_Shape_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Shape = PokemonShape.Quadruped
+            };
+
+            Assert.That(pokemon.Shape, Is.EqualTo(PokemonShape.Quadruped));
+        }
+
+        [Test]
+        public void Test_Habitat_Default_Is_Unknown()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.Habitat, Is.EqualTo(PokemonHabitat.Unknown));
+        }
+
+        [Test]
+        public void Test_Habitat_Can_Be_Set()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Habitat = PokemonHabitat.Forest
+            };
+
+            Assert.That(pokemon.Habitat, Is.EqualTo(PokemonHabitat.Forest));
         }
 
         #endregion

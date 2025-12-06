@@ -278,7 +278,7 @@ namespace PokemonUltimate.Core.Instances
             Nature nature,
             Gender gender,
             List<MoveInstance> moves,
-            int friendship = 70,
+            int? friendship = null,
             bool isShiny = false,
             AbilityData ability = null,
             ItemData heldItem = null)
@@ -302,7 +302,9 @@ namespace PokemonUltimate.Core.Instances
             // Personal
             Nature = nature;
             Gender = gender;
-            Friendship = friendship.ClampFriendship();
+            // Use Species.BaseFriendship if available, otherwise use provided value or default to 70
+            int initialFriendship = friendship ?? species.BaseFriendship;
+            Friendship = initialFriendship.ClampFriendship();
             IsShiny = isShiny;
 
             // Moves

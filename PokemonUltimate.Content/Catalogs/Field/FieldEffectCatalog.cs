@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Content.Builders;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Field
@@ -188,12 +188,12 @@ namespace PokemonUltimate.Content.Catalogs.Field
             _all.Add(TrickRoom);
             _all.Add(MagicRoom);
             _all.Add(WonderRoom);
-            
+
             // Field Modifiers
             _all.Add(Gravity);
             _all.Add(IonDeluge);
             _all.Add(FairyLock);
-            
+
             // Type Weakeners
             _all.Add(MudSport);
             _all.Add(WaterSport);

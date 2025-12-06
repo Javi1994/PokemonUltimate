@@ -22,9 +22,10 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 -   ✅ **Core Complete**: All main data structures implemented (Pokemon, Moves, Abilities, Items, Field Conditions)
 -   ✅ **Infrastructure Complete**: Factories, Registries, Enums, Constants
 -   ✅ **Core Refactoring Complete (2024-12-XX)**: Comprehensive refactoring completed following SOLID principles. All major components now use Dependency Injection, Strategy Pattern, Value Objects, and centralized constants. Improved testability, maintainability, and extensibility. See `PokemonUltimate.Core/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for complete details. Phases 0-8 completed (21 of 22 tasks, 95.5%).
+-   ✅ **Gameplay Fields Complete (2025-01-XX)**: BaseExperienceYield, CatchRate, BaseFriendship, GrowthRate implemented
+-   ✅ **Pokedex Fields Complete (2025-01-XX)**: Description, Category, Height, Weight, Color, Shape, Habitat implemented
 -   ⚠️ **Note**: Builders moved to Feature 3 (Sub-Feature 3.9) as they are primarily used for content creation
 -   ⏳ **Planned**: Variants System (Mega, Dinamax, Terracristalización)
--   ⏳ **Planned**: Pokedex Fields (Description, Category, Height, Weight, Color, Shape, Habitat)
 
 ## Documentation
 

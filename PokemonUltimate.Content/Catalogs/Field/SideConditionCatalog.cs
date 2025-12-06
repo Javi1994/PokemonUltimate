@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Content.Builders;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Field
@@ -202,13 +202,13 @@ namespace PokemonUltimate.Content.Catalogs.Field
             _all.Add(Reflect);
             _all.Add(LightScreen);
             _all.Add(AuroraVeil);
-            
+
             // Speed/Status
             _all.Add(Tailwind);
             _all.Add(Safeguard);
             _all.Add(Mist);
             _all.Add(LuckyChant);
-            
+
             // Protection
             _all.Add(WideGuard);
             _all.Add(QuickGuard);
