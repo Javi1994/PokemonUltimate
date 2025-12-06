@@ -27,8 +27,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Damage
         [SetUp]
         public void SetUp()
         {
-            var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
-            var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Squirtle, 50) };
+            var playerParty = new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Pikachu, 50).WithPerfectIVs().Build() };
+            var enemyParty = new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Squirtle, 50).WithPerfectIVs().Build() };
             
             _field = new BattleField();
             _field.Initialize(BattleRules.Singles, playerParty, enemyParty);

@@ -128,7 +128,10 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
         {
             // Pikachu base HP = 35, Level 50, IV=31, EV=252
             // ((2*35 + 31 + 63) * 50 / 100) + 50 + 10 = 82 + 60 = 142
-            var pokemon = PokemonFactory.Create(_pikachu, 50, Nature.Hardy);
+            var pokemon = Pokemon.Create(_pikachu, 50)
+                .WithNature(Nature.Hardy)
+                .WithPerfectIVs()
+                .Build();
 
             Assert.That(pokemon.MaxHP, Is.EqualTo(142));
         }
@@ -138,7 +141,10 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
         {
             // Pikachu base Attack = 55, Level 50, Adamant (+Atk), IV=31, EV=252
             // ((2*55 + 31 + 63) * 50 / 100) + 5 = 102 + 5 = 107, * 1.1 = 117
-            var pokemon = PokemonFactory.Create(_pikachu, 50, Nature.Adamant);
+            var pokemon = Pokemon.Create(_pikachu, 50)
+                .WithNature(Nature.Adamant)
+                .WithPerfectIVs()
+                .Build();
 
             Assert.That(pokemon.Attack, Is.EqualTo(117));
         }
@@ -148,7 +154,11 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
         {
             // Pikachu base SpAttack = 50, Level 50, Adamant (-SpAtk), IV=31, EV=252
             // ((2*50 + 31 + 63) * 50 / 100) + 5 = 97 + 5 = 102, * 0.9 = 91
-            var pokemon = PokemonFactory.Create(_pikachu, 50, Nature.Adamant);
+            var pokemon = Pokemon.Create(_pikachu, 50)
+                .WithNature(Nature.Adamant)
+                .WithPerfectIVs()
+                .WithEVs(0, 0, 0, 252, 0, 0) // SpAttack EVs = 252
+                .Build();
 
             Assert.That(pokemon.SpAttack, Is.EqualTo(91));
         }

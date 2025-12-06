@@ -109,6 +109,24 @@ namespace PokemonUltimate.Core.Blueprints
 
         #endregion
 
+        #region Breeding Fields
+
+        /// <summary>
+        /// Egg groups this Pokemon belongs to (determines breeding compatibility).
+        /// Most Pokemon have one egg group, some have two (e.g., Pikachu is Field/Fairy).
+        /// Pokemon can breed if they share at least one egg group (unless one is Ditto).
+        /// </summary>
+        public List<EggGroup> EggGroups { get; set; } = new List<EggGroup>();
+
+        /// <summary>
+        /// Number of egg cycles required to hatch an egg of this Pokemon species.
+        /// Range: 1-40 (typical: 5-20, legendaries: 40, baby Pokemon: 5-10).
+        /// Each cycle = 255 steps in the original games.
+        /// </summary>
+        public int EggCycles { get; set; } = 20;
+
+        #endregion
+
         #region Pokedex Fields
 
         /// <summary>
@@ -416,6 +434,55 @@ namespace PokemonUltimate.Core.Blueprints
 
             return Learnset.Any(m => m.Move == move);
         }
+
+        #endregion
+
+        #region Breeding Helpers
+
+        /// <summary>
+        /// Checks if this Pokemon can breed with another Pokemon species.
+        /// Two Pokemon can breed if:
+        /// - They share at least one egg group (unless one is Ditto)
+        /// - Neither has Undiscovered egg group
+        /// - If one is Ditto, the other must not be Undiscovered
+        /// </summary>
+        /// <param name="other">The other Pokemon species to check compatibility with.</param>
+        /// <returns>True if the two Pokemon can breed together.</returns>
+        public bool CanBreedWith(PokemonSpeciesData other)
+        {
+            if (other == null)
+                throw new ArgumentNullException(nameof(other), ErrorMessages.PokemonCannotBeNull);
+
+            // Undiscovered cannot breed
+            if (EggGroups.Contains(EggGroup.Undiscovered) ||
+                other.EggGroups.Contains(EggGroup.Undiscovered))
+            {
+                return false;
+            }
+
+            // Ditto can breed with any (except Undiscovered, already checked)
+            if (EggGroups.Contains(EggGroup.Ditto) ||
+                other.EggGroups.Contains(EggGroup.Ditto))
+            {
+                return true;
+            }
+
+            // Check if they share at least one egg group
+            return EggGroups.Intersect(other.EggGroups).Any();
+        }
+
+        /// <summary>
+        /// Returns true if this Pokemon belongs to a specific egg group.
+        /// </summary>
+        public bool IsInEggGroup(EggGroup eggGroup)
+        {
+            return EggGroups.Contains(eggGroup);
+        }
+
+        /// <summary>
+        /// Returns true if this Pokemon cannot breed (has Undiscovered egg group).
+        /// </summary>
+        public bool CannotBreed => EggGroups.Contains(EggGroup.Undiscovered);
 
         #endregion
     }

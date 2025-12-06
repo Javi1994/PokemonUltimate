@@ -30,8 +30,8 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
         {
             _field = new BattleField();
             _field.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
-                new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) },
-                new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) });
+                new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Pikachu, 50).WithPerfectIVs().Build() },
+                new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Charmander, 50).WithPerfectIVs().Build() });
 
             _attackerSlot = _field.PlayerSide.Slots[0];
             _defenderSlot = _field.EnemySide.Slots[0];
@@ -93,7 +93,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.Actions
         public void RecoilEffect_WithSTAB_RecoilBasedOnSTABDamage()
         {
             // Arrange - Normal type Pokemon using Normal move (STAB)
-            var normalPokemon = PokemonFactory.Create(PokemonCatalog.Snorlax, 50);
+            var normalPokemon = PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Snorlax, 50).WithPerfectIVs().Build();
             _field.PlayerSide.Slots[0].SetPokemon(normalPokemon);
             _attackerSlot = _field.PlayerSide.Slots[0];
             _attacker = _attackerSlot.Pokemon;

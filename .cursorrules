@@ -6,7 +6,6 @@
 
 **ALWAYS read at start:**
 1. `.ai/context.md` - Current project state
-2. `docs/ai/guidelines/project_guidelines.md` - Complete coding rules
 
 **Read on-demand:**
 - Feature docs → `docs/features_master_list_index.md` ⭐ **OPTIMIZED FOR AI** (or `docs/features_master_list.md` as fallback) → `docs/features/[N]-[feature-name]/`
@@ -88,7 +87,6 @@
 7. **Refactor** (if needed)
    - Improve code without changing behavior
    - All tests must still pass
-   - Follow `docs/ai/guidelines/project_guidelines.md`
    - Avoid `docs/ai/anti-patterns.md`
 
 8. **Validate Implementation** ⭐ **OBLIGATORY - EXECUTE ALL VALIDATIONS**
@@ -136,10 +134,9 @@
 
 ### When User Says "Review X" or "Check X"
 1. Read `docs/ai/anti-patterns.md`
-2. Verify against `docs/ai/guidelines/project_guidelines.md`
-3. Check `docs/ai/checklists/feature_complete.md`
-4. Run validation scripts if needed
-5. List issues and fix if requested
+2. Check `docs/ai/checklists/feature_complete.md`
+3. Run validation scripts if needed
+4. List issues and fix if requested
 
 ### When User Says "Refactor X" or "Improve X"
 1. **Read current implementation** - All related code files
@@ -150,19 +147,23 @@
 
 ### When Issues Arise
 
-**Spec incomplete** → Complete spec first  
-**Spec incorrect** → Document discrepancy, fix spec or implementation  
-**Test reveals missing functionality** → Implement immediately (Test-Driven Discovery)  
+**Spec incomplete** → Complete spec first
+**Spec incorrect** → Document discrepancy, fix spec or implementation
+**Test reveals missing functionality** → Implement immediately (Test-Driven Discovery)
 **Architectural change needed** → Document discovery, evaluate impact, update architecture
 
 ## ✅ Mandatory Rules
 
 ### Code Quality
+- **SOLID principles** → Follow strictly
+- **Clean Code** → Readable, maintainable, self-documenting
+- **High code quality** → No code smells, follow best practices
 - **NO magic strings** → Use `ErrorMessages.cs` or `GameMessages.cs`
 - **NO magic numbers** → Use named constants
 - **NO try-catch** → Unless absolutely necessary (I/O, external APIs)
 - **Fail-fast** → Throw exceptions for invalid inputs
 - **Guard clauses** → Validate at method start
+- **High coverage tests** → ALL code must be test
 
 ### Architecture
 - **Core/** → Logic only, NO game data
@@ -216,7 +217,6 @@ public void Method(int value) {
 | Game definition | `docs/GAME_DEFINITION.yaml` |
 | Feature documentation standard | `docs/feature_documentation_standard.md` |
 | Feature naming in code | `docs/ai/guidelines/feature_naming_in_code.md` ⭐ **MANDATORY** |
-| Coding rules | `docs/ai/guidelines/project_guidelines.md` |
 | What NOT to do | `docs/ai/anti-patterns.md` |
 | Code examples | `docs/ai/examples/good_code.md` |
 | Test examples | `docs/ai/examples/good_tests.md` |
@@ -281,7 +281,7 @@ Before marking feature complete:
 - STAB = 1.5x multiplier
 - Dual-type multiplies
 
-### Stat Calculation  
+### Stat Calculation
 - Gen 3+ formula
 - HP formula different from other stats
 - Nature = 0.9, 1.0, or 1.1 modifier
@@ -330,9 +330,7 @@ Before marking feature complete:
 
 **Rule**: If you haven't read the existing code, you cannot write new code
 
-**See**: `docs/ai/guidelines/project_guidelines.md` Section 5.7 for complete guidelines
-
 ### Current Phase
 - ✅ Phase 1: Core Data (Complete)
-- ✅ Phase 2: Instances (Complete)  
+- ✅ Phase 2: Instances (Complete)
 - 🎯 Phase 3: Combat System (In Progress)

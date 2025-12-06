@@ -122,7 +122,7 @@ Usa el decision tree: `decision-trees/tdd-workflow.yaml`
 
 **Validación**:
 - Todos los tests deben seguir pasando
-- Seguir `docs/ai/guidelines/project_guidelines.md`
+- Seguir reglas de código en `.cursorrules` y `docs/ai/guidelines/`
 - Evitar `docs/ai/anti-patterns.md`
 
 ---

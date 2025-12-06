@@ -15,7 +15,7 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   **Grupo C: Supporting Systems** (1.11-1.12) - Evolution System, Type Effectiveness Table
 -   **Grupo D: Infrastructure** (1.13-1.14, 1.16-1.17) - Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
 -   **Grupo E: Planned Features** (1.18-1.19) - Variants System ✅ Complete, Pokedex Fields ✅ Complete
--   **Phase 4: Optional Enhancements** - IVs/EVs System, Breeding System, Ownership/Tracking Fields ⏳ Pending
+-   **Phase 4: Optional Enhancements** ✅ Complete - IVs/EVs System, Breeding System, Ownership/Tracking Fields
 -   **Content** - Data definitions in `PokemonUltimate.Content` (Feature 3: Content Expansion)
 
 **See**: [Sub-Features Overview](../1-game-data/README.md) for complete sub-feature list.
@@ -334,38 +334,32 @@ Game data is organized into logical groups matching the sub-feature structure:
 
 ---
 
-#### Phase 4: Optional Enhancements ⏳ PENDING
+#### Phase 4: Optional Enhancements ✅ COMPLETE
 
 **Sub-Feature**: 1.1: Pokemon Data (extensions)  
-**Status**: ⏳ **Not Implemented** - Optional extensions for advanced features
+**Status**: ✅ **Complete** - All Phase 4 optional enhancements implemented
 
-**Pending Implementations**:
+**Implemented Features**:
 
-**1. IVs/EVs System**:
--   **Missing**: `IVSet` class to store Individual Values per stat (HP, Attack, Defense, SpAttack, SpDefense, Speed)
--   **Missing**: `EVSet` class to store Effort Values per stat (0-252 per stat, 510 total)
--   **Missing**: `IVs` and `EVs` properties in `PokemonInstance`
--   **Missing**: Methods to gain EVs from battles
--   **Current**: Uses max IVs/EVs (31/252) by default via `StatCalculator` but values are not stored per instance
+**1. IVs/EVs System** ✅ Complete:
+-   **Files**: `PokemonUltimate.Core/Instances/IVSet.cs`, `PokemonUltimate.Core/Instances/EVSet.cs`
+-   **Properties**: `PokemonInstance.IVs` (IVSet), `PokemonInstance.EVs` (EVSet)
+-   **Integration**: `StatCalculator` uses IVs/EVs for stat calculation
+-   **Default Behavior**: Random IVs (0-31), Maximum EVs (252/252/4/0/0/0)
+-   **Builder Methods**: `.WithPerfectIVs()`, `.WithZeroIVs()`, `.WithIVs(...)`, `.WithMaximumEVs()`, `.WithZeroEVs()`, `.WithEVs(...)`
 
-**2. Breeding System**:
--   **Missing**: `EggGroup` enum (Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered)
--   **Missing**: `EggGroups` property in `PokemonSpeciesData` (list of EggGroup)
--   **Missing**: `EggCycles` property in `PokemonSpeciesData` (cycles to hatch egg)
--   **Missing**: Breeding compatibility logic
--   **Missing**: IV inheritance from parents
--   **Missing**: Egg move inheritance
--   **Current**: Only `BaseFriendship` has default 120 for "hatched from egg", `LearnMethod.Egg` exists but no breeding system
+**2. Breeding System** ✅ Complete:
+-   **Files**: `PokemonUltimate.Core/Enums/EggGroup.cs`
+-   **Properties**: `PokemonSpeciesData.EggGroups` (List<EggGroup>), `PokemonSpeciesData.EggCycles` (int, default: 20)
+-   **Methods**: `CanBreedWith(PokemonSpeciesData other)`, `IsInEggGroup(EggGroup eggGroup)`, `CannotBreed` (property)
+-   **Egg Groups**: Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered
+-   **Note**: IV inheritance and egg move inheritance are future enhancements
 
-**3. Ownership/Tracking Fields**:
--   **Missing**: `OriginalTrainer` (string?) in `PokemonInstance`
--   **Missing**: `TrainerId` (int?) in `PokemonInstance`
--   **Missing**: `MetLevel` (int?) in `PokemonInstance`
--   **Missing**: `MetLocation` (string?) in `PokemonInstance`
--   **Missing**: `MetDate` (DateTime?) in `PokemonInstance`
--   **Current**: No tracking of Pokemon origin or ownership
+**3. Ownership/Tracking Fields** ✅ Complete:
+-   **Properties**: `PokemonInstance.OriginalTrainer` (string?), `PokemonInstance.TrainerId` (int?), `PokemonInstance.MetLevel` (int?), `PokemonInstance.MetLocation` (string?), `PokemonInstance.MetDate` (DateTime?)
+-   **Usage**: All fields are nullable and can be set/get for tracking Pokemon origin and ownership
 
-**See**: [`roadmap.md`](roadmap.md#phase-4-optional-enhancements-low-priority) for complete details.
+**See**: [`roadmap.md`](roadmap.md#phase-4-optional-enhancements-low-priority) for complete implementation details.
 
 ---
 

@@ -93,7 +93,6 @@ The project includes a complete AI guidance system:
 .cursorrules                      # Auto-loaded rules for Cursor IDE
 
 docs/
-├── project_guidelines.md         # 24+ coding rules
 ├── anti-patterns.md              # What NOT to do (with examples)
 │
 ├── checklists/                   # Quality verification
@@ -139,7 +138,6 @@ docs/
 |------|---------|-------------|
 | `.cursorrules` | Rules for every AI conversation | ✅ Yes |
 | `.ai/context.md` | Current project state | ✅ AI reads first |
-| `docs/ai/guidelines/project_guidelines.md` | 24+ coding rules | ✅ AI reads first |
 
 ---
 
@@ -181,7 +179,6 @@ See `docs/features/README.md` for overview of all features.
 | **Refactoring** | Safe code improvement process | [`docs/ai/workflow/refactoring_guide.md`](docs/ai/workflow/refactoring_guide.md) |
 | **Integration Testing** | System integration test patterns | [`docs/features/2-combat-system/testing/integration_guide.md`](docs/features/2-combat-system/testing/integration_guide.md) |
 | **Game Data Testing** | Comprehensive game data testing strategy | [`docs/features/1-game-data/testing.md`](docs/features/1-game-data/testing.md) |
-| **Project Guidelines** | 24+ mandatory coding rules | [`docs/ai/guidelines/project_guidelines.md`](docs/ai/guidelines/project_guidelines.md) |
 | **Anti-Patterns** | What NOT to do | [`docs/ai/anti-patterns.md`](docs/ai/anti-patterns.md) |
 
 ---
@@ -200,7 +197,7 @@ Create `.cursorrules` with your coding standards:
 ## Automatic Context Loading
 ALWAYS read these files at the start of any task:
 1. `.ai/context.md` - Current project state
-2. `docs/ai/guidelines/project_guidelines.md` - Coding rules
+2. `.cursorrules` - Coding rules and guidelines
 
 ## Development Workflow
 When implementing a feature:

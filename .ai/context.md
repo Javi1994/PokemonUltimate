@@ -13,7 +13,7 @@
 | **Sub-Phase**           | 2.14 Hazards System ✅ Core Complete                                                                                                                                                                                                                                                                      |
 | **Combat Refactoring**  | ✅ Complete (2024-12-05) - Phases 0-13 completed (42/44 tasks, 95.5%). DI, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, Validation implemented.                                                                                                                               |
 | **Core Refactoring**    | ✅ Complete (2024-12-XX) - Phases 0-8 completed (21/22 tasks, 95.5%). DI, Strategy Pattern, Constants centralization, Extension methods, Validation, Move selection, Stat stage management, Stats caching implemented. See `PokemonUltimate.Core/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details. |
-| **Tests**               | 2,528+ passing (includes Weather System 48 tests, Terrain System 84+ tests, Hazards System 25+ tests)                                                                                                                                                                                                     |
+| **Tests**               | 3,161+ passing (includes Phase 4: IVs/EVs System, Breeding System, Ownership/Tracking tests)                                                                                                                                                                                                     |
 | **Integration Tests**   | 83+ tests (system interactions)                                                                                                                                                                                                                                                                           |
 | **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed.                                                                                                                                                                         |
 | **Warnings**            | 0                                                                                                                                                                                                                                                                                                         |
@@ -121,6 +121,10 @@ PokemonUltimate/
     -   Pokedex fields specified (Description, Category, Height, Weight, Color, Shape, Habitat)
     -   Variants system fields specified (BaseForm, VariantType, TeraType, Variants)
     -   See `docs/features/1-game-data/roadmap.md` for complete specification
+-   [x] **Phase 4: Optional Enhancements** ✅ Complete
+    -   **IVs/EVs System**: IVSet and EVSet classes, integrated with StatCalculator, random IVs (0-31), max EVs (252/252/4/0/0/0)
+    -   **Breeding System**: EggGroup enum (13 groups), EggGroups and EggCycles properties, breeding compatibility methods (CanBreedWith, IsInEggGroup, CannotBreed)
+    -   **Ownership/Tracking Fields**: OriginalTrainer, TrainerId, MetLevel, MetLocation, MetDate properties in PokemonInstance
 
 ---
 
@@ -259,7 +263,7 @@ See `docs/features/3-content-expansion/roadmap.md` for full details.
 | Document                                                                   | Purpose                                    |
 | -------------------------------------------------------------------------- | ------------------------------------------ |
 | `docs/features_master_list.md`                                             | **📋 Feature numbering and naming**        |
-| `docs/ai/guidelines/project_guidelines.md`                                 | 24+ coding rules                           |
+| `.cursorrules`                                                             | Coding rules and guidelines                 |
 | `.cursorrules`                                                             | **AI workflow rules**                      |
 | `docs/implementation_plan.md`                                              | Technical roadmap                          |
 | `docs/features/2-combat-system/roadmap.md`                                 | **Combat phases**                          |

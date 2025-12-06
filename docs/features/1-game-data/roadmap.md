@@ -15,7 +15,7 @@ This document defines the implementation roadmap for **all game data structures*
 -   **Supporting Systems** (1.11-1.12): Evolution System, Type Effectiveness Table
 -   **Infrastructure** (1.13-1.14, 1.16-1.17): Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9, was 1.15)
 -   **Planned Features** (1.18-1.19): Variants System ✅ Complete, Pokedex Fields ✅ Complete
--   **Phase 4: Optional Enhancements**: IVs/EVs System, Breeding System, Ownership/Tracking Fields ⏳ Pending
+-   **Phase 4: Optional Enhancements**: IVs/EVs System ✅ Complete, Breeding System ✅ Complete, Ownership/Tracking Fields ✅ Complete
 
 **Goal**: Ensure all data structures are complete and well-organized before expanding content, preventing future refactoring.
 
@@ -30,7 +30,7 @@ This document defines the implementation roadmap for **all game data structures*
 | **Grupo C: Supporting Systems**  | 1.11-1.12            | ✅ Core Complete | 100%       |
 | **Grupo D: Infrastructure**      | 1.13-1.14, 1.16-1.17 | ✅ Core Complete | 100%       |
 | **Grupo E: Planned Features**    | 1.18-1.19            | ✅ Complete      | 100%       |
-| **Phase 4: Optional Extensions** | 1.1 (extensions)     | ⏳ Planned       | 0%         |
+| **Phase 4: Optional Extensions** | 1.1 (extensions)     | ✅ Complete      | 100%       |
 
 ---
 
@@ -569,35 +569,55 @@ public IEnumerable<PokemonSpeciesData> MegaVariants => Variants.Where(v => v.IsM
 
 **Sub-Feature**: 1.1: Pokemon Data (extensions)
 
-#### 4.1 IVs and EVs (For Competitive/Breeding)
+#### 4.1 IVs and EVs ✅ COMPLETE
 
 **Purpose**: Individual Values and Effort Values for stat variation.
 
-**Implementation**: Create `IVSet` and `EVSet` classes, add to `PokemonInstance`.
+**Implementation**: 
+- Created `IVSet` class to store Individual Values (0-31 per stat)
+- Created `EVSet` class to store Effort Values (0-252 per stat, 510 total)
+- Added `IVs` and `EVs` properties to `PokemonInstance`
+- Updated `StatCalculator` to use stored IVs/EVs instead of defaults
+- Updated `PokemonInstanceBuilder` to generate random IVs and maximum EVs by default
+- Added fluent builder methods for custom IV/EV configuration
 
-**Note**: Current implementation uses max IVs/EVs (roguelike). This is for future competitive features.
+**Note**: 
+- **IVs**: Generated randomly (0-31) for each stat when creating Pokemon instances
+- **EVs**: Always set to maximum (252/252/4/0/0/0 distribution) by default, as all Pokemon will have max EVs in this game
+- No EV gain from battles implemented (not needed since EVs are always max)
 
 ---
 
-#### 4.2 Breeding Fields
+#### 4.2 Breeding Fields ✅ COMPLETE
 
 **Purpose**: Breeding compatibility and egg hatching.
 
-**Implementation**: Add `EggGroups` and `EggCycles` to `PokemonSpeciesData`, create `EggGroup` enum.
+**Implementation**: 
+- Created `EggGroup` enum with all 13 egg groups (Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered)
+- Added `EggGroups` property to `PokemonSpeciesData` (List<EggGroup>)
+- Added `EggCycles` property to `PokemonSpeciesData` (int, default: 20)
+- Implemented breeding compatibility methods:
+  - `CanBreedWith(PokemonSpeciesData other)` - Checks if two Pokemon can breed
+  - `IsInEggGroup(EggGroup eggGroup)` - Checks if Pokemon belongs to an egg group
+  - `CannotBreed` - Property indicating if Pokemon cannot breed (Undiscovered)
+
+**Note**: Core breeding compatibility system is complete. IV inheritance and egg move inheritance are future enhancements.
 
 ---
 
-#### 4.3 Ownership Fields
+#### 4.3 Ownership Fields ✅ COMPLETE
 
 **Purpose**: Track Pokemon origin and ownership.
 
-**Implementation**: Add to `PokemonInstance`:
+**Implementation**: Added to `PokemonInstance`:
 
--   `OriginalTrainer` (string?)
--   `TrainerId` (int?)
--   `MetLevel` (int?)
--   `MetLocation` (string?)
--   `MetDate` (DateTime?)
+-   `OriginalTrainer` (string?) - Original Trainer's name (OT)
+-   `TrainerId` (int?) - Unique identifier for the original trainer
+-   `MetLevel` (int?) - Level at which Pokemon was met/caught
+-   `MetLocation` (string?) - Location where Pokemon was met/caught
+-   `MetDate` (DateTime?) - Date when Pokemon was met/caught
+
+**Note**: All fields are nullable and can be set/get. Useful for tracking Pokemon origin, trading, and ownership.
 
 ---
 
@@ -655,30 +675,31 @@ public IEnumerable<PokemonSpeciesData> MegaVariants => Variants.Where(v => v.IsM
 
 **Pending Items**:
 
--   [ ] **IVs/EVs System** - Individual Values and Effort Values tracking per Pokemon instance
-    -   Create `IVSet` class to store IVs per stat (HP, Attack, Defense, SpAttack, SpDefense, Speed)
-    -   Create `EVSet` class to store EVs per stat (0-252 per stat, 510 total)
-    -   Add `IVs` and `EVs` properties to `PokemonInstance`
-    -   Update `StatCalculator` to use stored IVs/EVs instead of defaults
-    -   Add methods to gain EVs from battles
-    -   **Note**: Currently uses max IVs/EVs (31/252) by default for roguelike experience
+-   [x] **IVs/EVs System** ✅ Complete - Individual Values and Effort Values tracking per Pokemon instance
+    -   [x] Create `IVSet` class to store IVs per stat (HP, Attack, Defense, SpAttack, SpDefense, Speed)
+    -   [x] Create `EVSet` class to store EVs per stat (0-252 per stat, 510 total)
+    -   [x] Add `IVs` and `EVs` properties to `PokemonInstance`
+    -   [x] Update `StatCalculator` to use stored IVs/EVs instead of defaults
+    -   [x] Update `PokemonInstanceBuilder` to generate random IVs and maximum EVs
+    -   [x] Add fluent builder methods for custom IV/EV configuration
+    -   **Note**: IVs are randomly generated (0-31), EVs are always maximum (252/252/4/0/0/0) as all Pokemon will have max EVs in this game
 
--   [ ] **Breeding System** - Breeding compatibility and egg hatching
-    -   Create `EggGroup` enum (Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered)
-    -   Add `EggGroups` property to `PokemonSpeciesData` (list of EggGroup)
-    -   Add `EggCycles` property to `PokemonSpeciesData` (cycles to hatch egg)
-    -   Implement breeding compatibility logic
-    -   Implement IV inheritance from parents
-    -   Implement egg move inheritance
-    -   **Note**: Currently only `BaseFriendship` has default 120 for "hatched from egg"
+-   [x] **Breeding System** ✅ Complete - Breeding compatibility and egg hatching
+    -   [x] Create `EggGroup` enum (Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered)
+    -   [x] Add `EggGroups` property to `PokemonSpeciesData` (list of EggGroup)
+    -   [x] Add `EggCycles` property to `PokemonSpeciesData` (cycles to hatch egg)
+    -   [x] Implement breeding compatibility logic (`CanBreedWith`, `IsInEggGroup`, `CannotBreed`)
+    -   [ ] Implement IV inheritance from parents (future enhancement)
+    -   [ ] Implement egg move inheritance (future enhancement)
+    -   **Note**: Core breeding compatibility system is complete. IV inheritance and egg moves are future enhancements.
 
--   [ ] **Ownership/Tracking Fields** - Track Pokemon origin and ownership
-    -   Add `OriginalTrainer` (string?) to `PokemonInstance`
-    -   Add `TrainerId` (int?) to `PokemonInstance`
-    -   Add `MetLevel` (int?) to `PokemonInstance`
-    -   Add `MetLocation` (string?) to `PokemonInstance`
-    -   Add `MetDate` (DateTime?) to `PokemonInstance`
-    -   **Note**: Useful for tracking Pokemon origin, trading, and ownership
+-   [x] **Ownership/Tracking Fields** ✅ Complete - Track Pokemon origin and ownership
+    -   [x] Add `OriginalTrainer` (string?) to `PokemonInstance`
+    -   [x] Add `TrainerId` (int?) to `PokemonInstance`
+    -   [x] Add `MetLevel` (int?) to `PokemonInstance`
+    -   [x] Add `MetLocation` (string?) to `PokemonInstance`
+    -   [x] Add `MetDate` (DateTime?) to `PokemonInstance`
+    -   **Note**: All ownership/tracking fields are implemented and can be set/get. Useful for tracking Pokemon origin, trading, and ownership.
 
 -   [ ] **Advanced Pokedex Features** (if needed)
     -   Multiple Pokedex entries by generation

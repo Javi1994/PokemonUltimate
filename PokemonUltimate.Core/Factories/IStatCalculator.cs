@@ -1,4 +1,5 @@
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Core.Factories
 {
@@ -24,6 +25,11 @@ namespace PokemonUltimate.Core.Factories
         int CalculateHP(int baseHP, int level, int iv, int ev);
 
         /// <summary>
+        /// Calculates HP stat using IVSet and EVSet from PokemonInstance.
+        /// </summary>
+        int CalculateHP(int baseHP, int level, IVSet ivs, EVSet evs);
+
+        /// <summary>
         /// Calculates a non-HP stat using full Gen3+ formula with max IVs/EVs.
         /// Formula: floor((floor((StatFormulaBase * Base + IV + floor(EV/EVBonusDivisor)) * Level / StatFormulaDivisor) + StatFormulaBonus) * Nature)
         /// </summary>
@@ -33,6 +39,11 @@ namespace PokemonUltimate.Core.Factories
         /// Calculates a non-HP stat with custom IVs/EVs (for testing).
         /// </summary>
         int CalculateStat(int baseStat, int level, Nature nature, Stat stat, int iv, int ev);
+
+        /// <summary>
+        /// Calculates a non-HP stat using IVSet and EVSet from PokemonInstance.
+        /// </summary>
+        int CalculateStat(int baseStat, int level, Nature nature, Stat stat, IVSet ivs, EVSet evs);
 
         /// <summary>
         /// Gets the stat stage multiplier for battle calculations.

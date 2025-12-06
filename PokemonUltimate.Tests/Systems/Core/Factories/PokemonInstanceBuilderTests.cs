@@ -726,6 +726,7 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
             // ((2*35 + 31 + 63) * 50 / 100) + 50 + 10 = 82 + 60 = 142
             var pokemon = Pokemon.Create(_pikachu, 50)
                 .WithNeutralNature()
+                .WithPerfectIVs()
                 .Build();
 
             Assert.That(pokemon.MaxHP, Is.EqualTo(142));

@@ -65,6 +65,10 @@ namespace PokemonUltimate.Core.Factories
         private int? _overrideSpDefense;
         private int? _overrideSpeed;
 
+        // IVs and EVs
+        private IVSet _ivs;
+        private EVSet _evs;
+
         #region Constructor
 
         private PokemonInstanceBuilder(PokemonSpeciesData species, int level, IRandomProvider randomProvider = null)
@@ -731,6 +735,85 @@ namespace PokemonUltimate.Core.Factories
 
         #endregion
 
+        #region IVs and EVs Configuration
+
+        /// <summary>
+        /// Set specific IVs for the Pokemon.
+        /// </summary>
+        public PokemonInstanceBuilder WithIVs(IVSet ivs)
+        {
+            _ivs = ivs ?? throw new ArgumentNullException(nameof(ivs));
+            return this;
+        }
+
+        /// <summary>
+        /// Set specific IVs for each stat.
+        /// </summary>
+        public PokemonInstanceBuilder WithIVs(int hp, int attack, int defense, int spAttack, int spDefense, int speed)
+        {
+            _ivs = new IVSet(hp, attack, defense, spAttack, spDefense, speed);
+            return this;
+        }
+
+        /// <summary>
+        /// Set perfect IVs (all 31).
+        /// </summary>
+        public PokemonInstanceBuilder WithPerfectIVs()
+        {
+            _ivs = IVSet.Perfect();
+            return this;
+        }
+
+        /// <summary>
+        /// Set zero IVs (all 0).
+        /// </summary>
+        public PokemonInstanceBuilder WithZeroIVs()
+        {
+            _ivs = IVSet.Zero();
+            return this;
+        }
+
+        /// <summary>
+        /// Set specific EVs for the Pokemon.
+        /// Note: In this game, EVs are always maximum by default for roguelike experience.
+        /// </summary>
+        public PokemonInstanceBuilder WithEVs(EVSet evs)
+        {
+            _evs = evs ?? throw new ArgumentNullException(nameof(evs));
+            return this;
+        }
+
+        /// <summary>
+        /// Set specific EVs for each stat.
+        /// Note: Total must not exceed 510.
+        /// </summary>
+        public PokemonInstanceBuilder WithEVs(int hp, int attack, int defense, int spAttack, int spDefense, int speed)
+        {
+            _evs = new EVSet(hp, attack, defense, spAttack, spDefense, speed);
+            return this;
+        }
+
+        /// <summary>
+        /// Set maximum EVs (all 252).
+        /// This is the default for this game.
+        /// </summary>
+        public PokemonInstanceBuilder WithMaximumEVs()
+        {
+            _evs = EVSet.Maximum();
+            return this;
+        }
+
+        /// <summary>
+        /// Set zero EVs (all 0).
+        /// </summary>
+        public PokemonInstanceBuilder WithZeroEVs()
+        {
+            _evs = EVSet.Zero();
+            return this;
+        }
+
+        #endregion
+
         #region Build
 
         /// <summary>
@@ -747,8 +830,12 @@ namespace PokemonUltimate.Core.Factories
             // Determine gender
             Gender gender = DetermineGender();
 
-            // Calculate stats
-            var stats = CalculateStats(nature);
+            // Generate IVs and EVs if not provided
+            IVSet ivs = _ivs ?? GenerateRandomIVs();
+            EVSet evs = _evs ?? EVSet.Maximum(); // Always maximum EVs for roguelike experience
+
+            // Calculate stats using IVs and EVs
+            var stats = CalculateStats(nature, ivs, evs);
 
             // Select moves
             List<MoveInstance> moves = SelectMoves();
@@ -763,7 +850,7 @@ namespace PokemonUltimate.Core.Factories
             var pokemon = new PokemonInstance(
                 _species, _level, stats.HP, stats.Attack, stats.Defense,
                 stats.SpAttack, stats.SpDefense, stats.Speed, nature, gender, moves,
-                _friendship, isShiny, ability, _heldItem);
+                _friendship, isShiny, ability, _heldItem, ivs, evs);
 
             // Apply optional configurations
             ApplyOptionalConfigurations(pokemon);
@@ -873,18 +960,35 @@ namespace PokemonUltimate.Core.Factories
         }
 
         /// <summary>
-        /// Calculates all stats for the Pokemon instance.
+        /// Calculates all stats for the Pokemon instance using IVs and EVs.
         /// </summary>
-        private (int HP, int Attack, int Defense, int SpAttack, int SpDefense, int Speed) CalculateStats(Nature nature)
+        private (int HP, int Attack, int Defense, int SpAttack, int SpDefense, int Speed) CalculateStats(Nature nature, IVSet ivs, EVSet evs)
         {
-            int hp = _overrideMaxHP ?? StatCalculator.CalculateHP(_species.BaseStats.HP, _level);
-            int attack = _overrideAttack ?? StatCalculator.CalculateStat(_species.BaseStats.Attack, _level, nature, Stat.Attack);
-            int defense = _overrideDefense ?? StatCalculator.CalculateStat(_species.BaseStats.Defense, _level, nature, Stat.Defense);
-            int spAttack = _overrideSpAttack ?? StatCalculator.CalculateStat(_species.BaseStats.SpAttack, _level, nature, Stat.SpAttack);
-            int spDefense = _overrideSpDefense ?? StatCalculator.CalculateStat(_species.BaseStats.SpDefense, _level, nature, Stat.SpDefense);
-            int speed = _overrideSpeed ?? StatCalculator.CalculateStat(_species.BaseStats.Speed, _level, nature, Stat.Speed);
+            var calculator = StatCalculator.Default;
+
+            int hp = _overrideMaxHP ?? calculator.CalculateHP(_species.BaseStats.HP, _level, ivs, evs);
+            int attack = _overrideAttack ?? calculator.CalculateStat(_species.BaseStats.Attack, _level, nature, Stat.Attack, ivs, evs);
+            int defense = _overrideDefense ?? calculator.CalculateStat(_species.BaseStats.Defense, _level, nature, Stat.Defense, ivs, evs);
+            int spAttack = _overrideSpAttack ?? calculator.CalculateStat(_species.BaseStats.SpAttack, _level, nature, Stat.SpAttack, ivs, evs);
+            int spDefense = _overrideSpDefense ?? calculator.CalculateStat(_species.BaseStats.SpDefense, _level, nature, Stat.SpDefense, ivs, evs);
+            int speed = _overrideSpeed ?? calculator.CalculateStat(_species.BaseStats.Speed, _level, nature, Stat.Speed, ivs, evs);
 
             return (hp, attack, defense, spAttack, spDefense, speed);
+        }
+
+        /// <summary>
+        /// Generates random IVs for each stat (0-31).
+        /// </summary>
+        private IVSet GenerateRandomIVs()
+        {
+            return new IVSet(
+                _randomProvider.Next(IVSet.MinIV, IVSet.MaxIV + 1), // HP
+                _randomProvider.Next(IVSet.MinIV, IVSet.MaxIV + 1), // Attack
+                _randomProvider.Next(IVSet.MinIV, IVSet.MaxIV + 1), // Defense
+                _randomProvider.Next(IVSet.MinIV, IVSet.MaxIV + 1), // SpAttack
+                _randomProvider.Next(IVSet.MinIV, IVSet.MaxIV + 1), // SpDefense
+                _randomProvider.Next(IVSet.MinIV, IVSet.MaxIV + 1)  // Speed
+            );
         }
 
         /// <summary>

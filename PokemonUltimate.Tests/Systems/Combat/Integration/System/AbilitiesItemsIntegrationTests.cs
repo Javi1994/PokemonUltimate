@@ -48,12 +48,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
 
             var playerParty = new[]
             {
-                PokemonFactory.Create(PokemonCatalog.Pikachu, 50),
-                PokemonFactory.Create(PokemonCatalog.Bulbasaur, 50)
+                PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Pikachu, 50).WithPerfectIVs().Build(),
+                PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Bulbasaur, 50).WithPerfectIVs().Build()
             };
             playerParty[1].SetAbility(intimidateAbility);
 
-            var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+            var enemyParty = new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Charmander, 50).WithPerfectIVs().Build() };
             var enemySlot = _engine.Field?.EnemySide?.Slots?[0];
 
             _engine.Initialize(_rules, playerParty, enemyParty,
@@ -85,12 +85,12 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
         public async Task CombatEngine_EndOfTurn_WithLeftovers_HealsPokemon()
         {
             // Arrange
-            var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+            var playerParty = new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Pikachu, 50).WithPerfectIVs().Build() };
             playerParty[0].HeldItem = ItemCatalog.Leftovers;
             int maxHP = playerParty[0].MaxHP;
             playerParty[0].CurrentHP = maxHP - 20; // Damage Pokemon
 
-            var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+            var enemyParty = new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Charmander, 50).WithPerfectIVs().Build() };
 
             _engine.Initialize(_rules, playerParty, enemyParty,
                 new TestActionProvider(new MessageAction("Pass")),
@@ -113,13 +113,13 @@ namespace PokemonUltimate.Tests.Systems.Combat.Integration.System
         public async Task CombatEngine_EndOfTurn_StatusDamageAndLeftovers_BothProcess()
         {
             // Arrange
-            var playerParty = new[] { PokemonFactory.Create(PokemonCatalog.Pikachu, 50) };
+            var playerParty = new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Pikachu, 50).WithPerfectIVs().Build() };
             playerParty[0].HeldItem = ItemCatalog.Leftovers;
             playerParty[0].Status = PersistentStatus.Burn; // Burn deals damage
             int maxHP = playerParty[0].MaxHP;
             playerParty[0].CurrentHP = maxHP - 10; // Damage Pokemon
 
-            var enemyParty = new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) };
+            var enemyParty = new[] { PokemonUltimate.Core.Factories.Pokemon.Create(PokemonCatalog.Charmander, 50).WithPerfectIVs().Build() };
 
             _engine.Initialize(_rules, playerParty, enemyParty,
                 new TestActionProvider(new MessageAction("Pass")),

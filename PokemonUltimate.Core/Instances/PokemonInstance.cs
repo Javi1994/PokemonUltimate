@@ -130,6 +130,54 @@ namespace PokemonUltimate.Core.Instances
         /// </summary>
         public bool IsShiny { get; }
 
+        /// <summary>
+        /// Individual Values (IVs) for this Pokemon instance.
+        /// IVs range from 0-31 for each stat and are determined when the Pokemon is created.
+        /// </summary>
+        public IVSet IVs { get; }
+
+        /// <summary>
+        /// Effort Values (EVs) for this Pokemon instance.
+        /// EVs range from 0-252 per stat, with a maximum total of 510.
+        /// In this game, EVs are always set to maximum (252 per stat) for a roguelike experience.
+        /// </summary>
+        public EVSet EVs { get; }
+
+        #endregion
+
+        #region Ownership & Tracking
+
+        /// <summary>
+        /// Original Trainer's name (OT) - the trainer who first obtained this Pokemon.
+        /// Null for wild Pokemon or if not tracked.
+        /// </summary>
+        public string OriginalTrainer { get; set; }
+
+        /// <summary>
+        /// Trainer ID (TID) - unique identifier for the original trainer.
+        /// Used for tracking ownership and determining shininess in some games.
+        /// Null if not tracked.
+        /// </summary>
+        public int? TrainerId { get; set; }
+
+        /// <summary>
+        /// Level at which this Pokemon was met/caught.
+        /// Null if not tracked.
+        /// </summary>
+        public int? MetLevel { get; set; }
+
+        /// <summary>
+        /// Location where this Pokemon was met/caught (e.g., "Route 1", "Cerulean Cave").
+        /// Null if not tracked.
+        /// </summary>
+        public string MetLocation { get; set; }
+
+        /// <summary>
+        /// Date when this Pokemon was met/caught.
+        /// Null if not tracked.
+        /// </summary>
+        public DateTime? MetDate { get; set; }
+
         #endregion
 
         #region Moves
@@ -281,7 +329,9 @@ namespace PokemonUltimate.Core.Instances
             int? friendship = null,
             bool isShiny = false,
             AbilityData ability = null,
-            ItemData heldItem = null)
+            ItemData heldItem = null,
+            IVSet ivs = null,
+            EVSet evs = null)
         {
             Species = species ?? throw new ArgumentNullException(nameof(species));
             InstanceId = Guid.NewGuid().ToString();
@@ -306,6 +356,10 @@ namespace PokemonUltimate.Core.Instances
             int initialFriendship = friendship ?? species.BaseFriendship;
             Friendship = initialFriendship.ClampFriendship();
             IsShiny = isShiny;
+
+            // IVs and EVs
+            IVs = ivs ?? new IVSet(); // Default: random IVs will be set by builder
+            EVs = evs ?? new EVSet(); // Default: maximum EVs (252 per stat)
 
             // Moves
             Moves = moves ?? new List<MoveInstance>();

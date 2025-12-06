@@ -246,7 +246,7 @@
 
 - Improve code without changing behavior
 - Ensure all tests still pass
-- Follow `docs/ai/guidelines/project_guidelines.md`
+- Follow coding rules in `.cursorrules` and `docs/ai/guidelines/`
 - Avoid `docs/ai/anti-patterns.md`
 
 ---
@@ -347,7 +347,7 @@ public void Method(int value) {
 | Feature numbers/names | `docs/features_master_list_index.md` ⭐ **MASTER REFERENCE** |
 | Feature documentation standard | `docs/feature_documentation_standard.md` |
 | Feature naming in code | `docs/ai/guidelines/feature_naming_in_code.md` ⭐ **MANDATORY** |
-| Coding rules | `docs/ai/guidelines/project_guidelines.md` |
+| Coding rules | See `.cursorrules` and `docs/ai/guidelines/` |
 | What NOT to do | `docs/ai/anti-patterns.md` |
 | Code examples | `docs/ai/examples/good_code.md` |
 | Test examples | `docs/ai/examples/good_tests.md` |

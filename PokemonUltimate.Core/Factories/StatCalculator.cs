@@ -2,6 +2,7 @@ using System;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Instances;
 
 namespace PokemonUltimate.Core.Factories
 {
@@ -89,6 +90,19 @@ namespace PokemonUltimate.Core.Factories
         }
 
         /// <summary>
+        /// Calculates HP stat using IVSet and EVSet from PokemonInstance.
+        /// </summary>
+        int IStatCalculator.CalculateHP(int baseHP, int level, IVSet ivs, EVSet evs)
+        {
+            if (ivs == null)
+                throw new ArgumentNullException(nameof(ivs));
+            if (evs == null)
+                throw new ArgumentNullException(nameof(evs));
+
+            return CalculateHPInternal(baseHP, level, ivs.HP, evs.HP);
+        }
+
+        /// <summary>
         /// Internal implementation of HP calculation.
         /// </summary>
         private int CalculateHPInternal(int baseHP, int level, int iv, int ev)
@@ -121,6 +135,21 @@ namespace PokemonUltimate.Core.Factories
         /// </summary>
         int IStatCalculator.CalculateStat(int baseStat, int level, Nature nature, Stat stat, int iv, int ev)
         {
+            return CalculateStatInternal(baseStat, level, nature, stat, iv, ev);
+        }
+
+        /// <summary>
+        /// Calculates a non-HP stat using IVSet and EVSet from PokemonInstance.
+        /// </summary>
+        int IStatCalculator.CalculateStat(int baseStat, int level, Nature nature, Stat stat, IVSet ivs, EVSet evs)
+        {
+            if (ivs == null)
+                throw new ArgumentNullException(nameof(ivs));
+            if (evs == null)
+                throw new ArgumentNullException(nameof(evs));
+
+            int iv = ivs.GetIV(stat);
+            int ev = evs.GetEV(stat);
             return CalculateStatInternal(baseStat, level, nature, stat, iv, ev);
         }
 
