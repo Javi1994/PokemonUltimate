@@ -182,6 +182,26 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 ---
 
+## Development Tools
+
+### Feature 6: Development Tools
+
+**Folder**: `docs/features/6-development-tools/`  
+**Status**: 🎯 In Progress  
+**Description**: Windows Forms debugger applications for testing and analyzing the Pokemon battle system
+
+**Sub-Features**:
+
+- **Existing**: Battle Debugger, Move Debugger, Type Matchup Debugger ✅ Complete
+- **6.1**: Stat Calculator Debugger - Calculate and visualize Pokemon stats with different configurations ✅ Complete
+- **6.2**: Damage Calculator Debugger - Step-by-step damage calculation pipeline visualization ⏳ Planned
+- **6.3**: Status Effect Debugger - Test status effects and their interactions ⏳ Planned
+- **6.4**: Turn Order Debugger - Visualize turn order determination with speed and priority ⏳ Planned
+
+**Related Roadmap**: `docs/features/6-development-tools/roadmap.md`
+
+---
+
 ## Feature Reference Table
 
 | #     | Feature Name      | Folder                 | Status           | Roadmap                                                  |
@@ -191,6 +211,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 | **3** | Content Expansion | `3-content-expansion/` | 🎯 In Progress   | [roadmap.md](../features/3-content-expansion/roadmap.md) |
 | **4** | Unity Integration | `4-unity-integration/` | ⏳ Planned       | [roadmap.md](../features/4-unity-integration/roadmap.md) |
 | **5** | Game Features     | `5-game-features/`     | ⏳ Planned       | [roadmap.md](../features/5-game-features/roadmap.md)     |
+| **6** | Development Tools | `6-development-tools/` | 🎯 In Progress   | [roadmap.md](../features/6-development-tools/roadmap.md) |
 
 ---
 

@@ -11,9 +11,11 @@ namespace PokemonUltimate.UnifiedDebuggerUI
         private TabPage tabBattle;
         private TabPage tabMove;
         private TabPage tabTypeMatchup;
+        private TabPage tabStatCalculator;
         private BattleDebuggerTab battleDebuggerTab;
         private MoveDebuggerTab moveDebuggerTab;
         private TypeMatchupDebuggerTab typeMatchupDebuggerTab;
+        private StatCalculatorDebuggerTab statCalculatorDebuggerTab;
 
         public MainForm()
         {
@@ -26,9 +28,11 @@ namespace PokemonUltimate.UnifiedDebuggerUI
             this.tabBattle = new TabPage();
             this.tabMove = new TabPage();
             this.tabTypeMatchup = new TabPage();
+            this.tabStatCalculator = new TabPage();
             this.battleDebuggerTab = new BattleDebuggerTab();
             this.moveDebuggerTab = new MoveDebuggerTab();
             this.typeMatchupDebuggerTab = new TypeMatchupDebuggerTab();
+            this.statCalculatorDebuggerTab = new StatCalculatorDebuggerTab();
 
             this.SuspendLayout();
 
@@ -61,11 +65,18 @@ namespace PokemonUltimate.UnifiedDebuggerUI
             this.typeMatchupDebuggerTab.Dock = DockStyle.Fill;
             this.tabTypeMatchup.Controls.Add(this.typeMatchupDebuggerTab);
 
+            // Stat Calculator Tab
+            this.tabStatCalculator.Text = "Stat Calculator";
+            this.tabStatCalculator.Padding = new Padding(5);
+            this.statCalculatorDebuggerTab.Dock = DockStyle.Fill;
+            this.tabStatCalculator.Controls.Add(this.statCalculatorDebuggerTab);
+
             // Add tabs to TabControl
             this.mainTabControl.TabPages.AddRange(new TabPage[] {
                 this.tabBattle,
                 this.tabMove,
-                this.tabTypeMatchup
+                this.tabTypeMatchup,
+                this.tabStatCalculator
             });
 
             // Add TabControl to Form

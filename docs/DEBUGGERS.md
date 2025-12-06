@@ -15,10 +15,11 @@ The **PokemonUltimate.UnifiedDebuggerUI** is a unified Windows Forms application
 dotnet run --project PokemonUltimate.UnifiedDebuggerUI
 ```
 
-The application opens with three tabs:
+The application opens with four tabs:
 - **Battle Debugger** - Run multiple battles and see statistics
 - **Move Debugger** - Test moves multiple times and see statistics
 - **Type Matchup** - Calculate type effectiveness
+- **Stat Calculator** - Calculate and visualize Pokemon stats with different configurations
 
 ## Debugger Tabs
 
@@ -172,13 +173,46 @@ All debugger tabs provide:
 ✅ **Tabbed Navigation** - Easy switching between debuggers  
 ✅ **Shared Resources** - Common runners and utilities  
 
+### Stat Calculator Debugger Tab
+
+**Purpose**: Calculate and visualize Pokemon stats with different configurations
+
+**Features**:
+- ✅ Select Pokemon species and level
+- ✅ Configure Nature (all 25 natures)
+- ✅ Configure IVs (0-31 per stat)
+- ✅ Configure EVs (0-252 per stat, 510 total)
+- ✅ Display all calculated stats (HP, Attack, Defense, SpAttack, SpDefense, Speed)
+- ✅ Show breakdown of calculation (base, IV, EV, Nature multiplier)
+- ✅ Visual highlighting of Nature-affected stats
+
+**Configuration**:
+- Select Pokemon species
+- Set level (1-100)
+- Select Nature
+- Set IVs for each stat (0-31)
+- Set EVs for each stat (0-252)
+- Real-time EV total validation (max 510)
+
+**Results Tabs**:
+- **Summary**: Formatted text with Pokemon info, final stats, Nature effects
+- **Stats Breakdown**: DataGridView showing detailed calculation breakdown for each stat
+
+**Use Cases**:
+- Understanding how stats are calculated
+- Testing different builds (IVs/EVs/Nature combinations)
+- Validating stat calculations
+- Comparing stat values at different levels
+
 ## Future Enhancements
 
 Planned additions to the unified debugger:
 
+- **Damage Calculator Debugger Tab** - Step-by-step damage pipeline visualization
+- **Status Effect Debugger Tab** - Test status effects and their interactions
+- **Turn Order Debugger Tab** - Visualize turn order determination
 - **Ability Debugger Tab** - Test abilities and their effects
 - **Item Debugger Tab** - Test held items and their effects
-- **Status Debugger Tab** - Test status effects and their interactions
 - **Weather Debugger Tab** - Test weather effects
 - **Terrain Debugger Tab** - Test terrain effects
 - **Export Results** - Save results to CSV/JSON
