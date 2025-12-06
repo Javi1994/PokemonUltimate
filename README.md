@@ -2,9 +2,10 @@
 
 > **An experiment in AI-assisted game development**: A complete Pokémon battle engine built entirely through structured AI pair programming.
 
-[![Tests](https://img.shields.io/badge/tests-2,075%2B%20passing-brightgreen)](https://github.com)
+[![Tests](https://img.shields.io/badge/tests-3,210%2B%20passing-brightgreen)](https://github.com)
 [![AI Generated](https://img.shields.io/badge/AI%20Generated-100%25-blueviolet)](https://github.com)
 [![Warnings](https://img.shields.io/badge/warnings-0-success)](https://github.com)
+[![Unity Integration](https://img.shields.io/badge/Unity-Basic%20Complete-green)](https://github.com)
 
 ---
 
@@ -28,14 +29,17 @@ This project answers the question:
 
 | Metric | Value |
 |--------|-------|
-| **Lines of Code** | ~8,000+ |
-| **Test Cases** | 2,075+ passing |
-| **Integration Tests** | 66 tests |
+| **Lines of Code** | ~15,000+ |
+| **Test Cases** | 3,210+ passing |
+| **Integration Tests** | 90+ tests |
 | **Test Pass Rate** | 100% |
 | **Compiler Warnings** | 0 |
-| **Architecture Docs** | 20+ files |
-| **Workflow Guides** | 5+ comprehensive guides |
+| **Architecture Docs** | 30+ files |
+| **Workflow Guides** | 8+ comprehensive guides |
 | **Coding Rules** | 24+ enforced |
+| **Unity Integration** | Basic Complete (Phases 4.1-4.3) |
+| **Pokemon Catalog** | 26 Pokemon (Gen 1) |
+| **Move Catalog** | 36 Moves (12 types) |
 
 ---
 
@@ -163,9 +167,8 @@ docs/
 | **Feature 1: Game Data** | `docs/features/1-game-data/roadmap.md` | Complete data structure fields | ✅ Core Complete |
 | **Feature 2: Combat System** | `docs/features/2-combat-system/roadmap.md` | Core combat phases (2.1-2.19) | ✅ Core Complete |
 | **Feature 3: Content Expansion** | `docs/features/3-content-expansion/roadmap.md` | Pokemon, Moves, Items expansion | 🎯 In Progress |
-| **Feature 4: Unity Integration** | `docs/features/4-unity-integration/roadmap.md` | Unity UI and integration | ⏳ Planned |
+| **Feature 4: Unity Integration** | `docs/features/4-unity-integration/roadmap.md` | Unity UI and integration | ✅ Basic Complete (4.1-4.3) |
 | **Feature 5: Game Features** | `docs/features/5-game-features/roadmap.md` | Progression, roguelike, meta-game | ⏳ Planned |
-| **Testing** | `docs/features/testing/roadmap.md` | Test coverage and quality improvements | ⏳ Planned |
 
 See `docs/features/README.md` for overview of all features.
 
@@ -311,7 +314,7 @@ Show the AI what good code looks like in `docs/ai/examples/`:
 
 | Finding | Details |
 |---------|---------|
-| ✅ **Consistency is possible** | With proper documentation, AI maintains patterns across 8000+ lines |
+| ✅ **Consistency is possible** | With proper documentation, AI maintains patterns across 15,000+ lines |
 | ✅ **TDD works** | AI follows test-first development when explicitly instructed |
 | ✅ **Edge cases are thorough** | AI-generated edge case tests often reveal missing functionality |
 | ✅ **Documentation stays current** | AI updates docs as it implements features |
@@ -332,16 +335,18 @@ Everything below this line describes the actual Pokémon battle engine that was 
 
 ## 🎯 Game Overview
 
-PokemonUltimate is a battle-focused Pokémon game engine built with clean architecture principles. The core logic is completely testable without Unity, making it perfect for both game development and battle simulation.
+PokemonUltimate is a battle-focused Pokémon game engine built with clean architecture principles. The core logic is completely testable without Unity, making it perfect for both game development and battle simulation. The engine is now integrated with Unity, providing a visual battle experience with UI components and IBattleView implementation.
 
 ### Key Features
 
-- ✅ **Complete Combat System** - Full battle mechanics with actions, turn order, damage calculation
-- ✅ **Test-Driven Development** - 2,075+ passing tests with comprehensive coverage
+- ✅ **Complete Combat System** - Full battle mechanics with actions, turn order, damage calculation, abilities, items, weather, terrain, hazards
+- ✅ **Test-Driven Development** - 3,210+ passing tests with comprehensive coverage
 - ✅ **Modular Architecture** - Clean separation between Core, Combat, and Content
 - ✅ **Accurate Game Mechanics** - Gen 6+ type chart, Gen 3+ stat formulas, official damage calculations
-- ✅ **Integration Testing** - 66 integration tests verifying system interactions
+- ✅ **Integration Testing** - 90+ integration tests verifying system interactions
 - ✅ **AI vs AI Battles** - Built-in AI providers for automated testing and demos
+- ✅ **Unity Integration** - Basic UI foundation and IBattleView implementation complete
+- ✅ **Content System** - 26 Pokemon, 36 Moves, 35 Abilities, 23 Items cataloged
 
 ---
 
@@ -353,23 +358,36 @@ PokemonUltimate/
 │   ├── Blueprints/    # Immutable data structures
 │   ├── Instances/     # Mutable runtime state
 │   ├── Effects/       # Move effects (IMoveEffect)
+│   ├── Factories/     # Object creation (DI-based)
+│   ├── Registry/      # Data access layer
 │   └── Constants/     # Centralized strings
 │
 ├── Combat/            # Battle system
 │   ├── Engine/       # CombatEngine, BattleQueue, TurnOrderResolver
 │   ├── Actions/      # BattleAction implementations
-│   ├── Damage/      # DamagePipeline with modular steps
-│   ├── AI/          # RandomAI, AlwaysAttackAI
-│   └── Providers/   # IActionProvider, PlayerInputProvider
+│   ├── Damage/       # DamagePipeline with modular steps
+│   ├── Field/        # BattleField, BattleSide, BattleSlot
+│   ├── Events/       # BattleTrigger system, IBattleListener
+│   ├── AI/           # RandomAI, AlwaysAttackAI
+│   └── Providers/    # IActionProvider, PlayerInputProvider
 │
-├── Content/          # Game data definitions
+├── Content/           # Game data definitions
 │   └── Catalogs/     # Pokemon, Move, Ability, Item definitions
 │
-├── Tests/            # Comprehensive test suite
-│   ├── [Module]/     # Mirrors source structure
-│   └── Integration/  # System integration tests
+├── Tests/             # Comprehensive test suite
+│   ├── Systems/      # System tests (HOW systems work)
+│   ├── Blueprints/   # Data structure tests (HOW data is structured)
+│   └── Data/         # Content tests (WHAT data contains)
 │
-└── BattleDemo/       # Visual AI vs AI battle simulator
+├── BattleDemo/       # Visual AI vs AI battle simulator
+│
+└── PokemonUltimateUnity/  # Unity project
+    ├── Assets/
+    │   ├── Plugins/   # Battle engine DLLs
+    │   ├── Scripts/   # Unity C# scripts
+    │   │   ├── Battle/  # UnityBattleView, BattleManager
+    │   │   └── UI/      # HPBar, PokemonDisplay, BattleDialog
+    │   └── Scenes/    # BattleScene
 ```
 
 ---
@@ -380,6 +398,7 @@ PokemonUltimate/
 
 - .NET SDK 8.0 or later
 - IDE with C# support (Rider, Visual Studio, VS Code)
+- Unity 6 (or Unity 2021.3+) - For Unity integration (optional)
 
 ### Building
 
@@ -396,6 +415,12 @@ dotnet test
 
 # Run battle demo (AI vs AI battles)
 dotnet run --project PokemonUltimate.BattleDemo
+
+# Build DLLs for Unity (optional)
+dotnet build -c Release
+# DLLs will be in: PokemonUltimate.Core/bin/Release/netstandard2.1/
+#                   PokemonUltimate.Combat/bin/Release/netstandard2.1/
+#                   PokemonUltimate.Content/bin/Release/netstandard2.1/
 ```
 
 ---
@@ -426,16 +451,60 @@ dotnet run --project PokemonUltimate.BattleDemo
 - ✅ Combat Engine (Full battle loop)
 - ✅ Integration (AI providers, Player input, Full battles)
 - ✅ End-of-Turn Effects (Status damage: Burn, Poison, Toxic)
+- ✅ Abilities & Items (BattleTrigger system, AbilityListener, ItemListener)
+- ✅ Weather System (9 weather conditions with damage modifiers)
+- ✅ Terrain System (4 terrains with damage modifiers and healing)
+- ✅ Hazards System (Stealth Rock, Spikes, Toxic Spikes, Sticky Web)
+- ✅ Advanced Abilities & Items (29+ abilities, 21+ items tested)
+
+**Phase 4: Unity Integration** ✅ Basic Complete
+- ✅ Unity Project Setup (DLL integration, project structure)
+- ✅ UI Foundation (HPBar, PokemonDisplay, BattleDialog, scene generator)
+- ✅ IBattleView Implementation (UnityBattleView, BattleManager, UnityBattleLogger)
+- ⏳ Player Input System (Phase 4.4 - Planned)
+- ⏳ Animations & Visual Effects (Phase 4.5 - Planned)
+- ⏳ Audio System (Phase 4.6 - Planned)
 
 ### 🎯 Next Steps
 
 See detailed roadmaps for implementation plans:
-- **Feature 1: Game Data**: `docs/features/1-game-data/roadmap.md` (Sub-features 1.14-1.15: Variants, Pokedex fields)
-- **Feature 2: Combat System**: `docs/features/2-combat-system/roadmap.md` (Phases 2.12-2.19: Extended features)
-- **Feature 3: Content Expansion**: `docs/features/3-content-expansion/roadmap.md` (Phases 3.1-3.8: Pokemon, Moves, Items, Status Effects, Field Conditions)
-- **Feature 4: Unity Integration**: `docs/features/4-unity-integration/roadmap.md` (Phases 4.1-4.8: UI and visual integration)
-- **Feature 5: Game Features**: `docs/features/5-game-features/roadmap.md` (Phases 5.1-5.6: Progression, roguelike, meta-game)
+- **Feature 1: Game Data**: `docs/features/1-game-data/roadmap.md` ✅ Core Complete (Optional: IVs/EVs, Breeding, Ownership tracking)
+- **Feature 2: Combat System**: `docs/features/2-combat-system/roadmap.md` ✅ Core Complete (Optional: Advanced moves, Battle formats)
+- **Feature 3: Content Expansion**: `docs/features/3-content-expansion/roadmap.md` 🎯 In Progress (26/151 Gen 1 Pokemon, 36 moves, expanding)
+- **Feature 4: Unity Integration**: `docs/features/4-unity-integration/roadmap.md` ✅ Basic Complete (Next: Player Input, Animations, Audio)
+- **Feature 5: Game Features**: `docs/features/5-game-features/roadmap.md` ⏳ Planned (Progression, roguelike, meta-game)
 - **Testing**: Each feature has `testing.md`. Shared strategy: `docs/ai/testing_structure_definition.md`
+
+---
+
+## 🎮 Unity Integration
+
+The engine is integrated with Unity for visual battles. Basic implementation includes:
+
+### ✅ Completed (Phases 4.1-4.3)
+
+- **DLL Integration**: Battle engine DLLs imported as Unity plugins
+- **UI Foundation**: 
+  - `HPBar` - Visual HP representation
+  - `PokemonDisplay` - Pokemon sprite, name, and level display
+  - `BattleDialog` - Battle message system with typewriter effect
+  - `BattleSceneGenerator` - Automated scene creation tool
+- **IBattleView Implementation**:
+  - `UnityBattleView` - Full IBattleView interface implementation
+  - `BattleManager` - Battle orchestration and lifecycle
+  - `UnityBattleLogger` - Unity-specific logging
+
+### 🎯 Using Unity Integration
+
+1. **Open Unity Project**: Open `PokemonUltimateUnity/` in Unity Editor
+2. **Build DLLs**: Run `dotnet build -c Release` to generate DLLs
+3. **Copy DLLs**: Copy DLLs to `PokemonUltimateUnity/Assets/Plugins/`
+4. **Generate Scene**: Use `PokemonUltimate > Generate Battle Scene` menu
+5. **Run Battle**: Attach `BattleManager` to a GameObject and start a battle
+
+See [`docs/features/4-unity-integration/README.md`](docs/features/4-unity-integration/README.md) for complete documentation.
+
+---
 
 ---
 
@@ -478,10 +547,14 @@ See detailed roadmaps for implementation plans:
 
 ### Battle Mechanics
 - Turn order: Priority → Speed → Random
-- Damage pipeline: Base → Crit → Random → STAB → Type → Status
-- Status effects: Burn, Poison, Toxic, Sleep, Freeze, Paralysis
+- Damage pipeline: Base → Crit → Random → STAB → Type → Status (modular 6-step pipeline)
+- Status effects: Burn, Poison, Toxic, Sleep, Freeze, Paralysis (6 persistent + 9 volatile)
 - Stat stages: -6 to +6 with proper multipliers
-- End-of-turn effects: Status damage processing
+- End-of-turn effects: Status damage processing, weather damage, terrain healing
+- Abilities & Items: Event-driven system with BattleTrigger (29+ abilities, 21+ items)
+- Weather: 9 weather conditions (5 standard + 3 primal + fog) with damage modifiers
+- Terrain: 4 terrains (Grassy, Electric, Psychic, Misty) with damage modifiers and healing
+- Hazards: 4 entry hazards (Stealth Rock, Spikes, Toxic Spikes, Sticky Web)
 
 ---
 
@@ -489,9 +562,14 @@ See detailed roadmaps for implementation plans:
 
 The project follows **Test-Driven Development (TDD)** with three-phase testing:
 
-1. **Functional Tests** - Core behavior verification
-2. **Edge Case Tests** - Boundary conditions and real-world scenarios
-3. **Integration Tests** - System interactions and cascading effects
+1. **Functional Tests** - Core behavior verification (Systems/ folder)
+2. **Edge Case Tests** - Boundary conditions and real-world scenarios (Systems/ folder)
+3. **Integration Tests** - System interactions and cascading effects (Systems/[Feature]/Integration/)
+
+**Test Organization**:
+- `Systems/` - Tests de sistemas (CÓMO funcionan los sistemas)
+- `Blueprints/` - Tests de estructura de datos (CÓMO son los datos)
+- `Data/` - Tests de contenido específico (QUÉ contienen los datos)
 
 ### Running Tests
 
@@ -534,5 +612,5 @@ This is a non-commercial fan project for educational purposes. Pokémon names an
 ---
 
 <p align="center">
-  <strong>🤖 100% AI-Generated Code | 2,075+ Tests | 0 Warnings</strong>
+  <strong>🤖 100% AI-Generated Code | 3,210+ Tests | 0 Warnings | Unity Integration Basic Complete</strong>
 </p>

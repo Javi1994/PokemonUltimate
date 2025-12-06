@@ -13,7 +13,7 @@ Unity integration code will be organized in a separate Unity project:
 - **DLLs** - Battle engine DLLs imported as plugins
 - **Unity Scripts** - C# scripts implementing Unity-specific functionality
 
-**Note**: This is planned structure. Code not yet implemented.
+**Note**: Basic implementation complete (Phases 4.1-4.3). Code structure matches planned design.
 
 ## Project Structure
 
@@ -27,17 +27,22 @@ Unity Project/
 │   │
 │   ├── Scripts/                        # Unity C# scripts
 │   │   ├── Battle/
-│   │   │   ├── UnityBattleView.cs      # IBattleView implementation
-│   │   │   ├── BattleManager.cs        # Battle orchestration
-│   │   │   └── BattleInputHandler.cs   # Input handling
+│   │   │   ├── UnityBattleView.cs      # IBattleView implementation ✅
+│   │   │   ├── BattleManager.cs        # Battle orchestration ✅
+│   │   │   ├── UnityBattleLogger.cs    # Unity logger implementation ✅
+│   │   │   └── BattleInputHandler.cs   # Input handling ⏳ Planned
 │   │   │
 │   │   ├── UI/
-│   │   │   ├── HPBar.cs                # HP bar component
-│   │   │   ├── PokemonDisplay.cs        # Pokemon sprite/name display
-│   │   │   ├── BattleDialog.cs         # Dialog system
-│   │   │   ├── ActionMenu.cs           # Action selection menu
-│   │   │   ├── MoveMenu.cs             # Move selection menu
-│   │   │   └── PostBattleUI.cs         # Post-battle UI
+│   │   │   ├── HPBar.cs                # HP bar component ✅
+│   │   │   ├── PokemonDisplay.cs        # Pokemon sprite/name display ✅
+│   │   │   ├── BattleDialog.cs         # Dialog system ✅
+│   │   │   ├── BattleUISetup.cs        # UI setup helper ✅
+│   │   │   ├── ActionMenu.cs           # Action selection menu ⏳ Planned
+│   │   │   ├── MoveMenu.cs             # Move selection menu ⏳ Planned
+│   │   │   └── PostBattleUI.cs         # Post-battle UI ⏳ Planned
+│   │   │
+│   │   ├── Editor/
+│   │   │   └── BattleSceneGenerator.cs  # Automated scene generator ✅
 │   │   │
 │   │   ├── Animation/
 │   │   │   ├── BattleAnimator.cs       # Animation controller
@@ -79,49 +84,73 @@ Unity Project/
 ## Key Classes (Planned)
 
 ### UnityBattleView
-**Namespace**: `PokemonUltimate.Unity.Battle`
-**File**: `Assets/Scripts/Battle/UnityBattleView.cs`
+**Namespace**: (Global namespace - Unity scripts)
+**File**: `Assets/Scripts/Battle/UnityBattleView.cs` ✅ **Implemented**
 **Purpose**: Implements `IBattleView` interface for Unity
 **Key Methods**:
-- `ShowMessage(string)` - Display battle messages
-- `UpdateHPBar(BattleSlot, int, int)` - Update HP bar
-- `ShowStatusIcon(BattleSlot, StatusEffect)` - Display status effects
-- `ShowStatChangeEffect(BattleSlot, Stat, int)` - Show stat change visuals
-- `PlayAnimation(string)` - Play move animations
+- `ShowMessage(string)` - Display battle messages ✅
+- `UpdateHPBar(BattleSlot)` - Update HP bar ✅
+- `PlaySwitchInAnimation(BattleSlot)` - Update Pokemon display ✅
+- `SelectActionType(BattleSlot)` - Player input (placeholder) ⏳
+- `SelectMove(IReadOnlyList<MoveInstance>)` - Player input (placeholder) ⏳
+- `SelectTarget(IReadOnlyList<BattleSlot>)` - Player input (placeholder) ⏳
+- `SelectSwitch(IReadOnlyList<PokemonInstance>)` - Player input (placeholder) ⏳
 
 ### BattleManager
-**Namespace**: `PokemonUltimate.Unity.Battle`
-**File**: `Assets/Scripts/Battle/BattleManager.cs`
+**Namespace**: (Global namespace - Unity scripts)
+**File**: `Assets/Scripts/Battle/BattleManager.cs` ✅ **Implemented**
 **Purpose**: Orchestrates battle in Unity
 **Key Methods**:
-- `StartBattle(PokemonInstance[], PokemonInstance[])` - Initialize battle
-- `RunBattle()` - Run battle loop
-- `HandleBattleEnd(BattleResult)` - Handle battle conclusion
+- `StartBattle(IReadOnlyList<PokemonInstance>, IReadOnlyList<PokemonInstance>)` - Initialize battle ✅
+- `CreateCombatEngine()` - Create engine with dependencies ✅
+- `BindSlotsToUI()` - Connect BattleSlots to UI components ✅
+- `HandleBattleEnd(BattleResult)` - Handle battle conclusion ✅
+
+### PokemonDisplay
+**Namespace**: (Global namespace - Unity scripts)
+**File**: `Assets/Scripts/UI/PokemonDisplay.cs` ✅ **Implemented**
+**Purpose**: Displays Pokemon sprite, name, and level
+**Key Methods**:
+- `Display(PokemonInstance)` - Display Pokemon data ✅
+
+### BattleUISetup
+**Namespace**: (Global namespace - Unity scripts)
+**File**: `Assets/Scripts/UI/BattleUISetup.cs` ✅ **Implemented**
+**Purpose**: Helper script for setting up and testing UI components
+**Key Methods**:
+- `SetupTestBattle()` - Create test Pokemon and display them ✅
+- `UpdateHPBars()` - Update HP bars with current values ✅
+
+### BattleSceneGenerator
+**Namespace**: (Global namespace - Unity Editor scripts)
+**File**: `Assets/Scripts/Editor/BattleSceneGenerator.cs` ✅ **Implemented**
+**Purpose**: Automated editor script to generate battle scene with all UI components
+**Key Methods**:
+- `GenerateBattleScene()` - Create complete battle scene ✅
 
 ### BattleInputHandler
-**Namespace**: `PokemonUltimate.Unity.Battle`
-**File**: `Assets/Scripts/Battle/BattleInputHandler.cs`
+**Namespace**: (Global namespace - Unity scripts)
+**File**: `Assets/Scripts/Battle/BattleInputHandler.cs` ⏳ **Planned**
 **Purpose**: Handles player input and converts to actions
 **Key Methods**:
-- `OnActionSelected(ActionType)` - Handle action selection
-- `OnMoveSelected(MoveData)` - Handle move selection
-- `OnPokemonSelected(PokemonInstance)` - Handle Pokemon selection
+- `OnActionSelected(ActionType)` - Handle action selection ⏳
+- `OnMoveSelected(MoveData)` - Handle move selection ⏳
+- `OnPokemonSelected(PokemonInstance)` - Handle Pokemon selection ⏳
 
 ### HPBar
-**Namespace**: `PokemonUltimate.Unity.UI`
-**File**: `Assets/Scripts/UI/HPBar.cs`
+**Namespace**: (Global namespace - Unity scripts)
+**File**: `Assets/Scripts/UI/HPBar.cs` ✅ **Implemented**
 **Purpose**: Displays Pokemon HP bar
 **Key Methods**:
-- `UpdateHP(int current, int max)` - Update HP display
-- `AnimateHPChange(int from, int to)` - Animate HP change
+- `UpdateHP(int current, int max)` - Update HP display ✅
 
 ### BattleDialog
-**Namespace**: `PokemonUltimate.Unity.UI`
-**File**: `Assets/Scripts/UI/BattleDialog.cs`
+**Namespace**: (Global namespace - Unity scripts)
+**File**: `Assets/Scripts/UI/BattleDialog.cs` ✅ **Implemented**
 **Purpose**: Displays battle messages
 **Key Methods**:
-- `ShowMessage(string, bool)` - Display message
-- `ShowMessageAsync(string)` - Display message async
+- `ShowMessage(string, bool)` - Display message with typewriter effect ✅
+- `Hide()` - Hide dialog box ✅
 
 ## DLL Integration
 
@@ -167,5 +196,5 @@ Unity Project/
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: 2025-01-XX (Basic Implementation Complete - Phases 4.1-4.3)
 
