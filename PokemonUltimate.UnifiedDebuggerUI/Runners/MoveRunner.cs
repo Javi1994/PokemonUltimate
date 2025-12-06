@@ -11,7 +11,7 @@ using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.MoveDebuggerUI
+namespace PokemonUltimate.UnifiedDebuggerUI.Runners
 {
     public class MoveRunner
     {
@@ -45,7 +45,7 @@ namespace PokemonUltimate.MoveDebuggerUI
             public List<string> ActionsGenerated { get; set; } = new List<string>();
         }
 
-        public async Task<MoveTestStatistics> RunTestsAsync(MoveTestConfig config, IProgress<int> progress = null)
+        public async Task<MoveTestStatistics> RunTestsAsync(MoveTestConfig config, IProgress<int>? progress = null)
         {
             var stats = new MoveTestStatistics();
 

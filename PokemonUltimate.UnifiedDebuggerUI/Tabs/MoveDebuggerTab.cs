@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -9,10 +8,11 @@ using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Factories;
+using PokemonUltimate.UnifiedDebuggerUI.Runners;
 
-namespace PokemonUltimate.MoveDebuggerUI
+namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
 {
-    public partial class MainForm : Form
+    public partial class MoveDebuggerTab : UserControl
     {
         private ComboBox comboMove;
         private ComboBox comboAttackerPokemon;
@@ -33,7 +33,7 @@ namespace PokemonUltimate.MoveDebuggerUI
         private ProgressBar progressBar;
         private Label lblStatus;
 
-        public MainForm()
+        public MoveDebuggerTab()
         {
             InitializeComponent();
             LoadData();
@@ -62,11 +62,8 @@ namespace PokemonUltimate.MoveDebuggerUI
             
             this.SuspendLayout();
 
-            // Form
-            this.Text = "Move Debugger - Statistics Tool";
-            this.Size = new Size(1400, 900);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.MinimumSize = new Size(1000, 600);
+            // UserControl
+            this.Dock = DockStyle.Fill;
             this.Padding = new Padding(0);
 
             // Usar TableLayoutPanel para evitar solapamientos
@@ -263,7 +260,7 @@ namespace PokemonUltimate.MoveDebuggerUI
             mainTableLayout.Controls.Add(panelConfig, 0, 0);
             mainTableLayout.Controls.Add(this.tabResults, 1, 0);
 
-            // Agregar TableLayoutPanel al formulario
+            // Agregar TableLayoutPanel al UserControl
             this.Controls.Add(mainTableLayout);
 
             this.ResumeLayout(true);

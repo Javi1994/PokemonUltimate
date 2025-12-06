@@ -5,20 +5,20 @@ using System.Windows.Forms;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 
-namespace PokemonUltimate.TypeMatchupDebuggerUI
+namespace PokemonUltimate.UnifiedDebuggerUI.Tabs
 {
-    public partial class MainForm : Form
+    public partial class TypeMatchupDebuggerTab : UserControl
     {
-        private ComboBox comboAttackingType = null!;
-        private ComboBox comboDefenderPrimaryType = null!;
-        private ComboBox comboDefenderSecondaryType = null!;
-        private Button btnCalculate = null!;
-        private Label lblResult = null!;
-        private RichTextBox txtBreakdown = null!;
-        private DataGridView dgvTypeChart = null!;
-        private Label lblTitle = null!;
+        private ComboBox comboAttackingType;
+        private ComboBox comboDefenderPrimaryType;
+        private ComboBox comboDefenderSecondaryType;
+        private Button btnCalculate;
+        private Label lblResult;
+        private RichTextBox txtBreakdown;
+        private DataGridView dgvTypeChart;
+        private Label lblTitle;
 
-        public MainForm()
+        public TypeMatchupDebuggerTab()
         {
             InitializeComponent();
             LoadTypeLists();
@@ -37,11 +37,8 @@ namespace PokemonUltimate.TypeMatchupDebuggerUI
 
             this.SuspendLayout();
 
-            // Form
-            this.Text = "Type Matchup Debugger";
-            this.Size = new Size(1200, 800);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.MinimumSize = new Size(900, 600);
+            // UserControl
+            this.Dock = DockStyle.Fill;
             this.Padding = new Padding(0);
 
             // Usar TableLayoutPanel para evitar solapamientos

@@ -1,153 +1,209 @@
-# Battle Debuggers - Specialized Testing Tools
+# Unified Debugger - Testing Tools
 
-> Collection of specialized debuggers for testing different aspects of the Pokemon battle system.
+> Single Windows Forms application integrating all debuggers for testing different aspects of the Pokemon battle system.
 
 ## Overview
 
-The debugger suite consists of multiple specialized projects, each focused on testing a specific aspect of the game:
-
-| Debugger | Purpose | Focus Area |
-|----------|---------|------------|
-| **[BattleDebuggerUI](../PokemonUltimate.BattleDebuggerUI/)** | Windows Forms | Visual interface for battle statistics (move usage, status effects) |
-| **[MoveDebuggerUI](../PokemonUltimate.MoveDebuggerUI/)** | Windows Forms | Visual interface for move testing statistics (damage, effects, actions) |
-| **[TypeMatchupDebuggerUI](../PokemonUltimate.TypeMatchupDebuggerUI/)** | Windows Forms | Visual interface for type effectiveness testing (type chart, dual types, immunities) |
-| **[TypeMatchupDebugger](../PokemonUltimate.TypeMatchupDebugger/)** | Console | Type chart, dual types, immunities (legacy console version) |
+The **PokemonUltimate.UnifiedDebuggerUI** is a unified Windows Forms application that combines all debuggers into a single interface with tabbed navigation. This provides a more consistent experience and easier maintenance compared to separate applications.
 
 ## Quick Start
 
-### Run All Debuggers
+### Run the Unified Debugger
 
 ```bash
-# Visual battle debugging with statistics
-dotnet run --project PokemonUltimate.BattleDebuggerUI
-
-# Visual move testing with statistics
-dotnet run --project PokemonUltimate.MoveDebuggerUI
-
-# Visual type effectiveness testing
-dotnet run --project PokemonUltimate.TypeMatchupDebuggerUI
-
-# Test type effectiveness (console - legacy)
-dotnet run --project PokemonUltimate.TypeMatchupDebugger
+# Run the unified debugger application
+dotnet run --project PokemonUltimate.UnifiedDebuggerUI
 ```
 
-## When to Use Each Debugger
+The application opens with three tabs:
+- **Battle Debugger** - Run multiple battles and see statistics
+- **Move Debugger** - Test moves multiple times and see statistics
+- **Type Matchup** - Calculate type effectiveness
 
-### Use BattleDebuggerUI When:
-- ✅ You want to run multiple battles and see statistics
-- ✅ You need move usage statistics (most used moves per Pokemon)
-- ✅ You want status effect statistics (what effects are caused)
-- ✅ You're debugging general battle mechanics
-- ✅ You want to compare Pokemon matchups over many battles
-- ✅ You need win/loss statistics
-- ✅ You prefer visual interfaces with easy configuration
+## Debugger Tabs
 
-### Use MoveDebuggerUI When:
-- ✅ Testing specific moves multiple times
-- ✅ Verifying move power averages and ranges
-- ✅ Testing status effect chance percentages
-- ✅ Verifying move effects and action generation
-- ✅ Comparing damage output across multiple tests
-- ✅ Analyzing what actions a move generates
-- ✅ You prefer visual interfaces with easy configuration
+### Battle Debugger Tab
 
-### Use TypeMatchupDebuggerUI When:
-- ✅ Verifying type chart correctness
-- ✅ Testing dual-type effectiveness
-- ✅ Checking immunities
-- ✅ Validating super effective combinations
-- ✅ Viewing complete type chart for any attacking type
-- ✅ You prefer visual interfaces with easy configuration
+**Purpose**: Run multiple battles and analyze statistics
 
-## Shared Components
+**Features**:
+- ✅ Move usage statistics (most used moves per Pokemon)
+- ✅ Status effect statistics (effects caused per Pokemon)
+- ✅ Win/loss/draw rates
+- ✅ Visual progress tracking during execution
+- ✅ Results displayed in tables and formatted text
 
-UI debuggers use:
-- **BattleRunner** / **MoveRunner**: Reusable execution logic extracted from console debuggers
-- Common battle execution patterns
-- Statistics collection and tracking
+**Configuration**:
+- Select Player Pokemon (or Random)
+- Select Enemy Pokemon (or Random)
+- Set level (1-100)
+- Set number of battles (1-10000)
+- Optional detailed output
 
-## Future Debuggers
+**Results Tabs**:
+- **Summary**: Win/loss/draw statistics, move usage summary, status effect summary
+- **Move Usage**: Table showing Pokemon, move name, usage count, and percentage
+- **Status Effects**: Table showing Pokemon, effect name, times caused, and percentage
 
-Planned specialized debuggers:
+**Use Cases**:
+- Testing Pokemon matchups over many battles
+- Verifying move usage patterns
+- Analyzing status effect rates
+- Debugging battle mechanics
+- Comparing Pokemon performance
 
-- **AbilityDebugger** - Test abilities and their effects
-- **ItemDebugger** - Test held items and their effects
-- **StatusDebugger** - Test status effects and their interactions
-- **WeatherDebugger** - Test weather effects
-- **TerrainDebugger** - Test terrain effects
+### Move Debugger Tab
+
+**Purpose**: Test moves multiple times and collect comprehensive statistics
+
+**Features**:
+- ✅ Damage statistics (average, min, max, median)
+- ✅ Critical hit rates
+- ✅ Miss rates
+- ✅ Status effect application rates (persistent and volatile)
+- ✅ Action generation tracking (what actions the move creates)
+- ✅ Visual progress tracking during execution
+- ✅ Results displayed in tables and formatted text
+
+**Configuration**:
+- Select move to test
+- Select attacker Pokemon
+- Select target Pokemon
+- Set level (1-100)
+- Set number of tests (1-10000)
+- Optional detailed output
+
+**Results Tabs**:
+- **Summary**: Move information, type effectiveness, damage statistics, status effects, actions generated
+- **Damage**: Table with damage metrics (total hits, average, min, max, median, critical hits, misses)
+- **Status Effects**: Table showing persistent and volatile status effects caused
+- **Actions**: Table showing all action types generated by the move
+
+**Use Cases**:
+- Verifying move power ranges
+- Testing status effect chances
+- Analyzing move effects and action generation
+- Comparing damage output across multiple tests
+- Debugging move mechanics
+
+### Type Matchup Tab
+
+**Purpose**: Calculate and visualize type effectiveness combinations
+
+**Features**:
+- ✅ Single type vs single type effectiveness
+- ✅ Single type vs dual type effectiveness
+- ✅ Complete type chart table for any attacking type
+- ✅ Effectiveness breakdown for dual-type defenders
+- ✅ Color-coded results (Red=Immune, Orange=Not Very Effective, Green=Super Effective)
+
+**Configuration**:
+- Select attacking type
+- Select defender primary type
+- Select defender secondary type (or None for single-type)
+
+**Results**:
+- **Effectiveness Result**: Shows calculated effectiveness with color coding
+- **Breakdown**: For dual-type defenders, shows how each type contributes
+- **Complete Type Chart**: Table showing effectiveness against all 18 Pokemon types
+
+**Use Cases**:
+- Verifying type chart correctness
+- Testing dual-type effectiveness
+- Checking immunities
+- Validating super effective combinations
+- Understanding type interactions
 
 ## Architecture
 
 ```
-PokemonUltimate.BattleDebuggerUI/
-├── MainForm.cs              # Windows Forms UI
-├── BattleRunner.cs          # Reusable battle execution logic
-└── README.md
-
-PokemonUltimate.MoveDebuggerUI/
-├── MainForm.cs              # Windows Forms UI
-├── MoveRunner.cs            # Reusable move testing logic
-└── README.md
-
-PokemonUltimate.TypeMatchupDebuggerUI/
-├── MainForm.cs              # Windows Forms UI
-├── Program.cs                # Application entry point
-└── README.md
-
-PokemonUltimate.TypeMatchupDebugger/ (legacy console version)
-├── Program.cs               # Type effectiveness tests
-└── README.md
+PokemonUltimate.UnifiedDebuggerUI/
+├── MainForm.cs                    # Main form with TabControl
+├── Program.cs                     # Application entry point
+├── Runners/
+│   ├── BattleRunner.cs           # Reusable battle execution logic
+│   └── MoveRunner.cs             # Reusable move testing logic
+└── Tabs/
+    ├── BattleDebuggerTab.cs      # Battle debugger UserControl
+    ├── MoveDebuggerTab.cs        # Move debugger UserControl
+    └── TypeMatchupDebuggerTab.cs # Type matchup UserControl
 ```
+
+## Shared Components
+
+The unified debugger uses:
+- **BattleRunner**: Reusable battle execution logic with statistics tracking
+- **MoveRunner**: Reusable move testing logic with statistics tracking
+- Common Windows Forms patterns and UI components
+- Shared statistics collection and tracking mechanisms
 
 ## Common Features
 
-All debuggers provide:
+All debugger tabs provide:
 
-1. **Detailed Damage Calculations**
-   - Base damage
-   - Multipliers breakdown (CRIT, STAB, Type Effectiveness, Random)
-   - Final damage
+1. **Visual Configuration**
+   - Dropdown menus for easy selection
+   - Numeric inputs with validation
+   - Checkboxes for optional features
+   - Clear, organized layout
 
-2. **Complete Battle State**
-   - Pokemon stats
-   - Stat stages
-   - Status effects
-   - Moves and PP
+2. **Real-time Progress Tracking**
+   - Progress bars during execution
+   - Status labels with current operation
+   - Non-blocking UI (async execution)
 
-3. **Turn-by-Turn Information**
-   - Turn order
-   - Action details
-   - Reaction chains
+3. **Comprehensive Results**
+   - Formatted text summaries
+   - DataGridView tables for structured data
+   - Multiple result views (tabs)
+   - Easy-to-read statistics
 
-4. **Statistics Collection** (BattleDebuggerUI & MoveDebuggerUI)
-   - Move usage statistics
-   - Status effect statistics
-   - Action generation statistics
-   - Win/loss/draw rates
-   - Damage averages and ranges
-   - Visual progress tracking
+4. **Error Handling**
+   - Clear error messages
+   - Graceful failure handling
+   - UI remains responsive
+
+## Benefits of Unified Application
+
+✅ **Single Entry Point** - One application instead of three separate ones  
+✅ **Consistent UI** - Same look and feel across all debuggers  
+✅ **Easier Maintenance** - Shared code and components  
+✅ **Better Organization** - All debuggers in one place  
+✅ **Tabbed Navigation** - Easy switching between debuggers  
+✅ **Shared Resources** - Common runners and utilities  
+
+## Future Enhancements
+
+Planned additions to the unified debugger:
+
+- **Ability Debugger Tab** - Test abilities and their effects
+- **Item Debugger Tab** - Test held items and their effects
+- **Status Debugger Tab** - Test status effects and their interactions
+- **Weather Debugger Tab** - Test weather effects
+- **Terrain Debugger Tab** - Test terrain effects
+- **Export Results** - Save results to CSV/JSON
+- **Save/Load Configurations** - Preserve debugger settings
+- **Compare Results** - Side-by-side comparison of multiple runs
 
 ## Contributing
 
-When adding a new debugger:
+When adding a new debugger tab:
 
-1. Create new Windows Forms project: `PokemonUltimate.[Name]DebuggerUI`
-2. Create `MainForm.cs` with configuration controls and result tabs
-3. Create `[Name]Runner.cs` with reusable execution logic
-4. Add to solution: `dotnet sln add PokemonUltimate.[Name]DebuggerUI`
-5. Create `README.md` documenting purpose and usage
-6. Update this document with new debugger entry
+1. Create new UserControl: `Tabs/[Name]DebuggerTab.cs`
+2. Implement `InitializeComponent()` for UI setup
+3. Create runner class if needed: `Runners/[Name]Runner.cs`
+4. Add tab to `MainForm.cs` TabControl
+5. Update this document with new tab entry
 
 ## Notes
 
-- UI debuggers use Windows Forms for visual interfaces
+- The unified debugger uses Windows Forms for visual interfaces
 - Battles/tests are fully automated (AI vs AI)
 - Progress tracking during execution
 - Results displayed in tables and formatted text
-- Each debugger can be run independently
+- All debuggers accessible from single application
 - Debuggers are designed for development/debugging, not gameplay
 
 ---
 
 **Last Updated**: 2025-01-XX
-

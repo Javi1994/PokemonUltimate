@@ -11,7 +11,7 @@ using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 
-namespace PokemonUltimate.BattleDebuggerUI
+namespace PokemonUltimate.UnifiedDebuggerUI.Runners
 {
     public class BattleRunner
     {
@@ -36,7 +36,7 @@ namespace PokemonUltimate.BattleDebuggerUI
             public bool DetailedOutput { get; set; } = false;
         }
 
-        public async Task<BattleStatistics> RunBattlesAsync(BattleConfig config, IProgress<int> progress = null)
+        public async Task<BattleStatistics> RunBattlesAsync(BattleConfig config, IProgress<int>? progress = null)
         {
             var stats = new BattleStatistics();
             
@@ -263,6 +263,5 @@ namespace PokemonUltimate.BattleDebuggerUI
             }
         }
     }
-
 }
 

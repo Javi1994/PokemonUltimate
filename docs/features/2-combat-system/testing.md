@@ -87,30 +87,33 @@ PokemonUltimate.Tests/
 
 ### Battle Debuggers
 
-Specialized console applications for testing and debugging combat mechanics:
+**Unified Debugger Application** - Single Windows Forms application with tabbed interface:
 
-- **[BattleDebuggerUI](../../../PokemonUltimate.BattleDebuggerUI/)** - Windows Forms application for battle statistics
-  - Visual interface with dropdowns and controls
-  - Move usage statistics (most used moves per Pokemon)
-  - Status effect statistics (effects caused per Pokemon)
-  - Win/loss/draw rates
-  - Progress tracking during execution
-  - Results displayed in tables and formatted text
+- **[UnifiedDebuggerUI](../../../PokemonUltimate.UnifiedDebuggerUI/)** - Integrated debugger application
+  - **Battle Debugger Tab**: Run multiple battles and analyze statistics
+    - Move usage statistics (most used moves per Pokemon)
+    - Status effect statistics (effects caused per Pokemon)
+    - Win/loss/draw rates
+    - Progress tracking during execution
+    - Results displayed in tables and formatted text
+  - **Move Debugger Tab**: Test moves multiple times and collect statistics
+    - Damage statistics (average, min, max, median)
+    - Critical hit rates
+    - Miss rates
+    - Status effect application rates
+    - Action generation tracking (what actions the move creates)
+    - Progress tracking during execution
+    - Results displayed in tables and formatted text
+  - **Type Matchup Tab**: Calculate type effectiveness
+    - Type chart verification
+    - Dual-type effectiveness
+    - Immunity checks
+    - Complete type chart visualization
 
-- **[MoveDebuggerUI](../../../PokemonUltimate.MoveDebuggerUI/)** - Windows Forms application for move testing statistics
-  - Visual interface with dropdowns and controls
-  - Damage statistics (average, min, max, median)
-  - Critical hit rates
-  - Miss rates
-  - Status effect application rates
-  - Action generation tracking (what actions the move creates)
-  - Progress tracking during execution
-  - Results displayed in tables and formatted text
-
-- **[TypeMatchupDebugger](../../../PokemonUltimate.TypeMatchupDebugger/)** - Test type effectiveness
-  - Type chart verification
-  - Dual-type effectiveness
-  - Immunity checks
+**Usage**:
+```bash
+dotnet run --project PokemonUltimate.UnifiedDebuggerUI
+```
 
 See [`../../../docs/DEBUGGERS.md`](../../../docs/DEBUGGERS.md) for complete debugger documentation.
 
