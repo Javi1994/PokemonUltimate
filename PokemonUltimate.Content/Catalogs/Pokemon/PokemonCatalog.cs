@@ -68,12 +68,18 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             
             // Register each generation - add new lines here when adding generations
             RegisterGen1();
+            RegisterGen3();
+            RegisterGen4();
+            RegisterGen5();
             // RegisterGen2();  // Uncomment when Gen2 is added
             // RegisterCustom(); // For custom Pokemon
         }
 
         // Partial methods - implemented in separate files
         static partial void RegisterGen1();
+        static partial void RegisterGen3();
+        static partial void RegisterGen4();
+        static partial void RegisterGen5();
         // static partial void RegisterGen2();
         // static partial void RegisterCustom();
     }

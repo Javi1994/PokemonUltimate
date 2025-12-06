@@ -27,7 +27,13 @@ namespace PokemonUltimate.Combat.Events
         OnTurnEnd,
         
         /// <summary>When weather changes.</summary>
-        OnWeatherChange
+        OnWeatherChange,
+        
+        /// <summary>When a Pokemon receives contact from a move.</summary>
+        OnContactReceived,
+        
+        /// <summary>When a Pokemon would be knocked out (before fainting).</summary>
+        OnWouldFaint
     }
 }
 

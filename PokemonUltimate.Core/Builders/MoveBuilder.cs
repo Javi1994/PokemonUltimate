@@ -157,6 +157,15 @@ namespace PokemonUltimate.Content.Builders
         }
 
         /// <summary>
+        /// Set whether this move makes physical contact (triggers abilities like Static, Iron Barbs).
+        /// </summary>
+        public MoveBuilder MakesContact(bool makesContact = true)
+        {
+            _move.MakesContact = makesContact;
+            return this;
+        }
+
+        /// <summary>
         /// Build the final MoveData instance.
         /// </summary>
         public MoveData Build()

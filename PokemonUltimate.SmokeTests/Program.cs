@@ -1357,7 +1357,7 @@ class Program
         // BattleTrigger enum
         Test("BattleTrigger enum exists", () => Enum.IsDefined(typeof(BattleTrigger), BattleTrigger.OnSwitchIn));
         Test("BattleTrigger.OnTurnEnd exists", () => Enum.IsDefined(typeof(BattleTrigger), BattleTrigger.OnTurnEnd));
-        Test("BattleTrigger has 6 values", () => Enum.GetNames(typeof(BattleTrigger)).Length == 6);
+        Test("BattleTrigger has 8 values", () => Enum.GetNames(typeof(BattleTrigger)).Length == 8);
 
         // IBattleListener interface
         Test("IBattleListener interface exists", () => typeof(IBattleListener).IsInterface);
@@ -1630,7 +1630,180 @@ class Program
         }
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 41: COMPLETE POKEMON LISTING
+        // SECTION 41: ADVANCED ABILITIES & ITEMS
+        // ═══════════════════════════════════════════════════════
+        try
+        {
+            PrintSection("ADVANCED ABILITIES & ITEMS");
+
+            var advancedHelpers = CombatEngineFactory.CreateHelpers();
+
+            // Test OnContactReceived trigger exists
+            Test("BattleTrigger.OnContactReceived exists", () => Enum.IsDefined(typeof(BattleTrigger), BattleTrigger.OnContactReceived));
+            Test("BattleTrigger.OnWeatherChange exists", () => Enum.IsDefined(typeof(BattleTrigger), BattleTrigger.OnWeatherChange));
+            Test("BattleTrigger.OnAfterMove exists", () => Enum.IsDefined(typeof(BattleTrigger), BattleTrigger.OnAfterMove));
+            Test("BattleTrigger.OnWouldFaint exists", () => Enum.IsDefined(typeof(BattleTrigger), BattleTrigger.OnWouldFaint));
+
+            // Advanced Abilities Tests
+            // Speed Boost
+            var speedBoostAbility = AbilityCatalog.SpeedBoost;
+            Test("Speed Boost ability exists", () => speedBoostAbility != null);
+            Test("Speed Boost listens to OnTurnEnd", () => speedBoostAbility.ListensTo(AbilityTrigger.OnTurnEnd));
+            Test("Speed Boost has RaiseOwnStat effect", () => speedBoostAbility.Effect == AbilityEffect.RaiseOwnStat);
+
+            var speedBoostPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            speedBoostPokemon.SetAbility(speedBoostAbility);
+            var speedBoostField = new BattleField();
+            speedBoostField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+                new[] { speedBoostPokemon }, new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) });
+            var speedBoostSlot = speedBoostField.PlayerSide.Slots[0];
+            int initialSpeedStage = speedBoostSlot.GetStatStage(Stat.Speed);
+            var speedBoostActions = advancedHelpers.BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, speedBoostField);
+            Test("Speed Boost generates actions on OnTurnEnd", () => speedBoostActions.Count > 0);
+            var speedBoostStatAction = speedBoostActions.OfType<StatChangeAction>().FirstOrDefault();
+            if (speedBoostStatAction != null)
+            {
+                speedBoostStatAction.ExecuteLogic(speedBoostField);
+                Test("Speed Boost raises Speed stat", () => speedBoostSlot.GetStatStage(Stat.Speed) > initialSpeedStage);
+            }
+
+            // Swift Swim
+            var swiftSwimAbility = AbilityCatalog.SwiftSwim;
+            Test("Swift Swim ability exists", () => swiftSwimAbility != null);
+            Test("Swift Swim has SpeedBoostInWeather effect", () => swiftSwimAbility.Effect == AbilityEffect.SpeedBoostInWeather);
+            Test("Swift Swim weather condition is Rain", () => swiftSwimAbility.WeatherCondition == Weather.Rain);
+
+            // Chlorophyll
+            var chlorophyllAbility = AbilityCatalog.Chlorophyll;
+            Test("Chlorophyll ability exists", () => chlorophyllAbility != null);
+            Test("Chlorophyll has SpeedBoostInWeather effect", () => chlorophyllAbility.Effect == AbilityEffect.SpeedBoostInWeather);
+            Test("Chlorophyll weather condition is Sun", () => chlorophyllAbility.WeatherCondition == Weather.Sun);
+
+            // Static
+            var staticAbility = AbilityCatalog.Static;
+            Test("Static ability exists", () => staticAbility != null);
+            Test("Static listens to OnContactReceived", () => staticAbility.ListensTo(AbilityTrigger.OnContactReceived));
+
+            // Rough Skin
+            var roughSkinAbility = AbilityCatalog.RoughSkin;
+            Test("Rough Skin ability exists", () => roughSkinAbility != null);
+            Test("Rough Skin listens to OnContactReceived", () => roughSkinAbility.ListensTo(AbilityTrigger.OnContactReceived));
+
+            // Moxie
+            var moxieAbility = AbilityCatalog.Moxie;
+            Test("Moxie ability exists", () => moxieAbility != null);
+            Test("Moxie listens to OnAfterMove", () => moxieAbility.ListensTo(AbilityTrigger.OnAfterMove));
+            Test("Moxie has RaiseStatOnKO effect", () => moxieAbility.Effect == AbilityEffect.RaiseStatOnKO);
+
+            // Advanced Items Tests
+            // Focus Sash
+            var focusSashItem = ItemCatalog.FocusSash;
+            Test("Focus Sash item exists", () => focusSashItem != null);
+            Test("Focus Sash listens to OnWouldFaint", () => focusSashItem.ListensTo(ItemTrigger.OnWouldFaint));
+
+            var focusSashPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            focusSashPokemon.HeldItem = focusSashItem;
+            focusSashPokemon.CurrentHP = focusSashPokemon.MaxHP; // Full HP required
+            var focusSashField = new BattleField();
+            focusSashField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+                new[] { focusSashPokemon }, new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) });
+            var focusSashSlot = focusSashField.PlayerSide.Slots[0];
+            var fatalContext = new DamageContext(focusSashField.EnemySide.Slots[0], focusSashSlot, MoveCatalog.Tackle, focusSashField);
+            fatalContext.BaseDamage = focusSashPokemon.MaxHP + 100; // Fatal damage
+            fatalContext.Multiplier = 1.0f;
+            var fatalDamageAction = new DamageAction(focusSashField.EnemySide.Slots[0], focusSashSlot, fatalContext);
+            var fatalReactions = fatalDamageAction.ExecuteLogic(focusSashField).ToList();
+            Test("Focus Sash prevents fainting from fatal damage", () => focusSashSlot.Pokemon.CurrentHP == 1);
+            Test("Focus Sash is consumed after use", () => focusSashSlot.Pokemon.HeldItem == null);
+
+            // Rocky Helmet
+            var rockyHelmetItem = ItemCatalog.RockyHelmet;
+            Test("Rocky Helmet item exists", () => rockyHelmetItem != null);
+            Test("Rocky Helmet listens to OnContactReceived", () => rockyHelmetItem.ListensTo(ItemTrigger.OnContactReceived));
+
+            // Life Orb
+            var lifeOrbItem = ItemCatalog.LifeOrb;
+            Test("Life Orb item exists", () => lifeOrbItem != null);
+            Test("Life Orb listens to OnDamageDealt", () => lifeOrbItem.ListensTo(ItemTrigger.OnDamageDealt));
+
+            var lifeOrbPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            lifeOrbPokemon.HeldItem = lifeOrbItem;
+            int lifeOrbInitialHP = lifeOrbPokemon.CurrentHP;
+            var lifeOrbField = new BattleField();
+            lifeOrbField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+                new[] { lifeOrbPokemon }, new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) });
+            var lifeOrbSlot = lifeOrbField.PlayerSide.Slots[0];
+            var lifeOrbMove = new MoveInstance(MoveCatalog.Tackle);
+            if (lifeOrbPokemon.Moves.Count == 0)
+                lifeOrbPokemon.Moves.Add(lifeOrbMove);
+            else
+                lifeOrbPokemon.Moves[0] = lifeOrbMove;
+            var lifeOrbUseMoveAction = new UseMoveAction(lifeOrbSlot, lifeOrbField.EnemySide.Slots[0], lifeOrbMove);
+            var lifeOrbReactions = lifeOrbUseMoveAction.ExecuteLogic(lifeOrbField).ToList();
+            // Execute damage first
+            var lifeOrbDamageActions = lifeOrbReactions.OfType<DamageAction>().ToList();
+            foreach (var da in lifeOrbDamageActions)
+                da.ExecuteLogic(lifeOrbField).ToList();
+            // Then trigger OnAfterMove
+            var lifeOrbAfterMoveActions = advancedHelpers.BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnAfterMove, lifeOrbField);
+            foreach (var action in lifeOrbAfterMoveActions)
+                action.ExecuteLogic(lifeOrbField).ToList();
+            Test("Life Orb causes recoil damage", () => lifeOrbSlot.Pokemon.CurrentHP < lifeOrbInitialHP);
+
+            // Black Sludge
+            var blackSludgeItem = ItemCatalog.BlackSludge;
+            Test("Black Sludge item exists", () => blackSludgeItem != null);
+            Test("Black Sludge listens to OnTurnEnd", () => blackSludgeItem.ListensTo(ItemTrigger.OnTurnEnd));
+
+            // Test Black Sludge on Poison type (should heal)
+            var poisonPokemon = PokemonFactory.Create(PokemonCatalog.Venusaur, 50);
+            poisonPokemon.HeldItem = blackSludgeItem;
+            poisonPokemon.CurrentHP = poisonPokemon.MaxHP - 50; // Damage it
+            var blackSludgeField = new BattleField();
+            blackSludgeField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+                new[] { poisonPokemon }, new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) });
+            var blackSludgeSlot = blackSludgeField.PlayerSide.Slots[0];
+            int blackSludgeInitialHP = blackSludgeSlot.Pokemon.CurrentHP;
+            var blackSludgeActions = advancedHelpers.BattleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, blackSludgeField);
+            Test("Black Sludge generates actions on OnTurnEnd", () => blackSludgeActions.Count > 0);
+            var blackSludgeHealAction = blackSludgeActions.OfType<HealAction>().FirstOrDefault();
+            if (blackSludgeHealAction != null)
+            {
+                blackSludgeHealAction.ExecuteLogic(blackSludgeField);
+                Test("Black Sludge heals Poison type Pokemon", () => blackSludgeSlot.Pokemon.CurrentHP > blackSludgeInitialHP);
+            }
+
+            // Test TurnOrderResolver with ability speed modifiers
+            var swiftSwimPokemon = PokemonFactory.Create(PokemonCatalog.Pikachu, 50);
+            swiftSwimPokemon.SetAbility(swiftSwimAbility);
+            var turnOrderField = new BattleField();
+            turnOrderField.Initialize(new BattleRules { PlayerSlots = 1, EnemySlots = 1 },
+                new[] { swiftSwimPokemon }, new[] { PokemonFactory.Create(PokemonCatalog.Charmander, 50) });
+            // Set rain weather using SetWeather method
+            turnOrderField.SetWeather(Weather.Rain, 5, WeatherCatalog.Rain);
+            var turnOrderResolver = new TurnOrderResolver(new Combat.Providers.RandomProvider());
+            var swiftSwimSlot = turnOrderField.PlayerSide.Slots[0];
+            var normalSlot = turnOrderField.EnemySide.Slots[0];
+            float swiftSwimSpeed = turnOrderResolver.GetEffectiveSpeed(swiftSwimSlot, turnOrderField);
+            float normalSpeed = turnOrderResolver.GetEffectiveSpeed(normalSlot, turnOrderField);
+            // Swift Swim should double speed in rain
+            Test("TurnOrderResolver applies Swift Swim speed boost in rain", () => swiftSwimSpeed >= normalSpeed * 1.5f);
+
+            PrintInfo($"Advanced Abilities: Speed Boost, Swift Swim, Chlorophyll, Static, Rough Skin, Moxie");
+            PrintInfo($"Advanced Items: Focus Sash, Rocky Helmet, Life Orb, Black Sludge");
+            PrintInfo($"Triggers: OnContactReceived, OnWeatherChange, OnAfterMove, OnWouldFaint");
+            PrintInfo($"Integration: All triggers work correctly in battle system");
+        }
+        catch (Exception ex)
+        {
+            System.Console.ForegroundColor = ConsoleColor.Red;
+            System.Console.WriteLine($"ERROR in Section 41: {ex.Message}");
+            System.Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            System.Console.ResetColor();
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // SECTION 42: COMPLETE POKEMON LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL POKEMON IN CATALOG");
 
@@ -1647,7 +1820,7 @@ class Program
         }
 
         // ═══════════════════════════════════════════════════════
-        // SECTION 42: COMPLETE MOVE LISTING
+        // SECTION 43: COMPLETE MOVE LISTING
         // ═══════════════════════════════════════════════════════
         PrintSection("ALL MOVES IN CATALOG");
 

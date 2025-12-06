@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -34,6 +35,8 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public WeatherData WeatherData { get; }
 
+        private readonly IBattleTriggerProcessor _battleTriggerProcessor;
+
         /// <summary>
         /// Creates a new set weather action.
         /// </summary>
@@ -41,11 +44,15 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="weather">The weather to set. Use Weather.None to clear.</param>
         /// <param name="duration">Duration in turns. 0 means infinite duration.</param>
         /// <param name="weatherData">The weather data for this weather condition. Can be null if not available.</param>
-        public SetWeatherAction(BattleSlot user, Weather weather, int duration, WeatherData weatherData = null) : base(user)
+        /// <param name="battleTriggerProcessor">The battle trigger processor. If null, creates a temporary one.</param>
+        public SetWeatherAction(BattleSlot user, Weather weather, int duration, WeatherData weatherData = null, IBattleTriggerProcessor battleTriggerProcessor = null) : base(user)
         {
             Weather = weather;
             Duration = duration;
             WeatherData = weatherData;
+
+            // Create BattleTriggerProcessor if not provided (temporary until full DI refactoring)
+            _battleTriggerProcessor = battleTriggerProcessor ?? new BattleTriggerProcessor();
         }
 
         /// <summary>
@@ -78,7 +85,14 @@ namespace PokemonUltimate.Combat.Actions
             // Set the weather
             field.SetWeather(Weather, Duration, WeatherData);
 
-            return Enumerable.Empty<BattleAction>();
+            var reactions = new List<BattleAction>();
+
+            // Trigger OnWeatherChange for abilities (e.g., Swift Swim, Chlorophyll, Sand Rush, Slush Rush)
+            // This happens AFTER weather is set
+            var weatherChangeActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnWeatherChange, field);
+            reactions.AddRange(weatherChangeActions);
+
+            return reactions;
         }
 
         /// <summary>

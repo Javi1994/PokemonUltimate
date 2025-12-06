@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Extensions;
+using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
@@ -31,17 +33,23 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public DamageContext Context { get; }
 
+        private readonly IBattleTriggerProcessor _battleTriggerProcessor;
+
         /// <summary>
         /// Creates a new damage action.
         /// </summary>
         /// <param name="user">The slot that initiated this damage (attacker).</param>
         /// <param name="target">The slot receiving damage. Cannot be null.</param>
         /// <param name="context">The damage context with calculated damage. Cannot be null.</param>
+        /// <param name="battleTriggerProcessor">The battle trigger processor. If null, creates a temporary one.</param>
         /// <exception cref="ArgumentNullException">If target or context is null.</exception>
-        public DamageAction(BattleSlot user, BattleSlot target, DamageContext context) : base(user)
+        public DamageAction(BattleSlot user, BattleSlot target, DamageContext context, IBattleTriggerProcessor battleTriggerProcessor = null) : base(user)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
             Context = context ?? throw new ArgumentNullException(nameof(context));
+
+            // Create BattleTriggerProcessor if not provided (temporary until full DI refactoring)
+            _battleTriggerProcessor = battleTriggerProcessor ?? new BattleTriggerProcessor();
         }
 
         /// <summary>
@@ -62,7 +70,48 @@ namespace PokemonUltimate.Combat.Actions
             if (damage == 0)
                 return Enumerable.Empty<BattleAction>();
 
-            // Apply damage
+            var reactions = new List<BattleAction>();
+
+            // Check if damage would cause fainting BEFORE applying damage (for Focus Sash, Sturdy)
+            bool wouldFaint = Target.Pokemon.CurrentHP <= damage;
+            bool wasAtFullHP = Target.Pokemon.CurrentHP >= Target.Pokemon.MaxHP;
+
+            // Trigger OnWouldFaint BEFORE applying damage if damage would be fatal
+            // This allows items/abilities to prevent fainting (Focus Sash, Sturdy)
+            // Items/abilities can modify the damage amount by checking conditions
+            if (wouldFaint && wasAtFullHP)
+            {
+                // Check for Focus Sash or Sturdy
+                bool hasFocusSash = Target.Pokemon.HeldItem != null && 
+                                    Target.Pokemon.HeldItem.Name.Equals("Focus Sash", StringComparison.OrdinalIgnoreCase);
+                bool hasSturdy = Target.Pokemon.Ability != null && 
+                                Target.Pokemon.Ability.Name.Equals("Sturdy", StringComparison.OrdinalIgnoreCase);
+
+                if (hasFocusSash || hasSturdy)
+                {
+                    // Reduce damage to leave Pokemon at 1 HP
+                    int newDamage = Target.Pokemon.CurrentHP - 1;
+                    if (newDamage < 0)
+                        newDamage = 0;
+                    
+                    damage = newDamage;
+
+                    // Consume Focus Sash (Sturdy is an ability, so it doesn't get consumed)
+                    if (hasFocusSash)
+                    {
+                        Target.Pokemon.HeldItem = null; // Consume item
+                        reactions.Add(new MessageAction(string.Format(GameMessages.ItemActivated, Target.Pokemon.DisplayName, "Focus Sash")));
+                        reactions.Add(new MessageAction(string.Format("{0} held on using its {1}!", Target.Pokemon.DisplayName, "Focus Sash")));
+                    }
+                    else if (hasSturdy)
+                    {
+                        reactions.Add(new MessageAction(string.Format(GameMessages.AbilityActivated, Target.Pokemon.DisplayName, "Sturdy")));
+                        reactions.Add(new MessageAction(string.Format("{0} endured the hit!", Target.Pokemon.DisplayName)));
+                    }
+                }
+            }
+
+            // Apply damage (may have been modified by Focus Sash/Sturdy)
             int actualDamage = Target.Pokemon.TakeDamage(damage);
 
             // Record damage taken for Counter/Mirror Coat
@@ -84,13 +133,40 @@ namespace PokemonUltimate.Combat.Actions
                 Target.MarkHitWhileFocusing();
             }
 
-            // Check if Pokemon fainted
-            if (Target.Pokemon.IsFainted)
+            // Trigger OnDamageTaken for abilities (e.g., Static, Rough Skin)
+            // This happens AFTER damage is applied
+            var damageTakenActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnDamageTaken, field);
+            reactions.AddRange(damageTakenActions);
+
+            // Trigger OnContactReceived if move makes contact (e.g., Static, Rough Skin, Rocky Helmet)
+            // This happens AFTER damage is applied
+            // Only process for the TARGET that received contact
+            // Pass the attacker (User) as context
+            if (Context.Move != null && Context.Move.MakesContact && actualDamage > 0)
             {
-                return new[] { new FaintAction(User, Target) };
+                // Process OnContactReceived only for the target slot, passing attacker context
+                if (Target.Pokemon.Ability != null)
+                {
+                    var abilityListener = new AbilityListener(Target.Pokemon.Ability);
+                    var abilityActions = abilityListener.OnTrigger(BattleTrigger.OnContactReceived, Target, field, User);
+                    reactions.AddRange(abilityActions);
+                }
+
+                if (Target.Pokemon.HeldItem != null)
+                {
+                    var itemListener = new ItemListener(Target.Pokemon.HeldItem);
+                    var itemActions = itemListener.OnTrigger(BattleTrigger.OnContactReceived, Target, field, User);
+                    reactions.AddRange(itemActions);
+                }
             }
 
-            return Enumerable.Empty<BattleAction>();
+            // Check if Pokemon fainted (after OnWouldFaint triggers may have prevented it)
+            if (Target.Pokemon.IsFainted)
+            {
+                reactions.Add(new FaintAction(User, Target));
+            }
+
+            return reactions;
         }
 
         /// <summary>

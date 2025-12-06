@@ -99,6 +99,24 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
             .PreventsStatus(PersistentStatus.Poison)
             .Build();
 
+        /// <summary>
+        /// Prevents sleep.
+        /// </summary>
+        public static readonly AbilityData VitalSpirit = Ability.Define("Vital Spirit")
+            .Description("Prevents the Pokémon from falling asleep.")
+            .Gen(3)
+            .PreventsStatus(PersistentStatus.Sleep)
+            .Build();
+
+        /// <summary>
+        /// Blocks sound-based moves.
+        /// </summary>
+        public static readonly AbilityData Soundproof = Ability.Define("Soundproof")
+            .Description("Gives immunity to sound-based moves.")
+            .Gen(3)
+            .Passive()
+            .Build();
+
         // ===== TYPE IMMUNITY ABILITIES =====
 
         /// <summary>
@@ -255,6 +273,17 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
             .DamagesOnContact(0.125f)
             .Build();
 
+        // ===== TURN SKIP ABILITIES =====
+
+        /// <summary>
+        /// Pokemon can't attack on consecutive turns.
+        /// </summary>
+        public static readonly AbilityData Truant = Ability.Define("Truant")
+            .Description("Pokémon can't attack on consecutive turns.")
+            .Gen(3)
+            .SkipsTurn()
+            .Build();
+
         // ===== REGISTRATION =====
 
         static partial void RegisterGen3Abilities()
@@ -268,6 +297,8 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
             _all.Add(FlameBody);
             _all.Add(Limber);
             _all.Add(Immunity);
+            _all.Add(VitalSpirit);
+            _all.Add(Soundproof);
             _all.Add(Levitate);
             _all.Add(FlashFire);
             _all.Add(WaterAbsorb);
@@ -284,6 +315,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
             _all.Add(Chlorophyll);
             _all.Add(Sturdy);
             _all.Add(RoughSkin);
+            _all.Add(Truant);
         }
     }
 }

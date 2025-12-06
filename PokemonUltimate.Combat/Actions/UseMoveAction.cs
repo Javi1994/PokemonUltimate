@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Effects;
+using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
@@ -35,6 +36,7 @@ namespace PokemonUltimate.Combat.Actions
         private readonly IDamagePipeline _damagePipeline;
         private readonly Effects.MoveEffectProcessorRegistry _effectProcessorRegistry;
         private readonly IBattleMessageFormatter _messageFormatter;
+        private readonly IBattleTriggerProcessor _battleTriggerProcessor;
 
         /// <summary>
         /// The target slot for this move.
@@ -72,6 +74,7 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="damagePipeline">The damage pipeline. If null, creates a temporary one.</param>
         /// <param name="effectProcessorRegistry">The effect processor registry. If null, creates a temporary one.</param>
         /// <param name="messageFormatter">The message formatter. If null, creates a default one.</param>
+        /// <param name="battleTriggerProcessor">The battle trigger processor. If null, creates a temporary one.</param>
         /// <exception cref="ArgumentNullException">If user, target, or moveInstance is null.</exception>
         public UseMoveAction(
             BattleSlot user,
@@ -81,7 +84,8 @@ namespace PokemonUltimate.Combat.Actions
             AccuracyChecker accuracyChecker = null,
             IDamagePipeline damagePipeline = null,
             Effects.MoveEffectProcessorRegistry effectProcessorRegistry = null,
-            IBattleMessageFormatter messageFormatter = null) : base(user)
+            IBattleMessageFormatter messageFormatter = null,
+            IBattleTriggerProcessor battleTriggerProcessor = null) : base(user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user), ErrorMessages.PokemonCannotBeNull);
@@ -103,6 +107,9 @@ namespace PokemonUltimate.Combat.Actions
 
             // Create BattleMessageFormatter if not provided
             _messageFormatter = messageFormatter ?? new BattleMessageFormatter();
+
+            // Create BattleTriggerProcessor if not provided (temporary until full DI refactoring)
+            _battleTriggerProcessor = battleTriggerProcessor ?? new BattleTriggerProcessor();
         }
 
         /// <summary>
@@ -126,6 +133,24 @@ namespace PokemonUltimate.Combat.Actions
 
             // Cancel conflicting move states
             CancelConflictingMoveStates();
+
+            // Trigger OnBeforeMove for abilities (e.g., Truant)
+            // This happens BEFORE validation so abilities can block the move
+            var beforeMoveActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnBeforeMove, field);
+            
+            // Check if any ability blocked the move (e.g., Truant)
+            // Truant returns a TruantLoafing message - if present, block the move
+            bool moveBlocked = beforeMoveActions.Any(action => 
+                action is MessageAction msg && 
+                msg.Message.Contains("loafing around"));
+            
+            if (moveBlocked)
+            {
+                actions.AddRange(beforeMoveActions);
+                return actions; // Block move execution (PP not consumed)
+            }
+            
+            actions.AddRange(beforeMoveActions);
 
             // Validate move execution (PP, Flinch, Status)
             var validationResult = ValidateMoveExecution(actions);
@@ -179,6 +204,13 @@ namespace PokemonUltimate.Combat.Actions
 
             // 12. Process move effects
             ProcessEffects(field, actions);
+
+            // Trigger OnAfterMove for abilities and items (e.g., Moxie, Life Orb recoil)
+            // This happens AFTER all effects are processed
+            // Note: DamageActions are in the actions list but haven't been executed yet.
+            // Life Orb and Moxie will check damage trackers which are updated when DamageActions execute.
+            var afterMoveActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnAfterMove, field);
+            actions.AddRange(afterMoveActions);
 
             return actions;
         }

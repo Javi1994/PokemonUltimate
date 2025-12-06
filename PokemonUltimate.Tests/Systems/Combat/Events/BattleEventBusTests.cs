@@ -232,6 +232,11 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
 
             public IEnumerable<BattleAction> OnTrigger(BattleTrigger trigger, BattleSlot holder, BattleField field)
             {
+                return OnTrigger(trigger, holder, field, attacker: null);
+            }
+
+            public IEnumerable<BattleAction> OnTrigger(BattleTrigger trigger, BattleSlot holder, BattleField field, BattleSlot attacker)
+            {
                 yield return new MessageAction($"{_name} triggered on {trigger}");
             }
         }

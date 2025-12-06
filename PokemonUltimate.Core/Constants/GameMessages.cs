@@ -80,6 +80,8 @@ namespace PokemonUltimate.Core.Constants
 
         public const string AbilityActivated = "{0}'s {1}!";
         public const string ItemActivated = "{0}'s {1}!";
+        public const string MoveFailed = "{0} can't use {1}!";
+        public const string TruantLoafing = "{0} is loafing around!";
 
         #endregion
     }

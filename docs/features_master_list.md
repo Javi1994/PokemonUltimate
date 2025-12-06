@@ -84,7 +84,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 ### Feature 2: Combat System
 
 **Folder**: `docs/features/2-combat-system/`  
-**Status**: ✅ Core Complete (Phases 2.1-2.11, 2.12-2.14, 2.16)  
+**Status**: ✅ Core Complete (Phases 2.1-2.11, 2.12-2.15, 2.16, 2.17 ~95%, 2.18 Complete)  
 **Description**: Complete Pokemon battle engine implementation
 
 > **📋 Refactoring Completed (2024-12-05)**: Comprehensive refactoring completed following SOLID principles. All major components now use Dependency Injection, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, and Validation. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details.
@@ -104,7 +104,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 -   **2.12**: Weather System - Weather conditions and effects ✅ Core Complete (advanced features pending dependent systems)
 -   **2.13**: Terrain System - Terrain conditions and effects ✅ Core Complete (advanced features pending dependent systems)
 -   **2.14**: Hazards System - Stealth Rock, Spikes, etc. ✅ Core Complete (hazard removal actions pending move-specific implementation)
--   **2.15**: Advanced Move Mechanics - Multi-hit, charging moves (Planned)
+-   **2.15**: Advanced Move Mechanics - Protect, Counter, Pursuit, Focus Punch, Semi-Invulnerable, Multi-Hit, Multi-Turn ✅ Core Complete (advanced variants pending)
 -   **2.16**: Field Conditions - Screens, Tailwind, protections ✅ Core Complete
 -   **2.17**: Advanced Abilities - Complex ability interactions (Planned)
 -   **2.18**: Advanced Items - Complex item interactions (Planned)
@@ -185,8 +185,8 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 | #     | Feature Name      | Folder                 | Status           | Roadmap                                                  |
 | ----- | ----------------- | ---------------------- | ---------------- | -------------------------------------------------------- |
-| **1** | Game Data         | `1-game-data/`         | ✅ Core Complete<br>⏳ Phase 4 Pending | Game data structures (blueprints) and supporting systems<br>Pending: IVs/EVs, Breeding, Ownership/Tracking |
-| **2** | Combat System     | `2-combat-system/`     | ✅ Core Complete | [roadmap.md](../features/2-combat-system/roadmap.md)     |
+| **1** | Game Data         | `1-game-data/`         | ✅ Complete | Game data structures (blueprints) and supporting systems<br>All phases complete including Phase 4 enhancements |
+| **2** | Combat System     | `2-combat-system/`     | ✅ Core Complete<br>✅ Advanced Moves Complete | [roadmap.md](../features/2-combat-system/roadmap.md)<br>Phases 2.1-2.15, 2.16 complete. 2.17-2.19 pending |
 | **3** | Content Expansion | `3-content-expansion/` | 🎯 In Progress   | [roadmap.md](../features/3-content-expansion/roadmap.md) |
 | **4** | Unity Integration | `4-unity-integration/` | ⏳ Planned       | [roadmap.md](../features/4-unity-integration/roadmap.md) |
 | **5** | Game Features     | `5-game-features/`     | ⏳ Planned       | [roadmap.md](../features/5-game-features/roadmap.md)     |

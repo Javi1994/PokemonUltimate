@@ -39,10 +39,16 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         static AbilityCatalog()
         {
             RegisterGen3Abilities();
+            RegisterGen4Abilities();
+            RegisterGen5Abilities();
+            RegisterGen7Abilities();
             RegisterAdditionalAbilities();
         }
 
         static partial void RegisterGen3Abilities();
+        static partial void RegisterGen4Abilities();
+        static partial void RegisterGen5Abilities();
+        static partial void RegisterGen7Abilities();
         static partial void RegisterAdditionalAbilities();
     }
 }

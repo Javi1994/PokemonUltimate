@@ -78,6 +78,24 @@ namespace PokemonUltimate.Content.Builders
             return this;
         }
 
+        public AbilityBuilder OnBeforeMove()
+        {
+            _triggers |= AbilityTrigger.OnBeforeMove;
+            return this;
+        }
+
+        public AbilityBuilder OnAfterMove()
+        {
+            _triggers |= AbilityTrigger.OnAfterMove;
+            return this;
+        }
+
+        public AbilityBuilder OnWeatherChange()
+        {
+            _triggers |= AbilityTrigger.OnWeatherChange;
+            return this;
+        }
+
         public AbilityBuilder OnContactReceived()
         {
             _triggers |= AbilityTrigger.OnContactReceived;
@@ -345,6 +363,28 @@ namespace PokemonUltimate.Content.Builders
         public AbilityBuilder OnStatusReceived()
         {
             _triggers |= AbilityTrigger.OnStatusApplied;
+            return this;
+        }
+
+        /// <summary>
+        /// Skips turn every other turn (Truant).
+        /// </summary>
+        public AbilityBuilder SkipsTurn()
+        {
+            _effect = AbilityEffect.SkipTurn;
+            _triggers |= AbilityTrigger.OnBeforeMove;
+            return this;
+        }
+
+        /// <summary>
+        /// Raises stat when knocking out opponent (Moxie, Beast Boost).
+        /// </summary>
+        public AbilityBuilder RaisesStatOnKO(Stat stat, int stages = 1)
+        {
+            _effect = AbilityEffect.RaiseStatOnKO;
+            _targetStat = stat;
+            _statStages = stages;
+            _triggers |= AbilityTrigger.OnAfterMove;
             return this;
         }
 

@@ -23,6 +23,17 @@ namespace PokemonUltimate.Combat.Events
         /// <param name="field">The battlefield context.</param>
         /// <returns>Actions to execute, or empty if this listener doesn't respond to this trigger.</returns>
         IEnumerable<BattleAction> OnTrigger(BattleTrigger trigger, BattleSlot holder, BattleField field);
+
+        /// <summary>
+        /// Called when a battle trigger occurs with additional context (e.g., attacker for contact moves).
+        /// Returns actions to be enqueued and processed.
+        /// </summary>
+        /// <param name="trigger">The battle event that occurred.</param>
+        /// <param name="holder">The slot holding this listener (Pokemon with ability/item).</param>
+        /// <param name="field">The battlefield context.</param>
+        /// <param name="attacker">The slot that caused this trigger (e.g., attacker for contact moves).</param>
+        /// <returns>Actions to execute, or empty if this listener doesn't respond to this trigger.</returns>
+        IEnumerable<BattleAction> OnTrigger(BattleTrigger trigger, BattleSlot holder, BattleField field, BattleSlot attacker);
     }
 }
 

@@ -95,7 +95,9 @@ namespace PokemonUltimate.Combat.Helpers
             // Apply side condition speed modifiers (Tailwind)
             speed *= GetSideConditionSpeedMultiplier(slot.Side);
 
-            // Future: Apply ability modifiers (Swift Swim, Sand Rush)
+            // Apply ability speed modifiers (Swift Swim, Chlorophyll, Sand Rush, Slush Rush, Speed Boost)
+            speed *= GetAbilitySpeedMultiplier(slot, field);
+
             // Future: Apply field effects (Trick Room)
 
             return speed;
@@ -174,6 +176,41 @@ namespace PokemonUltimate.Combat.Helpers
                 if (tailwindData != null && tailwindData.ModifiesSpeed)
                 {
                     return tailwindData.SpeedMultiplier;
+                }
+            }
+
+            return 1.0f;
+        }
+
+        /// <summary>
+        /// Gets the speed multiplier from abilities (Swift Swim, Chlorophyll, Sand Rush, Slush Rush, Speed Boost).
+        /// </summary>
+        /// <param name="slot">The slot to check.</param>
+        /// <param name="field">The battlefield for weather context.</param>
+        /// <returns>The speed multiplier (1.0f if no modification).</returns>
+        /// <remarks>
+        /// **Feature**: 2: Combat System
+        /// **Sub-Feature**: 2.17: Advanced Abilities
+        /// **Documentation**: See `docs/features/2-combat-system/PLAN_COMPLETAR_FEATURE_2.md`
+        /// </remarks>
+        private static float GetAbilitySpeedMultiplier(BattleSlot slot, BattleField field)
+        {
+            if (slot?.Pokemon?.Ability == null || field == null)
+                return 1.0f;
+
+            var ability = slot.Pokemon.Ability;
+
+            // Speed Boost: +1 Speed stage each turn (handled via stat stages, not multiplier)
+            // This is handled by OnTurnEnd trigger, not here
+
+            // SpeedBoostInWeather: Double speed in specific weather (Swift Swim, Chlorophyll, Sand Rush, Slush Rush)
+            if (ability.Effect == Core.Enums.AbilityEffect.SpeedBoostInWeather)
+            {
+                // Check if current weather matches ability's weather condition
+                if (ability.WeatherCondition.HasValue && field.Weather == ability.WeatherCondition.Value)
+                {
+                    // Use multiplier from ability (default 2.0f for Swift Swim, Chlorophyll, etc.)
+                    return ability.Multiplier > 0 ? ability.Multiplier : 2.0f;
                 }
             }
 

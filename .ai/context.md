@@ -13,13 +13,13 @@
 | **Sub-Phase**           | 2.14 Hazards System ✅ Core Complete                                                                                                                                                                                                                                                                      |
 | **Combat Refactoring**  | ✅ Complete (2024-12-05) - Phases 0-13 completed (42/44 tasks, 95.5%). DI, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, Validation implemented.                                                                                                                               |
 | **Core Refactoring**    | ✅ Complete (2024-12-XX) - Phases 0-8 completed (21/22 tasks, 95.5%). DI, Strategy Pattern, Constants centralization, Extension methods, Validation, Move selection, Stat stage management, Stats caching implemented. See `PokemonUltimate.Core/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details. |
-| **Tests**               | 3,161+ passing (includes Phase 4: IVs/EVs System, Breeding System, Ownership/Tracking tests)                                                                                                                                                                                                     |
-| **Integration Tests**   | 83+ tests (system interactions)                                                                                                                                                                                                                                                                           |
+| **Tests**               | 3,210+ passing (includes Phase 4: IVs/EVs System, Breeding System, Ownership/Tracking tests)                                                                                                                                                                                                     |
+| **Integration Tests**   | 90+ tests (system interactions, Advanced Abilities & Items)                                                                                                                                                                                                                                                                           |
 | **Test Reorganization** | ✅ Complete - All phases finished (62 individual catalog files: 26 Pokemon 100%, 36 Moves 100%). Redundant grouped tests removed.                                                                                                                                                                         |
 | **Warnings**            | 0                                                                                                                                                                                                                                                                                                         |
 | **Pokemon Catalog**     | 26 Pokemon (Gen1)                                                                                                                                                                                                                                                                                         |
 | **Move Catalog**        | 36 Moves (12 types)                                                                                                                                                                                                                                                                                       |
-| **Last Updated**        | January 2025 (Post-Refactoring)                                                                                                                                                                                                                                                                           |
+| **Last Updated**        | January 2025 (Advanced Abilities & Items Integration Complete)                                                                                                                                                                                                                                                                           |
 
 ---
 
@@ -148,6 +148,8 @@ See `docs/features/2-combat-system/roadmap.md` for full details.
 | 2.12 Weather System     | ✅ Complete | Weather tracking, damage modifiers, end-of-turn damage, perfect accuracy moves                                |
 | 2.13 Terrain System     | ✅ Complete | Terrain tracking, damage modifiers, end-of-turn healing, terrain actions                                      |
 | 2.14 Hazards System     | ✅ Complete | Entry hazard tracking, processing on switch-in, Spikes/Stealth Rock/Toxic Spikes/Sticky Web                   |
+| 2.17 Advanced Abilities | ✅ ~95% Complete | Truant, Speed Boost, Static, Rough Skin, Swift Swim, Chlorophyll, Moxie (29 tests) |
+| 2.18 Advanced Items    | ✅ Complete | Life Orb, Focus Sash, Rocky Helmet, Black Sludge (21 tests) |
 
 Reference docs:
 

@@ -21,6 +21,8 @@ namespace PokemonUltimate.Core.Enums
         PreventStatLoss,
         /// <summary>Raises stat when own stat is lowered (Defiant, Competitive).</summary>
         RaiseStatOnLoss,
+        /// <summary>Raises stat when knocking out opponent (Moxie, Beast Boost).</summary>
+        RaiseStatOnKO,
 
         // === STATUS EFFECTS ===
         /// <summary>Chance to apply status on contact (Static, Poison Point).</summary>
@@ -79,6 +81,8 @@ namespace PokemonUltimate.Core.Enums
         CopyAbility,
         /// <summary>Changes form based on conditions (Forecast).</summary>
         FormChange,
+        /// <summary>Skips turn every other turn (Truant).</summary>
+        SkipTurn,
         /// <summary>Custom effect handled by specific logic.</summary>
         Custom,
     }

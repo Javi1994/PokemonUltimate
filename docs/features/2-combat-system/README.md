@@ -25,7 +25,10 @@ This feature implements the core Pokemon battle system, including:
 -   ✅ **Core Complete**: Battle foundation, actions, turn order, damage, engine
 -   ✅ **Integration**: Abilities, items, stat/damage modifiers, recoil/drain
 -   ✅ **Field Systems**: Weather, terrain, hazards, field conditions (screens, Tailwind, etc.)
--   ⏳ **Planned**: Advanced move mechanics (2.15), advanced abilities/items (2.17-2.18), battle formats (2.19)
+-   ✅ **Advanced Moves**: Protect, Counter, Pursuit, Focus Punch, Semi-Invulnerable, Multi-Hit, Multi-Turn (2.15 Core Complete)
+-   ✅ **Advanced Abilities**: Truant, Speed Boost, Static, Rough Skin, Swift Swim, Chlorophyll, Moxie (2.17 ~95% Complete)
+-   ✅ **Advanced Items**: Life Orb, Focus Sash, Rocky Helmet, Black Sludge (2.18 Complete)
+-   ⏳ **Planned**: Battle formats (2.19)
 
 ## Documentation
 
@@ -57,12 +60,11 @@ This feature implements the core Pokemon battle system, including:
 -   **[2.12: Weather System](2.12-weather-system/)** - Weather conditions and effects ✅
 -   **[2.13: Terrain System](2.13-terrain-system/)** - Terrain conditions and effects ✅
 -   **[2.14: Hazards System](2.14-hazards-system/)** - Stealth Rock, Spikes, etc. ✅ Core Complete
+-   **[2.15: Advanced Move Mechanics](2.15-advanced-move-mechanics/)** - Protect, Counter, Pursuit, Focus Punch, Semi-Invulnerable, Multi-Hit, Multi-Turn ✅ Core Complete
 -   **[2.16: Field Conditions](2.16-field-conditions/)** - Screens, Tailwind, protections ✅ Core Complete
 
-### Planned (2.15, 2.17-2.19)
+### Planned (2.17-2.19)
 
--   **[2.15: Advanced Move Mechanics](2.15-advanced-move-mechanics/)** - Multi-hit, charging moves ⏳
--   **[2.16: Field Conditions](2.16-field-conditions/)** - Screens, Tailwind, protections ⏳
 -   **[2.17: Advanced Abilities](2.17-advanced-abilities/)** - Complex ability interactions ⏳
 -   **[2.18: Advanced Items](2.18-advanced-items/)** - Complex item interactions ⏳
 -   **[2.19: Battle Formats](2.19-battle-formats/)** - Doubles, Triples, Rotation ⏳
@@ -77,8 +79,8 @@ This feature implements the core Pokemon battle system, including:
 
 ## Quick Links
 
--   **Phases Complete**: 2.1-2.9, 2.11, 2.12, 2.13, 2.14, 2.16 (Core combat + Weather + Terrain + Hazards + Field Conditions - note: 2.10 consolidated into 2.4)
--   **Phases Planned**: 2.15, 2.17-2.19 (Extended features)
+-   **Phases Complete**: 2.1-2.9, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16 (Core combat + Weather + Terrain + Hazards + Advanced Moves + Field Conditions - note: 2.10 consolidated into 2.4)
+-   **Phases Planned**: 2.17-2.19 (Advanced Abilities, Advanced Items, Battle Formats)
 -   **Tests**: 2,528+ passing tests (see [testing](testing.md))
 -   **Key Classes**: See [code location](code_location.md) for implementation details
 -   **Use Cases**: See [use_cases.md](use_cases.md) for all battle scenarios

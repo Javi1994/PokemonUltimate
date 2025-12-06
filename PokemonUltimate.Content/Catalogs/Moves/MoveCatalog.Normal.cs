@@ -18,6 +18,7 @@ namespace PokemonUltimate.Content.Catalogs.Moves
             .Description("A physical attack in which the user charges and slams into the target.")
             .Type(PokemonType.Normal)
             .Physical(40, 100, 35)
+            .MakesContact(true)
             .WithEffects(e => e.Damage())
             .Build();
 
