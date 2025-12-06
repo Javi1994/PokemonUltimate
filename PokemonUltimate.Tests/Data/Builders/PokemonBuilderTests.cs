@@ -261,6 +261,180 @@ namespace PokemonUltimate.Tests.Data.Builders
         }
 
         #endregion
+
+        #region Variant Tests
+
+        [Test]
+        public void AsMegaVariant_Should_Set_BaseForm_And_VariantType()
+        {
+            var charizard = PokemonBuilder.Define("Charizard", 6)
+                .Types(PokemonType.Fire, PokemonType.Flying)
+                .Stats(78, 84, 78, 109, 85, 100)
+                .Build();
+
+            var megaCharizardX = PokemonBuilder.Define("Mega Charizard X", 6)
+                .Types(PokemonType.Fire, PokemonType.Dragon)
+                .Stats(78, 130, 111, 130, 85, 100)
+                .AsMegaVariant(charizard)
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(megaCharizardX.BaseForm, Is.EqualTo(charizard));
+                Assert.That(megaCharizardX.VariantType, Is.EqualTo(PokemonVariantType.Mega));
+                Assert.That(megaCharizardX.IsMegaVariant, Is.True);
+                Assert.That(megaCharizardX.IsVariant, Is.True);
+                Assert.That(charizard.Variants, Contains.Item(megaCharizardX));
+            });
+        }
+
+        [Test]
+        public void AsDinamaxVariant_Should_Set_BaseForm_And_VariantType()
+        {
+            var charizard = PokemonBuilder.Define("Charizard", 6)
+                .Types(PokemonType.Fire, PokemonType.Flying)
+                .Stats(78, 84, 78, 109, 85, 100)
+                .Build();
+
+            var charizardDinamax = PokemonBuilder.Define("Charizard Dinamax", 6)
+                .Types(PokemonType.Fire, PokemonType.Flying)
+                .Stats(156, 84, 78, 109, 85, 100) // HP doubled
+                .AsDinamaxVariant(charizard)
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizardDinamax.BaseForm, Is.EqualTo(charizard));
+                Assert.That(charizardDinamax.VariantType, Is.EqualTo(PokemonVariantType.Dinamax));
+                Assert.That(charizardDinamax.IsDinamaxVariant, Is.True);
+                Assert.That(charizardDinamax.IsVariant, Is.True);
+                Assert.That(charizard.Variants, Contains.Item(charizardDinamax));
+            });
+        }
+
+        [Test]
+        public void AsTeraVariant_Should_Set_BaseForm_VariantType_And_TeraType()
+        {
+            var charizard = PokemonBuilder.Define("Charizard", 6)
+                .Types(PokemonType.Fire, PokemonType.Flying)
+                .Stats(78, 84, 78, 109, 85, 100)
+                .Build();
+
+            var charizardTeraFire = PokemonBuilder.Define("Charizard Tera Fire", 6)
+                .Type(PokemonType.Fire) // Mono-type
+                .Stats(78, 84, 78, 109, 85, 100)
+                .AsTeraVariant(charizard, PokemonType.Fire)
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizardTeraFire.BaseForm, Is.EqualTo(charizard));
+                Assert.That(charizardTeraFire.VariantType, Is.EqualTo(PokemonVariantType.Tera));
+                Assert.That(charizardTeraFire.TeraType, Is.EqualTo(PokemonType.Fire));
+                Assert.That(charizardTeraFire.IsTeraVariant, Is.True);
+                Assert.That(charizardTeraFire.IsVariant, Is.True);
+                Assert.That(charizard.Variants, Contains.Item(charizardTeraFire));
+            });
+        }
+
+        [Test]
+        public void AsMegaVariant_With_Null_BaseForm_Should_Throw()
+        {
+            var builder = PokemonBuilder.Define("Mega Charizard X", 6)
+                .Types(PokemonType.Fire, PokemonType.Dragon);
+
+            Assert.Throws<System.ArgumentNullException>(() => builder.AsMegaVariant(null));
+        }
+
+        [Test]
+        public void AsDinamaxVariant_With_Null_BaseForm_Should_Throw()
+        {
+            var builder = PokemonBuilder.Define("Charizard Dinamax", 6);
+
+            Assert.Throws<System.ArgumentNullException>(() => builder.AsDinamaxVariant(null));
+        }
+
+        [Test]
+        public void AsTeraVariant_With_Null_BaseForm_Should_Throw()
+        {
+            var builder = PokemonBuilder.Define("Charizard Tera Fire", 6);
+
+            Assert.Throws<System.ArgumentNullException>(() => builder.AsTeraVariant(null, PokemonType.Fire));
+        }
+
+        [Test]
+        public void Multiple_Variants_Should_Be_Added_To_BaseForm_Variants_List()
+        {
+            var charizard = PokemonBuilder.Define("Charizard", 6)
+                .Types(PokemonType.Fire, PokemonType.Flying)
+                .Stats(78, 84, 78, 109, 85, 100)
+                .Build();
+
+            var megaCharizardX = PokemonBuilder.Define("Mega Charizard X", 6)
+                .Types(PokemonType.Fire, PokemonType.Dragon)
+                .Stats(78, 130, 111, 130, 85, 100)
+                .AsMegaVariant(charizard)
+                .Build();
+
+            var megaCharizardY = PokemonBuilder.Define("Mega Charizard Y", 6)
+                .Types(PokemonType.Fire, PokemonType.Flying)
+                .Stats(78, 104, 78, 159, 115, 100)
+                .AsMegaVariant(charizard)
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizard.Variants, Has.Count.EqualTo(2));
+                Assert.That(charizard.Variants, Contains.Item(megaCharizardX));
+                Assert.That(charizard.Variants, Contains.Item(megaCharizardY));
+            });
+        }
+
+        [Test]
+        public void AsRegionalVariant_Should_Set_BaseForm_VariantType_And_RegionalForm()
+        {
+            var vulpix = PokemonBuilder.Define("Vulpix", 37)
+                .Type(PokemonType.Fire)
+                .Stats(38, 41, 40, 50, 65, 65)
+                .Build();
+
+            var alolanVulpix = PokemonBuilder.Define("Alolan Vulpix", 37)
+                .Type(PokemonType.Ice) // Different type
+                .Stats(38, 41, 40, 50, 65, 65)
+                .AsRegionalVariant(vulpix, "Alola")
+                .Build();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(alolanVulpix.BaseForm, Is.EqualTo(vulpix));
+                Assert.That(alolanVulpix.VariantType, Is.EqualTo(PokemonVariantType.Regional));
+                Assert.That(alolanVulpix.RegionalForm, Is.EqualTo("Alola"));
+                Assert.That(alolanVulpix.IsRegionalVariant, Is.True);
+                Assert.That(alolanVulpix.IsVariant, Is.True);
+                Assert.That(vulpix.Variants, Contains.Item(alolanVulpix));
+            });
+        }
+
+        [Test]
+        public void AsRegionalVariant_With_Null_BaseForm_Should_Throw()
+        {
+            var builder = PokemonBuilder.Define("Alolan Vulpix", 37);
+
+            Assert.Throws<System.ArgumentNullException>(() => builder.AsRegionalVariant(null, "Alola"));
+        }
+
+        [Test]
+        public void AsRegionalVariant_With_Empty_Region_Should_Throw()
+        {
+            var vulpix = PokemonBuilder.Define("Vulpix", 37).Build();
+            var builder = PokemonBuilder.Define("Alolan Vulpix", 37);
+
+            Assert.Throws<System.ArgumentException>(() => builder.AsRegionalVariant(vulpix, null));
+            Assert.Throws<System.ArgumentException>(() => builder.AsRegionalVariant(vulpix, ""));
+            Assert.Throws<System.ArgumentException>(() => builder.AsRegionalVariant(vulpix, "   "));
+        }
+
+        #endregion
     }
 }
 

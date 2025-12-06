@@ -353,10 +353,59 @@ var pikachu = new PokemonInstanceBuilder(pikachuSpecies, 50)
 
 ---
 
+## Pending Extensions (Phase 4 - LOW Priority) ⏳
+
+**Note**: These are optional extensions to Sub-Feature 1.1 for advanced features:
+
+### IVs/EVs System
+
+**Status**: ⏳ Not Implemented  
+**Purpose**: Individual Values and Effort Values tracking per Pokemon instance (for competitive/breeding features)
+
+**Missing**:
+-   `IVSet` class to store Individual Values per stat (HP, Attack, Defense, SpAttack, SpDefense, Speed)
+-   `EVSet` class to store Effort Values per stat (0-252 per stat, 510 total)
+-   `IVs` and `EVs` properties in `PokemonInstance`
+-   Methods to gain EVs from battles
+
+**Current**: Uses max IVs/EVs (31/252) by default via `StatCalculator` but values are not stored per instance.
+
+### Breeding System
+
+**Status**: ⏳ Not Implemented  
+**Purpose**: Breeding compatibility and egg hatching (for breeding features)
+
+**Missing**:
+-   `EggGroup` enum (Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered)
+-   `EggGroups` property in `PokemonSpeciesData` (list of EggGroup)
+-   `EggCycles` property in `PokemonSpeciesData` (cycles to hatch egg)
+-   Breeding compatibility logic
+-   IV inheritance from parents
+-   Egg move inheritance
+
+**Current**: Only `BaseFriendship` has default 120 for "hatched from egg", `LearnMethod.Egg` exists but no breeding system.
+
+### Ownership/Tracking Fields
+
+**Status**: ⏳ Not Implemented  
+**Purpose**: Track Pokemon origin and ownership (for ownership tracking)
+
+**Missing** (in `PokemonInstance`):
+-   `OriginalTrainer` (string?)
+-   `TrainerId` (int?)
+-   `MetLevel` (int?)
+-   `MetLocation` (string?)
+-   `MetDate` (DateTime?)
+
+**Current**: No tracking of Pokemon origin or ownership.
+
+**See**: [Parent Roadmap - Phase 4](../roadmap.md#phase-4-optional-enhancements-low-priority) for complete details.
+
 ## Related Documents
 
 -   **[Parent Architecture](../architecture.md#11-pokemon-data)** - Feature-level technical specification
 -   **[Parent Code Location](../code_location.md#grupo-a-core-entity-data)** - Code organization
+-   **[Parent Roadmap - Phase 4](../roadmap.md#phase-4-optional-enhancements-low-priority)** - Pending extensions
 -   **[Sub-Feature README](README.md)** - Overview and quick navigation
 
 ---

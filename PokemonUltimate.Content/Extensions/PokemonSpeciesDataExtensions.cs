@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using PokemonUltimate.Content.Providers;
 using PokemonUltimate.Core.Blueprints;
 
@@ -76,6 +77,26 @@ namespace PokemonUltimate.Content.Extensions
             pokemon.Learnset = learnsetData.Moves;
 
             return pokemon;
+        }
+
+        /// <summary>
+        /// Gets all variant forms for this Pokemon from the VariantProvider.
+        /// </summary>
+        /// <param name="pokemon">The base Pokemon species.</param>
+        /// <returns>Enumerable collection of variant forms.</returns>
+        public static IEnumerable<PokemonSpeciesData> GetVariants(this PokemonSpeciesData pokemon)
+        {
+            return VariantProvider.GetVariants(pokemon);
+        }
+
+        /// <summary>
+        /// Checks if this Pokemon has any variant forms available.
+        /// </summary>
+        /// <param name="pokemon">The base Pokemon species.</param>
+        /// <returns>True if variants exist, false otherwise.</returns>
+        public static bool HasVariantsAvailable(this PokemonSpeciesData pokemon)
+        {
+            return VariantProvider.HasVariants(pokemon);
         }
     }
 }

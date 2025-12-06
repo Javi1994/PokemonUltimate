@@ -14,7 +14,8 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   **Grupo B: Field & Status Data** (1.5-1.10) - Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
 -   **Grupo C: Supporting Systems** (1.11-1.12) - Evolution System, Type Effectiveness Table
 -   **Grupo D: Infrastructure** (1.13-1.14, 1.16-1.17) - Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9)
--   **Grupo E: Planned Features** (1.18-1.19) - Variants System (Planned), Pokedex Fields ✅ Complete
+-   **Grupo E: Planned Features** (1.18-1.19) - Variants System ✅ Complete, Pokedex Fields ✅ Complete
+-   **Phase 4: Optional Enhancements** - IVs/EVs System, Breeding System, Ownership/Tracking Fields ⏳ Pending
 -   **Content** - Data definitions in `PokemonUltimate.Content` (Feature 3: Content Expansion)
 
 **See**: [Sub-Features Overview](../1-game-data/README.md) for complete sub-feature list.
@@ -242,19 +243,131 @@ Game data is organized into logical groups matching the sub-feature structure:
 
 ### Grupo E: Planned Features (Sub-Features 1.18-1.19)
 
-**Note**: 1.19 (Pokedex Fields) is now complete. Only 1.18 (Variants System) remains planned.
+**Note**: Both 1.18 (Variants System) and 1.19 (Pokedex Fields) are now complete.
 
-#### 1.18: Variants System
+#### 1.18: Variants System ✅ COMPLETE
 
-**Sub-Feature**: [1.18: Variants System](1.18-variants-system/) ⏳ Planned  
-**Namespace**: `PokemonUltimate.Core.Blueprints` (extensions to PokemonSpeciesData)
+**Sub-Feature**: [1.18: Variants System](1.18-variants-system/) ✅ Complete  
+**Namespace**: `PokemonUltimate.Core.Blueprints`, `PokemonUltimate.Core.Enums`, `PokemonUltimate.Core.Registry`, `PokemonUltimate.Content.Builders`
 
-**Planned Fields**:
+**Files**:
 
--   `BaseForm` - Reference to base Pokemon
--   `VariantType` - Type of variant (Mega, Dinamax, Tera)
--   `TeraType` - Tera type for Terracristalización variants
+-   `PokemonUltimate.Core/Enums/PokemonVariantType.cs` - Variant type enum (Mega, Dinamax, Tera)
+-   `PokemonUltimate.Core/Blueprints/PokemonSpeciesData.cs` - Variant fields and computed properties
+-   `PokemonUltimate.Core/Builders/PokemonBuilder.cs` - Variant builder methods
+-   `PokemonUltimate.Core/Registry/PokemonRegistry.cs` - Variant query methods
+
+**Fields** (in PokemonSpeciesData):
+
+-   `BaseForm` - Reference to base Pokemon (null if base form)
+-   `VariantType` - Type of variant (Mega, Dinamax, Tera, Regional, null if base form)
+-   `TeraType` - Tera type for Terracristalización variants (null if not Tera variant)
+-   `RegionalForm` - Regional identifier for Regional variants (e.g., "Alola", "Galar", "Hisui", empty if not Regional)
 -   `Variants` - List of all variant forms
+
+**Computed Properties**:
+
+-   `IsVariant` - Returns true if this Pokemon is a variant form
+-   `IsBaseForm` - Returns true if this Pokemon is a base form
+-   `IsMegaVariant` - Returns true if this Pokemon is a Mega Evolution variant
+-   `IsDinamaxVariant` - Returns true if this Pokemon is a Dinamax variant
+-   `IsTeraVariant` - Returns true if this Pokemon is a Terracristalización variant
+-   `IsRegionalVariant` - Returns true if this Pokemon is a Regional form variant
+-   `HasGameplayChanges` - Returns true if variant has different stats/types/abilities from base form (detects purely visual variants)
+
+**Builder Methods**:
+
+-   `AsMegaVariant(PokemonSpeciesData baseForm, string variant = null)` - Mark as Mega variant
+-   `AsDinamaxVariant(PokemonSpeciesData baseForm)` - Mark as Dinamax variant
+-   `AsTeraVariant(PokemonSpeciesData baseForm, PokemonType teraType)` - Mark as Tera variant
+-   `AsRegionalVariant(PokemonSpeciesData baseForm, string region)` - Mark as Regional variant
+-   `AsCosmeticVariant(PokemonSpeciesData baseForm, string cosmeticFormIdentifier)` - Mark as Cosmetic variant
+
+**Computed Properties** (on PokemonSpeciesData):
+
+-   `HasVariants` - Returns true if Pokemon has any variant forms
+-   `VariantCount` - Returns number of variant forms
+-   `MegaVariants` - Gets all Mega Evolution variants
+-   `DinamaxVariants` - Gets all Dinamax variants
+-   `TeraVariants` - Gets all Terracristalización variants
+-   `RegionalVariants` - Gets all Regional form variants
+-   `CosmeticVariants` - Gets all Cosmetic variants
+-   `VariantsWithGameplayChanges` - Gets variants with stat/type/ability changes
+-   `VisualOnlyVariants` - Gets purely visual variants
+
+**Registry Methods**:
+
+-   `GetVariantsOf(PokemonSpeciesData baseForm)` - Get all variants of a base form
+-   `GetMegaVariants()` - Get all Mega Evolution variants
+-   `GetDinamaxVariants()` - Get all Dinamax variants
+-   `GetTeraVariants()` - Get all Terracristalización variants
+-   `GetRegionalVariants()` - Get all Regional form variants
+-   `GetRegionalVariantsByRegion(string region)` - Get Regional variants from specific region
+-   `GetVariantsWithGameplayChanges()` - Get variants with stat/type/ability changes
+-   `GetVisualOnlyVariants()` - Get purely visual variants (no gameplay changes)
+-   `GetBaseForms()` - Get all base forms (non-variant Pokemon)
+
+**VariantProvider** (`PokemonUltimate.Content/Providers/VariantProvider.cs`):
+
+-   `GetVariants(PokemonSpeciesData baseForm)` - Get all variants for a Pokemon
+-   `GetVariants(string basePokemonName)` - Get all variants by Pokemon name
+-   `HasVariants(PokemonSpeciesData baseForm)` - Check if Pokemon has variants
+-   `GetMegaVariants(PokemonSpeciesData baseForm)` - Get Mega variants for a Pokemon
+-   `GetRegionalVariants(PokemonSpeciesData baseForm)` - Get Regional variants for a Pokemon
+-   `GetTeraVariants(PokemonSpeciesData baseForm)` - Get Tera variants for a Pokemon
+
+**Extension Methods** (`PokemonUltimate.Content/Extensions/PokemonSpeciesDataExtensions.cs`):
+
+-   `GetVariants(this PokemonSpeciesData pokemon)` - Extension method to get variants
+-   `HasVariantsAvailable(this PokemonSpeciesData pokemon)` - Extension method to check for variants
+
+**Robustness Features**:
+
+-   ✅ Supports variants with gameplay changes (Mega, Dinamax, Tera, Regional with changes)
+-   ✅ Supports purely visual variants (Cosmetic variants with same stats/types/abilities)
+-   ✅ Automatic detection of gameplay changes via `HasGameplayChanges` property
+-   ✅ Flexible regional form system (Alola, Galar, Hisui, Paldea, etc.)
+-   ✅ Centralized variant management via VariantProvider
+-   ✅ Easy querying via computed properties and extension methods
+
+**Tests**: 63+ tests passing (functional + edge cases + VariantProvider tests + registry tests)
+
+---
+
+#### Phase 4: Optional Enhancements ⏳ PENDING
+
+**Sub-Feature**: 1.1: Pokemon Data (extensions)  
+**Status**: ⏳ **Not Implemented** - Optional extensions for advanced features
+
+**Pending Implementations**:
+
+**1. IVs/EVs System**:
+-   **Missing**: `IVSet` class to store Individual Values per stat (HP, Attack, Defense, SpAttack, SpDefense, Speed)
+-   **Missing**: `EVSet` class to store Effort Values per stat (0-252 per stat, 510 total)
+-   **Missing**: `IVs` and `EVs` properties in `PokemonInstance`
+-   **Missing**: Methods to gain EVs from battles
+-   **Current**: Uses max IVs/EVs (31/252) by default via `StatCalculator` but values are not stored per instance
+
+**2. Breeding System**:
+-   **Missing**: `EggGroup` enum (Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered)
+-   **Missing**: `EggGroups` property in `PokemonSpeciesData` (list of EggGroup)
+-   **Missing**: `EggCycles` property in `PokemonSpeciesData` (cycles to hatch egg)
+-   **Missing**: Breeding compatibility logic
+-   **Missing**: IV inheritance from parents
+-   **Missing**: Egg move inheritance
+-   **Current**: Only `BaseFriendship` has default 120 for "hatched from egg", `LearnMethod.Egg` exists but no breeding system
+
+**3. Ownership/Tracking Fields**:
+-   **Missing**: `OriginalTrainer` (string?) in `PokemonInstance`
+-   **Missing**: `TrainerId` (int?) in `PokemonInstance`
+-   **Missing**: `MetLevel` (int?) in `PokemonInstance`
+-   **Missing**: `MetLocation` (string?) in `PokemonInstance`
+-   **Missing**: `MetDate` (DateTime?) in `PokemonInstance`
+-   **Current**: No tracking of Pokemon origin or ownership
+
+**See**: [`roadmap.md`](roadmap.md#phase-4-optional-enhancements-low-priority) for complete details.
+
+---
 
 #### 1.19: Pokedex Fields ✅ COMPLETE
 

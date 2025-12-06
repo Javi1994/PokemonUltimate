@@ -24,8 +24,11 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 -   ✅ **Core Refactoring Complete (2024-12-XX)**: Comprehensive refactoring completed following SOLID principles. All major components now use Dependency Injection, Strategy Pattern, Value Objects, and centralized constants. Improved testability, maintainability, and extensibility. See `PokemonUltimate.Core/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for complete details. Phases 0-8 completed (21 of 22 tasks, 95.5%).
 -   ✅ **Gameplay Fields Complete (2025-01-XX)**: BaseExperienceYield, CatchRate, BaseFriendship, GrowthRate implemented
 -   ✅ **Pokedex Fields Complete (2025-01-XX)**: Description, Category, Height, Weight, Color, Shape, Habitat implemented
+-   ✅ **Variants System Complete (2025-01-XX)**: Mega/Dinamax/Terracristalización/Regional/Cosmetic variants as separate species, VariantProvider
 -   ⚠️ **Note**: Builders moved to Feature 3 (Sub-Feature 3.9) as they are primarily used for content creation
--   ⏳ **Planned**: Variants System (Mega, Dinamax, Terracristalización)
+-   ⏳ **Pending Extensions (Phase 4 - LOW Priority)**: IVs/EVs System, Breeding System, Ownership/Tracking Fields
+
+**See**: [Roadmap - Phase 4](roadmap.md#phase-4-optional-enhancements-low-priority) for details on pending extensions.
 
 ## Documentation
 
@@ -70,8 +73,18 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 
 ### Grupo E: Planned Features
 
--   **[1.18: Variants System](1.18-variants-system/)** - Mega/Dinamax/Terracristalización as separate species (Planned)
+-   **[1.18: Variants System](1.18-variants-system/)** - Mega/Dinamax/Terracristalización/Regional/Cosmetic as separate species ✅ Complete
 -   **[1.19: Pokedex Fields](1.19-pokedex-fields/)** - Description, Category, Height, Weight, Color, Shape, Habitat ✅ Complete
+
+### Phase 4: Optional Enhancements (LOW Priority)
+
+**Note**: These are extensions to Sub-Feature 1.1 (Pokemon Data) for advanced features:
+
+-   **IVs/EVs System** - Individual Values and Effort Values tracking per Pokemon instance (for competitive/breeding features)
+-   **Breeding System** - Egg Groups, Egg Cycles, breeding compatibility (for breeding features)
+-   **Ownership/Tracking Fields** - OriginalTrainer, TrainerId, MetLevel, MetLocation, MetDate (for ownership tracking)
+
+**See**: [Roadmap - Phase 4](roadmap.md#phase-4-optional-enhancements-low-priority) for complete details.
 
 ## Related Features
 
@@ -83,10 +96,11 @@ This feature defines **all game data structures** (blueprints) and supporting sy
 
 ## Quick Links
 
--   **Current Status**: Core data structures complete, infrastructure complete
+-   **Current Status**: Core data structures complete, infrastructure complete. Phase 4 extensions pending (IVs/EVs, Breeding, Ownership/Tracking)
 -   **Key Classes**: See [code location](code_location.md) for implementation details
 -   **Tests**: See [testing](testing.md) for test organization
 -   **Sub-Feature Architecture**: Detailed technical specs available for complex sub-features (1.1, 1.2, 1.11, 1.16, 1.17, 1.18)
+-   **Pending Work**: See [Roadmap - Phase 4](roadmap.md#phase-4-optional-enhancements-low-priority) for IVs/EVs, Breeding, and Ownership/Tracking extensions
 
 ---
 

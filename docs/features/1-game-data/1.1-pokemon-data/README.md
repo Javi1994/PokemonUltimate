@@ -64,6 +64,16 @@ Structure containing base stat values (HP, Attack, Defense, SpAttack, SpDefense,
 
 Structure defining how a Pokemon learns a move (Move reference, LearnMethod, Level).
 
+## Pending Extensions (Phase 4 - LOW Priority)
+
+**Note**: These are optional extensions for advanced features:
+
+-   **IVs/EVs System** - Individual Values and Effort Values tracking per Pokemon instance (for competitive/breeding features)
+-   **Breeding System** - Egg Groups, Egg Cycles, breeding compatibility (for breeding features)
+-   **Ownership/Tracking Fields** - OriginalTrainer, TrainerId, MetLevel, MetLocation, MetDate (for ownership tracking)
+
+**See**: [Parent Roadmap - Phase 4](../roadmap.md#phase-4-optional-enhancements-low-priority) for complete details.
+
 ## Related Sub-Features
 
 -   **[1.2: Move Data](../1.2-move-data/)** - Moves referenced in Learnset
@@ -78,6 +88,7 @@ Structure defining how a Pokemon learns a move (Move reference, LearnMethod, Lev
 | **[Architecture](architecture.md)**                                      | Complete technical specification      |
 | **[Parent Architecture](../architecture.md#11-pokemon-data)**            | Feature-level technical specification |
 | **[Parent Code Location](../code_location.md#grupo-a-core-entity-data)** | Code organization                     |
+| **[Parent Roadmap - Phase 4](../roadmap.md#phase-4-optional-enhancements-low-priority)** | Pending extensions (IVs/EVs, Breeding, Ownership) |
 
 ---
 

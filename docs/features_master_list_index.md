@@ -13,7 +13,7 @@ This document provides a quick, parseable index of all features for fast AI scan
 
 | #     | Name              | Folder                 | Status           | Description                                              |
 | ----- | ----------------- | ---------------------- | ---------------- | -------------------------------------------------------- |
-| **1** | Game Data         | `1-game-data/`         | ✅ Core Complete | Game data structures (blueprints) and supporting systems |
+| **1** | Game Data         | `1-game-data/`         | ✅ Core Complete<br>⏳ Phase 4 Pending | Game data structures (blueprints) and supporting systems<br>Pending: IVs/EVs, Breeding, Ownership/Tracking |
 | **2** | Combat System     | `2-combat-system/`     | ✅ Core Complete | Complete Pokemon battle engine                           |
 | **3** | Content Expansion | `3-content-expansion/` | 🎯 In Progress   | Adding Pokemon, Moves, Items, Abilities                  |
 | **4** | Unity Integration | `4-unity-integration/` | ⏳ Planned       | Unity UI and integration                                 |
@@ -76,8 +76,8 @@ This document provides a quick, parseable index of all features for fast AI scan
 
 #### Feature 1: Game Data (Planned Features)
 
--   **1.18**: Variants System - Mega/Dinamax/Terracristalización (⏳ Planned)
--   **1.19**: Pokedex Fields - Description, Category, Height, Weight, etc. (⏳ Planned)
+-   **1.18**: Variants System - Mega/Dinamax/Terracristalización/Regional/Cosmetic (✅ Complete)
+-   **1.19**: Pokedex Fields - Description, Category, Height, Weight, etc. (✅ Complete)
 
 ### Can Start Now (No Dependencies)
 

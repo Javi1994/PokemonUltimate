@@ -826,6 +826,340 @@ namespace PokemonUltimate.Tests.Blueprints
 
         #endregion
 
+        #region Variant Tests
+
+        [Test]
+        public void Test_BaseForm_Default_Is_Null()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.BaseForm, Is.Null);
+                Assert.That(pokemon.IsBaseForm, Is.True);
+                Assert.That(pokemon.IsVariant, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_IsVariant_Returns_True_When_BaseForm_Is_Set()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var megaCharizardX = new PokemonSpeciesData
+            {
+                Name = "Mega Charizard X",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Mega
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(megaCharizardX.IsVariant, Is.True);
+                Assert.That(megaCharizardX.IsBaseForm, Is.False);
+                Assert.That(megaCharizardX.BaseForm, Is.EqualTo(charizard));
+            });
+        }
+
+        [Test]
+        public void Test_IsMegaVariant_Returns_True_For_Mega_Evolution()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var megaCharizardX = new PokemonSpeciesData
+            {
+                Name = "Mega Charizard X",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Mega
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(megaCharizardX.IsMegaVariant, Is.True);
+                Assert.That(megaCharizardX.IsDinamaxVariant, Is.False);
+                Assert.That(megaCharizardX.IsTeraVariant, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_IsDinamaxVariant_Returns_True_For_Dinamax()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var charizardDinamax = new PokemonSpeciesData
+            {
+                Name = "Charizard Dinamax",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Dinamax
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizardDinamax.IsDinamaxVariant, Is.True);
+                Assert.That(charizardDinamax.IsMegaVariant, Is.False);
+                Assert.That(charizardDinamax.IsTeraVariant, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_IsTeraVariant_Returns_True_For_Terracristalizacion()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var charizardTeraFire = new PokemonSpeciesData
+            {
+                Name = "Charizard Tera Fire",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Tera,
+                TeraType = PokemonType.Fire
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizardTeraFire.IsTeraVariant, Is.True);
+                Assert.That(charizardTeraFire.IsMegaVariant, Is.False);
+                Assert.That(charizardTeraFire.IsDinamaxVariant, Is.False);
+                Assert.That(charizardTeraFire.TeraType, Is.EqualTo(PokemonType.Fire));
+            });
+        }
+
+        [Test]
+        public void Test_Variants_List_Is_Initialized()
+        {
+            var pokemon = new PokemonSpeciesData();
+
+            Assert.That(pokemon.Variants, Is.Not.Null);
+            Assert.That(pokemon.Variants, Is.Empty);
+        }
+
+        [Test]
+        public void Test_Variants_Can_Be_Added()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var megaCharizardX = new PokemonSpeciesData { Name = "Mega Charizard X", BaseForm = charizard };
+            var megaCharizardY = new PokemonSpeciesData { Name = "Mega Charizard Y", BaseForm = charizard };
+
+            charizard.Variants.Add(megaCharizardX);
+            charizard.Variants.Add(megaCharizardY);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizard.Variants, Has.Count.EqualTo(2));
+                Assert.That(charizard.Variants, Contains.Item(megaCharizardX));
+                Assert.That(charizard.Variants, Contains.Item(megaCharizardY));
+            });
+        }
+
+        #endregion
+
+        #region Variant Edge Cases
+
+        [Test]
+        public void Test_Variant_With_Null_BaseForm_Is_Not_Variant()
+        {
+            var pokemon = new PokemonSpeciesData
+            {
+                Name = "Charizard",
+                BaseForm = null,
+                VariantType = null
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(pokemon.IsBaseForm, Is.True);
+                Assert.That(pokemon.IsVariant, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_TeraVariant_Must_Have_TeraType_Set()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var charizardTeraFire = new PokemonSpeciesData
+            {
+                Name = "Charizard Tera Fire",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Tera,
+                TeraType = PokemonType.Fire
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizardTeraFire.IsTeraVariant, Is.True);
+                Assert.That(charizardTeraFire.TeraType, Is.EqualTo(PokemonType.Fire));
+            });
+        }
+
+        [Test]
+        public void Test_MegaVariant_Should_Not_Have_TeraType()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var megaCharizardX = new PokemonSpeciesData
+            {
+                Name = "Mega Charizard X",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Mega,
+                TeraType = null
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(megaCharizardX.IsMegaVariant, Is.True);
+                Assert.That(megaCharizardX.TeraType, Is.Null);
+            });
+        }
+
+        [Test]
+        public void Test_DinamaxVariant_Should_Not_Have_TeraType()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var charizardDinamax = new PokemonSpeciesData
+            {
+                Name = "Charizard Dinamax",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Dinamax,
+                TeraType = null
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizardDinamax.IsDinamaxVariant, Is.True);
+                Assert.That(charizardDinamax.TeraType, Is.Null);
+            });
+        }
+
+        [Test]
+        public void Test_BaseForm_Variants_List_Is_Independent()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var pikachu = new PokemonSpeciesData { Name = "Pikachu" };
+
+            var megaCharizardX = new PokemonSpeciesData { Name = "Mega Charizard X", BaseForm = charizard };
+            var megaPikachu = new PokemonSpeciesData { Name = "Mega Pikachu", BaseForm = pikachu };
+
+            charizard.Variants.Add(megaCharizardX);
+            pikachu.Variants.Add(megaPikachu);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(charizard.Variants, Has.Count.EqualTo(1));
+                Assert.That(pikachu.Variants, Has.Count.EqualTo(1));
+                Assert.That(charizard.Variants, Does.Not.Contain(megaPikachu));
+                Assert.That(pikachu.Variants, Does.Not.Contain(megaCharizardX));
+            });
+        }
+
+        [Test]
+        public void Test_Circular_Reference_Prevention()
+        {
+            var charizard = new PokemonSpeciesData { Name = "Charizard" };
+            var megaCharizardX = new PokemonSpeciesData
+            {
+                Name = "Mega Charizard X",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Mega
+            };
+
+            // Variant should not be its own base form
+            Assert.That(megaCharizardX.BaseForm, Is.EqualTo(charizard));
+            Assert.That(megaCharizardX.BaseForm, Is.Not.EqualTo(megaCharizardX));
+        }
+
+        [Test]
+        public void Test_IsRegionalVariant_Returns_True_For_Regional_Forms()
+        {
+            var vulpix = new PokemonSpeciesData { Name = "Vulpix" };
+            var alolanVulpix = new PokemonSpeciesData
+            {
+                Name = "Alolan Vulpix",
+                BaseForm = vulpix,
+                VariantType = PokemonVariantType.Regional,
+                RegionalForm = "Alola"
+            };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(alolanVulpix.IsRegionalVariant, Is.True);
+                Assert.That(alolanVulpix.RegionalForm, Is.EqualTo("Alola"));
+                Assert.That(alolanVulpix.IsMegaVariant, Is.False);
+                Assert.That(alolanVulpix.IsDinamaxVariant, Is.False);
+                Assert.That(alolanVulpix.IsTeraVariant, Is.False);
+            });
+        }
+
+        [Test]
+        public void Test_HasGameplayChanges_Returns_True_For_Mega_Variants()
+        {
+            var charizard = new PokemonSpeciesData 
+            { 
+                Name = "Charizard",
+                BaseStats = new BaseStats(78, 84, 78, 109, 85, 100)
+            };
+            var megaCharizardX = new PokemonSpeciesData
+            {
+                Name = "Mega Charizard X",
+                BaseForm = charizard,
+                VariantType = PokemonVariantType.Mega,
+                BaseStats = new BaseStats(78, 130, 111, 130, 85, 100) // Higher BST
+            };
+
+            Assert.That(megaCharizardX.HasGameplayChanges, Is.True);
+        }
+
+        [Test]
+        public void Test_HasGameplayChanges_Returns_True_For_Regional_With_Different_Stats()
+        {
+            var vulpix = new PokemonSpeciesData 
+            { 
+                Name = "Vulpix",
+                PrimaryType = PokemonType.Fire,
+                BaseStats = new BaseStats(38, 41, 40, 50, 65, 65)
+            };
+            var alolanVulpix = new PokemonSpeciesData
+            {
+                Name = "Alolan Vulpix",
+                BaseForm = vulpix,
+                VariantType = PokemonVariantType.Regional,
+                RegionalForm = "Alola",
+                PrimaryType = PokemonType.Ice, // Different type
+                BaseStats = new BaseStats(38, 41, 40, 50, 65, 65) // Same stats
+            };
+
+            Assert.That(alolanVulpix.HasGameplayChanges, Is.True, "Alolan Vulpix has different type");
+        }
+
+        [Test]
+        public void Test_HasGameplayChanges_Returns_False_For_Purely_Visual_Variants()
+        {
+            var staticAbility = PokemonUltimate.Content.Catalogs.Abilities.AbilityCatalog.Static;
+            
+            var pikachu = new PokemonSpeciesData 
+            { 
+                Name = "Pikachu",
+                PrimaryType = PokemonType.Electric,
+                BaseStats = new BaseStats(35, 55, 40, 50, 50, 90),
+                Ability1 = staticAbility
+            };
+            var pikachuCosmetic = new PokemonSpeciesData
+            {
+                Name = "Pikachu (Cosmetic)",
+                BaseForm = pikachu,
+                VariantType = PokemonVariantType.Cosmetic,
+                RegionalForm = "Cosmetic",
+                PrimaryType = PokemonType.Electric, // Same type
+                BaseStats = new BaseStats(35, 55, 40, 50, 50, 90), // Same stats
+                Ability1 = staticAbility // Same ability (same reference)
+            };
+
+            Assert.That(pikachuCosmetic.HasGameplayChanges, Is.False, "Purely visual variant should have no gameplay changes");
+        }
+
+        [Test]
+        public void Test_HasGameplayChanges_Returns_False_For_Base_Forms()
+        {
+            var pokemon = new PokemonSpeciesData { Name = "Pikachu" };
+
+            Assert.That(pokemon.HasGameplayChanges, Is.False);
+        }
+
+        #endregion
+
         #region Helpers
 
         private static BaseStats CreateStatsWithTotal(int targetTotal)

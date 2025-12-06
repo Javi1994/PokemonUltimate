@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
 namespace PokemonUltimate.Content.Builders
@@ -268,14 +269,152 @@ namespace PokemonUltimate.Content.Builders
 
         #endregion
 
+        #region Variant Methods
+
+        /// <summary>
+        /// Mark this Pokemon as a Mega Evolution variant of the specified base form.
+        /// </summary>
+        /// <param name="baseForm">The base Pokemon form this variant is based on.</param>
+        /// <param name="variant">Optional variant identifier (e.g., "X", "Y") for Pokemon with multiple Mega forms.</param>
+        /// <remarks>
+        /// **Feature**: 1: Game Data
+        /// **Sub-Feature**: 1.18: Variants System
+        /// **Documentation**: See `docs/features/1-game-data/1.18-variants-system/architecture.md`
+        /// </remarks>
+        public PokemonBuilder AsMegaVariant(PokemonSpeciesData baseForm, string variant = null)
+        {
+            if (baseForm == null)
+                throw new ArgumentNullException(nameof(baseForm), ErrorMessages.PokemonCannotBeNull);
+
+            _pokemon.BaseForm = baseForm;
+            _pokemon.VariantType = PokemonVariantType.Mega;
+            _pokemon.TeraType = null;
+            _pokemon.RegionalForm = string.Empty;
+
+            // Note: The bidirectional relationship (adding to baseForm.Variants) 
+            // should be handled by the caller or a separate relationship manager
+            // to maintain Single Responsibility Principle
+
+            return this;
+        }
+
+        /// <summary>
+        /// Mark this Pokemon as a Dinamax variant of the specified base form.
+        /// </summary>
+        /// <param name="baseForm">The base Pokemon form this variant is based on.</param>
+        /// <remarks>
+        /// **Feature**: 1: Game Data
+        /// **Sub-Feature**: 1.18: Variants System
+        /// **Documentation**: See `docs/features/1-game-data/1.18-variants-system/architecture.md`
+        /// </remarks>
+        public PokemonBuilder AsDinamaxVariant(PokemonSpeciesData baseForm)
+        {
+            if (baseForm == null)
+                throw new ArgumentNullException(nameof(baseForm), ErrorMessages.PokemonCannotBeNull);
+
+            _pokemon.BaseForm = baseForm;
+            _pokemon.VariantType = PokemonVariantType.Dinamax;
+            _pokemon.TeraType = null;
+            _pokemon.RegionalForm = string.Empty;
+
+            // Note: The bidirectional relationship (adding to baseForm.Variants) 
+            // should be handled by the caller or a separate relationship manager
+            // to maintain Single Responsibility Principle
+
+            return this;
+        }
+
+        /// <summary>
+        /// Mark this Pokemon as a Terracristalización variant of the specified base form.
+        /// </summary>
+        /// <param name="baseForm">The base Pokemon form this variant is based on.</param>
+        /// <param name="teraType">The Tera type for this variant (mono-type).</param>
+        /// <remarks>
+        /// **Feature**: 1: Game Data
+        /// **Sub-Feature**: 1.18: Variants System
+        /// **Documentation**: See `docs/features/1-game-data/1.18-variants-system/architecture.md`
+        /// </remarks>
+        public PokemonBuilder AsTeraVariant(PokemonSpeciesData baseForm, PokemonType teraType)
+        {
+            if (baseForm == null)
+                throw new ArgumentNullException(nameof(baseForm), ErrorMessages.PokemonCannotBeNull);
+
+            _pokemon.BaseForm = baseForm;
+            _pokemon.VariantType = PokemonVariantType.Tera;
+            _pokemon.TeraType = teraType;
+            _pokemon.RegionalForm = string.Empty;
+
+            // Note: The bidirectional relationship (adding to baseForm.Variants) 
+            // should be handled by the caller or a separate relationship manager
+            // to maintain Single Responsibility Principle
+
+            return this;
+        }
+
+        /// <summary>
+        /// Mark this Pokemon as a Regional form variant of the specified base form.
+        /// Regional forms can have different types, stats, abilities, or be purely visual.
+        /// Examples: Alolan Vulpix (Ice type), Galarian Meowth (Steel type), Alolan Raichu (Electric/Psychic)
+        /// </summary>
+        /// <param name="baseForm">The base Pokemon form this variant is based on.</param>
+        /// <param name="region">The region identifier (e.g., "Alola", "Galar", "Hisui", "Paldea").</param>
+        /// <remarks>
+        /// **Feature**: 1: Game Data
+        /// **Sub-Feature**: 1.18: Variants System
+        /// **Documentation**: See `docs/features/1-game-data/1.18-variants-system/architecture.md`
+        /// </remarks>
+        public PokemonBuilder AsRegionalVariant(PokemonSpeciesData baseForm, string region)
+        {
+            if (baseForm == null)
+                throw new ArgumentNullException(nameof(baseForm), ErrorMessages.PokemonCannotBeNull);
+            if (string.IsNullOrWhiteSpace(region))
+                throw new ArgumentException("Region cannot be null or empty", nameof(region));
+
+            _pokemon.BaseForm = baseForm;
+            _pokemon.VariantType = PokemonVariantType.Regional;
+            _pokemon.RegionalForm = region;
+            _pokemon.TeraType = null;
+
+            // Note: The bidirectional relationship (adding to baseForm.Variants) 
+            // should be handled by the caller or a separate relationship manager
+            // to maintain Single Responsibility Principle
+
+            return this;
+        }
+
+        #endregion
+
         /// <summary>
         /// Build the final PokemonSpeciesData instance.
+        /// Establishes bidirectional relationship if this is a variant.
         /// </summary>
         public PokemonSpeciesData Build()
         {
             _pokemon.Learnset = _learnset;
             _pokemon.Evolutions = _evolutions;
+            
+            // Establish bidirectional relationship for variants (SRP: Build handles finalization)
+            if (_pokemon.IsVariant && _pokemon.BaseForm != null)
+            {
+                EstablishVariantRelationship(_pokemon, _pokemon.BaseForm);
+            }
+            
             return _pokemon;
+        }
+
+        /// <summary>
+        /// Establishes the bidirectional relationship between a variant and its base form.
+        /// This method encapsulates the relationship logic to maintain Single Responsibility Principle.
+        /// </summary>
+        private static void EstablishVariantRelationship(PokemonSpeciesData variant, PokemonSpeciesData baseForm)
+        {
+            if (variant == null || baseForm == null)
+                return;
+
+            if (!baseForm.Variants.Contains(variant))
+            {
+                baseForm.Variants.Add(variant);
+            }
         }
     }
 

@@ -148,6 +148,42 @@ namespace PokemonUltimate.Core.Blueprints
 
         #endregion
 
+        #region Variant Fields
+
+        /// <summary>
+        /// Reference to the base Pokemon form (null if this is a base form).
+        /// Variants are implemented as separate Pokemon species with different stats.
+        /// </summary>
+        /// <remarks>
+        /// **Feature**: 1: Game Data
+        /// **Sub-Feature**: 1.18: Variants System
+        /// **Documentation**: See `docs/features/1-game-data/1.18-variants-system/architecture.md`
+        /// </remarks>
+        public PokemonSpeciesData BaseForm { get; set; }
+
+        /// <summary>
+        /// Type of variant (Mega, Dinamax, Tera). Null if this is a base form.
+        /// </summary>
+        public PokemonVariantType? VariantType { get; set; }
+
+        /// <summary>
+        /// Tera type for Terracristalización variants. Only set when VariantType is Tera.
+        /// </summary>
+        public PokemonType? TeraType { get; set; }
+
+        /// <summary>
+        /// Regional identifier for Regional form variants (e.g., "Alola", "Galar", "Hisui", "Paldea").
+        /// Only set when VariantType is Regional.
+        /// </summary>
+        public string RegionalForm { get; set; } = string.Empty;
+
+        /// <summary>
+        /// List of all variant forms of this Pokemon. Populated automatically when variants are registered.
+        /// </summary>
+        public List<PokemonSpeciesData> Variants { get; set; } = new List<PokemonSpeciesData>();
+
+        #endregion
+
         /// <summary>
         /// IIdentifiable implementation - Name serves as the unique ID.
         /// </summary>
@@ -192,6 +228,125 @@ namespace PokemonUltimate.Core.Blueprints
         /// Returns true if this Pokemon has a hidden ability.
         /// </summary>
         public bool HasHiddenAbility => HiddenAbility != null;
+
+        /// <summary>
+        /// Returns true if this Pokemon is a variant form (has a BaseForm).
+        /// </summary>
+        public bool IsVariant => BaseForm != null;
+
+        /// <summary>
+        /// Returns true if this Pokemon is a base form (not a variant).
+        /// </summary>
+        public bool IsBaseForm => BaseForm == null;
+
+        /// <summary>
+        /// Returns true if this Pokemon is a Mega Evolution variant.
+        /// </summary>
+        public bool IsMegaVariant => VariantType == PokemonVariantType.Mega;
+
+        /// <summary>
+        /// Returns true if this Pokemon is a Dinamax variant.
+        /// </summary>
+        public bool IsDinamaxVariant => VariantType == PokemonVariantType.Dinamax;
+
+        /// <summary>
+        /// Returns true if this Pokemon is a Terracristalización variant.
+        /// </summary>
+        public bool IsTeraVariant => VariantType == PokemonVariantType.Tera;
+
+        /// <summary>
+        /// Returns true if this Pokemon is a Regional form variant.
+        /// </summary>
+        public bool IsRegionalVariant => VariantType == PokemonVariantType.Regional;
+
+        /// <summary>
+        /// Returns true if this Pokemon is a Cosmetic variant (e.g., Pikachu Libre).
+        /// </summary>
+        public bool IsCosmeticVariant => VariantType == PokemonVariantType.Cosmetic;
+
+        /// <summary>
+        /// Returns true if this variant has gameplay changes (stats, types, abilities).
+        /// Returns false for purely visual variants (some regional forms).
+        /// </summary>
+        public bool HasGameplayChanges
+        {
+            get
+            {
+                if (!IsVariant || BaseForm == null) return false;
+
+                // Check for stat differences
+                if (BaseStats.HP != BaseForm.BaseStats.HP ||
+                    BaseStats.Attack != BaseForm.BaseStats.Attack ||
+                    BaseStats.Defense != BaseForm.BaseStats.Defense ||
+                    BaseStats.SpAttack != BaseForm.BaseStats.SpAttack ||
+                    BaseStats.SpDefense != BaseForm.BaseStats.SpDefense ||
+                    BaseStats.Speed != BaseForm.BaseStats.Speed) return true;
+
+                // Check for type differences
+                if (PrimaryType != BaseForm.PrimaryType || SecondaryType != BaseForm.SecondaryType) return true;
+
+                // Check for ability differences (consider Ability1, Ability2, HiddenAbility)
+                if (Ability1?.Name != BaseForm.Ability1?.Name ||
+                    Ability2?.Name != BaseForm.Ability2?.Name ||
+                    HiddenAbility?.Name != BaseForm.HiddenAbility?.Name) return true;
+
+                // Tera variants always have a gameplay change (type change)
+                if (IsTeraVariant) return true;
+
+                // Dinamax variants always have a gameplay change (HP increase)
+                if (IsDinamaxVariant) return true;
+
+                // Mega variants always have gameplay changes (stats, types, abilities)
+                if (IsMegaVariant) return true;
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if this Pokemon has any variant forms.
+        /// </summary>
+        public bool HasVariants => Variants.Count > 0;
+
+        /// <summary>
+        /// Returns the number of variant forms this Pokemon has.
+        /// </summary>
+        public int VariantCount => Variants.Count;
+
+        /// <summary>
+        /// Gets all Mega Evolution variants of this Pokemon.
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> MegaVariants => Variants.Where(v => v.IsMegaVariant);
+
+        /// <summary>
+        /// Gets all Dinamax variants of this Pokemon.
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> DinamaxVariants => Variants.Where(v => v.IsDinamaxVariant);
+
+        /// <summary>
+        /// Gets all Terracristalización variants of this Pokemon.
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> TeraVariants => Variants.Where(v => v.IsTeraVariant);
+
+        /// <summary>
+        /// Gets all Regional form variants of this Pokemon.
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> RegionalVariants => Variants.Where(v => v.IsRegionalVariant);
+
+        /// <summary>
+        /// Gets all Cosmetic variants of this Pokemon.
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> CosmeticVariants => Variants.Where(v => v.IsCosmeticVariant);
+
+        /// <summary>
+        /// Gets all variants that have gameplay changes (stats, types, abilities).
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> VariantsWithGameplayChanges => Variants.Where(v => v.HasGameplayChanges);
+
+        /// <summary>
+        /// Gets all variants that are purely visual (no gameplay changes).
+        /// </summary>
+        public IEnumerable<PokemonSpeciesData> VisualOnlyVariants => Variants.Where(v => !v.HasGameplayChanges);
 
         /// <summary>
         /// Gets all possible abilities for this Pokemon.

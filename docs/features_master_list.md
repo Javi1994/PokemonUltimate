@@ -64,8 +64,18 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 #### Grupo E: Planned Features
 
--   **1.18**: Variants System - Mega/Dinamax/Terracristalización as separate species (Planned)
+-   **1.18**: Variants System - Mega/Dinamax/Terracristalización/Regional/Cosmetic as separate species (✅ Complete)
 -   **1.19**: Pokedex Fields - Description, Category, Height, Weight, Color, Shape, Habitat ✅ Complete
+
+#### Phase 4: Optional Enhancements (LOW Priority) ⏳ PENDING
+
+**Sub-Feature 1.1: Pokemon Data (extensions)**
+
+-   **IVs/EVs System** - Individual Values and Effort Values tracking per Pokemon instance ⏳ Planned
+-   **Breeding System** - Egg Groups, Egg Cycles, breeding compatibility ⏳ Planned
+-   **Ownership/Tracking Fields** - OriginalTrainer, TrainerId, MetLevel, MetLocation, MetDate ⏳ Planned
+
+**See**: [`docs/features/1-game-data/roadmap.md`](docs/features/1-game-data/roadmap.md#phase-4-optional-enhancements-low-priority) for details.
 
 **Related Roadmap**: `docs/features/1-game-data/roadmap.md`
 
@@ -175,7 +185,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 | #     | Feature Name      | Folder                 | Status           | Roadmap                                                  |
 | ----- | ----------------- | ---------------------- | ---------------- | -------------------------------------------------------- |
-| **1** | Game Data         | `1-game-data/`         | ✅ Core Complete | [roadmap.md](../features/1-game-data/roadmap.md)         |
+| **1** | Game Data         | `1-game-data/`         | ✅ Core Complete<br>⏳ Phase 4 Pending | Game data structures (blueprints) and supporting systems<br>Pending: IVs/EVs, Breeding, Ownership/Tracking |
 | **2** | Combat System     | `2-combat-system/`     | ✅ Core Complete | [roadmap.md](../features/2-combat-system/roadmap.md)     |
 | **3** | Content Expansion | `3-content-expansion/` | 🎯 In Progress   | [roadmap.md](../features/3-content-expansion/roadmap.md) |
 | **4** | Unity Integration | `4-unity-integration/` | ⏳ Planned       | [roadmap.md](../features/4-unity-integration/roadmap.md) |

@@ -60,8 +60,18 @@ It follows the **Testability First** guideline by separating the Data (POCO) fro
 
 **Features futuras**
 
--   **1.18: Variants System** - Mega/Dinamax/Terracristalización (Planned)
+-   **1.18: Variants System** - Mega/Dinamax/Terracristalización/Regional/Cosmetic as separate species ✅ Complete
 -   **1.19: Pokedex Fields** - Description, Category, Height, Weight, Color, Shape, Habitat ✅ Complete
+
+### Phase 4: Optional Enhancements (LOW Priority) ⏳ PENDING
+
+**Sub-Feature 1.1: Pokemon Data (extensions)**
+
+-   **IVs/EVs System** - Individual Values and Effort Values tracking per Pokemon instance ⏳ Planned
+-   **Breeding System** - Egg Groups, Egg Cycles, breeding compatibility ⏳ Planned
+-   **Ownership/Tracking Fields** - OriginalTrainer, TrainerId, MetLevel, MetLocation, MetDate ⏳ Planned
+
+**See**: [`roadmap.md`](roadmap.md#phase-4-optional-enhancements-low-priority) for complete details.
 
 ---
 

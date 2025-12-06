@@ -18,15 +18,48 @@ Instead of temporary transformations during battle, **Mega Evolutions**, **Dinam
 
 ## Current Status
 
-- ⏳ **Planned**: Variant system fields (BaseForm, VariantType, TeraType, Variants)
-- ⏳ **Planned**: Variant species definitions
-- ⏳ **Planned**: Variant relationship validation
+- ✅ **Complete**: Variant system fields (BaseForm, VariantType, TeraType, RegionalForm, Variants)
+- ✅ **Complete**: PokemonVariantType enum (Mega, Dinamax, Tera, Regional, Cosmetic)
+- ✅ **Complete**: Variant builder methods (AsMegaVariant, AsDinamaxVariant, AsTeraVariant, AsRegionalVariant, AsCosmeticVariant)
+- ✅ **Complete**: Variant registry query methods (GetVariantsOf, GetMegaVariants, etc.)
+- ✅ **Complete**: VariantProvider for centralized variant management
+- ✅ **Complete**: Extension methods for easy variant access (.GetVariants(), .HasVariantsAvailable())
+- ✅ **Complete**: Computed properties on PokemonSpeciesData (HasVariants, MegaVariants, etc.)
+- ✅ **Complete**: Variant relationship validation and tests (63+ tests passing)
 
 ## Variant Types
 
 - **Mega Evolutions**: Permanent stat changes, type changes, ability changes
 - **Dinamax**: Massive HP increase, special moves
 - **Terracristalización**: Type change, stat boost
+- **Regional Forms**: Can have different types, stats, abilities, or be purely visual (Alola, Galar, Hisui, etc.)
+
+## Robustness Features
+
+The system is designed to handle all types of variants robustly:
+
+1. **Variants with Gameplay Changes**:
+   - Mega Evolutions (stat/type/ability changes)
+   - Dinamax (HP increase)
+   - Terracristalización (type changes)
+   - Regional forms with different stats/types/abilities
+
+2. **Purely Visual Variants**:
+   - Regional forms with same stats/types/abilities (cosmetic only)
+   - Automatically detected via `HasGameplayChanges` property
+
+3. **Query Capabilities**:
+   - Get all variants of a base form (via `VariantProvider` or `pokemon.Variants`)
+   - Get variants by type (Mega, Dinamax, Tera, Regional, Cosmetic)
+   - Get regional variants by region (Alola, Galar, etc.)
+   - Get variants with gameplay changes vs visual-only variants
+   - Extension methods for easy access: `pokemon.GetVariants()`, `pokemon.HasVariantsAvailable()`
+
+4. **VariantProvider**:
+   - Centralized provider for variant management (`VariantProvider`)
+   - Automatic variant registration and relationship establishment
+   - Easy querying: `VariantProvider.GetVariants(pokemon)`, `VariantProvider.GetMegaVariants(pokemon)`
+   - Follows same pattern as `PokedexDataProvider` and `LearnsetProvider`
 
 ## Related Sub-Features
 
@@ -36,7 +69,31 @@ Instead of temporary transformations during battle, **Mega Evolutions**, **Dinam
 
 - **[Architecture](architecture.md)** - Complete specification of variants system
 - **[Parent Architecture](../architecture.md#114-variants-system)** - Technical specification
-- **[Parent Code Location](../code_location.md#grupo-e-planned-features)** - Code organization
+- **[Parent Code Location](../code_location.md#118-variants-system-complete)** - Code organization
+
+## VariantProvider
+
+The `VariantProvider` (`PokemonUltimate.Content/Providers/VariantProvider.cs`) provides centralized variant management:
+
+- **Centralized Creation**: All variants are created and registered in `VariantProvider`
+- **Easy Querying**: `VariantProvider.GetVariants(pokemon)` or `pokemon.GetVariants()`
+- **Automatic Registration**: Variants are automatically added to base form's `Variants` list
+- **Extension Methods**: Convenient methods like `pokemon.HasVariantsAvailable()`
+
+**Usage**:
+```csharp
+// Get all variants for a Pokemon
+var variants = VariantProvider.GetVariants(PokemonCatalog.Charizard);
+// Or using extension method
+var variants = PokemonCatalog.Charizard.GetVariants();
+
+// Check if Pokemon has variants
+if (VariantProvider.HasVariants(PokemonCatalog.Charizard)) { ... }
+// Or using extension method
+if (PokemonCatalog.Charizard.HasVariantsAvailable()) { ... }
+```
+
+See [Architecture](architecture.md#4-variantprovider) for complete details.
 
 ---
 

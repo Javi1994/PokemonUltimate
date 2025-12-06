@@ -14,7 +14,8 @@ This document defines the implementation roadmap for **all game data structures*
 -   **Field & Status Data** (1.5-1.10): Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects
 -   **Supporting Systems** (1.11-1.12): Evolution System, Type Effectiveness Table
 -   **Infrastructure** (1.13-1.14, 1.16-1.17): Interfaces, Enums, Constants, Factories, Registries (Note: Builders moved to Feature 3.9, was 1.15)
--   **Planned Features** (1.18-1.19): Variants System (Planned), Pokedex Fields ✅ Complete
+-   **Planned Features** (1.18-1.19): Variants System ✅ Complete, Pokedex Fields ✅ Complete
+-   **Phase 4: Optional Enhancements**: IVs/EVs System, Breeding System, Ownership/Tracking Fields ⏳ Pending
 
 **Goal**: Ensure all data structures are complete and well-organized before expanding content, preventing future refactoring.
 
@@ -28,7 +29,8 @@ This document defines the implementation roadmap for **all game data structures*
 | **Grupo B: Field & Status Data** | 1.5-1.10             | ✅ Core Complete | 100%       |
 | **Grupo C: Supporting Systems**  | 1.11-1.12            | ✅ Core Complete | 100%       |
 | **Grupo D: Infrastructure**      | 1.13-1.14, 1.16-1.17 | ✅ Core Complete | 100%       |
-| **Grupo E: Planned Features**    | 1.18-1.19            | 🎯 In Progress   | 50%        |
+| **Grupo E: Planned Features**    | 1.18-1.19            | ✅ Complete      | 100%       |
+| **Phase 4: Optional Extensions** | 1.1 (extensions)     | ⏳ Planned       | 0%         |
 
 ---
 
@@ -311,16 +313,20 @@ This document defines the implementation roadmap for **all game data structures*
 
 ### Grupo E: Planned Features
 
-#### 1.18: Variants System ⏳ PLANNED
+#### 1.18: Variants System ✅ COMPLETE
 
-**Status**: Planned  
+**Status**: Complete  
 **Components**: Mega/Dinamax/Terracristalización as separate species
 
-**⏳ Planned**:
+**✅ Implemented**:
 
+-   PokemonVariantType enum (Mega, Dinamax, Tera)
 -   BaseForm, VariantType, TeraType, Variants fields in PokemonSpeciesData
--   Variant relationship validation
--   Variant species definitions
+-   Computed properties (IsVariant, IsBaseForm, IsMegaVariant, IsDinamaxVariant, IsTeraVariant)
+-   Builder methods (AsMegaVariant, AsDinamaxVariant, AsTeraVariant)
+-   Registry query methods (GetVariantsOf, GetMegaVariants, GetDinamaxVariants, GetTeraVariants, GetBaseForms)
+-   Variant relationship validation and automatic linking
+-   25 tests passing (functional + edge cases)
 
 **Related**: [Sub-Feature 1.18 Documentation](1.18-variants-system/) | [Architecture](1.18-variants-system/architecture.md)
 
@@ -519,35 +525,42 @@ public PokemonHabitat Habitat { get; set; } = PokemonHabitat.Unknown;
 
 ---
 
-### Phase 3: Variants System (MEDIUM Priority)
+### Phase 3: Variants System (MEDIUM Priority) ✅ COMPLETE
 
 **Goal**: Implement Mega Evolutions, Dinamax, and Terracristalización as separate species.
 
 **Sub-Feature**: 1.18: Variants System  
-**Status**: ⏳ Planned
+**Status**: ✅ **COMPLETE**
 
 **See**: [`1.18-variants-system/architecture.md`](1.18-variants-system/architecture.md) for complete specification.
 
-#### 3.1 Variant Fields
+#### Implementation Summary
 
-**Purpose**: Support for variant forms as separate Pokemon species.
+**Purpose**: Support for variant forms as separate Pokemon species (Mega, Dinamax, Tera, Regional, Cosmetic).
 
 **Implementation**:
 
 ```csharp
 // In PokemonSpeciesData.cs
 public PokemonSpeciesData BaseForm { get; set; }  // Reference to base Pokemon (null if base form)
-public PokemonVariantType VariantType { get; set; } = PokemonVariantType.None;  // Mega, Dinamax, Tera
+public PokemonVariantType? VariantType { get; set; }  // Mega, Dinamax, Tera, Regional, Cosmetic
 public PokemonType? TeraType { get; set; }  // Tera type for Terracristalización variants
+public string RegionalForm { get; set; }  // Regional identifier for Regional/Cosmetic variants
 public List<PokemonSpeciesData> Variants { get; set; } = new List<PokemonSpeciesData>();  // All variant forms
 
 // Helper properties
-public bool IsVariant => VariantType != PokemonVariantType.None;
-public bool IsBaseForm => VariantType == PokemonVariantType.None;
+public bool IsVariant => BaseForm != null;
+public bool IsBaseForm => BaseForm == null;
+public bool HasVariants => Variants.Count > 0;
+public IEnumerable<PokemonSpeciesData> MegaVariants => Variants.Where(v => v.IsMegaVariant);
+// ... more computed properties
 ```
 
-**Builder Support**: Add `.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()` methods (Sub-Feature 3.9)  
-**Tests**: Verify variant relationships and validation  
+**Builder Support**: ✅ `.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()`, `.AsRegionalVariant()`, `.AsCosmeticVariant()`  
+**VariantProvider**: ✅ Centralized variant management (`PokemonUltimate.Content/Providers/VariantProvider.cs`)  
+**Extension Methods**: ✅ `.GetVariants()`, `.HasVariantsAvailable()`  
+**Registry Methods**: ✅ `GetVariantsOf()`, `GetMegaVariants()`, `GetRegionalVariants()`, etc.  
+**Tests**: ✅ 63+ tests passing (functional + edge cases + VariantProvider tests)  
 **Related**: [Sub-Feature 1.18 Architecture](1.18-variants-system/architecture.md)
 
 ---
@@ -625,21 +638,51 @@ public bool IsBaseForm => VariantType == PokemonVariantType.None;
 
 -   [ ] **3.1**: `BaseForm`, `VariantType`, `TeraType`, `Variants` fields added to `PokemonSpeciesData`
 -   [ ] `PokemonVariantType` enum created
--   [ ] Builder methods added (`.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()`)
--   [ ] Variant relationship validation implemented
--   [ ] Tests written for variants system
--   [ ] Documentation updated (see [1.18-variants-system/architecture.md](1.18-variants-system/architecture.md))
+-   [x] Builder methods added (`.AsMegaVariant()`, `.AsDinamaxVariant()`, `.AsTeraVariant()`, `.AsRegionalVariant()`, `.AsCosmeticVariant()`) ✅
+-   [x] Variant relationship validation implemented ✅
+-   [x] VariantProvider implemented ✅
+-   [x] Extension methods implemented ✅
+-   [x] Tests written for variants system (63+ tests) ✅
+-   [x] Documentation updated (see [1.18-variants-system/architecture.md](1.18-variants-system/architecture.md)) ✅
 
 ---
 
-### Phase 4: Optional Enhancements (LOW Priority)
+### Phase 4: Optional Enhancements (LOW Priority) ⏳ PENDING
 
 **Sub-Feature 1.1: Pokemon Data (extensions)**
 
--   [ ] IVs/EVs system (if competitive features needed)
--   [ ] Breeding fields (EggGroups, EggCycles)
--   [ ] Ownership fields (OriginalTrainer, MetLevel, etc.)
--   [ ] Advanced Pokedex features (multiple entries by generation)
+**Status**: ⏳ **Not Implemented** - These are optional extensions for advanced features (competitive play, breeding, ownership tracking).
+
+**Pending Items**:
+
+-   [ ] **IVs/EVs System** - Individual Values and Effort Values tracking per Pokemon instance
+    -   Create `IVSet` class to store IVs per stat (HP, Attack, Defense, SpAttack, SpDefense, Speed)
+    -   Create `EVSet` class to store EVs per stat (0-252 per stat, 510 total)
+    -   Add `IVs` and `EVs` properties to `PokemonInstance`
+    -   Update `StatCalculator` to use stored IVs/EVs instead of defaults
+    -   Add methods to gain EVs from battles
+    -   **Note**: Currently uses max IVs/EVs (31/252) by default for roguelike experience
+
+-   [ ] **Breeding System** - Breeding compatibility and egg hatching
+    -   Create `EggGroup` enum (Monster, Water1, Bug, Flying, Field, Fairy, Grass, Human-Like, Mineral, Amorphous, Dragon, Ditto, Undiscovered)
+    -   Add `EggGroups` property to `PokemonSpeciesData` (list of EggGroup)
+    -   Add `EggCycles` property to `PokemonSpeciesData` (cycles to hatch egg)
+    -   Implement breeding compatibility logic
+    -   Implement IV inheritance from parents
+    -   Implement egg move inheritance
+    -   **Note**: Currently only `BaseFriendship` has default 120 for "hatched from egg"
+
+-   [ ] **Ownership/Tracking Fields** - Track Pokemon origin and ownership
+    -   Add `OriginalTrainer` (string?) to `PokemonInstance`
+    -   Add `TrainerId` (int?) to `PokemonInstance`
+    -   Add `MetLevel` (int?) to `PokemonInstance`
+    -   Add `MetLocation` (string?) to `PokemonInstance`
+    -   Add `MetDate` (DateTime?) to `PokemonInstance`
+    -   **Note**: Useful for tracking Pokemon origin, trading, and ownership
+
+-   [ ] **Advanced Pokedex Features** (if needed)
+    -   Multiple Pokedex entries by generation
+    -   Regional Pokedex support
 
 ---
 
