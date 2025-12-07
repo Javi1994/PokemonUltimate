@@ -204,6 +204,27 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 ---
 
+## Game Implementation
+
+### Feature 7: Game Implementation
+
+**Folder**: `docs/features/7-game-implementation/`  
+**Status**: ⏳ Planned  
+**Description**: Text-based demo game implementation to test all game features before Unity integration
+
+**Sub-Features**:
+
+-   **7.1**: Game Loop Foundation - Core game loop, state management, menu system ⏳ Planned
+-   **7.2**: Battle Integration - Integrate combat system into game ⏳ Planned
+-   **7.3**: Pokemon Management - Party, PC, catching system ⏳ Planned
+-   **7.4**: World & Encounters - World map, locations, wild encounters, trainers, bosses ⏳ Planned
+-   **7.5**: Progression System - EXP, level ups, rewards, roguelike progression ⏳ Planned
+-   **7.6**: UI & Presentation - Complete UI system, save/load, polish ⏳ Planned
+
+**Related Roadmap**: `docs/features/7-game-implementation/roadmap.md`
+
+---
+
 ## Feature Reference Table
 
 | #     | Feature Name      | Folder                 | Status           | Roadmap                                                  |
@@ -214,6 +235,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 | **4** | Unity Integration | `4-unity-integration/` | ⏳ Planned       | [roadmap.md](../features/4-unity-integration/roadmap.md) |
 | **5** | Game Features     | `5-game-features/`     | ⏳ Planned       | [roadmap.md](../features/5-game-features/roadmap.md)     |
 | **6** | Development Tools | `6-development-tools/` | 🎯 In Progress   | [roadmap.md](../features/6-development-tools/roadmap.md) |
+| **7** | Game Implementation | `7-game-implementation/` | ⏳ Planned   | [roadmap.md](../features/7-game-implementation/roadmap.md) |
 
 ---
 
@@ -328,7 +350,7 @@ Use cases should reference feature numbers:
     - If fits existing → Use that feature (create sub-feature if needed)
     - If doesn't fit → Proceed with creating new feature
 
-2. **Determine Number**: Check this document for next available number (currently: 5)
+2. **Determine Number**: Check this document for next available number (currently: 7)
 3. **Choose Name**: Use kebab-case, check for duplicates
 4. **Create Folder**: `docs/features/[N]-[feature-name]/`
 5. **Create Complete Documentation Structure**: Follow standard structure (README.md, architecture.md, roadmap.md, use_cases.md, testing.md, code_location.md)

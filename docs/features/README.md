@@ -38,6 +38,12 @@ This directory contains all feature-specific documentation, organized by feature
 |---|---------|--------|-------------|
 | **6** | **[Development Tools](6-development-tools/)** | 🎯 In Progress | Windows Forms debugger applications |
 
+### 🎮 Game Implementation
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| **7** | **[Game Implementation](7-game-implementation/)** | ⏳ Planned | Text-based demo game to test all features before Unity |
+
 ## Structure
 
 Each feature follows this structure:
@@ -53,7 +59,7 @@ feature-name/
 └── sub-features/          # Related sub-features
 ```
 
-**Feature Numbering**: All features are numbered (1, 2, 3, 4, 5, 6) and sub-features use decimal notation (1.1, 1.2, 2.1, 2.2...). See [`../features_master_list.md`](../features_master_list.md) for complete reference.
+**Feature Numbering**: All features are numbered (1, 2, 3, 4, 5, 6, 7) and sub-features use decimal notation (1.1, 1.2, 2.1, 2.2...). See [`../features_master_list.md`](../features_master_list.md) for complete reference.
 
 **Testing**: Each feature has its own `testing.md` file.
 

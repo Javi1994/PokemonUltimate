@@ -18,6 +18,7 @@ This document provides a quick, parseable index of all features for fast AI scan
 | **3** | Content Expansion | `3-content-expansion/` | 🎯 In Progress   | Adding Pokemon, Moves, Items, Abilities                  |
 | **4** | Unity Integration | `4-unity-integration/` | ✅ Basic Complete<br>⏳ Phases 4.4-4.8 Pending | Unity UI and integration<br>Complete: DLL integration, UI Foundation, IBattleView |
 | **5** | Game Features     | `5-game-features/`     | ⏳ Planned       | Progression, roguelike, meta-game                        |
+| **7** | Game Implementation | `7-game-implementation/` | ⏳ Planned   | Text-based demo game to test all features before Unity |
 
 ---
 
@@ -52,6 +53,12 @@ This document provides a quick, parseable index of all features for fast AI scan
 **Keywords**: game, feature, reward, exp, level, management, party, pc, encounter, wild, trainer, inventory, save, progression, roguelike
 
 **Sub-Features**: 5.1 (Post-Battle Rewards), 5.2 (Pokemon Management), 5.3 (Encounter System), 5.4 (Inventory System), 5.5 (Save System), 5.6 (Progression System)
+
+### Feature 7: Game Implementation
+
+**Keywords**: game, implementation, demo, text-based, console, playable, test, validate, features, loop, state, menu, ui, world, encounter, battle, progression
+
+**Sub-Features**: 7.1 (Game Loop Foundation), 7.2 (Battle Integration), 7.3 (Pokemon Management), 7.4 (World & Encounters), 7.5 (Progression System), 7.6 (UI & Presentation)
 
 ---
 
@@ -101,6 +108,15 @@ This document provides a quick, parseable index of all features for fast AI scan
 -   **5.5**: Save System (⏳ Planned) - Requires 5.2, 5.4
 -   **5.6**: Progression System (⏳ Planned) - Requires 5.1, 5.2, 5.3
 
+#### Feature 7: Game Implementation (All Planned)
+
+-   **7.1**: Game Loop Foundation (⏳ Planned) - No dependencies, can start immediately
+-   **7.2**: Battle Integration (⏳ Planned) - Requires 7.1, Feature 2
+-   **7.3**: Pokemon Management (⏳ Planned) - Requires 7.1, Feature 1
+-   **7.4**: World & Encounters (⏳ Planned) - Requires 7.2, 7.3, Feature 2
+-   **7.5**: Progression System (⏳ Planned) - Requires 7.2, 7.4, Feature 5
+-   **7.6**: UI & Presentation (⏳ Planned) - Requires all previous phases
+
 ---
 
 ## Status Legend
@@ -118,7 +134,8 @@ This document provides a quick, parseable index of all features for fast AI scan
 **Looking for**: Battle/Combat → Check Feature 2  
 **Looking for**: UI/Visual → Check Feature 4  
 **Looking for**: Game systems → Check Feature 5  
-**Looking for**: Adding content → Check Feature 3
+**Looking for**: Adding content → Check Feature 3  
+**Looking for**: Demo game/Playable → Check Feature 7
 
 ---
 
