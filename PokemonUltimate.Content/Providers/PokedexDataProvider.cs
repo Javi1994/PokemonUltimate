@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Providers
 {

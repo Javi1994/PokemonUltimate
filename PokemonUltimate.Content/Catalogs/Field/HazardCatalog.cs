@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using PokemonUltimate.Content.Builders;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Builders;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Field
 {

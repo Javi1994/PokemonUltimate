@@ -1,4 +1,4 @@
-using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Data.Blueprints;
 
 namespace PokemonUltimate.Combat.Damage
 {

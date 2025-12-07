@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Services.Definition;
 
 namespace PokemonUltimate.DeveloperTools.Runners
 {
@@ -72,11 +73,11 @@ namespace PokemonUltimate.DeveloperTools.Runners
             public bool IsValidEVTotal => TotalEVs <= CoreConstants.MaxTotalEV;
         }
 
-        private readonly IStatCalculator _statCalculator;
+        private readonly IStatCalculatorService _statCalculatorService;
 
         public StatCalculatorRunner()
         {
-            _statCalculator = StatCalculator.Default;
+            _statCalculatorService = StatCalculatorService.Default;
         }
 
         /// <summary>
@@ -152,11 +153,11 @@ namespace PokemonUltimate.DeveloperTools.Runners
             // Stat formula: floor((floor((2 * Base + IV + floor(EV/4)) * Level / 100) + 5) * Nature)
             int rawStat = ((CoreConstants.StatFormulaBase * baseStat + iv + evBonus) * config.Level / CoreConstants.StatFormulaDivisor) + CoreConstants.StatFormulaBonus;
             float natureMultiplier = NatureData.GetStatMultiplier(config.Nature, stat);
-            
+
             // Verify calculation matches StatCalculator
-            int verifiedStat = _statCalculator.CalculateStat(baseStat, config.Level, config.Nature, stat, iv, ev);
+            int verifiedStat = _statCalculatorService.CalculateStat(baseStat, config.Level, config.Nature, stat, iv, ev);
             int finalStat = (int)(rawStat * natureMultiplier);
-            
+
             // Ensure our calculation matches StatCalculator (for debugging)
             if (finalStat != verifiedStat)
             {

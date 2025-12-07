@@ -7,10 +7,12 @@ using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Logging;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.AI
 {
@@ -118,7 +120,7 @@ namespace PokemonUltimate.Combat.AI
             if (moveAction is UseMoveAction useMove)
             {
                 // Get localized move name
-                var localizationProvider = LocalizationManager.Instance;
+                var localizationProvider = LocalizationService.Instance;
                 var moveName = useMove.Move.GetDisplayName(localizationProvider);
                 var targetName = useMove.Target.Pokemon?.DisplayName ?? "Unknown";
                 var reason = $"Using {moveName} on {targetName}";

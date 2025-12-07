@@ -22,12 +22,14 @@ using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Combat.Validation;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Content.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances.Party;
+using PokemonUltimate.Core.Domain.Instances.Stats;
+using PokemonUltimate.Core.Infrastructure.Builders;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.BattleSimulator.Forms
 {
@@ -108,7 +110,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
         public InteractiveBattleSimulatorForm()
         {
             // Initialize localization (defaults to Spanish)
-            LocalizationManager.Initialize(new LocalizationProvider(), "es");
+            LocalizationService.Initialize(new LocalizationProvider(), "es");
 
             InitializeComponent();
             LoadPokemonList();
@@ -1304,7 +1306,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                         continue;
 
                     var level = (int)slot.NumericLevel.Value;
-                    var builder = Pokemon.Create(pokemonData, level);
+                    var builder = PokemonInstanceBuilder.Create(pokemonData, level);
 
                     var nature = GetSelectedNature(slot.ComboNature);
                     if (nature.HasValue)
@@ -1335,7 +1337,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                         continue;
 
                     var level = (int)slot.NumericLevel.Value;
-                    var builder = Pokemon.Create(pokemonData, level);
+                    var builder = PokemonInstanceBuilder.Create(pokemonData, level);
 
                     var nature = GetSelectedNature(slot.ComboNature);
                     if (nature.HasValue)

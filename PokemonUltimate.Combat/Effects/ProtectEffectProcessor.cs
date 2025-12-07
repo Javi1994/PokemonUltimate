@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Effects;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Effects;
+using PokemonUltimate.Core.Data.Effects.Definition;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.Combat.Effects
 {
@@ -28,10 +30,10 @@ namespace PokemonUltimate.Combat.Effects
         }
 
         public void Process(
-            Core.Effects.IMoveEffect effect,
+            IMoveEffect effect,
             BattleSlot user,
             BattleSlot target,
-            Core.Blueprints.MoveData move,
+            MoveData move,
             BattleField field,
             int damageDealt,
             List<BattleAction> actions)
@@ -50,7 +52,7 @@ namespace PokemonUltimate.Combat.Effects
                 // Increment counter before checking success (tracks consecutive uses)
                 user.IncrementProtectUses();
 
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 if (_randomProvider.Next(100) < successRate)
                 {
                     user.AddVolatileStatus(VolatileStatus.Protected);

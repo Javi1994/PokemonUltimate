@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Content.Catalogs.Status;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Actions
 {

@@ -1,4 +1,4 @@
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {
@@ -21,7 +21,7 @@ namespace PokemonUltimate.Combat.Damage.Steps
             var move = context.Move;
 
             // Burn only affects physical attacks
-            if (attacker.Status == PersistentStatus.Burn && 
+            if (attacker.Status == PersistentStatus.Burn &&
                 move.Category == MoveCategory.Physical)
             {
                 context.Multiplier *= BurnPenalty;

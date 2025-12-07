@@ -1,9 +1,10 @@
 using System;
 using PokemonUltimate.Content.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Messages
 {

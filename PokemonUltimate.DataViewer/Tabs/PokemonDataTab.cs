@@ -3,9 +3,10 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -179,7 +180,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             foreach (var pokemon in pokemonList)
             {
-                var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 var typeStr = pokemon.IsDualType
                     ? $"{pokemon.PrimaryType.GetDisplayName(provider)}/{pokemon.SecondaryType.Value.GetDisplayName(provider)}"
                     : pokemon.PrimaryType.GetDisplayName(provider);
@@ -218,7 +219,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not PokemonSpeciesData pokemon)
                 return;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
             details.AppendLine($"#{pokemon.PokedexNumber:D3} {pokemon.GetDisplayName(provider)}");
             details.AppendLine();
@@ -254,7 +255,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
         private string GetTypeString(PokemonSpeciesData pokemon)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             return pokemon.IsDualType
                 ? $"{pokemon.PrimaryType.GetDisplayName(provider)}/{pokemon.SecondaryType.Value.GetDisplayName(provider)}"
                 : pokemon.PrimaryType.GetDisplayName(provider);

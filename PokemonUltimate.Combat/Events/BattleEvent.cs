@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Events
 {

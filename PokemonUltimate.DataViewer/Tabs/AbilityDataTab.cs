@@ -3,8 +3,10 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Abilities;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -161,7 +163,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var abilityList = AbilityCatalog.All.OrderBy(a => a.Name).ToList();
-            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
 
             foreach (var ability in abilityList)
             {
@@ -192,7 +194,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not AbilityData ability)
                 return;
 
-            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+            var provider =  LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
             details.AppendLine(ability.GetDisplayName(provider));
             details.AppendLine();

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Items;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -164,7 +166,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var itemList = ItemCatalog.All.OrderBy(i => i.Name).ToList();
-            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
 
             foreach (var item in itemList)
             {
@@ -196,7 +198,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not ItemData item)
                 return;
 
-            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
             details.AppendLine(item.GetLocalizedName(provider));
             details.AppendLine();

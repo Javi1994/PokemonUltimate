@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Factories;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Effects;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Effects;
+using PokemonUltimate.Core.Data.Effects.Definition;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.Combat.Effects
 {
@@ -26,10 +29,10 @@ namespace PokemonUltimate.Combat.Effects
         }
 
         public void Process(
-            Core.Effects.IMoveEffect effect,
+            IMoveEffect effect,
             BattleSlot user,
             BattleSlot target,
-            Core.Blueprints.MoveData move,
+            MoveData move,
             BattleField field,
             int damageDealt,
             List<BattleAction> actions)
@@ -52,7 +55,7 @@ namespace PokemonUltimate.Combat.Effects
                     // Create damage context for counter damage
                     var counterContext = _damageContextFactory.CreateForCounter(user, target, damageToReturn, move, field);
                     actions.Add(new DamageAction(user, target, counterContext));
-                    var provider = LocalizationManager.Instance;
+                    var provider = LocalizationService.Instance;
                     actions.Add(new MessageAction(provider.GetString(LocalizationKey.MoveCountered, user.Pokemon.DisplayName)));
                 }
                 // If no damage taken, Counter fails silently (no message)

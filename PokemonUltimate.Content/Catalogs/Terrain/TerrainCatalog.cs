@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using PokemonUltimate.Content.Builders;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Builders;
 
 namespace PokemonUltimate.Content.Catalogs.Terrain
 {
@@ -35,7 +35,7 @@ namespace PokemonUltimate.Content.Catalogs.Terrain
         /// </summary>
         public static readonly TerrainData Grassy = TerrainEffect.Define("Grassy Terrain")
             .Description("Grass grows on the battlefield. Grass moves are boosted and grounded Pokemon heal each turn.")
-            .Type(Core.Enums.Terrain.Grassy)
+            .Type(Core.Data.Enums.Terrain.Grassy)
             .Duration(5)
             .Boosts(PokemonType.Grass, 1.3f)
             .HealsEachTurn(1f / 16f)
@@ -55,7 +55,7 @@ namespace PokemonUltimate.Content.Catalogs.Terrain
         /// </summary>
         public static readonly TerrainData Electric = TerrainEffect.Define("Electric Terrain")
             .Description("Electricity crackles on the ground. Electric moves are boosted and grounded Pokemon cannot fall asleep.")
-            .Type(Core.Enums.Terrain.Electric)
+            .Type(Core.Data.Enums.Terrain.Electric)
             .Duration(5)
             .Boosts(PokemonType.Electric, 1.3f)
             .PreventsSleep()
@@ -74,7 +74,7 @@ namespace PokemonUltimate.Content.Catalogs.Terrain
         /// </summary>
         public static readonly TerrainData Psychic = TerrainEffect.Define("Psychic Terrain")
             .Description("Psychic energy covers the ground. Psychic moves are boosted and grounded Pokemon are protected from priority moves.")
-            .Type(Core.Enums.Terrain.Psychic)
+            .Type(Core.Data.Enums.Terrain.Psychic)
             .Duration(5)
             .Boosts(PokemonType.Psychic, 1.3f)
             .BlocksPriorityMoves()
@@ -92,7 +92,7 @@ namespace PokemonUltimate.Content.Catalogs.Terrain
         /// </summary>
         public static readonly TerrainData Misty = TerrainEffect.Define("Misty Terrain")
             .Description("Mist covers the ground. Grounded Pokemon are protected from status conditions and Dragon damage is halved.")
-            .Type(Core.Enums.Terrain.Misty)
+            .Type(Core.Data.Enums.Terrain.Misty)
             .Duration(5)
             .ReducesDamageFrom(PokemonType.Dragon, 0.5f)
             .PreventsAllStatuses()
@@ -109,14 +109,14 @@ namespace PokemonUltimate.Content.Catalogs.Terrain
         /// <summary>
         /// Gets terrain data by terrain enum.
         /// </summary>
-        public static TerrainData GetByTerrain(Core.Enums.Terrain terrain)
+        public static TerrainData GetByTerrain(Core.Data.Enums.Terrain terrain)
         {
             switch (terrain)
             {
-                case Core.Enums.Terrain.Grassy: return Grassy;
-                case Core.Enums.Terrain.Electric: return Electric;
-                case Core.Enums.Terrain.Psychic: return Psychic;
-                case Core.Enums.Terrain.Misty: return Misty;
+                case Core.Data.Enums.Terrain.Grassy: return Grassy;
+                case Core.Data.Enums.Terrain.Electric: return Electric;
+                case Core.Data.Enums.Terrain.Psychic: return Psychic;
+                case Core.Data.Enums.Terrain.Misty: return Misty;
                 default: return null;
             }
         }

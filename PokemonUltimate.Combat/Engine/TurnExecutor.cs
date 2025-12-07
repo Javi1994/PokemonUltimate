@@ -7,8 +7,10 @@ using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Logging;
 using PokemonUltimate.Combat.Validation;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -191,7 +193,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 switch (action)
                 {
                     case UseMoveAction moveAction:
-                        var localizationProvider = Core.Localization.LocalizationManager.Instance;
+                        var localizationProvider = LocalizationService.Instance;
                         var moveName = moveAction.Move.GetDisplayName(localizationProvider);
                         var targetName = moveAction.Target?.Pokemon?.DisplayName ?? "Unknown";
                         actionDescription += $" - {action.GetType().Name}: {moveName} → {targetName}";

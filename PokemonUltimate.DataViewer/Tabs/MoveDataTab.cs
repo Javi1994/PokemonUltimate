@@ -3,10 +3,10 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -174,7 +174,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             // Load data
             var moveList = MoveCatalog.All.OrderBy(m => m.Name).ToList();
 
-            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             foreach (var move in moveList)
             {
                 var categoryStr = move.Category.GetDisplayName(provider);
@@ -213,7 +213,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not MoveData move)
                 return;
 
-            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
             details.AppendLine(move.GetDisplayName(provider));
             details.AppendLine();

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Infrastructure.Localization;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -37,7 +38,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
             if (slot == null)
                 throw new ArgumentNullException(nameof(slot));
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             var actions = new List<BattleAction>();
 
@@ -132,10 +133,10 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 return actions;
 
             // Message for ability activation
-            var provider = Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var abilityName = ability.GetDisplayName(provider);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.AbilityActivated, slot.Pokemon.DisplayName, abilityName)));
+                provider.GetString(LocalizationKey.AbilityActivated, slot.Pokemon.DisplayName, abilityName)));
 
             // Raise own stat
             actions.Add(new StatChangeAction(slot, slot, ability.TargetStat.Value, ability.StatStages));
@@ -164,15 +165,15 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 recoilDamage = 1;
 
             // Message for item activation
-            var provider = Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var itemName = item.GetLocalizedName(provider);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.ItemActivated, slot.Pokemon.DisplayName, itemName)));
+                provider.GetString(LocalizationKey.ItemActivated, slot.Pokemon.DisplayName, itemName)));
 
             // Apply recoil damage directly
             slot.Pokemon.TakeDamage(recoilDamage);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.HurtByRecoil, slot.Pokemon.DisplayName)));
+                provider.GetString(LocalizationKey.HurtByRecoil, slot.Pokemon.DisplayName)));
 
             return actions;
         }

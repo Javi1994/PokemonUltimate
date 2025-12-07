@@ -1,8 +1,7 @@
-using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Pokemon
 {
@@ -20,7 +19,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         // ===== GRASS STARTER LINE (Venusaur → Ivysaur → Bulbasaur) =====
         // Starters have 87.5% male ratio
 
-        public static readonly PokemonSpeciesData Venusaur = Builders.Pokemon.Define("Venusaur", 3)
+        public static readonly PokemonSpeciesData Venusaur = Core.Infrastructure.Builders.Pokemon.Define("Venusaur", 3)
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(80, 82, 83, 100, 100, 80)
             .GenderRatio(87.5f)
@@ -30,7 +29,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Ivysaur = Builders.Pokemon.Define("Ivysaur", 2)
+        public static readonly PokemonSpeciesData Ivysaur = Core.Infrastructure.Builders.Pokemon.Define("Ivysaur", 2)
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(60, 62, 63, 80, 80, 60)
             .GenderRatio(87.5f)
@@ -41,7 +40,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Bulbasaur = Builders.Pokemon.Define("Bulbasaur", 1)
+        public static readonly PokemonSpeciesData Bulbasaur = Core.Infrastructure.Builders.Pokemon.Define("Bulbasaur", 1)
             .Types(PokemonType.Grass, PokemonType.Poison)
             .Stats(45, 49, 49, 65, 65, 45)
             .GenderRatio(87.5f)
@@ -59,7 +58,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         // ===== FIRE STARTER LINE (Charizard → Charmeleon → Charmander) =====
         // Starters have 87.5% male ratio
 
-        public static readonly PokemonSpeciesData Charizard = Builders.Pokemon.Define("Charizard", 6)
+        public static readonly PokemonSpeciesData Charizard = Core.Infrastructure.Builders.Pokemon.Define("Charizard", 6)
             .Types(PokemonType.Fire, PokemonType.Flying)
             .Stats(78, 84, 78, 109, 85, 100)
             .GenderRatio(87.5f)
@@ -69,7 +68,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Charmeleon = Builders.Pokemon.Define("Charmeleon", 5)
+        public static readonly PokemonSpeciesData Charmeleon = Core.Infrastructure.Builders.Pokemon.Define("Charmeleon", 5)
             .Type(PokemonType.Fire)
             .Stats(58, 64, 58, 80, 65, 80)
             .GenderRatio(87.5f)
@@ -80,7 +79,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Charmander = Builders.Pokemon.Define("Charmander", 4)
+        public static readonly PokemonSpeciesData Charmander = Core.Infrastructure.Builders.Pokemon.Define("Charmander", 4)
             .Type(PokemonType.Fire)
             .Stats(39, 52, 43, 60, 50, 65)
             .GenderRatio(87.5f)
@@ -98,7 +97,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         // ===== WATER STARTER LINE (Blastoise → Wartortle → Squirtle) =====
         // Starters have 87.5% male ratio
 
-        public static readonly PokemonSpeciesData Blastoise = Builders.Pokemon.Define("Blastoise", 9)
+        public static readonly PokemonSpeciesData Blastoise = Core.Infrastructure.Builders.Pokemon.Define("Blastoise", 9)
             .Type(PokemonType.Water)
             .Stats(79, 83, 100, 85, 105, 78)
             .GenderRatio(87.5f)
@@ -108,7 +107,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Wartortle = Builders.Pokemon.Define("Wartortle", 8)
+        public static readonly PokemonSpeciesData Wartortle = Core.Infrastructure.Builders.Pokemon.Define("Wartortle", 8)
             .Type(PokemonType.Water)
             .Stats(59, 63, 80, 65, 80, 58)
             .GenderRatio(87.5f)
@@ -119,7 +118,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Squirtle = Builders.Pokemon.Define("Squirtle", 7)
+        public static readonly PokemonSpeciesData Squirtle = Core.Infrastructure.Builders.Pokemon.Define("Squirtle", 7)
             .Type(PokemonType.Water)
             .Stats(44, 48, 65, 50, 64, 43)
             .GenderRatio(87.5f)
@@ -132,7 +131,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
 
         // ===== ELECTRIC LINE (Raichu → Pikachu) =====
 
-        public static readonly PokemonSpeciesData Raichu = Builders.Pokemon.Define("Raichu", 26)
+        public static readonly PokemonSpeciesData Raichu = Core.Infrastructure.Builders.Pokemon.Define("Raichu", 26)
             .Type(PokemonType.Electric)
             .Stats(60, 90, 55, 90, 80, 110)
             .Ability(AbilityCatalog.Static)
@@ -141,7 +140,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Pikachu = Builders.Pokemon.Define("Pikachu", 25)
+        public static readonly PokemonSpeciesData Pikachu = Core.Infrastructure.Builders.Pokemon.Define("Pikachu", 25)
             .Type(PokemonType.Electric)
             .Stats(35, 55, 40, 50, 50, 90)
             .GenderRatio(50f)
@@ -158,7 +157,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
 
         // ===== NORMAL POKEMON =====
 
-        public static readonly PokemonSpeciesData Eevee = Builders.Pokemon.Define("Eevee", 133)
+        public static readonly PokemonSpeciesData Eevee = Core.Infrastructure.Builders.Pokemon.Define("Eevee", 133)
             .Type(PokemonType.Normal)
             .Stats(55, 55, 50, 45, 65, 55)
             .GenderRatio(87.5f)
@@ -169,7 +168,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         // Note: Eevee evolutions would reference Vaporeon, Jolteon, etc.
         // which aren't defined yet. We'll add them when we have those Pokemon.
 
-        public static readonly PokemonSpeciesData Snorlax = Builders.Pokemon.Define("Snorlax", 143)
+        public static readonly PokemonSpeciesData Snorlax = Core.Infrastructure.Builders.Pokemon.Define("Snorlax", 143)
             .Type(PokemonType.Normal)
             .Stats(160, 110, 65, 65, 110, 30)
             .GenderRatio(87.5f)
@@ -183,7 +182,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
 
         // ===== GHOST/POISON LINE (Gengar → Haunter → Gastly) =====
 
-        public static readonly PokemonSpeciesData Gengar = Builders.Pokemon.Define("Gengar", 94)
+        public static readonly PokemonSpeciesData Gengar = Core.Infrastructure.Builders.Pokemon.Define("Gengar", 94)
             .Types(PokemonType.Ghost, PokemonType.Poison)
             .Stats(60, 65, 60, 130, 75, 110)
             .GenderRatio(50f)
@@ -192,7 +191,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Haunter = Builders.Pokemon.Define("Haunter", 93)
+        public static readonly PokemonSpeciesData Haunter = Core.Infrastructure.Builders.Pokemon.Define("Haunter", 93)
             .Types(PokemonType.Ghost, PokemonType.Poison)
             .Stats(45, 50, 45, 115, 55, 95)
             .GenderRatio(50f)
@@ -202,7 +201,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Gastly = Builders.Pokemon.Define("Gastly", 92)
+        public static readonly PokemonSpeciesData Gastly = Core.Infrastructure.Builders.Pokemon.Define("Gastly", 92)
             .Types(PokemonType.Ghost, PokemonType.Poison)
             .Stats(30, 35, 30, 100, 35, 80)
             .GenderRatio(50f)
@@ -214,7 +213,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
 
         // ===== ROCK/GROUND LINE (Golem → Graveler → Geodude) =====
 
-        public static readonly PokemonSpeciesData Golem = Builders.Pokemon.Define("Golem", 76)
+        public static readonly PokemonSpeciesData Golem = Core.Infrastructure.Builders.Pokemon.Define("Golem", 76)
             .Types(PokemonType.Rock, PokemonType.Ground)
             .Stats(80, 120, 130, 55, 65, 45)
             .GenderRatio(50f)
@@ -224,7 +223,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Graveler = Builders.Pokemon.Define("Graveler", 75)
+        public static readonly PokemonSpeciesData Graveler = Core.Infrastructure.Builders.Pokemon.Define("Graveler", 75)
             .Types(PokemonType.Rock, PokemonType.Ground)
             .Stats(55, 95, 115, 45, 45, 35)
             .GenderRatio(50f)
@@ -235,7 +234,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Geodude = Builders.Pokemon.Define("Geodude", 74)
+        public static readonly PokemonSpeciesData Geodude = Core.Infrastructure.Builders.Pokemon.Define("Geodude", 74)
             .Types(PokemonType.Rock, PokemonType.Ground)
             .Stats(40, 80, 100, 30, 30, 20)
             .GenderRatio(50f)
@@ -248,7 +247,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
 
         // ===== WATER/FLYING LINE (Gyarados → Magikarp) =====
 
-        public static readonly PokemonSpeciesData Gyarados = Builders.Pokemon.Define("Gyarados", 130)
+        public static readonly PokemonSpeciesData Gyarados = Core.Infrastructure.Builders.Pokemon.Define("Gyarados", 130)
             .Types(PokemonType.Water, PokemonType.Flying)
             .Stats(95, 125, 79, 60, 100, 81)
             .GenderRatio(50f)
@@ -261,7 +260,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
                 .AtLevel(50, Moves.MoveCatalog.HydroPump))
             .Build();
 
-        public static readonly PokemonSpeciesData Magikarp = Builders.Pokemon.Define("Magikarp", 129)
+        public static readonly PokemonSpeciesData Magikarp = Core.Infrastructure.Builders.Pokemon.Define("Magikarp", 129)
             .Type(PokemonType.Water)
             .Stats(20, 10, 55, 15, 20, 80)
             .GenderRatio(50f)
@@ -274,7 +273,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
 
         // ===== PSYCHIC LINE (Alakazam → Kadabra → Abra) =====
 
-        public static readonly PokemonSpeciesData Alakazam = Builders.Pokemon.Define("Alakazam", 65)
+        public static readonly PokemonSpeciesData Alakazam = Core.Infrastructure.Builders.Pokemon.Define("Alakazam", 65)
             .Type(PokemonType.Psychic)
             .Stats(55, 50, 45, 135, 95, 120)
             .GenderRatio(75f)
@@ -287,7 +286,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
                 .ByTM(Moves.MoveCatalog.Thunderbolt, Moves.MoveCatalog.FireBlast))
             .Build();
 
-        public static readonly PokemonSpeciesData Kadabra = Builders.Pokemon.Define("Kadabra", 64)
+        public static readonly PokemonSpeciesData Kadabra = Core.Infrastructure.Builders.Pokemon.Define("Kadabra", 64)
             .Type(PokemonType.Psychic)
             .Stats(40, 35, 30, 120, 70, 105)
             .GenderRatio(75f)
@@ -300,7 +299,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .EvolvesTo(Alakazam, e => e.ByTrade())
             .Build();
 
-        public static readonly PokemonSpeciesData Abra = Builders.Pokemon.Define("Abra", 63)
+        public static readonly PokemonSpeciesData Abra = Core.Infrastructure.Builders.Pokemon.Define("Abra", 63)
             .Type(PokemonType.Psychic)
             .Stats(25, 20, 15, 105, 55, 90)
             .GenderRatio(75f)
@@ -315,7 +314,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         // ===== LEGENDARY/MYTHICAL =====
         // Legendaries are typically genderless
 
-        public static readonly PokemonSpeciesData Mewtwo = Builders.Pokemon.Define("Mewtwo", 150)
+        public static readonly PokemonSpeciesData Mewtwo = Core.Infrastructure.Builders.Pokemon.Define("Mewtwo", 150)
             .Type(PokemonType.Psychic)
             .Stats(106, 110, 90, 154, 90, 130)
             .Genderless()
@@ -325,7 +324,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
             .WithPokedexData()
             .WithLearnset();
 
-        public static readonly PokemonSpeciesData Mew = Builders.Pokemon.Define("Mew", 151)
+        public static readonly PokemonSpeciesData Mew = Core.Infrastructure.Builders.Pokemon.Define("Mew", 151)
             .Type(PokemonType.Psychic)
             .Stats(100, 100, 100, 100, 100, 100)
             .Genderless()

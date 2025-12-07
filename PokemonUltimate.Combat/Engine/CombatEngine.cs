@@ -12,8 +12,9 @@ using PokemonUltimate.Combat.Logging;
 using PokemonUltimate.Combat.Processors.Phases;
 using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Combat.Validation;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat
 {

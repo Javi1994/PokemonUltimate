@@ -6,7 +6,9 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Logging;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -51,7 +53,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
         public async Task<List<BattleAction>> ProcessAsync(BattleField field)
         {
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             var switchActions = new List<BattleAction>();
 
@@ -93,7 +95,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 return;
 
             // Track Pokemon already selected for switching to avoid duplicates
-            var reservedPokemon = new HashSet<Core.Instances.PokemonInstance>();
+            var reservedPokemon = new HashSet<PokemonInstance>();
 
             // Process each slot that needs switching
             foreach (var slot in slotsNeedingSwitch)
@@ -111,7 +113,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
                         continue;
 
                     // Select a Pokemon for this slot
-                    Core.Instances.PokemonInstance selectedPokemon;
+                    PokemonInstance selectedPokemon;
 
                     // For TeamBattleAI, we can simulate its selection logic
                     // Otherwise, get action from provider and validate

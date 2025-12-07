@@ -1,11 +1,10 @@
 // Pokemon names and game data referenced here are trademarks of Nintendo/Game Freak/The Pokemon Company.
 // This is a non-commercial fan project for educational purposes only. See LEGAL.md for details.
 
-using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Pokemon
 {
@@ -24,7 +23,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Thorn Pod Pokemon. Grass/Steel type. Has Iron Barbs ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Ferrothorn = Builders.Pokemon.Define("Ferrothorn", 598)
+        public static readonly PokemonSpeciesData Ferrothorn = Core.Infrastructure.Builders.Pokemon.Define("Ferrothorn", 598)
             .Types(PokemonType.Grass, PokemonType.Steel)
             .Stats(74, 94, 131, 54, 116, 20)
             .GenderRatio(50f)
@@ -41,7 +40,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Thorn Seed Pokemon. Grass/Steel type. Has Iron Barbs ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Ferroseed = Builders.Pokemon.Define("Ferroseed", 597)
+        public static readonly PokemonSpeciesData Ferroseed = Core.Infrastructure.Builders.Pokemon.Define("Ferroseed", 597)
             .Types(PokemonType.Grass, PokemonType.Steel)
             .Stats(44, 50, 91, 24, 86, 10)
             .GenderRatio(50f)

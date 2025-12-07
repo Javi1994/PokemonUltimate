@@ -8,8 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Factories\" />
-      <Folder Include="Instances\" />
+      <Folder Include="Data\" />
+      <Folder Include="Domain\" />
+      <Folder Include="Infrastructure\" />
+      <Folder Include="Strategies\" />
+      <Folder Include="Utilities\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="ORGANIZACION_ANALISIS.md" />
     </ItemGroup>
 
 </Project>

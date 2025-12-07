@@ -1,6 +1,6 @@
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Content.Builders;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Builders;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Abilities
 {
@@ -212,7 +212,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData Drizzle = Ability.Define("Drizzle")
             .Description("Summons rain on entry.")
             .Gen(3)
-            .SummonsWeather(Core.Enums.Weather.Rain)
+            .SummonsWeather(Core.Data.Enums.Weather.Rain)
             .Build();
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData Drought = Ability.Define("Drought")
             .Description("Summons harsh sunlight on entry.")
             .Gen(3)
-            .SummonsWeather(Core.Enums.Weather.Sun)
+            .SummonsWeather(Core.Data.Enums.Weather.Sun)
             .Build();
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData SandStream = Ability.Define("Sand Stream")
             .Description("Summons a sandstorm on entry.")
             .Gen(3)
-            .SummonsWeather(Core.Enums.Weather.Sandstorm)
+            .SummonsWeather(Core.Data.Enums.Weather.Sandstorm)
             .Build();
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData SwiftSwim = Ability.Define("Swift Swim")
             .Description("Doubles Speed in rain.")
             .Gen(3)
-            .SpeedBoostInWeather(Core.Enums.Weather.Rain)
+            .SpeedBoostInWeather(Core.Data.Enums.Weather.Rain)
             .Build();
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData Chlorophyll = Ability.Define("Chlorophyll")
             .Description("Doubles Speed in sunlight.")
             .Gen(3)
-            .SpeedBoostInWeather(Core.Enums.Weather.Sun)
+            .SpeedBoostInWeather(Core.Data.Enums.Weather.Sun)
             .Build();
 
         // ===== SURVIVAL ABILITIES =====

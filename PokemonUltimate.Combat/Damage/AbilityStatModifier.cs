@@ -1,7 +1,7 @@
 using System;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Damage
 {
@@ -58,7 +58,7 @@ namespace PokemonUltimate.Combat.Damage
                 float hpPercent = (float)pokemon.CurrentHP / pokemon.MaxHP;
 
                 // Check if HP is below threshold and move type matches
-                if (hpPercent <= _abilityData.HPThreshold && 
+                if (hpPercent <= _abilityData.HPThreshold &&
                     context.Move.Type == _abilityData.AffectedType.Value)
                 {
                     return _abilityData.Multiplier;

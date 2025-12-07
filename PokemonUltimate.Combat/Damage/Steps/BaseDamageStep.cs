@@ -1,7 +1,7 @@
 using System;
 using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Core.Effects;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Effects;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {
@@ -54,14 +54,14 @@ namespace PokemonUltimate.Combat.Damage.Steps
             // Apply stat stages
             attackStat = ApplyStatStage(attackStat, context.Attacker.GetStatStage(
                 move.Category == MoveCategory.Physical ? Stat.Attack : Stat.SpAttack));
-            
+
             defenseStat = ApplyStatStage(defenseStat, context.Defender.GetStatStage(
                 move.Category == MoveCategory.Physical ? Stat.Defense : Stat.SpDefense));
 
             // Apply stat modifiers from abilities and items
-            attackStat = ApplyStatModifiers(attackStat, context.Attacker, 
+            attackStat = ApplyStatModifiers(attackStat, context.Attacker,
                 move.Category == MoveCategory.Physical ? Stat.Attack : Stat.SpAttack, context.Field);
-            
+
             defenseStat = ApplyStatModifiers(defenseStat, context.Defender,
                 move.Category == MoveCategory.Physical ? Stat.Defense : Stat.SpDefense, context.Field);
 

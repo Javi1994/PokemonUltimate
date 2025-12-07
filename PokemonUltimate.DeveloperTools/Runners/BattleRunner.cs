@@ -8,9 +8,9 @@ using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Factories;
+using PokemonUltimate.Core.Domain.Instances;
 
 namespace PokemonUltimate.DeveloperTools.Runners
 {

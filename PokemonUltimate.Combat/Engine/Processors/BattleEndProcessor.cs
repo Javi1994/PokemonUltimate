@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -45,7 +46,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
         public List<BattleAction> ProcessBattleEnd(BattleField field, BattleResult result)
         {
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
 

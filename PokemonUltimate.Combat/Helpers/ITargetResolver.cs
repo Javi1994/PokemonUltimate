@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Data.Blueprints;
 
 namespace PokemonUltimate.Combat.Helpers
 {

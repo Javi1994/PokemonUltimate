@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Content.Catalogs.Status;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Factories;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.DeveloperTools.Runners
 {

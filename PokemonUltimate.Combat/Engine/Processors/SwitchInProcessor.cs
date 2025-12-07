@@ -10,13 +10,16 @@ using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Catalogs.Field;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Infrastructure.Factories;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -64,7 +67,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
             if (pokemon == null)
                 throw new ArgumentNullException(nameof(pokemon));
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             var actions = new List<BattleAction>();
 
@@ -137,7 +140,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
 
             if (damage > 0)
             {
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 var hazardName = hazardData.GetLocalizedName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardSpikesDamage, pokemon.DisplayName, hazardName)));
                 actions.Add(CreateHazardDamageAction(slot, field, damage));
@@ -169,7 +172,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
 
             if (damage > 0)
             {
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 var hazardName = hazardData.GetLocalizedName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardStealthRockDamage, pokemon.DisplayName, hazardName)));
                 actions.Add(CreateHazardDamageAction(slot, field, damage));
@@ -192,7 +195,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
             if (hazardData.IsPoisonAbsorber(pokemon.Species.PrimaryType, pokemon.Species.SecondaryType))
             {
                 side.RemoveHazard(HazardType.ToxicSpikes);
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 var hazardName = hazardData.GetLocalizedName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardToxicSpikesAbsorbed, pokemon.DisplayName, hazardName)));
                 return;
@@ -207,7 +210,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
 
             if (status != PersistentStatus.None)
             {
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 var hazardName = hazardData.GetLocalizedName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardToxicSpikesStatus, pokemon.DisplayName, hazardName)));
                 actions.Add(new ApplyStatusAction(null, slot, status));
@@ -242,7 +245,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
                     stages = -stages; // Reverse the stat change
                 }
 
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 var hazardName = hazardData.GetLocalizedName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardStickyWebSpeed, pokemon.DisplayName, hazardName)));
                 actions.Add(new StatChangeAction(null, slot, hazardData.StatToLower.Value, stages));
@@ -254,9 +257,9 @@ namespace PokemonUltimate.Combat.Processors.Phases
         /// </summary>
         private float CalculateTypeEffectiveness(PokemonType attackingType, PokemonType primaryType, PokemonType? secondaryType)
         {
-            float effectiveness1 = TypeEffectiveness.GetEffectiveness(attackingType, primaryType);
+            float effectiveness1 = TypeEffectivenessService.GetEffectiveness(attackingType, primaryType);
             float effectiveness2 = secondaryType.HasValue
-                ? TypeEffectiveness.GetEffectiveness(attackingType, secondaryType.Value)
+                ? TypeEffectivenessService.GetEffectiveness(attackingType, secondaryType.Value)
                 : 1.0f;
 
             return effectiveness1 * effectiveness2;
@@ -318,10 +321,10 @@ namespace PokemonUltimate.Combat.Processors.Phases
             var opposingSide = field.GetOppositeSide(slot.Side);
 
             // Message for ability activation
-            var provider = Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var abilityName = ability.GetDisplayName(provider);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.AbilityActivated, slot.Pokemon.DisplayName, abilityName)));
+                provider.GetString(LocalizationKey.AbilityActivated, slot.Pokemon.DisplayName, abilityName)));
 
             // Lower stat for all opposing active Pokemon
             foreach (var enemySlot in opposingSide.GetActiveSlots())

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Helpers;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -44,7 +45,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
             if (actions == null)
                 throw new ArgumentNullException(nameof(actions));
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             return _turnOrderResolver.SortActions(actions, field);
         }

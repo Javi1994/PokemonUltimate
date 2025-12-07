@@ -1,8 +1,7 @@
 using System;
 using System.Linq;
 using PokemonUltimate.Content.Catalogs.Items;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
 
 namespace PokemonUltimate.DataViewer.Viewers;
 
@@ -55,7 +54,7 @@ public static class ItemViewer
         Console.WriteLine($"{item.Name}");
         Console.WriteLine($"  ID: {item.Id}");
         Console.WriteLine($"  Category: {item.Category}");
-        
+
         if (!string.IsNullOrEmpty(item.Description))
             Console.WriteLine($"  Description: {item.Description}");
     }

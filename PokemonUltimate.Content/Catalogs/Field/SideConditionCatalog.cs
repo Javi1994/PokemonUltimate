@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using PokemonUltimate.Content.Builders;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Builders;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Field
 {
@@ -60,7 +60,7 @@ namespace PokemonUltimate.Content.Catalogs.Field
             .Duration(5)
             .ExtendedBy("Light Clay", 8)
             .ReducesAllDamage(0.5f, 0.66f)
-            .RequiresWeather(Core.Enums.Weather.Hail, Core.Enums.Weather.Snow)
+            .RequiresWeather(Core.Data.Enums.Weather.Hail, Core.Data.Enums.Weather.Snow)
             .RemovedBy("Brick Break", "Psychic Fangs", "Defog")
             .Build();
 

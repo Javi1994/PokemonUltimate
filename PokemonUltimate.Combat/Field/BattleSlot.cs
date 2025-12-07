@@ -1,8 +1,9 @@
 using System;
 using PokemonUltimate.Combat.ValueObjects;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat
 {

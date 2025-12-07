@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.Combat.Statistics.Trackers
 {
@@ -54,7 +55,7 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
                             // Check if message corresponds to "missed" localization key
                             // This is a simplified check - in a more robust implementation,
                             // we could track message keys instead of formatted messages
-                            var provider = LocalizationManager.Instance;
+                            var provider = LocalizationService.Instance;
                             var missedMessage = provider.GetString(LocalizationKey.BattleMissed);
                             if (msgAction.Message.Contains(missedMessage) ||
                                 msgAction.Message.Contains("missed") ||

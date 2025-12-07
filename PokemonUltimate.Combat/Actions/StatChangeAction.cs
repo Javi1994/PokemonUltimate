@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -45,10 +45,10 @@ namespace PokemonUltimate.Combat.Actions
         public StatChangeAction(BattleSlot user, BattleSlot target, Stat stat, int change) : base(user)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
-            
+
             if (stat == Stat.HP)
                 throw new ArgumentException(ErrorMessages.CannotModifyHPStatStage, nameof(stat));
-            
+
             Stat = stat;
             Change = change;
         }

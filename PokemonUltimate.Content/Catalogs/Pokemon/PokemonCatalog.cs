@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Registry;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Registry.Definition;
 
 namespace PokemonUltimate.Content.Catalogs.Pokemon
 {

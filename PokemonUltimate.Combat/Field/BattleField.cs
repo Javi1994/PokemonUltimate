@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.ValueObjects;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat
 {
@@ -171,13 +172,13 @@ namespace PokemonUltimate.Combat
             for (int i = 0; i < side.Slots.Count && i < healthyPokemon.Count; i++)
             {
                 var pokemon = healthyPokemon[i];
-                
+
                 // Apply Boss multipliers if this is a Boss battle and it's an enemy Pokemon
                 if (_rules.IsBossBattle && !side.IsPlayer)
                 {
                     pokemon.ApplyBossMultipliers(_rules.BossMultiplier, _rules.BossStatMultiplier);
                 }
-                
+
                 side.Slots[i].SetPokemon(pokemon);
             }
         }

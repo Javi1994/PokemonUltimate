@@ -4,11 +4,12 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
@@ -113,7 +114,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 320;
             int leftMargin = 5;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -340,7 +341,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 this.comboPokemon.SelectedIndex = 0;
 
             // Load Natures - ensure all 25 natures are loaded
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var natures = Enum.GetValues<Nature>().OrderBy(n => n.ToString()).ToList();
             foreach (var nature in natures)
             {
@@ -360,7 +361,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int total = (int)(numericEV_HP.Value + numericEV_Attack.Value + numericEV_Defense.Value +
                              numericEV_SpAttack.Value + numericEV_SpDefense.Value + numericEV_Speed.Value);
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             this.lblTotalEVs.Text = $"Total EVs: {total} / {CoreConstants.MaxTotalEV}";
 
             if (total > CoreConstants.MaxTotalEV)
@@ -375,7 +376,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void BtnCalculate_Click(object? sender, EventArgs e)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             if (comboPokemon.SelectedItem == null)
             {
                 MessageBox.Show("Please select a Pokemon.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -489,7 +490,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(StatCalculatorRunner.StatCalculationResult result, StatCalculatorRunner.StatCalculationConfig config)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             // Summary tab
             var summary = new System.Text.StringBuilder();
             summary.AppendLine("=== Stat Calculation Results ===");
@@ -575,7 +576,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void AddStatRow(StatCalculatorRunner.StatBreakdown breakdown)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var row = new DataGridViewRow();
             row.CreateCells(dgvStatsTable,
                 breakdown.Stat.GetDisplayName(provider),

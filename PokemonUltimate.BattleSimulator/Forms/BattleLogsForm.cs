@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.BattleSimulator.Logging;
-using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.BattleSimulator.Forms
 {

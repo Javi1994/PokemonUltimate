@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using PokemonUltimate.Content.Builders;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Builders;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Weather
 {
@@ -30,7 +30,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData Rain = WeatherEffect.Define("Rain")
             .Description("Rain is falling. Water moves are boosted and Fire moves are weakened.")
-            .Type(Core.Enums.Weather.Rain)
+            .Type(Core.Data.Enums.Weather.Rain)
             .Duration(5)
             .Boosts(PokemonType.Water)
             .Weakens(PokemonType.Fire)
@@ -45,7 +45,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData Sun = WeatherEffect.Define("Harsh Sunlight")
             .Description("The sunlight is harsh. Fire moves are boosted and Water moves are weakened.")
-            .Type(Core.Enums.Weather.Sun)
+            .Type(Core.Data.Enums.Weather.Sun)
             .Duration(5)
             .Boosts(PokemonType.Fire)
             .Weakens(PokemonType.Water)
@@ -60,7 +60,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData Sandstorm = WeatherEffect.Define("Sandstorm")
             .Description("A sandstorm is raging. Non-Rock/Ground/Steel types take damage each turn.")
-            .Type(Core.Enums.Weather.Sandstorm)
+            .Type(Core.Data.Enums.Weather.Sandstorm)
             .Duration(5)
             .DealsDamagePerTurn(1f / 16f, PokemonType.Rock, PokemonType.Ground, PokemonType.Steel)
             .BoostsStat(Stat.SpDefense, 1.5f, PokemonType.Rock)
@@ -74,7 +74,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData Hail = WeatherEffect.Define("Hail")
             .Description("It is hailing. Non-Ice types take damage each turn.")
-            .Type(Core.Enums.Weather.Hail)
+            .Type(Core.Data.Enums.Weather.Hail)
             .Duration(5)
             .DealsDamagePerTurn(1f / 16f, PokemonType.Ice)
             .PerfectAccuracy("Blizzard")
@@ -88,7 +88,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData Snow = WeatherEffect.Define("Snow")
             .Description("It is snowing. Ice-type Defense is boosted.")
-            .Type(Core.Enums.Weather.Snow)
+            .Type(Core.Data.Enums.Weather.Snow)
             .Duration(5)
             .BoostsStat(Stat.Defense, 1.5f, PokemonType.Ice)
             .PerfectAccuracy("Blizzard")
@@ -105,7 +105,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData HeavyRain = WeatherEffect.Define("Heavy Rain")
             .Description("Heavy rain is falling! Fire-type moves are completely nullified.")
-            .Type(Core.Enums.Weather.HeavyRain)
+            .Type(Core.Data.Enums.Weather.HeavyRain)
             .Indefinite()
             .Primal()
             .Boosts(PokemonType.Water)
@@ -119,7 +119,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData ExtremelyHarshSunlight = WeatherEffect.Define("Extremely Harsh Sunlight")
             .Description("The sunlight is extremely harsh! Water-type moves are completely nullified.")
-            .Type(Core.Enums.Weather.ExtremelyHarshSunlight)
+            .Type(Core.Data.Enums.Weather.ExtremelyHarshSunlight)
             .Indefinite()
             .Primal()
             .Boosts(PokemonType.Fire)
@@ -133,7 +133,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData StrongWinds = WeatherEffect.Define("Strong Winds")
             .Description("Mysterious strong winds are blowing! Flying-type weaknesses are reduced.")
-            .Type(Core.Enums.Weather.StrongWinds)
+            .Type(Core.Data.Enums.Weather.StrongWinds)
             .Indefinite()
             .Primal()
             .Build();
@@ -147,7 +147,7 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// </summary>
         public static readonly WeatherData Fog = WeatherEffect.Define("Fog")
             .Description("The fog is deep. Move accuracy is reduced.")
-            .Type(Core.Enums.Weather.Fog)
+            .Type(Core.Data.Enums.Weather.Fog)
             .Indefinite() // Only in specific areas, removed by Defog
             .Build();
 
@@ -158,19 +158,19 @@ namespace PokemonUltimate.Content.Catalogs.Weather
         /// <summary>
         /// Gets weather data by weather enum.
         /// </summary>
-        public static WeatherData GetByWeather(Core.Enums.Weather weather)
+        public static WeatherData GetByWeather(Core.Data.Enums.Weather weather)
         {
             switch (weather)
             {
-                case Core.Enums.Weather.Rain: return Rain;
-                case Core.Enums.Weather.Sun: return Sun;
-                case Core.Enums.Weather.Sandstorm: return Sandstorm;
-                case Core.Enums.Weather.Hail: return Hail;
-                case Core.Enums.Weather.Snow: return Snow;
-                case Core.Enums.Weather.HeavyRain: return HeavyRain;
-                case Core.Enums.Weather.ExtremelyHarshSunlight: return ExtremelyHarshSunlight;
-                case Core.Enums.Weather.StrongWinds: return StrongWinds;
-                case Core.Enums.Weather.Fog: return Fog;
+                case Core.Data.Enums.Weather.Rain: return Rain;
+                case Core.Data.Enums.Weather.Sun: return Sun;
+                case Core.Data.Enums.Weather.Sandstorm: return Sandstorm;
+                case Core.Data.Enums.Weather.Hail: return Hail;
+                case Core.Data.Enums.Weather.Snow: return Snow;
+                case Core.Data.Enums.Weather.HeavyRain: return HeavyRain;
+                case Core.Data.Enums.Weather.ExtremelyHarshSunlight: return ExtremelyHarshSunlight;
+                case Core.Data.Enums.Weather.StrongWinds: return StrongWinds;
+                case Core.Data.Enums.Weather.Fog: return Fog;
                 default: return null;
             }
         }

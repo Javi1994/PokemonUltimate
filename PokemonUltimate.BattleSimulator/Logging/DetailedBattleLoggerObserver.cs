@@ -7,10 +7,12 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Statistics;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.BattleSimulator.Logging
 {
@@ -34,7 +36,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
         public DetailedBattleLoggerObserver(UIBattleLogger logger, IBattleEventBus eventBus = null)
         {
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
-            _localizationProvider = LocalizationManager.Instance;
+            _localizationProvider = LocalizationService.Instance;
             _eventBus = eventBus;
 
             // Get name mapping from logger if available

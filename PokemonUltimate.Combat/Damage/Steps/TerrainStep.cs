@@ -1,7 +1,9 @@
 using System;
 using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {
@@ -23,7 +25,7 @@ namespace PokemonUltimate.Combat.Damage.Steps
         public void Process(DamageContext context)
         {
             if (context == null)
-                throw new ArgumentNullException(nameof(context), Core.Constants.ErrorMessages.ContextCannotBeNull);
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ContextCannotBeNull);
 
             var field = context.Field;
             var moveType = context.Move.Type;
@@ -65,7 +67,7 @@ namespace PokemonUltimate.Combat.Damage.Steps
         /// Checks if a Pokemon is grounded (affected by terrain).
         /// Pokemon is grounded if it doesn't have Flying type, Levitate ability, or Air Balloon item.
         /// </summary>
-        private static bool IsGrounded(Core.Instances.PokemonInstance pokemon)
+        private static bool IsGrounded(PokemonInstance pokemon)
         {
             if (pokemon == null)
                 return false;

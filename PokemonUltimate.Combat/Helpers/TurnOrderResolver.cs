@@ -5,8 +5,8 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Helpers
 {
@@ -204,7 +204,7 @@ namespace PokemonUltimate.Combat.Helpers
             // This is handled by OnTurnEnd trigger, not here
 
             // SpeedBoostInWeather: Double speed in specific weather (Swift Swim, Chlorophyll, Sand Rush, Slush Rush)
-            if (ability.Effect == Core.Enums.AbilityEffect.SpeedBoostInWeather)
+            if (ability.Effect == AbilityEffect.SpeedBoostInWeather)
             {
                 // Check if current weather matches ability's weather condition
                 if (ability.WeatherCondition.HasValue && field.Weather == ability.WeatherCondition.Value)

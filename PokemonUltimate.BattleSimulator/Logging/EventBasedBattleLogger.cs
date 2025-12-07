@@ -5,9 +5,10 @@ using PokemonUltimate.BattleSimulator.Helpers;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Logging;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Services;
+using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.BattleSimulator.Logging
 {
@@ -30,7 +31,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
         public EventBasedBattleLogger(IBattleLogger logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _localizationProvider = LocalizationManager.Instance;
+            _localizationProvider = LocalizationService.Instance;
 
             // Try to get name mapping from UIBattleLogger if available
             if (logger is UIBattleLogger uiLogger)

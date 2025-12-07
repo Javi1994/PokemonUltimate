@@ -7,10 +7,10 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Domain.Instances.Move;
+using PokemonUltimate.Core.Infrastructure.Factories;
+using PokemonUltimate.Core.Domain.Instances;
 
 namespace PokemonUltimate.DeveloperTools.Runners
 {

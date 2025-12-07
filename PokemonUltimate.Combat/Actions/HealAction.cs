@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -38,10 +38,10 @@ namespace PokemonUltimate.Combat.Actions
         public HealAction(BattleSlot user, BattleSlot target, int amount) : base(user)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
-            
+
             if (amount < 0)
                 throw new ArgumentException(ErrorMessages.AmountCannotBeNegative, nameof(amount));
-            
+
             Amount = amount;
         }
 

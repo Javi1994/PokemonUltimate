@@ -1,11 +1,10 @@
 // Pokemon names and game data referenced here are trademarks of Nintendo/Game Freak/The Pokemon Company.
 // This is a non-commercial fan project for educational purposes only. See LEGAL.md for details.
 
-using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Pokemon
 {
@@ -24,7 +23,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Frost Tree Pokemon. Grass/Ice type. Has Snow Warning ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Abomasnow = Builders.Pokemon.Define("Abomasnow", 460)
+        public static readonly PokemonSpeciesData Abomasnow = Core.Infrastructure.Builders.Pokemon.Define("Abomasnow", 460)
             .Types(PokemonType.Grass, PokemonType.Ice)
             .Stats(90, 92, 75, 92, 85, 60)
             .GenderRatio(50f)
@@ -41,7 +40,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Frost Tree Pokemon. Grass/Ice type. Has Snow Warning ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Snover = Builders.Pokemon.Define("Snover", 459)
+        public static readonly PokemonSpeciesData Snover = Core.Infrastructure.Builders.Pokemon.Define("Snover", 459)
             .Types(PokemonType.Grass, PokemonType.Ice)
             .Stats(60, 62, 50, 62, 60, 40)
             .GenderRatio(50f)

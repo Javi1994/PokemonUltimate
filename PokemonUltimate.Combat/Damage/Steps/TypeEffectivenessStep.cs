@@ -1,5 +1,6 @@
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Factories;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {
@@ -21,7 +22,7 @@ namespace PokemonUltimate.Combat.Damage.Steps
             var defender = context.Defender.Pokemon;
 
             // Use the existing TypeEffectiveness utility
-            float effectiveness = TypeEffectiveness.GetEffectiveness(
+            float effectiveness = TypeEffectivenessService.GetEffectiveness(
                 moveType,
                 defender.Species.PrimaryType,
                 defender.Species.SecondaryType);

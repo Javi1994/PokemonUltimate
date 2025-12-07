@@ -1,5 +1,6 @@
 using System;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {
@@ -21,7 +22,7 @@ namespace PokemonUltimate.Combat.Damage.Steps
         public void Process(DamageContext context)
         {
             if (context == null)
-                throw new ArgumentNullException(nameof(context), Core.Constants.ErrorMessages.ContextCannotBeNull);
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ContextCannotBeNull);
 
             var field = context.Field;
             var moveType = context.Move.Type;

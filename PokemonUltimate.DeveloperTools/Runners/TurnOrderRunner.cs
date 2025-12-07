@@ -12,10 +12,12 @@ using PokemonUltimate.Combat.Messages;
 using PokemonUltimate.Combat.Processors.Phases;
 using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Content.Catalogs.Field;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances.Move;
+using PokemonUltimate.Core.Infrastructure.Factories;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.DeveloperTools.Runners
 {

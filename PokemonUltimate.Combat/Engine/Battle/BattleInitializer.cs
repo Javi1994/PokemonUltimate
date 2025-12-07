@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Validation;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -57,9 +59,9 @@ namespace PokemonUltimate.Combat.Processors.Phases
             if (rules == null)
                 throw new ArgumentNullException(nameof(rules));
             if (playerParty == null)
-                throw new ArgumentNullException(nameof(playerParty), Core.Constants.ErrorMessages.PartyCannotBeNull);
+                throw new ArgumentNullException(nameof(playerParty), ErrorMessages.PartyCannotBeNull);
             if (enemyParty == null)
-                throw new ArgumentNullException(nameof(enemyParty), Core.Constants.ErrorMessages.PartyCannotBeNull);
+                throw new ArgumentNullException(nameof(enemyParty), ErrorMessages.PartyCannotBeNull);
             if (playerProvider == null)
                 throw new ArgumentNullException(nameof(playerProvider));
             if (enemyProvider == null)

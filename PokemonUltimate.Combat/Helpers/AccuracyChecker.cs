@@ -1,9 +1,10 @@
 using System;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Factories;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.Combat.Helpers
 {
@@ -87,8 +88,8 @@ namespace PokemonUltimate.Combat.Helpers
             }
 
             // Calculate effective accuracy
-            float accuracyMultiplier = StatCalculator.GetAccuracyStageMultiplier(user.GetStatStage(Stat.Accuracy));
-            float evasionMultiplier = StatCalculator.GetAccuracyStageMultiplier(target.GetStatStage(Stat.Evasion));
+            float accuracyMultiplier = StatCalculatorService.GetAccuracyStageMultiplier(user.GetStatStage(Stat.Accuracy));
+            float evasionMultiplier = StatCalculatorService.GetAccuracyStageMultiplier(target.GetStatStage(Stat.Evasion));
 
             float effectiveAccuracy = move.Accuracy * (accuracyMultiplier / evasionMultiplier);
             effectiveAccuracy = Math.Max(1f, Math.Min(100f, effectiveAccuracy)); // Clamp to 1-100%

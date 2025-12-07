@@ -1,11 +1,10 @@
 // Pokemon names and game data referenced here are trademarks of Nintendo/Game Freak/The Pokemon Company.
 // This is a non-commercial fan project for educational purposes only. See LEGAL.md for details.
 
-using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Pokemon
 {
@@ -25,7 +24,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Apex Pokemon. Normal type. Has Truant ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Slaking = Builders.Pokemon.Define("Slaking", 289)
+        public static readonly PokemonSpeciesData Slaking = Core.Infrastructure.Builders.Pokemon.Define("Slaking", 289)
             .Type(PokemonType.Normal)
             .Stats(150, 160, 100, 95, 65, 100)
             .GenderRatio(50f)
@@ -41,7 +40,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Wild Monkey Pokemon. Normal type. Has Vital Spirit ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Vigoroth = Builders.Pokemon.Define("Vigoroth", 288)
+        public static readonly PokemonSpeciesData Vigoroth = Core.Infrastructure.Builders.Pokemon.Define("Vigoroth", 288)
             .Type(PokemonType.Normal)
             .Stats(80, 80, 80, 55, 55, 90)
             .GenderRatio(50f)
@@ -58,7 +57,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Slacker Pokemon. Normal type. Has Truant ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Slakoth = Builders.Pokemon.Define("Slakoth", 287)
+        public static readonly PokemonSpeciesData Slakoth = Core.Infrastructure.Builders.Pokemon.Define("Slakoth", 287)
             .Type(PokemonType.Normal)
             .Stats(60, 60, 60, 35, 35, 30)
             .GenderRatio(50f)
@@ -77,7 +76,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Brutal Pokemon. Water/Dark type. Has Speed Boost ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Sharpedo = Builders.Pokemon.Define("Sharpedo", 319)
+        public static readonly PokemonSpeciesData Sharpedo = Core.Infrastructure.Builders.Pokemon.Define("Sharpedo", 319)
             .Types(PokemonType.Water, PokemonType.Dark)
             .Stats(70, 120, 40, 95, 40, 95)
             .GenderRatio(50f)
@@ -94,7 +93,7 @@ namespace PokemonUltimate.Content.Catalogs.Pokemon
         /// <summary>
         /// The Savage Pokemon. Water/Dark type. Has Rough Skin ability.
         /// </summary>
-        public static readonly PokemonSpeciesData Carvanha = Builders.Pokemon.Define("Carvanha", 318)
+        public static readonly PokemonSpeciesData Carvanha = Core.Infrastructure.Builders.Pokemon.Define("Carvanha", 318)
             .Types(PokemonType.Water, PokemonType.Dark)
             .Stats(45, 90, 20, 65, 20, 65)
             .GenderRatio(50f)

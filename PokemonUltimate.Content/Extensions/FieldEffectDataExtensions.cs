@@ -1,6 +1,6 @@
 using PokemonUltimate.Content.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Localization;
 
 namespace PokemonUltimate.Content.Extensions
 {

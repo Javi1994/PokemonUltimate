@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Move;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat
 {
@@ -42,16 +44,16 @@ namespace PokemonUltimate.Combat
         public Task PlaySwitchInAnimation(BattleSlot slot) => Task.CompletedTask;
 
         // Input methods - return defaults for testing
-        public Task<BattleActionType> SelectActionType(BattleSlot slot) => 
+        public Task<BattleActionType> SelectActionType(BattleSlot slot) =>
             Task.FromResult(BattleActionType.Fight);
 
-        public Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves) => 
+        public Task<MoveInstance> SelectMove(IReadOnlyList<MoveInstance> moves) =>
             Task.FromResult(moves?.FirstOrDefault());
 
-        public Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets) => 
+        public Task<BattleSlot> SelectTarget(IReadOnlyList<BattleSlot> validTargets) =>
             Task.FromResult(validTargets?.FirstOrDefault());
 
-        public Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon) => 
+        public Task<PokemonInstance> SelectSwitch(IReadOnlyList<PokemonInstance> availablePokemon) =>
             Task.FromResult(availablePokemon?.FirstOrDefault());
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Infrastructure.Localization;
 
 namespace PokemonUltimate.Content.Providers
 {

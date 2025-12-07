@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Damage.Steps;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Damage
 {

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using PokemonUltimate.Content.Builders;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Builders;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Providers
 {
@@ -22,7 +22,7 @@ namespace PokemonUltimate.Content.Providers
     /// </remarks>
     public static class VariantProvider
     {
-        private static readonly Dictionary<string, List<PokemonSpeciesData>> _variantsByBaseName = 
+        private static readonly Dictionary<string, List<PokemonSpeciesData>> _variantsByBaseName =
             new Dictionary<string, List<PokemonSpeciesData>>(System.StringComparer.OrdinalIgnoreCase);
 
         static VariantProvider()
@@ -73,7 +73,7 @@ namespace PokemonUltimate.Content.Providers
             if (baseForm == null)
                 return false;
 
-            return _variantsByBaseName.ContainsKey(baseForm.Name) && 
+            return _variantsByBaseName.ContainsKey(baseForm.Name) &&
                    _variantsByBaseName[baseForm.Name].Count > 0;
         }
 

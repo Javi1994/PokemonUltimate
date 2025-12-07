@@ -2,10 +2,10 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Localization;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
@@ -70,7 +70,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 290;
             int leftMargin = 5;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             this.lblTitle = new Label
             {
                 Text = "Configuration",
@@ -224,7 +224,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private void LoadTypeLists()
         {
             var allTypes = Enum.GetValues<PokemonType>().ToList();
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
 
             // Agregar tipos traducidos a los ComboBox
             foreach (var type in allTypes)
@@ -254,7 +254,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             var defenderPrimaryType = GetTypeFromItem(comboDefenderPrimaryType.SelectedItem);
             PokemonType? defenderSecondaryType = null;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             if (comboDefenderSecondaryType.SelectedItem != null &&
                 comboDefenderSecondaryType.SelectedItem.ToString() != "None")
             {
@@ -267,12 +267,12 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private void CalculateEffectiveness(PokemonType attackingType, PokemonType defenderPrimaryType, PokemonType? defenderSecondaryType)
         {
             // Calcular efectividad
-            var effectiveness = TypeEffectiveness.GetEffectiveness(
+            var effectiveness = TypeEffectivenessService.GetEffectiveness(
                 attackingType,
                 defenderPrimaryType,
                 defenderSecondaryType);
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var effectivenessText = effectiveness switch
             {
                 0.0f => "Immune (0x)",
@@ -303,8 +303,8 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             txtBreakdown.Clear();
             if (defenderSecondaryType.HasValue)
             {
-                var primaryEff = TypeEffectiveness.GetEffectiveness(attackingType, defenderPrimaryType);
-                var secondaryEff = TypeEffectiveness.GetEffectiveness(attackingType, defenderSecondaryType.Value);
+                var primaryEff = TypeEffectivenessService.GetEffectiveness(attackingType, defenderPrimaryType);
+                var secondaryEff = TypeEffectivenessService.GetEffectiveness(attackingType, defenderSecondaryType.Value);
 
                 txtBreakdown.AppendText("Breakdown:\n");
                 txtBreakdown.AppendText($"{attackingTypeName} vs {defenderPrimaryTypeName}: {primaryEff:F2}x\n");
@@ -377,7 +377,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void LoadTypeChart(PokemonType attackingType)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             dgvTypeChart.Columns.Clear();
             dgvTypeChart.Rows.Clear();
 
@@ -388,7 +388,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             var allTypes = Enum.GetValues<PokemonType>();
             foreach (var defendingType in allTypes)
             {
-                var eff = TypeEffectiveness.GetEffectiveness(attackingType, defendingType);
+                var eff = TypeEffectivenessService.GetEffectiveness(attackingType, defendingType);
                 var desc = GetEffectivenessDescription(eff);
                 var color = GetEffectivenessColor(eff);
 

@@ -1,4 +1,5 @@
 using System;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -26,7 +27,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
         public void Process(BattleField field)
         {
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             // Decrement weather duration
             field.DecrementWeatherDuration();

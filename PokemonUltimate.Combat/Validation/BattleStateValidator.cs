@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Validation
 {

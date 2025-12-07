@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Effects;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Effects;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
@@ -97,7 +97,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 290;
             int leftMargin = 5;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -276,7 +276,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private void LoadData()
         {
             // Cargar movimientos con nombres traducidos
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var moveList = MoveCatalog.All.OrderBy(m => m.Name).ToList();
             foreach (var move in moveList)
             {
@@ -321,7 +321,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private async void BtnRun_Click(object? sender, EventArgs e)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             this.btnRun.Enabled = false;
             this.progressBar.Value = 0;
             this.lblStatus.Text = "Running tests...";
@@ -404,11 +404,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var move = config.MoveToTest;
             var attackerName = config.AttackerPokemon.Name;
             var targetName = config.TargetPokemon.Name;
-            var typeEffectiveness = TypeEffectiveness.GetEffectiveness(
+            var typeEffectiveness = TypeEffectivenessService.GetEffectiveness(
                 move.Type,
                 config.TargetPokemon.PrimaryType,
                 config.TargetPokemon.SecondaryType);
@@ -537,7 +537,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateDamageTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var dataTable = new DataTable();
             dataTable.Columns.Add("Metric", typeof(string));
             dataTable.Columns.Add("Value", typeof(string));
@@ -573,7 +573,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateStatusEffectsTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var dataTable = new DataTable();
             dataTable.Columns.Add("Type", typeof(string));
             dataTable.Columns.Add("Effect", typeof(string));
@@ -599,7 +599,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateActionsTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var dataTable = new DataTable();
             dataTable.Columns.Add("Action", typeof(string));
             dataTable.Columns.Add("Times", typeof(int));

@@ -6,6 +6,7 @@ using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Statistics;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -125,7 +126,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
         private void ProcessWeatherAction(SetWeatherAction weatherAction, BattleField field)
         {
             // Only process if weather was actually set (not cleared)
-            if (weatherAction.Weather == Core.Enums.Weather.None)
+            if (weatherAction.Weather == Weather.None)
                 return;
 
             var weatherChangeActions = _weatherChangeProcessor.ProcessWeatherChange(field);

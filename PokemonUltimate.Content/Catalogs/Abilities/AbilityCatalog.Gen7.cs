@@ -1,6 +1,6 @@
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Content.Builders;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Builders;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Abilities
 {
@@ -22,7 +22,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData SlushRush = Ability.Define("Slush Rush")
             .Description("Doubles Speed in hail.")
             .Gen(7)
-            .SpeedBoostInWeather(Core.Enums.Weather.Hail, 2.0f)
+            .SpeedBoostInWeather(Core.Data.Enums.Weather.Hail, 2.0f)
             .OnWeatherChange()
             .Build();
 

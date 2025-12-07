@@ -1,5 +1,5 @@
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Effects
 {

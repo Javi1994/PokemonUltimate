@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -46,7 +48,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
         public async Task<List<BattleAction>> ProcessAsync(BattleField field)
         {
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             var pendingActions = new List<BattleAction>();
 

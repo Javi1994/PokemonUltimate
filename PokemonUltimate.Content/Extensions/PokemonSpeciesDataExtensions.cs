@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using PokemonUltimate.Content.Providers;
-using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Extensions
 {
@@ -42,13 +43,13 @@ namespace PokemonUltimate.Content.Extensions
             if (pokemon.Weight == 0f)
                 pokemon.Weight = pokedexData.Weight;
 
-            if (pokemon.Color == PokemonUltimate.Core.Enums.PokemonColor.Unknown)
+            if (pokemon.Color == PokemonColor.Unknown)
                 pokemon.Color = pokedexData.Color;
 
-            if (pokemon.Shape == PokemonUltimate.Core.Enums.PokemonShape.Unknown)
+            if (pokemon.Shape == PokemonShape.Unknown)
                 pokemon.Shape = pokedexData.Shape;
 
-            if (pokemon.Habitat == PokemonUltimate.Core.Enums.PokemonHabitat.Unknown)
+            if (pokemon.Habitat == PokemonHabitat.Unknown)
                 pokemon.Habitat = pokedexData.Habitat;
 
             return pokemon;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -45,7 +46,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
         public async Task<List<BattleAction>> ProcessAsync(BattleField field, int turnNumber, BattleQueue queue = null)
         {
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             // Publish turn started event
             _eventBus.PublishEvent(new BattleEvent(

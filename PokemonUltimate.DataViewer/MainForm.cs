@@ -1,7 +1,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Providers;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 using PokemonUltimate.DataViewer.Tabs;
 
 namespace PokemonUltimate.DataViewer
@@ -41,7 +42,7 @@ namespace PokemonUltimate.DataViewer
         public MainForm()
         {
             // Initialize localization (defaults to Spanish)
-            LocalizationManager.Initialize(new LocalizationProvider(), "es");
+            LocalizationService.Initialize(new LocalizationProvider(), "es");
 
             InitializeComponent();
         }

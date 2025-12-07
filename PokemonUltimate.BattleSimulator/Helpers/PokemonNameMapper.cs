@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.BattleSimulator.Helpers
 {

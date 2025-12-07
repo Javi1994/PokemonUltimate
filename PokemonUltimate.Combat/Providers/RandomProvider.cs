@@ -1,5 +1,5 @@
 using System;
-using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Providers
 {

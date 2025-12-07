@@ -1,6 +1,6 @@
 using System;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {

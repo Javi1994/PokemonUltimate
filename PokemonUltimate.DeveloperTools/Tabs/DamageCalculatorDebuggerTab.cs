@@ -4,9 +4,10 @@ using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
@@ -96,7 +97,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 320;
             int leftMargin = 5;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -265,7 +266,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 this.comboDefender.SelectedIndex = Math.Min(1, this.comboDefender.Items.Count - 1);
 
             // Load Moves
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var moveList = MoveCatalog.All.OrderBy(m => m.Name).ToList();
             foreach (var move in moveList)
             {
@@ -295,7 +296,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 return;
             }
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var attackerName = comboAttacker.SelectedItem.ToString();
             var defenderName = comboDefender.SelectedItem.ToString();
             var moveDisplayName = comboMove.SelectedItem.ToString();
@@ -338,7 +339,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(DamageCalculatorRunner.DamageCalculationResult result, DamageCalculatorRunner.DamageCalculationConfig config)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             // Summary tab
             var summary = new System.Text.StringBuilder();
             summary.AppendLine("=== Damage Calculation Results ===");

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Actions
 {

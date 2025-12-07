@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Forms;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.DataViewer.Localization
 {
@@ -17,7 +18,7 @@ namespace PokemonUltimate.DataViewer.Localization
         /// <summary>
         /// Gets the current localization provider instance.
         /// </summary>
-        private static ILocalizationProvider Provider => LocalizationManager.Instance;
+        private static ILocalizationProvider Provider => LocalizationService.Instance;
 
         #region ComboBox Helpers
 

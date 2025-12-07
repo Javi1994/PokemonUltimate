@@ -5,9 +5,10 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Steps;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Factories;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.DeveloperTools.Runners
 {
@@ -169,9 +170,9 @@ namespace PokemonUltimate.DeveloperTools.Runners
                 // Step 1: Base Damage
                 var baseStep = new BaseDamageStep();
                 baseStep.Process(context);
-                AddStep("Base Damage", 
+                AddStep("Base Damage",
                     $"Calculates base damage from formula: ((2 * Level / 5 + 2) * Power * Attack / Defense) / 50 + 2",
-                    multiplierBefore, context.Multiplier, context.BaseDamage, context.BaseDamage, 
+                    multiplierBefore, context.Multiplier, context.BaseDamage, context.BaseDamage,
                     context.IsCritical, context.RandomFactor, context.TypeEffectiveness, context.IsStab,
                     $"Base: {context.BaseDamage:F2}");
                 multiplierBefore = context.Multiplier;
@@ -295,7 +296,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
             }
 
             private void AddStep(string stepName, string description, float multiplierBefore, float multiplierAfter,
-                float damageBefore, float damageAfter, bool isCritical, float randomFactor, 
+                float damageBefore, float damageAfter, bool isCritical, float randomFactor,
                 float typeEffectiveness, bool isStab, string details)
             {
                 _steps.Add(new PipelineStep

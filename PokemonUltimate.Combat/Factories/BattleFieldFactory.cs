@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Factories
 {

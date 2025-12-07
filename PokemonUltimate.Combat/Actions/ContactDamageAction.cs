@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -63,7 +64,7 @@ namespace PokemonUltimate.Combat.Actions
             Target.Pokemon.TakeDamage(Damage);
 
             // Return message about damage dealt
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             yield return new MessageAction(provider.GetString(LocalizationKey.HurtByContact, Target.Pokemon.DisplayName, Source));
         }
 

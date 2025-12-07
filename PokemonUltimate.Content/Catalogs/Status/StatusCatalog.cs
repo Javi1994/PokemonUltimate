@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Content.Builders;
-using PokemonUltimate.Core.Enums;
-using StatusBuilder = PokemonUltimate.Content.Builders.Status;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using StatusBuilder = PokemonUltimate.Core.Infrastructure.Builders.Status;
 
 namespace PokemonUltimate.Content.Catalogs.Status
 {

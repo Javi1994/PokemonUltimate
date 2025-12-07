@@ -7,11 +7,12 @@ using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Catalogs.Items;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -100,14 +101,14 @@ namespace PokemonUltimate.Combat.Actions
                     if (hasFocusSash)
                     {
                         Target.Pokemon.HeldItem = null; // Consume item
-                        var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+                        var provider = LocalizationService.Instance;
                         var itemName = focusSashItem?.GetLocalizedName(provider) ?? "Focus Sash";
                         reactions.Add(new MessageAction(provider.GetString(LocalizationKey.ItemActivated, Target.Pokemon.DisplayName, itemName)));
                         reactions.Add(new MessageAction(provider.GetString(LocalizationKey.HeldOnUsingItem, Target.Pokemon.DisplayName, itemName)));
                     }
                     else if (hasSturdy)
                     {
-                        var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+                        var provider = LocalizationService.Instance;
                         var abilityName = sturdyAbility?.GetDisplayName(provider) ?? "Sturdy";
                         reactions.Add(new MessageAction(provider.GetString(LocalizationKey.AbilityActivated, Target.Pokemon.DisplayName, abilityName)));
                         reactions.Add(new MessageAction(provider.GetString(LocalizationKey.EnduredHit, Target.Pokemon.DisplayName)));

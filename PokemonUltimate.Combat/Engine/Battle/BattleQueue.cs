@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Combat.Statistics;
-using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat
 {

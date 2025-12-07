@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
@@ -95,7 +96,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 320;
             int leftMargin = 5;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -237,8 +238,8 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 this.comboPokemon.SelectedIndex = 0;
 
             // Load Persistent Status with translations
-            var provider = LocalizationManager.Instance;
-            this.comboPersistentStatus.Items.Add(LocalizationManager.Instance.GetString(LocalizationKey.Status_None));
+            var provider = LocalizationService.Instance;
+            this.comboPersistentStatus.Items.Add(LocalizationService.Instance.GetString(LocalizationKey.Status_None));
             foreach (PersistentStatus status in Enum.GetValues<PersistentStatus>())
             {
                 if (status != PersistentStatus.None)
@@ -287,7 +288,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 {
                     persistentStatus = status;
                 }
-                else if (comboPersistentStatus.SelectedItem.ToString() != LocalizationManager.Instance.GetString(LocalizationKey.Status_None))
+                else if (comboPersistentStatus.SelectedItem.ToString() != LocalizationService.Instance.GetString(LocalizationKey.Status_None))
                 {
                     if (Enum.TryParse<PersistentStatus>(comboPersistentStatus.SelectedItem.ToString(), out var parsedStatus))
                     {
@@ -326,7 +327,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private void DisplayResults(StatusEffectRunner.StatusEffectResult result)
         {
             // Summary tab
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var summary = new StringBuilder();
             summary.AppendLine("=== Status Effect Analysis ===");
             summary.AppendLine();

@@ -5,9 +5,10 @@ using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
@@ -105,7 +106,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 320;
             int leftMargin = 10;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -240,7 +241,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             var panel = new PokemonSlotPanel();
             int smallMargin = 5; // Small margin between fields
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             // Label
             panel.Label = new Label
             {
@@ -318,7 +319,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
 
             // Load Moves
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var moveList = MoveCatalog.All.OrderBy(m => m.Name).ToList();
             foreach (var slot in _pokemonSlots)
             {
@@ -343,7 +344,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 if (slot.ComboPokemon.SelectedItem == null || slot.ComboMove.SelectedItem == null)
                     continue;
 
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 var pokemonName = slot.ComboPokemon.SelectedItem.ToString();
                 var moveDisplayName = slot.ComboMove.SelectedItem.ToString();
 
@@ -384,7 +385,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(TurnOrderRunner.TurnOrderResult result, List<TurnOrderRunner.PokemonConfig> configs)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             // Summary tab
             var summary = new System.Text.StringBuilder();
             summary.AppendLine("=== Turn Order Calculation Results ===");

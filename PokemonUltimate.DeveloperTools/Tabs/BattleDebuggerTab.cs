@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Runners;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
@@ -242,7 +243,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         {
             var pokemonList = PokemonCatalog.All.OrderBy(p => p.Name).ToList();
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             this.comboPlayerPokemon.Items.Add("Random");
             this.comboEnemyPokemon.Items.Add("Random");
 
@@ -327,7 +328,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
             catch (Exception ex)
             {
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 MessageBox.Show($"Error: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.lblStatus.Text = "Error occurred";
                 this.txtSummary.Text = $"Error: {ex.Message}";
@@ -341,7 +342,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private void DisplayResults(BattleRunner.BattleStatistics stats, BattleRunner.BattleConfig config)
         {
             // Obtener nombres traducidos de los Pokemon
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var playerName = config.PlayerPokemon != null
                 ? config.PlayerPokemon.GetDisplayName(provider)
                 : "Player";
@@ -380,7 +381,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                     // Obtener nombre traducido del Pokemon
                     var pokemonSpecies = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
                     var translatedPokemonName = pokemonSpecies != null
-                        ? pokemonSpecies.GetDisplayName(LocalizationManager.Instance)
+                        ? pokemonSpecies.GetDisplayName(LocalizationService.Instance)
                         : pokemonName;
 
                     this.txtSummary.AppendText($"{translatedPokemonName} (Total Moves: {totalMoves}):\n");
@@ -415,7 +416,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                     // Obtener nombre traducido del Pokemon
                     var pokemonSpeciesForStatus = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
                     var translatedPokemonNameForStatus = pokemonSpeciesForStatus != null
-                        ? pokemonSpeciesForStatus.GetDisplayName(LocalizationManager.Instance)
+                        ? pokemonSpeciesForStatus.GetDisplayName(LocalizationService.Instance)
                         : pokemonName;
 
                     this.txtSummary.AppendText($"{translatedPokemonNameForStatus} (Total Effects: {totalStatuses}):\n");
@@ -437,7 +438,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateMoveUsageTable(BattleRunner.BattleStatistics stats)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var dataTable = new DataTable();
             dataTable.Columns.Add("Pokemon", typeof(string));
             dataTable.Columns.Add("Move", typeof(string));
@@ -450,7 +451,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 // Obtener nombre traducido del Pokemon
                 var pokemonSpecies = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
                 var translatedPokemonName = pokemonSpecies != null
-                    ? pokemonSpecies.GetDisplayName(LocalizationManager.Instance)
+                    ? pokemonSpecies.GetDisplayName(LocalizationService.Instance)
                     : pokemonName;
 
                 var totalMoves = pokemonStats.Value.Values.Sum();
@@ -461,7 +462,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                     // Obtener nombre traducido del movimiento
                     var moveData = MoveCatalog.All.FirstOrDefault(m => m.Name == move.Key);
                     var translatedMoveName = moveData != null
-                        ? moveData.GetDisplayName(LocalizationManager.Instance)
+                        ? moveData.GetDisplayName(LocalizationService.Instance)
                         : move.Key;
 
                     var percentage = (move.Value * 100.0) / totalMoves;
@@ -474,7 +475,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateStatusEffectsTable(BattleRunner.BattleStatistics stats)
         {
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var dataTable = new DataTable();
             dataTable.Columns.Add("Pokemon", typeof(string));
             dataTable.Columns.Add("Effect", typeof(string));
@@ -489,7 +490,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 // Obtener nombre traducido del Pokemon
                 var pokemonSpecies = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
                 var translatedPokemonName = pokemonSpecies != null
-                    ? pokemonSpecies.GetDisplayName(LocalizationManager.Instance)
+                    ? pokemonSpecies.GetDisplayName(LocalizationService.Instance)
                     : pokemonName;
 
                 var statuses = pokemonStats.Value.OrderByDescending(s => s.Value).ToList();

@@ -4,11 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Extensions;
-using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -37,7 +35,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
         public List<BattleAction> ProcessWeatherChange(BattleField field)
         {
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             var actions = new List<BattleAction>();
 

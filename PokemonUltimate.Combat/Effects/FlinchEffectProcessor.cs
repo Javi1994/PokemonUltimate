@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Effects;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Effects;
+using PokemonUltimate.Core.Data.Effects.Definition;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Effects
 {
@@ -26,10 +27,10 @@ namespace PokemonUltimate.Combat.Effects
         }
 
         public void Process(
-            Core.Effects.IMoveEffect effect,
+            IMoveEffect effect,
             BattleSlot user,
             BattleSlot target,
-            Core.Blueprints.MoveData move,
+            MoveData move,
             BattleField field,
             int damageDealt,
             List<BattleAction> actions)

@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Helpers;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Domain.Instances;
 
 namespace PokemonUltimate.Combat.AI
 {

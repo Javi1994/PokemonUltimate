@@ -1,7 +1,7 @@
 using System;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Damage
 {
@@ -40,7 +40,7 @@ namespace PokemonUltimate.Combat.Damage
             // Special case: Eviolite boosts Defense and SpDefense by 50% if Pokemon can evolve
             if (_itemData.Name == "Eviolite")
             {
-                if ((stat == Stat.Defense || stat == Stat.SpDefense) && 
+                if ((stat == Stat.Defense || stat == Stat.SpDefense) &&
                     holder.Pokemon.Species.CanEvolve)
                 {
                     return 1.5f;

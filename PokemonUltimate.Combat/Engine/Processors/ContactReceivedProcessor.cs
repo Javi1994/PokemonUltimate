@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Utilities.Extensions;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -40,7 +41,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
             if (attacker == null)
                 throw new ArgumentNullException(nameof(attacker));
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             var actions = new List<BattleAction>();
 
@@ -142,10 +143,10 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 return actions;
 
             // Message for ability activation
-            var provider = Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var abilityName = ability.GetDisplayName(provider);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.AbilityActivated, defender.Pokemon.DisplayName, abilityName)));
+                provider.GetString(LocalizationKey.AbilityActivated, defender.Pokemon.DisplayName, abilityName)));
 
             // Apply status to attacker
             actions.Add(new ApplyStatusAction(defender, attacker, ability.StatusEffect.Value));
@@ -170,10 +171,10 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 damage = 1;
 
             // Message for ability activation
-            var provider = Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var abilityName = ability.GetDisplayName(provider);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.AbilityActivated, defender.Pokemon.DisplayName, abilityName)));
+                provider.GetString(LocalizationKey.AbilityActivated, defender.Pokemon.DisplayName, abilityName)));
 
             // Apply damage using ContactDamageAction
             actions.Add(new ContactDamageAction(attacker, damage, abilityName));
@@ -197,10 +198,10 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 damage = 1;
 
             // Message for item activation
-            var provider = Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var itemName = item.GetLocalizedName(provider);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.ItemActivated, defender.Pokemon.DisplayName, itemName)));
+                provider.GetString(LocalizationKey.ItemActivated, defender.Pokemon.DisplayName, itemName)));
 
             // Apply damage using ContactDamageAction
             actions.Add(new ContactDamageAction(attacker, damage, itemName));

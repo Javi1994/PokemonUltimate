@@ -12,12 +12,15 @@ using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Messages;
 using PokemonUltimate.Combat.Processors.Phases;
 using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Effects;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Effects;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Domain.Instances.Move;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -276,7 +279,7 @@ namespace PokemonUltimate.Combat.Actions
             {
                 // Deduct PP even if move fails
                 MoveInstance.Use();
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.MoveFocusLost, User.Pokemon.DisplayName)));
                 User.RemoveVolatileStatus(VolatileStatus.Focusing);
                 return actions;
@@ -498,7 +501,7 @@ namespace PokemonUltimate.Combat.Actions
                     return new MessageAction(_messageFormatter.Format(LocalizationKey.BattleAsleep, pokemon.DisplayName), User);
 
                 case PersistentStatus.Freeze:
-                    var provider = LocalizationManager.Instance;
+                    var provider = LocalizationService.Instance;
                     return new MessageAction(provider.GetString(LocalizationKey.BattleFrozen, pokemon.DisplayName), User);
 
                 case PersistentStatus.Paralysis:

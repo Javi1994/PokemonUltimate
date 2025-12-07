@@ -1,6 +1,6 @@
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Content.Builders;
-using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Infrastructure.Builders;
+using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Content.Catalogs.Abilities
 {
@@ -22,7 +22,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData SandRush = Ability.Define("Sand Rush")
             .Description("Doubles Speed in sandstorm.")
             .Gen(4)
-            .SpeedBoostInWeather(Core.Enums.Weather.Sandstorm, 2.0f)
+            .SpeedBoostInWeather(Core.Data.Enums.Weather.Sandstorm, 2.0f)
             .OnWeatherChange()
             .Build();
 
@@ -34,7 +34,7 @@ namespace PokemonUltimate.Content.Catalogs.Abilities
         public static readonly AbilityData SnowWarning = Ability.Define("Snow Warning")
             .Description("Summons a hailstorm on entry.")
             .Gen(4)
-            .SummonsWeather(Core.Enums.Weather.Hail)
+            .SummonsWeather(Core.Data.Enums.Weather.Hail)
             .Build();
 
         // ===== REGISTRATION =====

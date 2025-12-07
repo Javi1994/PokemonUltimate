@@ -1,4 +1,5 @@
 using System;
+using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Damage.Steps
 {
@@ -20,7 +21,7 @@ namespace PokemonUltimate.Combat.Damage.Steps
         public void Process(DamageContext context)
         {
             if (context == null)
-                throw new ArgumentNullException(nameof(context), Core.Constants.ErrorMessages.ContextCannotBeNull);
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ContextCannotBeNull);
 
             var attacker = context.Attacker.Pokemon;
 

@@ -6,11 +6,13 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Core.Services;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -144,7 +146,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
             var pokemon = slot.Pokemon;
 
             int damage = CalculateBurnDamage(pokemon.MaxHP);
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             actions.Add(new MessageAction(provider.GetString(LocalizationKey.StatusBurnDamage, pokemon.DisplayName)));
             actions.Add(CreateStatusDamageAction(slot, field, damage));
 
@@ -160,7 +162,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
             var pokemon = slot.Pokemon;
 
             int damage = CalculatePoisonDamage(pokemon.MaxHP);
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             actions.Add(new MessageAction(provider.GetString(LocalizationKey.StatusPoisonDamage, pokemon.DisplayName)));
             actions.Add(CreateStatusDamageAction(slot, field, damage));
 
@@ -184,7 +186,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
 
             pokemon.StatusTurnCounter = nextCounter;
 
-            var provider = LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             actions.Add(new MessageAction(provider.GetString(LocalizationKey.StatusPoisonDamage, pokemon.DisplayName)));
             actions.Add(CreateStatusDamageAction(slot, field, damage));
 
@@ -252,7 +254,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 // Calculate and apply weather damage
                 int damage = CalculateWeatherDamage(pokemon.MaxHP, weatherData.EndOfTurnDamage);
                 string localizationKey = GetWeatherDamageMessageKey(field.Weather);
-                var provider = LocalizationManager.Instance;
+                var provider = LocalizationService.Instance;
 
                 actions.Add(new MessageAction(provider.GetString(localizationKey, pokemon.DisplayName)));
                 actions.Add(CreateStatusDamageAction(slot, field, damage));
@@ -360,7 +362,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 // Only heal if Pokemon is not at full HP and healing amount > 0
                 if (pokemon.CurrentHP < pokemon.MaxHP && healing > 0)
                 {
-                    var provider = LocalizationManager.Instance;
+                    var provider = LocalizationService.Instance;
                     var terrainName = terrainData.GetLocalizedName(provider);
                     actions.Add(new MessageAction(provider.GetString(LocalizationKey.TerrainHealing, pokemon.DisplayName, terrainName)));
                     actions.Add(new HealAction(null, slot, healing)); // null user = system action

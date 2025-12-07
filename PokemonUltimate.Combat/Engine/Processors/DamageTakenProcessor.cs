@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Extensions;
-using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Enums;
-using PokemonUltimate.Core.Extensions;
-using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Infrastructure.Localization;
 
 namespace PokemonUltimate.Combat.Processors.Phases
 {
@@ -39,7 +39,7 @@ namespace PokemonUltimate.Combat.Processors.Phases
             if (slot == null)
                 throw new ArgumentNullException(nameof(slot));
             if (field == null)
-                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
+                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
 
             var actions = new List<BattleAction>();
 
@@ -133,10 +133,10 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 return actions;
 
             // Message for ability activation
-            var provider = Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var abilityName = ability.GetDisplayName(provider);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.AbilityActivated, pokemon.DisplayName, abilityName)));
+                provider.GetString(LocalizationKey.AbilityActivated, pokemon.DisplayName, abilityName)));
 
             // Raise stat to maximum (+6 stages)
             int stagesToRaise = 6 - currentStatStage;
@@ -170,10 +170,10 @@ namespace PokemonUltimate.Combat.Processors.Phases
                 return actions;
 
             // Message for ability activation
-            var provider = Core.Localization.LocalizationManager.Instance;
+            var provider = LocalizationService.Instance;
             var abilityName = ability.GetDisplayName(provider);
             actions.Add(new MessageAction(
-                provider.GetString(Core.Localization.LocalizationKey.AbilityActivated, pokemon.DisplayName, abilityName)));
+                provider.GetString(LocalizationKey.AbilityActivated, pokemon.DisplayName, abilityName)));
 
             // Raise own stat
             actions.Add(new StatChangeAction(slot, slot, ability.TargetStat.Value, ability.StatStages));

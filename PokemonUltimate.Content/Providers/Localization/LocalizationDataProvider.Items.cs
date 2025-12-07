@@ -1,4 +1,4 @@
-using PokemonUltimate.Core.Localization;
+using PokemonUltimate.Core.Infrastructure.Localization;
 
 namespace PokemonUltimate.Content.Providers
 {
