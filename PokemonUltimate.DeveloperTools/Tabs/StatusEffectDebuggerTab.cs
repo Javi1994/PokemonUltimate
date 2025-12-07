@@ -6,6 +6,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
+using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
@@ -92,6 +95,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 320;
             int leftMargin = 5;
 
+            var provider = LocalizationManager.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -121,7 +125,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += spacing;
 
             // Persistent Status
-            var lblPersistentStatus = new Label { Text = "Persistent Status:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblPersistentStatus = new Label { Text = "Persistent Status", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.comboPersistentStatus.Location = new Point(leftMargin, yPos);
             this.comboPersistentStatus.Width = controlWidth;
@@ -130,7 +134,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += spacing;
 
             // Volatile Status
-            var lblVolatileStatus = new Label { Text = "Volatile Status:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblVolatileStatus = new Label { Text = "Volatile Status", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.chkListVolatileStatus.Location = new Point(leftMargin, yPos);
             this.chkListVolatileStatus.Width = controlWidth;
@@ -175,7 +179,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.txtSummary.Dock = DockStyle.Fill;
             this.txtSummary.Font = new Font("Consolas", 9);
             this.txtSummary.ReadOnly = true;
-            this.txtSummary.Text = "Configure settings and click 'Apply Status' to see results here.";
+            this.txtSummary.Text = "Configure and apply status";
             this.tabSummary.Controls.Add(this.txtSummary);
 
             // Tab Stat Modifications
@@ -232,23 +236,24 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             if (this.comboPokemon.Items.Count > 0)
                 this.comboPokemon.SelectedIndex = 0;
 
-            // Load Persistent Status
-            this.comboPersistentStatus.Items.Add("None");
+            // Load Persistent Status with translations
+            var provider = LocalizationManager.Instance;
+            this.comboPersistentStatus.Items.Add(LocalizationManager.Instance.GetString(LocalizationKey.Status_None));
             foreach (PersistentStatus status in Enum.GetValues<PersistentStatus>())
             {
                 if (status != PersistentStatus.None)
                 {
-                    this.comboPersistentStatus.Items.Add(status);
+                    this.comboPersistentStatus.Items.Add(new StatusDisplayItem(status, provider));
                 }
             }
             this.comboPersistentStatus.SelectedIndex = 0;
 
-            // Load Volatile Status
+            // Load Volatile Status with translations
             foreach (VolatileStatus status in Enum.GetValues<VolatileStatus>())
             {
                 if (status != VolatileStatus.None)
                 {
-                    this.chkListVolatileStatus.Items.Add(status, false);
+                    this.chkListVolatileStatus.Items.Add(new VolatileStatusDisplayItem(status, provider), false);
                 }
             }
         }
@@ -257,7 +262,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         {
             if (comboPokemon.SelectedItem == null)
             {
-                MessageBox.Show("Please select a Pokemon.", "Missing Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a Pokemon.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -266,7 +271,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             if (pokemon == null)
             {
-                MessageBox.Show("Selected Pokemon not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Pokemon not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -274,11 +279,15 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             PersistentStatus persistentStatus = PersistentStatus.None;
             if (comboPersistentStatus.SelectedItem != null)
             {
-                if (comboPersistentStatus.SelectedItem is PersistentStatus status)
+                if (comboPersistentStatus.SelectedItem is StatusDisplayItem statusItem)
+                {
+                    persistentStatus = statusItem.Status;
+                }
+                else if (comboPersistentStatus.SelectedItem is PersistentStatus status)
                 {
                     persistentStatus = status;
                 }
-                else if (comboPersistentStatus.SelectedItem.ToString() != "None")
+                else if (comboPersistentStatus.SelectedItem.ToString() != LocalizationManager.Instance.GetString(LocalizationKey.Status_None))
                 {
                     if (Enum.TryParse<PersistentStatus>(comboPersistentStatus.SelectedItem.ToString(), out var parsedStatus))
                     {
@@ -291,7 +300,12 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             VolatileStatus volatileStatus = VolatileStatus.None;
             foreach (int index in chkListVolatileStatus.CheckedIndices)
             {
-                if (chkListVolatileStatus.Items[index] is VolatileStatus status)
+                var item = chkListVolatileStatus.Items[index];
+                if (item is VolatileStatusDisplayItem vsItem)
+                {
+                    volatileStatus |= vsItem.Status;
+                }
+                else if (item is VolatileStatus status)
                 {
                     volatileStatus |= status;
                 }
@@ -312,25 +326,37 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private void DisplayResults(StatusEffectRunner.StatusEffectResult result)
         {
             // Summary tab
+            var provider = LocalizationManager.Instance;
             var summary = new StringBuilder();
-            summary.AppendLine("=== STATUS EFFECT ANALYSIS ===");
+            summary.AppendLine("=== Status Effect Analysis ===");
             summary.AppendLine();
             summary.AppendLine($"Pokemon: {result.Pokemon.Species.Name}");
             summary.AppendLine($"Level: {result.Pokemon.Level}");
-            summary.AppendLine($"Type: {result.Pokemon.Species.PrimaryType}" + (result.Pokemon.Species.SecondaryType.HasValue ? $" / {result.Pokemon.Species.SecondaryType.Value}" : ""));
+            var primaryTypeName = result.Pokemon.Species.PrimaryType.GetDisplayName(provider);
+            var secondaryTypeName = result.Pokemon.Species.SecondaryType.HasValue
+                ? $" / {result.Pokemon.Species.SecondaryType.Value.GetDisplayName(provider)}"
+                : "";
+            summary.AppendLine($"Type: {primaryTypeName}{secondaryTypeName}");
             summary.AppendLine();
-            summary.AppendLine("=== CURRENT STATUS ===");
-            summary.AppendLine($"Persistent Status: {result.CurrentPersistentStatus}");
+            summary.AppendLine("=== Current Status ===");
+            var persistentStatusName = result.CurrentPersistentStatus != PersistentStatus.None
+                ? result.CurrentPersistentStatus.GetDisplayName(provider)
+                : provider.GetString(LocalizationKey.Status_None);
+            summary.AppendLine($"Persistent Status: {persistentStatusName}");
             if (result.PersistentStatusData != null)
             {
                 summary.AppendLine($"  Description: {result.PersistentStatusData.Description}");
             }
-            summary.AppendLine($"Volatile Status: {result.CurrentVolatileStatus}");
+            var volatileStatusText = result.CurrentVolatileStatus != VolatileStatus.None
+                ? GetVolatileStatusDisplayNames(result.CurrentVolatileStatus, provider)
+                : provider.GetString(LocalizationKey.VolatileStatus_None);
+            summary.AppendLine($"Volatile Status: {volatileStatusText}");
             if (result.VolatileStatusDataList.Count > 0)
             {
                 foreach (var volatileData in result.VolatileStatusDataList)
                 {
-                    summary.AppendLine($"  - {volatileData.Name}: {volatileData.Description}");
+                    var volatileStatusName = volatileData.VolatileStatus.GetDisplayName(provider);
+                    summary.AppendLine($"  - {volatileStatusName}: {volatileData.Description}");
                 }
             }
             summary.AppendLine();
@@ -338,7 +364,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             // Stat modifications summary
             if (result.StatModifications.Count > 0)
             {
-                summary.AppendLine("=== STAT MODIFICATIONS ===");
+                summary.AppendLine("=== Stat Modifications ===");
                 foreach (var mod in result.StatModifications)
                 {
                     summary.AppendLine($"{mod.Stat}: {mod.BaseValue} → {mod.ModifiedValue} ({mod.Multiplier:F2}x) - {mod.Description}");
@@ -349,7 +375,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             // Damage per turn summary
             if (result.DamagePerTurnList.Count > 0)
             {
-                summary.AppendLine("=== DAMAGE PER TURN ===");
+                summary.AppendLine("=== Damage Per Turn ===");
                 foreach (var damage in result.DamagePerTurnList)
                 {
                     summary.AppendLine($"{damage.StatusName}: {damage.DamageAmount} HP ({damage.DamageFraction * 100:F1}% of max HP)");
@@ -472,6 +498,66 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 dgvInteractions.Columns[1].Width = 80;
                 dgvInteractions.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             }
+        }
+
+        /// <summary>
+        /// Helper class to display persistent status with translated names in ComboBox.
+        /// </summary>
+        private class StatusDisplayItem
+        {
+            public PersistentStatus Status { get; }
+            private readonly ILocalizationProvider _provider;
+
+            public StatusDisplayItem(PersistentStatus status, ILocalizationProvider provider)
+            {
+                Status = status;
+                _provider = provider;
+            }
+
+            public override string ToString()
+            {
+                return Status.GetDisplayName(_provider);
+            }
+        }
+
+        /// <summary>
+        /// Helper class to display volatile status with translated names in CheckedListBox.
+        /// </summary>
+        private class VolatileStatusDisplayItem
+        {
+            public VolatileStatus Status { get; }
+            private readonly ILocalizationProvider _provider;
+
+            public VolatileStatusDisplayItem(VolatileStatus status, ILocalizationProvider provider)
+            {
+                Status = status;
+                _provider = provider;
+            }
+
+            public override string ToString()
+            {
+                return Status.GetDisplayName(_provider);
+            }
+        }
+
+        /// <summary>
+        /// Gets display names for volatile status flags (handles multiple flags).
+        /// </summary>
+        private string GetVolatileStatusDisplayNames(VolatileStatus status, ILocalizationProvider provider)
+        {
+            if (status == VolatileStatus.None)
+                return provider.GetString(LocalizationKey.VolatileStatus_None);
+
+            var names = new List<string>();
+            foreach (VolatileStatus flag in Enum.GetValues<VolatileStatus>())
+            {
+                if (flag != VolatileStatus.None && status.HasFlag(flag))
+                {
+                    names.Add(flag.GetDisplayName(provider));
+                }
+            }
+
+            return names.Count > 0 ? string.Join(", ", names) : provider.GetString(LocalizationKey.VolatileStatus_None);
         }
     }
 }

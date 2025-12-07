@@ -6,6 +6,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
+using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
@@ -102,6 +105,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 320;
             int leftMargin = 10;
 
+            var provider = LocalizationManager.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -112,7 +116,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += 30;
 
             // Level
-            var lblLevel = new Label { Text = "Level:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblLevel = new Label { Text = "Level", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 22;
             this.numericLevel.Location = new Point(leftMargin, yPos);
             this.numericLevel.Width = 100;
@@ -126,16 +130,16 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             {
                 var slotPanel = CreatePokemonSlotPanel(i + 1, leftMargin, ref yPos, controlWidth, spacing);
                 _pokemonSlots.Add(slotPanel);
-                
+
                 // Add speed label (positioned above the numeric control with proper spacing)
                 var speedLabel = new Label
                 {
-                    Text = "Speed Stage:",
+                    Text = "Speed Stage",
                     Location = new Point(leftMargin, slotPanel.NumericSpeedStage.Location.Y - 20),
                     AutoSize = true,
                     Font = new Font("Segoe UI", 8)
                 };
-                
+
                 panelConfig.Controls.AddRange(new Control[]
                 {
                     slotPanel.Label,
@@ -185,7 +189,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.txtSummary.Dock = DockStyle.Fill;
             this.txtSummary.Font = new Font("Consolas", 9);
             this.txtSummary.ReadOnly = true;
-            this.txtSummary.Text = "Configure Pokemon and click 'Calculate Turn Order' to see results here.";
+            this.txtSummary.Text = "Configure and calculate turn order";
             this.tabSummary.Controls.Add(this.txtSummary);
 
             // Tab Speed Calculation
@@ -236,10 +240,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             var panel = new PokemonSlotPanel();
             int smallMargin = 5; // Small margin between fields
 
+            var provider = LocalizationManager.Instance;
             // Label
             panel.Label = new Label
             {
-                Text = $"Pokemon {slotNumber}:",
+                Text = $"Pokemon Slot {slotNumber}:",
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 Location = new Point(leftMargin, yPos),
                 AutoSize = true
@@ -273,7 +278,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 Location = new Point(leftMargin, yPos),
                 AutoSize = true
             };
-            
+
             panel.ChkTailwind = new CheckBox
             {
                 Text = "Tailwind",
@@ -313,12 +318,13 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
 
             // Load Moves
+            var provider = LocalizationManager.Instance;
             var moveList = MoveCatalog.All.OrderBy(m => m.Name).ToList();
             foreach (var slot in _pokemonSlots)
             {
                 foreach (var move in moveList)
                 {
-                    slot.ComboMove.Items.Add(move.Name);
+                    slot.ComboMove.Items.Add(move.GetDisplayName(provider));
                 }
                 if (slot.ComboMove.Items.Count > 0)
                 {
@@ -337,11 +343,12 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 if (slot.ComboPokemon.SelectedItem == null || slot.ComboMove.SelectedItem == null)
                     continue;
 
+                var provider = LocalizationManager.Instance;
                 var pokemonName = slot.ComboPokemon.SelectedItem.ToString();
-                var moveName = slot.ComboMove.SelectedItem.ToString();
+                var moveDisplayName = slot.ComboMove.SelectedItem.ToString();
 
                 var species = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
-                var move = MoveCatalog.All.FirstOrDefault(m => m.Name == moveName);
+                var move = MoveCatalog.All.FirstOrDefault(m => m.GetDisplayName(provider) == moveDisplayName);
 
                 if (species == null || move == null)
                     continue;
@@ -360,7 +367,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             if (configs.Count < MinPokemonSlots)
             {
-                MessageBox.Show($"Please configure at least {MinPokemonSlots} Pokemon.", "Missing Configuration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"Please configure at least {MinPokemonSlots} Pokemon.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -377,35 +384,39 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(TurnOrderRunner.TurnOrderResult result, List<TurnOrderRunner.PokemonConfig> configs)
         {
+            var provider = LocalizationManager.Instance;
             // Summary tab
             var summary = new System.Text.StringBuilder();
-            summary.AppendLine($"=== TURN ORDER CALCULATION RESULTS ===");
+            summary.AppendLine("=== Turn Order Calculation Results ===");
             summary.AppendLine();
             summary.AppendLine($"Level: {numericLevel.Value}");
             summary.AppendLine($"Pokemon Count: {configs.Count}");
             summary.AppendLine();
 
-            summary.AppendLine($"=== FINAL TURN ORDER ===");
+            summary.AppendLine("=== Final Turn Order ===");
             if (result.TurnOrder.Count == 0)
             {
-                summary.AppendLine("No actions were created. Check that all Pokemon have valid slots and moves.");
+                summary.AppendLine("No actions created");
             }
             else
             {
                 foreach (var entry in result.TurnOrder)
                 {
-                    summary.AppendLine($"{entry.Position}. {entry.PokemonName} - {entry.MoveName}");
+                    // Translate move name
+                    var move = MoveCatalog.All.FirstOrDefault(m => m.Name == entry.MoveName);
+                    var moveDisplayName = move != null ? move.GetDisplayName(provider) : entry.MoveName;
+                    summary.AppendLine($"{entry.Position}. {entry.PokemonName} - {moveDisplayName}");
                     summary.AppendLine($"   Priority: {entry.Priority}, Speed: {entry.EffectiveSpeed:F2}");
                     summary.AppendLine($"   Reasoning: {entry.Reasoning}");
                     summary.AppendLine();
                 }
             }
-            
+
             // Show Pokemon that have speed calculations but no turn order entry
             if (result.SpeedCalculations.Count > result.TurnOrder.Count)
             {
                 summary.AppendLine();
-                summary.AppendLine($"=== NOTE: {result.SpeedCalculations.Count - result.TurnOrder.Count} Pokemon have speed calculations but no turn order entry ===");
+                summary.AppendLine($"=== Note: {result.SpeedCalculations.Count - result.TurnOrder.Count} Pokemon have speed but no turn order ===");
                 var turnOrderPokemonNames = new HashSet<string>(result.TurnOrder.Select(e => e.PokemonName));
                 foreach (var speedCalc in result.SpeedCalculations)
                 {
@@ -424,9 +435,9 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             dgvSpeedCalculation.Columns.Add("Pokemon", "Pokemon");
             dgvSpeedCalculation.Columns.Add("Base Speed", "Base Speed");
-            dgvSpeedCalculation.Columns.Add("Stat Stage Mult", "Stat Stage");
-            dgvSpeedCalculation.Columns.Add("Status Mult", "Status");
-            dgvSpeedCalculation.Columns.Add("Side Mult", "Side");
+            dgvSpeedCalculation.Columns.Add("Stat Stage Mult", "Stat Stage Mult");
+            dgvSpeedCalculation.Columns.Add("Status Mult", "Status Mult");
+            dgvSpeedCalculation.Columns.Add("Side Mult", "Side Mult");
             dgvSpeedCalculation.Columns.Add("Effective Speed", "Effective Speed");
             dgvSpeedCalculation.Columns.Add("Details", "Details");
 
@@ -464,10 +475,14 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             foreach (var priority in result.PriorityInfo)
             {
+                // Translate move name
+                var move = MoveCatalog.All.FirstOrDefault(m => m.Name == priority.MoveName);
+                var moveDisplayName = move != null ? move.GetDisplayName(provider) : priority.MoveName;
+
                 var row = new DataGridViewRow();
                 row.CreateCells(dgvPriority,
                     priority.PokemonName,
-                    priority.MoveName,
+                    moveDisplayName,
                     priority.Priority.ToString(),
                     priority.Description);
                 dgvPriority.Rows.Add(row);
@@ -492,11 +507,15 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             foreach (var entry in result.TurnOrder)
             {
+                // Translate move name
+                var move = MoveCatalog.All.FirstOrDefault(m => m.Name == entry.MoveName);
+                var moveDisplayName = move != null ? move.GetDisplayName(provider) : entry.MoveName;
+
                 var row = new DataGridViewRow();
                 row.CreateCells(dgvOrder,
                     entry.Position.ToString(),
                     entry.PokemonName,
-                    entry.MoveName,
+                    moveDisplayName,
                     entry.Priority.ToString(),
                     entry.EffectiveSpeed.ToString("F2"),
                     entry.Reasoning);

@@ -3,7 +3,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Field;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -161,6 +163,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var hazardList = HazardCatalog.All.OrderBy(h => h.Name).ToList();
+            var provider = LocalizationManager.Instance;
 
             foreach (var hazard in hazardList)
             {
@@ -169,7 +172,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvHazard,
-                    hazard.Name,
+                    hazard.GetLocalizedName(provider),
                     typeStr,
                     layersStr);
 
@@ -194,8 +197,9 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not HazardData hazard)
                 return;
 
+            var provider = LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(hazard.Name);
+            details.AppendLine(hazard.GetLocalizedName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {hazard.Type}");
             details.AppendLine($"Max Layers: {hazard.MaxLayers}");
@@ -205,10 +209,11 @@ namespace PokemonUltimate.DataViewer.Tabs
             else
                 details.AppendLine("Affects Flying: No (grounded only)");
 
-            if (!string.IsNullOrEmpty(hazard.Description))
+            var description = hazard.GetLocalizedDescription(provider);
+            if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();
-                details.AppendLine($"Description: {hazard.Description}");
+                details.AppendLine($"Description: {description}");
             }
 
             this.txtDetails.Text = details.ToString();

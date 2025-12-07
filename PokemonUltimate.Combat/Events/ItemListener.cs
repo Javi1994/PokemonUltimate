@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Combat.Extensions;
+using PokemonUltimate.Content.Catalogs.Items;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Localization;
 using ContactDamageAction = PokemonUltimate.Combat.Actions.ContactDamageAction;
 
 namespace PokemonUltimate.Combat.Events
@@ -140,10 +143,13 @@ namespace PokemonUltimate.Combat.Events
         private IEnumerable<BattleAction> ProcessEndOfTurnHealing(BattleSlot holder)
         {
             var pokemon = holder.Pokemon;
+            var provider = LocalizationManager.Instance;
+            var itemName = _itemData.GetLocalizedName(provider);
 
-            // Special handling for Black Sludge
-            bool isBlackSludge = _itemData.Name.Equals("Black Sludge", StringComparison.OrdinalIgnoreCase);
-            bool isPoisonType = pokemon.Species.PrimaryType == PokemonType.Poison || 
+            // Special handling for Black Sludge - use catalog lookup instead of hardcoded string
+            var blackSludgeItem = ItemCatalog.GetByName("Black Sludge");
+            bool isBlackSludge = blackSludgeItem != null && _itemData.Name.Equals(blackSludgeItem.Name, StringComparison.OrdinalIgnoreCase);
+            bool isPoisonType = pokemon.Species.PrimaryType == PokemonType.Poison ||
                                pokemon.Species.SecondaryType == PokemonType.Poison;
 
             if (isBlackSludge)
@@ -159,7 +165,7 @@ namespace PokemonUltimate.Combat.Events
                     if (blackSludgeHeal < 1)
                         blackSludgeHeal = 1;
 
-                    yield return new MessageAction(string.Format(GameMessages.ItemActivated, pokemon.DisplayName, _itemData.Name));
+                    yield return new MessageAction(provider.GetString(LocalizationKey.ItemActivated, pokemon.DisplayName, itemName));
                     yield return new HealAction(holder, holder, blackSludgeHeal);
                 }
                 else
@@ -169,11 +175,11 @@ namespace PokemonUltimate.Combat.Events
                     if (damageAmount < 1)
                         damageAmount = 1;
 
-                    yield return new MessageAction(string.Format(GameMessages.ItemActivated, pokemon.DisplayName, _itemData.Name));
-                    
+                    yield return new MessageAction(provider.GetString(LocalizationKey.ItemActivated, pokemon.DisplayName, itemName));
+
                     // Directly damage the Pokemon
                     pokemon.TakeDamage(damageAmount);
-                    yield return new MessageAction(string.Format("{0} was hurt by {1}!", pokemon.DisplayName, _itemData.Name));
+                    yield return new MessageAction(provider.GetString(LocalizationKey.HurtByItem, pokemon.DisplayName, itemName));
                 }
                 yield break;
             }
@@ -208,7 +214,7 @@ namespace PokemonUltimate.Combat.Events
                 standardHealAmount = 1;
 
             // Message
-            yield return new MessageAction(string.Format(GameMessages.ItemActivated, pokemon.DisplayName, _itemData.Name));
+            yield return new MessageAction(provider.GetString(LocalizationKey.ItemActivated, pokemon.DisplayName, itemName));
 
             // Healing action
             yield return new HealAction(holder, holder, standardHealAmount);
@@ -228,10 +234,12 @@ namespace PokemonUltimate.Combat.Events
                 damage = 1;
 
             // Message for item activation
-            yield return new MessageAction(string.Format(GameMessages.ItemActivated, holder.Pokemon.DisplayName, _itemData.Name));
+            var provider = LocalizationManager.Instance;
+            var itemName = _itemData.GetLocalizedName(provider);
+            yield return new MessageAction(provider.GetString(LocalizationKey.ItemActivated, holder.Pokemon.DisplayName, itemName));
 
             // Apply damage using ContactDamageAction (executes when action is executed, not when it's created)
-            yield return new ContactDamageAction(attacker, damage, _itemData.Name);
+            yield return new ContactDamageAction(attacker, damage, itemName);
         }
 
         /// <summary>
@@ -249,7 +257,7 @@ namespace PokemonUltimate.Combat.Events
             // Life Orb only causes recoil if damage was dealt
             var opposingSide = field.GetOppositeSide(holder.Side);
             bool damageWasDealt = false;
-            
+
             foreach (var enemySlot in opposingSide.GetActiveSlots())
             {
                 if (!enemySlot.IsEmpty && (enemySlot.PhysicalDamageTakenThisTurn > 0 || enemySlot.SpecialDamageTakenThisTurn > 0))
@@ -258,25 +266,27 @@ namespace PokemonUltimate.Combat.Events
                     break;
                 }
             }
-            
+
             // If no damage was dealt, don't cause recoil
             // This handles status moves and moves that missed/immune
             if (!damageWasDealt)
                 yield break;
-            
+
             // Life Orb recoil is 10% of max HP
             int recoilDamage = pokemon.MaxHP / 10;
             if (recoilDamage < 1)
                 recoilDamage = 1;
 
             // Message for item activation
-            yield return new MessageAction(string.Format(GameMessages.ItemActivated, pokemon.DisplayName, _itemData.Name));
+            var provider = LocalizationManager.Instance;
+            var itemName = _itemData.GetLocalizedName(provider);
+            yield return new MessageAction(provider.GetString(LocalizationKey.ItemActivated, pokemon.DisplayName, itemName));
 
             // Directly damage the holder (recoil)
             pokemon.TakeDamage(recoilDamage);
-            
+
             // Return message about recoil damage
-            yield return new MessageAction(string.Format("{0} was hurt by recoil!", pokemon.DisplayName));
+            yield return new MessageAction(provider.GetString(LocalizationKey.HurtByRecoil, pokemon.DisplayName));
         }
 
         /// <summary>
@@ -291,12 +301,12 @@ namespace PokemonUltimate.Combat.Events
             // This is called BEFORE damage is applied, so we need to check current HP
             // For now, we'll check if HP is at max (was at full HP before damage)
             // TODO: This needs to be called BEFORE damage is applied, which requires refactoring DamageAction
-            
+
             // Focus Sash prevents fainting and leaves Pokemon at 1 HP
             // We need to modify the damage before it's applied
             // For now, this is a placeholder - the actual implementation requires modifying DamageAction
             // to allow items/abilities to intercept and modify damage before application
-            
+
             yield break; // Placeholder - requires damage interception system
         }
     }

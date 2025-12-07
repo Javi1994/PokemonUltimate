@@ -3,7 +3,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Terrain;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -161,6 +163,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var terrainList = TerrainCatalog.All.OrderBy(t => t.Name).ToList();
+            var provider = LocalizationManager.Instance;
 
             foreach (var terrain in terrainList)
             {
@@ -169,7 +172,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvTerrain,
-                    terrain.Name,
+                    terrain.GetLocalizedName(provider),
                     typeStr,
                     durationStr);
 
@@ -194,8 +197,9 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not TerrainData terrain)
                 return;
 
+            var provider = LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(terrain.Name);
+            details.AppendLine(terrain.GetLocalizedName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {terrain.Terrain}");
             details.AppendLine($"Duration: {terrain.DefaultDuration} turns");
@@ -203,10 +207,11 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (terrain.BoostedType.HasValue)
                 details.AppendLine($"Boosts: {terrain.BoostedType} moves ({terrain.BoostMultiplier}x)");
 
-            if (!string.IsNullOrEmpty(terrain.Description))
+            var description = terrain.GetLocalizedDescription(provider);
+            if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();
-                details.AppendLine($"Description: {terrain.Description}");
+                details.AppendLine($"Description: {description}");
             }
 
             this.txtDetails.Text = details.ToString();

@@ -16,6 +16,7 @@ using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -143,19 +144,19 @@ namespace PokemonUltimate.Combat.Actions
             // Trigger OnBeforeMove for abilities (e.g., Truant)
             // This happens BEFORE validation so abilities can block the move
             var beforeMoveActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnBeforeMove, field);
-            
+
             // Check if any ability blocked the move (e.g., Truant)
             // Truant returns a TruantLoafing message - if present, block the move
-            bool moveBlocked = beforeMoveActions.Any(action => 
-                action is MessageAction msg && 
+            bool moveBlocked = beforeMoveActions.Any(action =>
+                action is MessageAction msg &&
                 msg.Message.Contains("loafing around"));
-            
+
             if (moveBlocked)
             {
                 actions.AddRange(beforeMoveActions);
                 return actions; // Block move execution (PP not consumed)
             }
-            
+
             actions.AddRange(beforeMoveActions);
 
             // Validate move execution (PP, Flinch, Status)
@@ -182,7 +183,7 @@ namespace PokemonUltimate.Combat.Actions
             // Show focusing message for Focus Punch (if not already failed)
             if (hasFocusPunchEffect)
             {
-                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveFocusing, User.Pokemon.DisplayName)));
+                actions.Add(new MessageAction(_messageFormatter.Format(LocalizationKey.MoveFocusing, User.Pokemon.DisplayName)));
             }
 
             // Check protection and semi-invulnerable status
@@ -272,7 +273,8 @@ namespace PokemonUltimate.Combat.Actions
             {
                 // Deduct PP even if move fails
                 MoveInstance.Use();
-                actions.Add(new MessageAction(string.Format(GameMessages.MoveFocusLost, User.Pokemon.DisplayName)));
+                var provider = LocalizationManager.Instance;
+                actions.Add(new MessageAction(provider.GetString(LocalizationKey.MoveFocusLost, User.Pokemon.DisplayName)));
                 User.RemoveVolatileStatus(VolatileStatus.Focusing);
                 return actions;
             }
@@ -298,7 +300,7 @@ namespace PokemonUltimate.Combat.Actions
             // Check if move bypasses Protect (e.g., Feint)
             if (!Move.BypassesProtect)
             {
-                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveProtected, Target.Pokemon.DisplayName)));
+                actions.Add(new MessageAction(_messageFormatter.Format(LocalizationKey.BattleProtected, Target.Pokemon.DisplayName)));
                 // Remove focusing status if move was blocked
                 if (hasFocusPunchEffect)
                 {
@@ -330,7 +332,7 @@ namespace PokemonUltimate.Combat.Actions
             bool canHit = CanHitSemiInvulnerable(Target.SemiInvulnerableMoveName);
             if (!canHit)
             {
-                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveMissed)));
+                actions.Add(new MessageAction(_messageFormatter.Format(LocalizationKey.BattleMissed)));
                 CleanupVolatileStatusesOnFailure(hasFocusPunchEffect, hasMultiTurnEffect);
                 return actions;
             }
@@ -351,7 +353,7 @@ namespace PokemonUltimate.Combat.Actions
             if (_accuracyChecker.CheckHit(User, Target, Move, field))
                 return null;
 
-            actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveMissed)));
+            actions.Add(new MessageAction(_messageFormatter.Format(LocalizationKey.BattleMissed)));
             CleanupVolatileStatusesOnFailure(hasFocusPunchEffect, hasMultiTurnEffect);
             return actions;
         }
@@ -457,14 +459,14 @@ namespace PokemonUltimate.Combat.Actions
             // Check PP
             if (!MoveInstance.HasPP)
             {
-                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveNoPP, User.Pokemon.DisplayName)));
+                actions.Add(new MessageAction(_messageFormatter.Format(LocalizationKey.BattleNoPP, User.Pokemon.DisplayName)));
                 return actions;
             }
 
             // Check Flinch (volatile status)
             if (User.HasVolatileStatus(VolatileStatus.Flinch))
             {
-                actions.Add(new MessageAction(_messageFormatter.Format(GameMessages.MoveFlinched, User.Pokemon.DisplayName)));
+                actions.Add(new MessageAction(_messageFormatter.Format(LocalizationKey.BattleFlinched, User.Pokemon.DisplayName)));
                 User.RemoveVolatileStatus(VolatileStatus.Flinch); // Consume flinch
                 return actions;
             }
@@ -490,16 +492,17 @@ namespace PokemonUltimate.Combat.Actions
             switch (pokemon.Status)
             {
                 case PersistentStatus.Sleep:
-                    return new MessageAction(_messageFormatter.Format(GameMessages.MoveAsleep, pokemon.DisplayName));
+                    return new MessageAction(_messageFormatter.Format(LocalizationKey.BattleAsleep, pokemon.DisplayName));
 
                 case PersistentStatus.Freeze:
-                    return new MessageAction(string.Format(GameMessages.MoveFrozen, pokemon.DisplayName));
+                    var provider = LocalizationManager.Instance;
+                    return new MessageAction(provider.GetString(LocalizationKey.BattleFrozen, pokemon.DisplayName));
 
                 case PersistentStatus.Paralysis:
                     // 25% chance to be fully paralyzed
                     if (_randomProvider.Next(100) < StatusConstants.ParalysisFullParalysisChance)
                     {
-                        return new MessageAction(_messageFormatter.Format(GameMessages.MoveParalyzed, pokemon.DisplayName));
+                        return new MessageAction(_messageFormatter.Format(LocalizationKey.BattleParalyzed, pokemon.DisplayName));
                     }
                     break;
             }
@@ -553,7 +556,7 @@ namespace PokemonUltimate.Combat.Actions
             // For spread moves, check if there are any valid active targets
             var potentialTargets = _targetResolver.GetValidTargets(User, Move, field);
             bool hasActiveTargets = Target.IsActive() || potentialTargets.Any(t => t.IsActive());
-            
+
             if (!(hasSemiInvulnerableEffect && !isSemiInvulnerableAttackTurn) && hasActiveTargets)
             {
                 foreach (var effect in Move.Effects)
@@ -597,7 +600,7 @@ namespace PokemonUltimate.Combat.Actions
                                         continue;
 
                                     var context = _damagePipeline.Calculate(User, target, moveForDamage, field);
-                                    
+
                                     // Apply spread move damage reduction
                                     if (spreadMultiplier < 1.0f)
                                     {

@@ -6,6 +6,7 @@ using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.Combat.Effects
 {
@@ -49,14 +50,15 @@ namespace PokemonUltimate.Combat.Effects
                 // Increment counter before checking success (tracks consecutive uses)
                 user.IncrementProtectUses();
 
+                var provider = LocalizationManager.Instance;
                 if (_randomProvider.Next(100) < successRate)
                 {
                     user.AddVolatileStatus(VolatileStatus.Protected);
-                    actions.Add(new MessageAction(string.Format(Core.Constants.GameMessages.MoveProtected, user.Pokemon.DisplayName)));
+                    actions.Add(new MessageAction(provider.GetString(LocalizationKey.BattleProtected, user.Pokemon.DisplayName)));
                 }
                 else
                 {
-                    actions.Add(new MessageAction(string.Format(Core.Constants.GameMessages.MoveProtectFailed, user.Pokemon.DisplayName)));
+                    actions.Add(new MessageAction(provider.GetString(LocalizationKey.MoveProtectFailed, user.Pokemon.DisplayName)));
                 }
             }
         }

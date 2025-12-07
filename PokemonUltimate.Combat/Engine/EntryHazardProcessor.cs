@@ -4,11 +4,14 @@ using System.Linq;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Content.Catalogs.Abilities;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.Combat.Engine
 {
@@ -88,7 +91,9 @@ namespace PokemonUltimate.Combat.Engine
 
             if (damage > 0)
             {
-                actions.Add(new MessageAction(string.Format(GameMessages.HazardSpikesDamage, pokemon.DisplayName)));
+                var provider = LocalizationManager.Instance;
+                var hazardName = hazardData.GetLocalizedName(provider);
+                actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardSpikesDamage, pokemon.DisplayName, hazardName)));
                 actions.Add(CreateHazardDamageAction(slot, field, damage));
             }
         }
@@ -118,7 +123,9 @@ namespace PokemonUltimate.Combat.Engine
 
             if (damage > 0)
             {
-                actions.Add(new MessageAction(string.Format(GameMessages.HazardStealthRockDamage, pokemon.DisplayName)));
+                var provider = LocalizationManager.Instance;
+                var hazardName = hazardData.GetLocalizedName(provider);
+                actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardStealthRockDamage, pokemon.DisplayName, hazardName)));
                 actions.Add(CreateHazardDamageAction(slot, field, damage));
             }
         }
@@ -139,7 +146,9 @@ namespace PokemonUltimate.Combat.Engine
             if (hazardData.IsPoisonAbsorber(pokemon.Species.PrimaryType, pokemon.Species.SecondaryType))
             {
                 side.RemoveHazard(HazardType.ToxicSpikes);
-                actions.Add(new MessageAction(string.Format(GameMessages.HazardToxicSpikesAbsorbed, pokemon.DisplayName)));
+                var provider = LocalizationManager.Instance;
+                var hazardName = hazardData.GetLocalizedName(provider);
+                actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardToxicSpikesAbsorbed, pokemon.DisplayName, hazardName)));
                 return;
             }
 
@@ -152,7 +161,9 @@ namespace PokemonUltimate.Combat.Engine
 
             if (status != PersistentStatus.None)
             {
-                actions.Add(new MessageAction(string.Format(GameMessages.HazardToxicSpikesStatus, pokemon.DisplayName)));
+                var provider = LocalizationManager.Instance;
+                var hazardName = hazardData.GetLocalizedName(provider);
+                actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardToxicSpikesStatus, pokemon.DisplayName, hazardName)));
                 actions.Add(new ApplyStatusAction(null, slot, status));
             }
         }
@@ -177,13 +188,17 @@ namespace PokemonUltimate.Combat.Engine
             {
                 int stages = hazardData.StatStages;
 
-                // Check for Contrary ability (reverses stat changes)
-                if (pokemon.Ability != null && pokemon.Ability.Name.Equals("Contrary", StringComparison.OrdinalIgnoreCase))
+                // Check for Contrary ability (reverses stat changes) - use catalog lookup instead of hardcoded string
+                var contraryAbility = AbilityCatalog.GetByName("Contrary");
+                if (pokemon.Ability != null && contraryAbility != null &&
+                    pokemon.Ability.Name.Equals(contraryAbility.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     stages = -stages; // Reverse the stat change
                 }
 
-                actions.Add(new MessageAction(string.Format(GameMessages.HazardStickyWebSpeed, pokemon.DisplayName)));
+                var provider = LocalizationManager.Instance;
+                var hazardName = hazardData.GetLocalizedName(provider);
+                actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardStickyWebSpeed, pokemon.DisplayName, hazardName)));
                 actions.Add(new StatChangeAction(null, slot, hazardData.StatToLower.Value, stages));
             }
         }

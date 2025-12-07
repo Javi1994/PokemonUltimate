@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using PokemonUltimate.Content.Providers;
+using PokemonUltimate.Core.Localization;
 using PokemonUltimate.DeveloperTools.Tabs;
 
 namespace PokemonUltimate.DeveloperTools
@@ -25,6 +27,9 @@ namespace PokemonUltimate.DeveloperTools
 
         public MainForm()
         {
+            // Initialize localization (defaults to Spanish)
+            LocalizationManager.Initialize(new LocalizationProvider(), "es");
+
             InitializeComponent();
         }
 
@@ -49,7 +54,7 @@ namespace PokemonUltimate.DeveloperTools
             this.SuspendLayout();
 
             // Form
-            this.Text = "Pokemon Ultimate - Developer Tools";
+            this.Text = "Developer Tools";
             this.Size = new Size(1400, 900);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MinimumSize = new Size(1000, 600);
@@ -60,13 +65,13 @@ namespace PokemonUltimate.DeveloperTools
             this.mainTabControl.Padding = new Point(10, 5);
 
             // Battle Tab
-            this.tabBattle.Text = "Battle Debugger";
+            this.tabBattle.Text = "Battle";
             this.tabBattle.Padding = new Padding(5);
             this.battleDebuggerTab.Dock = DockStyle.Fill;
             this.tabBattle.Controls.Add(this.battleDebuggerTab);
 
             // Move Tab
-            this.tabMove.Text = "Move Debugger";
+            this.tabMove.Text = "Move";
             this.tabMove.Padding = new Padding(5);
             this.moveDebuggerTab.Dock = DockStyle.Fill;
             this.tabMove.Controls.Add(this.moveDebuggerTab);

@@ -3,7 +3,10 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
 using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Localization;
+using PokemonUltimate.DeveloperTools.Localization;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
 {
@@ -67,6 +70,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 290;
             int leftMargin = 5;
 
+            var provider = LocalizationManager.Instance;
             this.lblTitle = new Label
             {
                 Text = "Configuration",
@@ -78,7 +82,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             var lblAttackingType = new Label
             {
-                Text = "Attacking Type:",
+                Text = "Attacking Type",
                 AutoSize = true,
                 Location = new Point(leftMargin, yPos)
             };
@@ -94,7 +98,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             var lblDefenderPrimaryType = new Label
             {
-                Text = "Defender Primary Type:",
+                Text = "Defender Primary Type",
                 AutoSize = true,
                 Location = new Point(leftMargin, yPos)
             };
@@ -110,7 +114,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             var lblDefenderSecondaryType = new Label
             {
-                Text = "Defender Secondary Type:",
+                Text = "Defender Secondary Type",
                 AutoSize = true,
                 Location = new Point(leftMargin, yPos)
             };
@@ -141,7 +145,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             this.lblResult = new Label
             {
-                Text = "Select types and click Calculate",
+                Text = "Select types and calculate",
                 AutoSize = false,
                 Width = controlWidth,
                 Height = 80,
@@ -220,35 +224,41 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private void LoadTypeLists()
         {
             var allTypes = Enum.GetValues<PokemonType>().ToList();
-            
-            comboAttackingType.Items.AddRange(allTypes.Cast<object>().ToArray());
-            comboDefenderPrimaryType.Items.AddRange(allTypes.Cast<object>().ToArray());
-            
-            comboDefenderSecondaryType.Items.Add("(None)");
-            comboDefenderSecondaryType.Items.AddRange(allTypes.Cast<object>().ToArray());
-            
+            var provider = LocalizationManager.Instance;
+
+            // Agregar tipos traducidos a los ComboBox
+            foreach (var type in allTypes)
+            {
+                comboAttackingType.Items.Add(new TypeDisplayItem(type, provider));
+                comboDefenderPrimaryType.Items.Add(new TypeDisplayItem(type, provider));
+                comboDefenderSecondaryType.Items.Add(new TypeDisplayItem(type, provider));
+            }
+
+            comboDefenderSecondaryType.Items.Insert(0, "None");
+
             // Defaults
-            comboAttackingType.SelectedItem = PokemonType.Fire;
-            comboDefenderPrimaryType.SelectedItem = PokemonType.Grass;
-            comboDefenderSecondaryType.SelectedItem = PokemonType.Poison;
+            SetSelectedType(comboAttackingType, PokemonType.Fire);
+            SetSelectedType(comboDefenderPrimaryType, PokemonType.Grass);
+            SetSelectedType(comboDefenderSecondaryType, PokemonType.Poison);
         }
 
         private void BtnCalculate_Click(object? sender, EventArgs e)
         {
             if (comboAttackingType.SelectedItem == null || comboDefenderPrimaryType.SelectedItem == null)
             {
-                MessageBox.Show("Please select both attacking and primary defender types.", "Missing Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select attacking and defender types.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var attackingType = (PokemonType)comboAttackingType.SelectedItem;
-            var defenderPrimaryType = (PokemonType)comboDefenderPrimaryType.SelectedItem;
+            var attackingType = GetTypeFromItem(comboAttackingType.SelectedItem);
+            var defenderPrimaryType = GetTypeFromItem(comboDefenderPrimaryType.SelectedItem);
             PokemonType? defenderSecondaryType = null;
 
-            if (comboDefenderSecondaryType.SelectedItem != null && 
-                comboDefenderSecondaryType.SelectedItem.ToString() != "(None)")
+            var provider = LocalizationManager.Instance;
+            if (comboDefenderSecondaryType.SelectedItem != null &&
+                comboDefenderSecondaryType.SelectedItem.ToString() != "None")
             {
-                defenderSecondaryType = (PokemonType)comboDefenderSecondaryType.SelectedItem;
+                defenderSecondaryType = GetTypeFromItem(comboDefenderSecondaryType.SelectedItem);
             }
 
             CalculateEffectiveness(attackingType, defenderPrimaryType, defenderSecondaryType);
@@ -262,9 +272,10 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 defenderPrimaryType,
                 defenderSecondaryType);
 
+            var provider = LocalizationManager.Instance;
             var effectivenessText = effectiveness switch
             {
-                0.0f => "IMMUNE (0x)",
+                0.0f => "Immune (0x)",
                 0.25f => "Not Very Effective (0.25x)",
                 0.5f => "Not Very Effective (0.5x)",
                 1.0f => "Normal (1x)",
@@ -273,14 +284,16 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 _ => $"{effectiveness:F2}x"
             };
 
-            // Mostrar resultado
-            var defenderTypeText = defenderPrimaryType.ToString();
+            // Mostrar resultado con tipos traducidos
+            var attackingTypeName = attackingType.GetDisplayName(provider);
+            var defenderPrimaryTypeName = defenderPrimaryType.GetDisplayName(provider);
+            var defenderTypeText = defenderPrimaryTypeName;
             if (defenderSecondaryType.HasValue)
             {
-                defenderTypeText += $"/{defenderSecondaryType.Value}";
+                defenderTypeText += $"/{defenderSecondaryType.Value.GetDisplayName(provider)}";
             }
 
-            lblResult.Text = $"Attacking: {attackingType}\n" +
+            lblResult.Text = $"Attacking: {attackingTypeName}\n" +
                            $"Defender: {defenderTypeText}\n\n" +
                            $"Effectiveness: {effectivenessText}";
 
@@ -294,8 +307,8 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 var secondaryEff = TypeEffectiveness.GetEffectiveness(attackingType, defenderSecondaryType.Value);
 
                 txtBreakdown.AppendText("Breakdown:\n");
-                txtBreakdown.AppendText($"{attackingType} vs {defenderPrimaryType}: {primaryEff:F2}x\n");
-                txtBreakdown.AppendText($"{attackingType} vs {defenderSecondaryType.Value}: {secondaryEff:F2}x\n");
+                txtBreakdown.AppendText($"{attackingTypeName} vs {defenderPrimaryTypeName}: {primaryEff:F2}x\n");
+                txtBreakdown.AppendText($"{attackingTypeName} vs {defenderSecondaryType.Value.GetDisplayName(provider)}: {secondaryEff:F2}x\n");
                 txtBreakdown.AppendText($"Total: {primaryEff:F2}x × {secondaryEff:F2}x = {effectiveness:F2}x");
             }
 
@@ -303,8 +316,68 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             LoadTypeChart(attackingType);
         }
 
+        /// <summary>
+        /// Helper class to display types with translated names in ComboBox.
+        /// </summary>
+        private class TypeDisplayItem
+        {
+            public PokemonType Type { get; }
+            private readonly ILocalizationProvider _provider;
+
+            public TypeDisplayItem(PokemonType type, ILocalizationProvider provider)
+            {
+                Type = type;
+                _provider = provider;
+            }
+
+            public override string ToString()
+            {
+                return Type.GetDisplayName(_provider);
+            }
+        }
+
+        /// <summary>
+        /// Gets PokemonType from ComboBox item (handles both TypeDisplayItem and direct PokemonType).
+        /// </summary>
+        private PokemonType GetTypeFromItem(object item)
+        {
+            if (item is TypeDisplayItem displayItem)
+                return displayItem.Type;
+            if (item is PokemonType type)
+                return type;
+            throw new ArgumentException("Invalid item type", nameof(item));
+        }
+
+        /// <summary>
+        /// Sets the selected type in a ComboBox by finding the matching TypeDisplayItem.
+        /// </summary>
+        private void SetSelectedType(ComboBox comboBox, PokemonType type)
+        {
+            foreach (var item in comboBox.Items)
+            {
+                // Skip string items like "(None)"
+                if (item is string)
+                    continue;
+
+                try
+                {
+                    if (GetTypeFromItem(item) == type)
+                    {
+                        comboBox.SelectedItem = item;
+                        return;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    // Skip invalid items
+                    continue;
+                }
+            }
+        }
+
         private void LoadTypeChart(PokemonType attackingType)
         {
+            var provider = LocalizationManager.Instance;
             dgvTypeChart.Columns.Clear();
             dgvTypeChart.Rows.Clear();
 
@@ -320,7 +393,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 var color = GetEffectivenessColor(eff);
 
                 var row = new DataGridViewRow();
-                row.CreateCells(dgvTypeChart, defendingType.ToString(), $"{eff:F2}x", desc);
+                row.CreateCells(dgvTypeChart, defendingType.GetDisplayName(provider), $"{eff:F2}x", desc);
                 row.DefaultCellStyle.ForeColor = color;
                 dgvTypeChart.Rows.Add(row);
             }
@@ -335,13 +408,15 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         {
             return effectiveness switch
             {
-                0.0f => "IMMUNE",
+                0.0f => "Immune (0x)",
                 0.25f => "Not Very Effective (0.25x)",
                 0.5f => "Not Very Effective (0.5x)",
-                1.0f => "Normal",
+                1.0f => "Normal (1x)",
                 2.0f => "Super Effective (2x)",
                 4.0f => "Super Effective (4x)",
-                _ => effectiveness > 1.0f ? "Super Effective" : "Not Very Effective"
+                _ => effectiveness > 1.0f
+                    ? "Super Effective (2x)"
+                    : "Not Very Effective (0.5x)"
             };
         }
 

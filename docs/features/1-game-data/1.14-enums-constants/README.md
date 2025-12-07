@@ -63,8 +63,8 @@ This sub-feature defines all enums and constants used throughout the game:
 **Namespace**: `PokemonUltimate.Core.Constants`  
 **Files**: `PokemonUltimate.Core/Constants/*.cs`
 
--   **ErrorMessages**: Centralized error message strings
--   **GameMessages**: In-game message strings for UI
+-   **ErrorMessages**: Centralized error message strings (for exceptions/validation)
+-   **GameMessages**: ⚠️ **DEPRECATED** - In-game message strings (only used in `TypeEffectiveness.GetEffectivenessDescription()` which is not used in production). All combat messages now use `LocalizationProvider` (see Feature 4.9)
 -   **CoreConstants** (post-refactor): Core module constants
     -   ShinyOdds, Friendship values (DefaultWildFriendship, HatchedFriendship, HighFriendshipThreshold, MaxFriendship)
     -   IV/EV limits (MaxIV, MaxEV, MaxTotalEV)

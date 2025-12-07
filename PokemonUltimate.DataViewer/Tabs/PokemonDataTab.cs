@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -177,14 +179,15 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             foreach (var pokemon in pokemonList)
             {
+                var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
                 var typeStr = pokemon.IsDualType
-                    ? $"{pokemon.PrimaryType}/{pokemon.SecondaryType}"
-                    : pokemon.PrimaryType.ToString();
+                    ? $"{pokemon.PrimaryType.GetDisplayName(provider)}/{pokemon.SecondaryType.Value.GetDisplayName(provider)}"
+                    : pokemon.PrimaryType.GetDisplayName(provider);
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvPokemon,
                     pokemon.PokedexNumber,
-                    pokemon.Name,
+                    pokemon.GetDisplayName(provider),
                     typeStr,
                     pokemon.BaseStats.HP,
                     pokemon.BaseStats.Attack,
@@ -215,8 +218,9 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not PokemonSpeciesData pokemon)
                 return;
 
+            var provider = LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine($"#{pokemon.PokedexNumber:D3} {pokemon.Name}");
+            details.AppendLine($"#{pokemon.PokedexNumber:D3} {pokemon.GetDisplayName(provider)}");
             details.AppendLine();
             details.AppendLine($"Types: {GetTypeString(pokemon)}");
             details.AppendLine();
@@ -232,11 +236,11 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (pokemon.Ability1 != null)
             {
                 details.AppendLine("Abilities:");
-                details.AppendLine($"  {pokemon.Ability1.Name}");
+                details.AppendLine($"  {pokemon.Ability1.GetDisplayName(provider)}");
                 if (pokemon.Ability2 != null)
-                    details.AppendLine($"  {pokemon.Ability2.Name}");
+                    details.AppendLine($"  {pokemon.Ability2.GetDisplayName(provider)}");
                 if (pokemon.HiddenAbility != null)
-                    details.AppendLine($"  {pokemon.HiddenAbility.Name} (Hidden)");
+                    details.AppendLine($"  {pokemon.HiddenAbility.GetDisplayName(provider)} (Hidden)");
                 details.AppendLine();
             }
 
@@ -250,9 +254,10 @@ namespace PokemonUltimate.DataViewer.Tabs
 
         private string GetTypeString(PokemonSpeciesData pokemon)
         {
+            var provider = LocalizationManager.Instance;
             return pokemon.IsDualType
-                ? $"{pokemon.PrimaryType}/{pokemon.SecondaryType}"
-                : pokemon.PrimaryType.ToString();
+                ? $"{pokemon.PrimaryType.GetDisplayName(provider)}/{pokemon.SecondaryType.Value.GetDisplayName(provider)}"
+                : pokemon.PrimaryType.GetDisplayName(provider);
         }
     }
 }

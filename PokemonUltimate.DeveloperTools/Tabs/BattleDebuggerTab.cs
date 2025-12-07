@@ -4,8 +4,11 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
@@ -96,7 +99,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             var lblPlayerPokemon = new Label
             {
-                Text = "Player Pokemon:",
+                Text = "Player Pokemon",
                 Location = new Point(leftMargin, yPos),
                 AutoSize = true
             };
@@ -109,7 +112,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             var lblEnemyPokemon = new Label
             {
-                Text = "Enemy Pokemon:",
+                Text = "Enemy Pokemon",
                 Location = new Point(leftMargin, yPos),
                 AutoSize = true
             };
@@ -122,7 +125,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             var lblLevel = new Label
             {
-                Text = "Level:",
+                Text = "Level",
                 Location = new Point(leftMargin, yPos),
                 AutoSize = true
             };
@@ -136,7 +139,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             var lblBattles = new Label
             {
-                Text = "Number of Battles:",
+                Text = "Number of Battles",
                 Location = new Point(leftMargin, yPos),
                 AutoSize = true
             };
@@ -195,7 +198,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.txtSummary.Font = new Font("Consolas", 9);
             this.txtSummary.ReadOnly = true;
             this.txtSummary.Margin = new Padding(10);
-            this.txtSummary.Text = "Configure settings and click 'Run Battles' to see results here.";
+            this.txtSummary.Text = "Configure and run battles";
             this.tabSummary.Controls.Add(this.txtSummary);
 
             // Tab Move Usage
@@ -239,8 +242,9 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         {
             var pokemonList = PokemonCatalog.All.OrderBy(p => p.Name).ToList();
 
-            this.comboPlayerPokemon.Items.Add("(Random)");
-            this.comboEnemyPokemon.Items.Add("(Random)");
+            var provider = LocalizationManager.Instance;
+            this.comboPlayerPokemon.Items.Add("Random");
+            this.comboEnemyPokemon.Items.Add("Random");
 
             foreach (var pokemon in pokemonList)
             {
@@ -312,6 +316,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
             catch (Exception ex)
             {
+                var provider = LocalizationManager.Instance;
                 MessageBox.Show($"Error: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.lblStatus.Text = "Error occurred";
                 this.txtSummary.Text = $"Error: {ex.Message}";
@@ -324,21 +329,27 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(BattleRunner.BattleStatistics stats, BattleRunner.BattleConfig config)
         {
-            var playerName = config.PlayerPokemon?.Name ?? "Player";
-            var enemyName = config.EnemyPokemon?.Name ?? "Enemy";
+            // Obtener nombres traducidos de los Pokemon
+            var provider = LocalizationManager.Instance;
+            var playerName = config.PlayerPokemon != null
+                ? config.PlayerPokemon.GetDisplayName(provider)
+                : "Player";
+            var enemyName = config.EnemyPokemon != null
+                ? config.EnemyPokemon.GetDisplayName(provider)
+                : "Enemy";
             var totalBattles = stats.PlayerWins + stats.EnemyWins + stats.Draws;
 
             // Mostrar resumen
             this.txtSummary.Clear();
             this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n");
-            this.txtSummary.AppendText("RESUMEN DE BATALLAS\n");
+            this.txtSummary.AppendText("Battle Summary\n");
             this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
-            this.txtSummary.AppendText($"Total de batallas: {totalBattles}\n\n");
-            this.txtSummary.AppendText($"{playerName} ganó: {stats.PlayerWins} ({stats.PlayerWins * 100.0 / totalBattles:F1}%)\n");
-            this.txtSummary.AppendText($"{enemyName} ganó: {stats.EnemyWins} ({stats.EnemyWins * 100.0 / totalBattles:F1}%)\n");
+            this.txtSummary.AppendText($"Total Battles: {totalBattles}\n\n");
+            this.txtSummary.AppendText($"{playerName} Won: {stats.PlayerWins} ({stats.PlayerWins * 100.0 / totalBattles:F1}%)\n");
+            this.txtSummary.AppendText($"{enemyName} Won: {stats.EnemyWins} ({stats.EnemyWins * 100.0 / totalBattles:F1}%)\n");
             if (stats.Draws > 0)
             {
-                this.txtSummary.AppendText($"Empates: {stats.Draws} ({stats.Draws * 100.0 / totalBattles:F1}%)\n");
+                this.txtSummary.AppendText($"Draws: {stats.Draws} ({stats.Draws * 100.0 / totalBattles:F1}%)\n");
             }
             this.txtSummary.AppendText("\n");
 
@@ -346,7 +357,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             if (stats.MoveUsageStats.Count > 0)
             {
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n");
-                this.txtSummary.AppendText("MOVIMIENTOS MÁS USADOS\n");
+                this.txtSummary.AppendText("Most Used Moves\n");
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
 
                 foreach (var pokemonStats in stats.MoveUsageStats.OrderByDescending(p => p.Value.Values.Sum()))
@@ -355,11 +366,23 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                     var moves = pokemonStats.Value.OrderByDescending(m => m.Value).Take(5).ToList();
                     var totalMoves = pokemonStats.Value.Values.Sum();
 
-                    this.txtSummary.AppendText($"{pokemonName} (Total: {totalMoves} movimientos):\n");
+                    // Obtener nombre traducido del Pokemon
+                    var pokemonSpecies = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
+                    var translatedPokemonName = pokemonSpecies != null
+                        ? pokemonSpecies.GetDisplayName(LocalizationManager.Instance)
+                        : pokemonName;
+
+                    this.txtSummary.AppendText($"{translatedPokemonName} (Total Moves: {totalMoves}):\n");
                     foreach (var move in moves)
                     {
+                        // Obtener nombre traducido del movimiento
+                        var moveData = MoveCatalog.All.FirstOrDefault(m => m.Name == move.Key);
+                        var translatedMoveName = moveData != null
+                            ? moveData.GetDisplayName(provider)
+                            : move.Key;
+
                         var percentage = (move.Value * 100.0) / totalMoves;
-                        this.txtSummary.AppendText($"  {move.Key}: {move.Value} veces ({percentage:F1}%)\n");
+                        this.txtSummary.AppendText($"  {translatedMoveName}: {move.Value} times ({percentage:F1}%)\n");
                     }
                     this.txtSummary.AppendText("\n");
                 }
@@ -369,7 +392,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             if (stats.StatusEffectStats.Count > 0)
             {
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n");
-                this.txtSummary.AppendText("EFECTOS DE ESTADO CAUSADOS\n");
+                this.txtSummary.AppendText("Status Effects Caused\n");
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
 
                 foreach (var pokemonStats in stats.StatusEffectStats.OrderByDescending(p => p.Value.Values.Sum()))
@@ -378,11 +401,17 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                     var statuses = pokemonStats.Value.OrderByDescending(s => s.Value).ToList();
                     var totalStatuses = pokemonStats.Value.Values.Sum();
 
-                    this.txtSummary.AppendText($"{pokemonName} (Total: {totalStatuses} efectos):\n");
+                    // Obtener nombre traducido del Pokemon
+                    var pokemonSpeciesForStatus = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
+                    var translatedPokemonNameForStatus = pokemonSpeciesForStatus != null
+                        ? pokemonSpeciesForStatus.GetDisplayName(LocalizationManager.Instance)
+                        : pokemonName;
+
+                    this.txtSummary.AppendText($"{translatedPokemonNameForStatus} (Total Effects: {totalStatuses}):\n");
                     foreach (var status in statuses)
                     {
                         var percentage = (status.Value * 100.0) / totalBattles;
-                        this.txtSummary.AppendText($"  {status.Key}: {status.Value} veces ({percentage:F1}%)\n");
+                        this.txtSummary.AppendText($"  {status.Key}: {status.Value} times ({percentage:F1}%)\n");
                     }
                     this.txtSummary.AppendText("\n");
                 }
@@ -397,22 +426,35 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateMoveUsageTable(BattleRunner.BattleStatistics stats)
         {
+            var provider = LocalizationManager.Instance;
             var dataTable = new DataTable();
             dataTable.Columns.Add("Pokemon", typeof(string));
-            dataTable.Columns.Add("Movimiento", typeof(string));
-            dataTable.Columns.Add("Usos", typeof(int));
-            dataTable.Columns.Add("Porcentaje", typeof(string));
+            dataTable.Columns.Add("Move", typeof(string));
+            dataTable.Columns.Add("Uses", typeof(int));
+            dataTable.Columns.Add("Percentage", typeof(string));
 
             foreach (var pokemonStats in stats.MoveUsageStats.OrderByDescending(p => p.Value.Values.Sum()))
             {
                 var pokemonName = pokemonStats.Key;
+                // Obtener nombre traducido del Pokemon
+                var pokemonSpecies = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
+                var translatedPokemonName = pokemonSpecies != null
+                    ? pokemonSpecies.GetDisplayName(LocalizationManager.Instance)
+                    : pokemonName;
+
                 var totalMoves = pokemonStats.Value.Values.Sum();
                 var moves = pokemonStats.Value.OrderByDescending(m => m.Value).ToList();
 
                 foreach (var move in moves)
                 {
+                    // Obtener nombre traducido del movimiento
+                    var moveData = MoveCatalog.All.FirstOrDefault(m => m.Name == move.Key);
+                    var translatedMoveName = moveData != null
+                        ? moveData.GetDisplayName(LocalizationManager.Instance)
+                        : move.Key;
+
                     var percentage = (move.Value * 100.0) / totalMoves;
-                    dataTable.Rows.Add(pokemonName, move.Key, move.Value, $"{percentage:F1}%");
+                    dataTable.Rows.Add(translatedPokemonName, translatedMoveName, move.Value, $"{percentage:F1}%");
                 }
             }
 
@@ -421,23 +463,30 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateStatusEffectsTable(BattleRunner.BattleStatistics stats)
         {
+            var provider = LocalizationManager.Instance;
             var dataTable = new DataTable();
             dataTable.Columns.Add("Pokemon", typeof(string));
-            dataTable.Columns.Add("Efecto", typeof(string));
-            dataTable.Columns.Add("Veces", typeof(int));
-            dataTable.Columns.Add("Porcentaje", typeof(string));
+            dataTable.Columns.Add("Effect", typeof(string));
+            dataTable.Columns.Add("Times", typeof(int));
+            dataTable.Columns.Add("Percentage", typeof(string));
 
             var totalBattles = stats.PlayerWins + stats.EnemyWins + stats.Draws;
 
             foreach (var pokemonStats in stats.StatusEffectStats.OrderByDescending(p => p.Value.Values.Sum()))
             {
                 var pokemonName = pokemonStats.Key;
+                // Obtener nombre traducido del Pokemon
+                var pokemonSpecies = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
+                var translatedPokemonName = pokemonSpecies != null
+                    ? pokemonSpecies.GetDisplayName(LocalizationManager.Instance)
+                    : pokemonName;
+
                 var statuses = pokemonStats.Value.OrderByDescending(s => s.Value).ToList();
 
                 foreach (var status in statuses)
                 {
                     var percentage = (status.Value * 100.0) / totalBattles;
-                    dataTable.Rows.Add(pokemonName, status.Key, status.Value, $"{percentage:F1}%");
+                    dataTable.Rows.Add(translatedPokemonName, status.Key, status.Value, $"{percentage:F1}%");
                 }
             }
 

@@ -3,7 +3,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Weather;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -161,6 +163,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var weatherList = WeatherCatalog.All.OrderBy(w => w.Name).ToList();
+            var provider = LocalizationManager.Instance;
 
             foreach (var weather in weatherList)
             {
@@ -169,7 +172,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvWeather,
-                    weather.Name,
+                    weather.GetLocalizedName(provider),
                     typeStr,
                     durationStr);
 
@@ -194,8 +197,9 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not WeatherData weather)
                 return;
 
+            var provider = LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(weather.Name);
+            details.AppendLine(weather.GetLocalizedName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {weather.Weather}");
 
@@ -207,10 +211,11 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (weather.IsPrimal)
                 details.AppendLine("Primal: Yes (cannot be overwritten)");
 
-            if (!string.IsNullOrEmpty(weather.Description))
+            var description = weather.GetLocalizedDescription(provider);
+            if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();
-                details.AppendLine($"Description: {weather.Description}");
+                details.AppendLine($"Description: {description}");
             }
 
             this.txtDetails.Text = details.ToString();

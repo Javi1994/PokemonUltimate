@@ -511,10 +511,11 @@ This document covers all use cases for **all game data structures** organized by
 **Preconditions**: None
 **Steps**:
 
-1. Access `GameMessages.[MessageName]` constant
-2. Use in game UI or logs
-   **Expected Result**: Consistent game messages across codebase
-   **Status**: ✅ Implemented
+1. ~~Access `GameMessages.[MessageName]` constant~~ ⚠️ **DEPRECATED**
+2. ✅ Use `LocalizationProvider` with `LocalizationKey` constants (see Feature 4.9)
+3. Use in game UI or logs
+   **Expected Result**: Consistent, localized game messages across codebase
+   **Status**: ✅ **Migrated to LocalizationProvider** - All combat messages now use Feature 4.9 localization system
 
 ---
 

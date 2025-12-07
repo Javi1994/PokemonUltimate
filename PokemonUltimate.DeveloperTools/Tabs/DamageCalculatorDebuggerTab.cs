@@ -5,6 +5,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
+using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
@@ -93,6 +96,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 320;
             int leftMargin = 5;
 
+            var provider = LocalizationManager.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -103,7 +107,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += 40;
 
             // Attacker Pokemon
-            var lblAttacker = new Label { Text = "Attacker Pokemon:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblAttacker = new Label { Text = "Attacker Pokemon", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.comboAttacker.Location = new Point(leftMargin, yPos);
             this.comboAttacker.Width = controlWidth;
@@ -112,7 +116,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += spacing;
 
             // Defender Pokemon
-            var lblDefender = new Label { Text = "Defender Pokemon:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblDefender = new Label { Text = "Defender Pokemon", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.comboDefender.Location = new Point(leftMargin, yPos);
             this.comboDefender.Width = controlWidth;
@@ -121,7 +125,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += spacing;
 
             // Move
-            var lblMove = new Label { Text = "Move:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblMove = new Label { Text = "Move", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.comboMove.Location = new Point(leftMargin, yPos);
             this.comboMove.Width = controlWidth;
@@ -130,7 +134,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += spacing;
 
             // Level
-            var lblLevel = new Label { Text = "Level:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblLevel = new Label { Text = "Level", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.numericLevel.Location = new Point(leftMargin, yPos);
             this.numericLevel.Width = controlWidth;
@@ -206,7 +210,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.txtSummary.Dock = DockStyle.Fill;
             this.txtSummary.Font = new Font("Consolas", 9);
             this.txtSummary.ReadOnly = true;
-            this.txtSummary.Text = "Configure settings and click 'Calculate Damage' to see results here.";
+            this.txtSummary.Text = "Configure and calculate damage";
             this.tabSummary.Controls.Add(this.txtSummary);
 
             // Tab Pipeline Steps
@@ -261,10 +265,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 this.comboDefender.SelectedIndex = Math.Min(1, this.comboDefender.Items.Count - 1);
 
             // Load Moves
+            var provider = LocalizationManager.Instance;
             var moveList = MoveCatalog.All.OrderBy(m => m.Name).ToList();
             foreach (var move in moveList)
             {
-                this.comboMove.Items.Add(move.Name);
+                this.comboMove.Items.Add(move.GetDisplayName(provider));
             }
             if (this.comboMove.Items.Count > 0)
                 this.comboMove.SelectedIndex = 0;
@@ -274,45 +279,46 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         {
             if (comboAttacker.SelectedItem == null)
             {
-                MessageBox.Show("Please select an attacker Pokemon.", "Missing Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select attacker Pokemon.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (comboDefender.SelectedItem == null)
             {
-                MessageBox.Show("Please select a defender Pokemon.", "Missing Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select defender Pokemon.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (comboMove.SelectedItem == null)
             {
-                MessageBox.Show("Please select a move.", "Missing Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a move.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            var provider = LocalizationManager.Instance;
             var attackerName = comboAttacker.SelectedItem.ToString();
             var defenderName = comboDefender.SelectedItem.ToString();
-            var moveName = comboMove.SelectedItem.ToString();
+            var moveDisplayName = comboMove.SelectedItem.ToString();
 
             var attacker = PokemonCatalog.All.FirstOrDefault(p => p.Name == attackerName);
             var defender = PokemonCatalog.All.FirstOrDefault(p => p.Name == defenderName);
-            var move = MoveCatalog.All.FirstOrDefault(m => m.Name == moveName);
+            var move = MoveCatalog.All.FirstOrDefault(m => m.GetDisplayName(provider) == moveDisplayName);
 
             if (attacker == null)
             {
-                MessageBox.Show("Selected attacker Pokemon not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Attacker Pokemon not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (defender == null)
             {
-                MessageBox.Show("Selected defender Pokemon not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Defender Pokemon not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (move == null)
             {
-                MessageBox.Show("Selected move not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Move not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -332,30 +338,31 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(DamageCalculatorRunner.DamageCalculationResult result, DamageCalculatorRunner.DamageCalculationConfig config)
         {
+            var provider = LocalizationManager.Instance;
             // Summary tab
             var summary = new System.Text.StringBuilder();
-            summary.AppendLine($"=== DAMAGE CALCULATION RESULTS ===");
+            summary.AppendLine("=== Damage Calculation Results ===");
             summary.AppendLine();
             summary.AppendLine($"Attacker: {config.AttackerSpecies.Name} (Level {config.Level})");
             summary.AppendLine($"Defender: {config.DefenderSpecies.Name} (Level {config.Level})");
-            summary.AppendLine($"Move: {config.Move.Name} ({config.Move.Type} {config.Move.Category}, Power: {config.Move.Power})");
+            summary.AppendLine($"Move: {config.Move.GetDisplayName(provider)} ({config.Move.Type.GetDisplayName(provider)} {config.Move.Category.GetDisplayName(provider)}, Power: {config.Move.Power})");
             summary.AppendLine();
-            summary.AppendLine($"=== FINAL DAMAGE ===");
+            summary.AppendLine("=== Final Damage ===");
             summary.AppendLine($"Base Damage: {result.BaseDamage:F2}");
             summary.AppendLine($"Final Multiplier: {result.FinalMultiplier:F4}x");
             summary.AppendLine($"Final Damage: {result.FinalDamage} HP");
-            summary.AppendLine($"Final Damage (float): {result.FinalDamageFloat:F2} HP");
+            summary.AppendLine($"Final Damage (Float): {result.FinalDamageFloat:F2} HP");
             summary.AppendLine();
             summary.AppendLine($"Defender Max HP: {result.DefenderMaxHP}");
             summary.AppendLine($"Damage Percentage: {result.DamagePercentage:F2}%");
             summary.AppendLine();
-            summary.AppendLine($"=== DETAILS ===");
+            summary.AppendLine("=== Details ===");
             summary.AppendLine($"Critical Hit: {(result.IsCritical ? "Yes (×1.5)" : "No")}");
             summary.AppendLine($"STAB: {(result.IsStab ? "Yes (×1.5)" : "No")}");
             summary.AppendLine($"Random Factor: {result.RandomFactor:F3} (range: 0.85-1.0)");
             summary.AppendLine($"Type Effectiveness: {result.TypeEffectiveness:F2}x ({GetTypeEffectivenessName(result.TypeEffectiveness)})");
             summary.AppendLine();
-            summary.AppendLine($"=== DAMAGE RANGE ===");
+            summary.AppendLine("=== Damage Range ===");
             summary.AppendLine($"Minimum Damage: {result.MinDamage} HP ({GetDamagePercentage(result.MinDamage, result.DefenderMaxHP):F2}%)");
             summary.AppendLine($"Maximum Damage: {result.MaxDamage} HP ({GetDamagePercentage(result.MaxDamage, result.DefenderMaxHP):F2}%)");
 
@@ -366,11 +373,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             dgvPipelineSteps.Rows.Clear();
 
             dgvPipelineSteps.Columns.Add("Step", "Step");
-            dgvPipelineSteps.Columns.Add("Multiplier Before", "Mult Before");
-            dgvPipelineSteps.Columns.Add("Multiplier After", "Mult After");
+            dgvPipelineSteps.Columns.Add("Multiplier Before", "Multiplier Before");
+            dgvPipelineSteps.Columns.Add("Multiplier After", "Multiplier After");
             dgvPipelineSteps.Columns.Add("Change", "Change");
-            dgvPipelineSteps.Columns.Add("Damage Before", "Dmg Before");
-            dgvPipelineSteps.Columns.Add("Damage After", "Dmg After");
+            dgvPipelineSteps.Columns.Add("Damage Before", "Damage Before");
+            dgvPipelineSteps.Columns.Add("Damage After", "Damage After");
             dgvPipelineSteps.Columns.Add("Details", "Details");
 
             foreach (var step in result.PipelineSteps)
@@ -398,19 +405,19 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
             // Damage Range tab
             var rangeText = new System.Text.StringBuilder();
-            rangeText.AppendLine($"=== DAMAGE RANGE ANALYSIS ===");
+            rangeText.AppendLine("=== Damage Range Analysis ===");
             rangeText.AppendLine();
             rangeText.AppendLine($"Base Damage: {result.BaseDamage:F2}");
             rangeText.AppendLine($"Final Multiplier (without random): {result.FinalMultiplier / result.RandomFactor:F4}x");
             rangeText.AppendLine();
-            rangeText.AppendLine($"=== RANDOM FACTOR EFFECTS ===");
-            rangeText.AppendLine($"Random factor range: 0.85 - 1.0");
+            rangeText.AppendLine("=== Random Factor Effects ===");
+            rangeText.AppendLine("Random Factor Range: 0.85 - 1.0");
             rangeText.AppendLine();
-            rangeText.AppendLine($"Minimum Damage (0.85x random):");
+            rangeText.AppendLine("Minimum Damage (0.85x random):");
             rangeText.AppendLine($"  Damage: {result.MinDamage} HP");
             rangeText.AppendLine($"  Percentage: {GetDamagePercentage(result.MinDamage, result.DefenderMaxHP):F2}%");
             rangeText.AppendLine();
-            rangeText.AppendLine($"Maximum Damage (1.0x random):");
+            rangeText.AppendLine("Maximum Damage (1.0x random):");
             rangeText.AppendLine($"  Damage: {result.MaxDamage} HP");
             rangeText.AppendLine($"  Percentage: {GetDamagePercentage(result.MaxDamage, result.DefenderMaxHP):F2}%");
             rangeText.AppendLine();
@@ -423,7 +430,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private string GetTypeEffectivenessName(float effectiveness)
         {
             if (effectiveness == 0f)
-                return "Immune";
+                return "Immune (0x)";
             if (effectiveness == 0.25f)
                 return "0.25x";
             if (effectiveness == 0.5f)

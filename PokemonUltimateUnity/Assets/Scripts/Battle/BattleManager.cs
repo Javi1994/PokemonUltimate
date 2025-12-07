@@ -12,6 +12,8 @@ using PokemonUltimate.Core.Instances;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Combat.Logging;
+using PokemonUltimate.Combat.Messages;
+using PokemonUltimate.Core.Localization;
 
 /// <summary>
 /// Manages battle initialization and execution in Unity.
@@ -30,14 +32,42 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private bool startBattleOnStart = false;
     [SerializeField] private bool useRandomAIForEnemy = true;
 
+    [Header("Localization")]
+    [SerializeField] private string languageCode = "es"; // Spanish by default
+    [SerializeField] private bool useLocalizationManager = true;
+
     private CombatEngine _engine;
     private bool _isBattleRunning = false;
+    private ILocalizationProvider _localizationProvider;
 
     void Start()
     {
+        // Initialize localization
+        InitializeLocalization();
+
         if (startBattleOnStart)
         {
             StartTestBattle();
+        }
+    }
+
+    /// <summary>
+    /// Initializes localization system.
+    /// Uses LocalizationManager singleton if available, otherwise creates new provider.
+    /// </summary>
+    private void InitializeLocalization()
+    {
+        if (useLocalizationManager && LocalizationManager.Instance != null)
+        {
+            _localizationProvider = LocalizationManager.Instance.Provider;
+            Debug.Log($"[BattleManager] Using LocalizationManager. Language: {_localizationProvider.CurrentLanguage}");
+        }
+        else
+        {
+            // Create new provider with specified language
+            _localizationProvider = new PokemonUltimate.Content.Providers.LocalizationProvider();
+            _localizationProvider.CurrentLanguage = languageCode;
+            Debug.Log($"[BattleManager] Created new LocalizationProvider. Language: {languageCode}");
         }
     }
 

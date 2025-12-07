@@ -3,7 +3,10 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Status;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -161,15 +164,18 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var statusList = StatusCatalog.All.OrderBy(s => s.Name).ToList();
+            var provider = LocalizationManager.Instance;
 
             foreach (var status in statusList)
             {
                 var categoryStr = status.IsPersistent ? "Persistent" : "Volatile";
-                var typeStr = status.IsPersistent ? status.PersistentStatus.ToString() : status.VolatileStatus.ToString();
+                var typeStr = status.IsPersistent
+                    ? status.PersistentStatus.GetDisplayName(provider)
+                    : status.VolatileStatus.GetDisplayName(provider);
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvStatus,
-                    status.Name,
+                    status.GetLocalizedName(provider),
                     typeStr,
                     categoryStr);
 
@@ -194,16 +200,18 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not StatusEffectData status)
                 return;
 
+            var provider = LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(status.Name);
+            details.AppendLine(status.GetLocalizedName(provider));
             details.AppendLine();
-            details.AppendLine($"Type: {(status.IsPersistent ? status.PersistentStatus.ToString() : status.VolatileStatus.ToString())}");
+            details.AppendLine($"Type: {(status.IsPersistent ? status.PersistentStatus.GetDisplayName(provider) : status.VolatileStatus.GetDisplayName(provider))}");
             details.AppendLine($"Category: {(status.IsPersistent ? "Persistent" : "Volatile")}");
 
-            if (!string.IsNullOrEmpty(status.Description))
+            var description = status.GetLocalizedDescription(provider);
+            if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();
-                details.AppendLine($"Description: {status.Description}");
+                details.AppendLine($"Description: {description}");
             }
 
             if (status.IsIndefinite)

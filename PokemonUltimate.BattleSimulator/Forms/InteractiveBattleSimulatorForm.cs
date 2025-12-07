@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Collections.Generic;
+using PokemonUltimate.BattleSimulator.Logging;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Damage;
@@ -14,14 +15,16 @@ using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Logging;
 using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Combat.Validation;
 using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Content.Providers;
 using PokemonUltimate.Core.Blueprints;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.BattleSimulator.Logging;
-using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.BattleSimulator.Forms
 {
@@ -40,18 +43,18 @@ namespace PokemonUltimate.BattleSimulator.Forms
         private TabPage tabBattleMode = null!;
         private TabPage tabPokemon = null!;
         private TabPage tabLogs = null!;
-        
+
         // Logs Tab controls
         private RichTextBox txtLogs = null!;
         private Button btnClearLogs = null!;
         private CheckBox checkAutoScroll = null!;
         private ComboBox comboLogFilter = null!;
-        
+
         // Battle Mode Tab controls
         private ComboBox comboBattleMode = null!;
         private NumericUpDown numericPlayerSlots = null!;
         private NumericUpDown numericEnemySlots = null!;
-        
+
         // Pokemon Tab controls - Dynamic lists for multiple slots
         private Panel panelPlayerPokemon = null!;
         private Panel panelEnemyPokemon = null!;
@@ -67,12 +70,12 @@ namespace PokemonUltimate.BattleSimulator.Forms
             public ComboBox ComboNature { get; set; } = null!;
             public CheckBox CheckPerfectIVs { get; set; } = null!;
         }
-        
+
         // Control buttons (outside tabs)
         private Button btnStartBattle = null!;
         private Button btnStopBattle = null!;
         private Label lblStatus = null!;
-        
+
         private UIBattleLogger? _logger;
         private CombatEngine? _engine;
         private Task? _battleTask;
@@ -81,6 +84,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
         public InteractiveBattleSimulatorForm()
         {
+            // Initialize localization (defaults to Spanish)
+            LocalizationManager.Initialize(new LocalizationProvider(), "es");
+
             InitializeComponent();
             LoadPokemonList();
         }
@@ -425,7 +431,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
             // Now that all controls are created, set up event handlers and initialize
             LoadBattleModes();
-            
+
             // Initialize with default slots (1v1) - this will be triggered by LoadBattleModes setting SelectedIndex
             // But we also call it explicitly to ensure initial state
             UpdatePokemonSlots();
@@ -458,7 +464,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
             this.comboBattleMode.Items.Add("Horde (1v3)");
             this.comboBattleMode.Items.Add("Horde (1v5)");
             this.comboBattleMode.Items.Add("Custom");
-            
+
             // Set up event handlers (controls are now initialized)
             // Handle selection change to update slots
             this.comboBattleMode.SelectedIndexChanged += (s, e) =>
@@ -475,7 +481,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     UpdatePokemonSlots();
                 }
             };
-            
+
             this.numericEnemySlots.ValueChanged += (s, e) =>
             {
                 if (!_isUpdatingSlots && this.comboBattleMode.SelectedItem?.ToString() == "Custom")
@@ -483,7 +489,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     UpdatePokemonSlots();
                 }
             };
-            
+
             // Set default selection AFTER event handlers are set up
             // Temporarily disable event to avoid double update
             this.comboBattleMode.SelectedIndexChanged -= (EventHandler)((s, e) =>
@@ -506,7 +512,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
             var selectedMode = this.comboBattleMode.SelectedItem.ToString();
             bool isCustom = selectedMode == "Custom";
-            
+
             // Enable/disable manual slot editing based on mode
             this.numericPlayerSlots.Enabled = isCustom;
             this.numericEnemySlots.Enabled = isCustom;
@@ -554,13 +560,13 @@ namespace PokemonUltimate.BattleSimulator.Forms
         {
             if (comboBox.SelectedItem == null || comboBox.SelectedItem.ToString() == "Random")
                 return null;
-            
+
             if (comboBox.SelectedItem is Nature nature)
                 return nature;
-            
+
             if (Enum.TryParse<Nature>(comboBox.SelectedItem.ToString(), out var parsedNature))
                 return parsedNature;
-            
+
             return null;
         }
 
@@ -602,7 +608,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
         {
             int yOffset = 0;
             int slotHeight = 80;
-            
+
             // Calculate available width (accounting for padding and scrollbar)
             int availableWidth = parentPanel.Width > 0 ? parentPanel.Width - 20 : 900;
 
@@ -702,7 +708,10 @@ namespace PokemonUltimate.BattleSimulator.Forms
             // Validate selections
             if (playerSlotControls.Count == 0 || enemySlotControls.Count == 0)
             {
-                MessageBox.Show("Please configure at least one Pokemon for each team.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Please configure Pokemon for each team.",
+                    "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -711,7 +720,10 @@ namespace PokemonUltimate.BattleSimulator.Forms
             {
                 if (slot.ComboPokemon.SelectedItem == null)
                 {
-                    MessageBox.Show("Please select Pokemon for all player slots.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(
+                        "Please select Pokemon for all player slots.",
+                        "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
@@ -720,17 +732,20 @@ namespace PokemonUltimate.BattleSimulator.Forms
             {
                 if (slot.ComboPokemon.SelectedItem == null)
                 {
-                    MessageBox.Show("Please select Pokemon for all enemy slots.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(
+                        "Please select Pokemon for all enemy slots.",
+                        "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
 
             // Create logger
             _logger = new UIBattleLogger();
-            
+
             // Subscribe to log events for the logs tab
             _logger.LogAdded += Logger_LogAdded;
-            
+
             // Clear and refresh logs display
             this.txtLogs.Clear();
             RefreshLogDisplay();
@@ -874,7 +889,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
             this.btnStartBattle.Enabled = true;
             this.btnStopBattle.Enabled = false;
             this.lblStatus.Text = "Battle stopped";
-            
+
             if (_logger != null)
             {
                 _logger.LogInfo("Battle stopped by user");
@@ -978,8 +993,8 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     _logger);
 
                 // Initialize with configured battle mode
-                var rules = new BattleRules 
-                { 
+                var rules = new BattleRules
+                {
                     PlayerSlots = (int)this.numericPlayerSlots.Value,
                     EnemySlots = (int)this.numericEnemySlots.Value
                 };
@@ -1025,7 +1040,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     if (!_isBattleRunning) return; // Battle was stopped
                     this.btnStartBattle.Enabled = true;
                     this.btnStopBattle.Enabled = false;
-                    this.lblStatus.Text = $"Battle ended: {result.Outcome}";
+                    this.lblStatus.Text = result.Outcome.ToString();
                     _isBattleRunning = false;
                 }
             }
@@ -1040,7 +1055,10 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 {
                     this.Invoke(new Action(() =>
                     {
-                        MessageBox.Show($"Battle error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(
+                            $"Battle error: {ex.Message}",
+                            "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.btnStartBattle.Enabled = true;
                         this.btnStopBattle.Enabled = false;
                         this.lblStatus.Text = "Error occurred";

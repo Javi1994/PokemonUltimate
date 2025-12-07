@@ -7,6 +7,9 @@ using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
+using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
@@ -110,6 +113,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 320;
             int leftMargin = 5;
 
+            var provider = LocalizationManager.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -120,7 +124,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += 40;
 
             // Pokemon
-            var lblPokemon = new Label { Text = "Pokemon:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblPokemon = new Label { Text = "Pokemon", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.comboPokemon.Location = new Point(leftMargin, yPos);
             this.comboPokemon.Width = controlWidth;
@@ -129,7 +133,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += spacing;
 
             // Level
-            var lblLevel = new Label { Text = "Level:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblLevel = new Label { Text = "Level", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.numericLevel.Location = new Point(leftMargin, yPos);
             this.numericLevel.Width = controlWidth;
@@ -139,7 +143,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             yPos += spacing;
 
             // Nature
-            var lblNature = new Label { Text = "Nature:", Location = new Point(leftMargin, yPos), AutoSize = true };
+            var lblNature = new Label { Text = "Nature", Location = new Point(leftMargin, yPos), AutoSize = true };
             yPos += 25;
             this.comboNature.Location = new Point(leftMargin, yPos);
             this.comboNature.Width = controlWidth;
@@ -150,7 +154,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             // IVs Section - Compact layout with 2 columns
             var lblIVsTitle = new Label
             {
-                Text = "IVs (0-31)",
+                Text = "IVs",
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 Location = new Point(leftMargin, yPos),
                 AutoSize = true
@@ -163,13 +167,13 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             var (numericIV_Attack, lblIV_Attack) = CreateCompactNumeric(leftMargin + 165, yPos, 150, "Atk", 0, CoreConstants.MaxIV, CoreConstants.DefaultIV);
             this.numericIV_Attack = numericIV_Attack;
             yPos += spacing;
-            
+
             var (numericIV_Defense, lblIV_Defense) = CreateCompactNumeric(leftMargin, yPos, 150, "Def", 0, CoreConstants.MaxIV, CoreConstants.DefaultIV);
             this.numericIV_Defense = numericIV_Defense;
             var (numericIV_SpAttack, lblIV_SpAttack) = CreateCompactNumeric(leftMargin + 165, yPos, 150, "SpA", 0, CoreConstants.MaxIV, CoreConstants.DefaultIV);
             this.numericIV_SpAttack = numericIV_SpAttack;
             yPos += spacing;
-            
+
             var (numericIV_SpDefense, lblIV_SpDefense) = CreateCompactNumeric(leftMargin, yPos, 150, "SpD", 0, CoreConstants.MaxIV, CoreConstants.DefaultIV);
             this.numericIV_SpDefense = numericIV_SpDefense;
             var (numericIV_Speed, lblIV_Speed) = CreateCompactNumeric(leftMargin + 165, yPos, 150, "Spe", 0, CoreConstants.MaxIV, CoreConstants.DefaultIV);
@@ -179,7 +183,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             // EVs Section - Compact layout with 2 columns
             var lblEVsTitle = new Label
             {
-                Text = "EVs (0-252 each, max 510 total)",
+                Text = "EVs",
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 Location = new Point(leftMargin, yPos),
                 AutoSize = true
@@ -192,13 +196,13 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             var (numericEV_Attack, lblEV_Attack) = CreateCompactNumeric(leftMargin + 165, yPos, 150, "Atk", 0, CoreConstants.MaxEV, 252);
             this.numericEV_Attack = numericEV_Attack;
             yPos += spacing;
-            
+
             var (numericEV_Defense, lblEV_Defense) = CreateCompactNumeric(leftMargin, yPos, 150, "Def", 0, CoreConstants.MaxEV, 0);
             this.numericEV_Defense = numericEV_Defense;
             var (numericEV_SpAttack, lblEV_SpAttack) = CreateCompactNumeric(leftMargin + 165, yPos, 150, "SpA", 0, CoreConstants.MaxEV, 0);
             this.numericEV_SpAttack = numericEV_SpAttack;
             yPos += spacing;
-            
+
             var (numericEV_SpDefense, lblEV_SpDefense) = CreateCompactNumeric(leftMargin, yPos, 150, "SpD", 0, CoreConstants.MaxEV, 0);
             this.numericEV_SpDefense = numericEV_SpDefense;
             var (numericEV_Speed, lblEV_Speed) = CreateCompactNumeric(leftMargin + 165, yPos, 150, "Spe", 0, CoreConstants.MaxEV, 252);
@@ -260,7 +264,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 lblTotalEVs,
                 btnCalculate
             });
-            
+
             // Set panel height to ensure scroll works
             panelConfig.AutoScrollMinSize = new Size(0, yPos + 80);
 
@@ -274,7 +278,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.txtSummary.Dock = DockStyle.Fill;
             this.txtSummary.Font = new Font("Consolas", 9);
             this.txtSummary.ReadOnly = true;
-            this.txtSummary.Text = "Configure settings and click 'Calculate Stats' to see results here.";
+            this.txtSummary.Text = "Configure and calculate stats";
             this.tabSummary.Controls.Add(this.txtSummary);
 
             // Tab Stats Table
@@ -336,17 +340,18 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 this.comboPokemon.SelectedIndex = 0;
 
             // Load Natures - ensure all 25 natures are loaded
+            var provider = LocalizationManager.Instance;
             var natures = Enum.GetValues<Nature>().OrderBy(n => n.ToString()).ToList();
             foreach (var nature in natures)
             {
-                this.comboNature.Items.Add(nature);
+                this.comboNature.Items.Add(new NatureDisplayItem(nature, provider));
             }
-            this.comboNature.SelectedItem = Nature.Hardy;
-            
+            this.comboNature.SelectedIndex = 0;
+
             // Verify all natures are loaded
             if (this.comboNature.Items.Count != 25)
             {
-                MessageBox.Show($"Warning: Expected 25 natures but loaded {this.comboNature.Items.Count}", "Nature Loading Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"Warning: Only {this.comboNature.Items.Count} natures loaded (expected 25).", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -354,9 +359,10 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         {
             int total = (int)(numericEV_HP.Value + numericEV_Attack.Value + numericEV_Defense.Value +
                              numericEV_SpAttack.Value + numericEV_SpDefense.Value + numericEV_Speed.Value);
-            
+
+            var provider = LocalizationManager.Instance;
             this.lblTotalEVs.Text = $"Total EVs: {total} / {CoreConstants.MaxTotalEV}";
-            
+
             if (total > CoreConstants.MaxTotalEV)
             {
                 this.lblTotalEVs.ForeColor = Color.Red;
@@ -369,39 +375,44 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void BtnCalculate_Click(object? sender, EventArgs e)
         {
+            var provider = LocalizationManager.Instance;
             if (comboPokemon.SelectedItem == null)
             {
-                MessageBox.Show("Please select a Pokemon.", "Missing Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a Pokemon.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (comboNature.SelectedItem == null)
             {
-                MessageBox.Show("Please select a Nature.", "Missing Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a Nature.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             int totalEVs = (int)(numericEV_HP.Value + numericEV_Attack.Value + numericEV_Defense.Value +
                                 numericEV_SpAttack.Value + numericEV_SpDefense.Value + numericEV_Speed.Value);
-            
+
             if (totalEVs > CoreConstants.MaxTotalEV)
             {
-                MessageBox.Show($"Total EVs ({totalEVs}) exceeds maximum ({CoreConstants.MaxTotalEV}).", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"Total EVs ({totalEVs}) exceeds maximum ({CoreConstants.MaxTotalEV}).", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             var pokemonName = comboPokemon.SelectedItem.ToString();
             var pokemon = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
-            
+
             if (pokemon == null)
             {
-                MessageBox.Show("Selected Pokemon not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Pokemon not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             // Get selected nature with validation
-            Nature selectedNature;
-            if (comboNature.SelectedItem is Nature nature)
+            Nature selectedNature = Nature.Hardy; // Default value
+            if (comboNature.SelectedItem is NatureDisplayItem natureItem)
+            {
+                selectedNature = natureItem.Nature;
+            }
+            else if (comboNature.SelectedItem is Nature nature)
             {
                 selectedNature = nature;
             }
@@ -409,7 +420,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             {
                 // Fallback: get by index
                 var item = comboNature.Items[comboNature.SelectedIndex];
-                if (item is Nature natureByIndex)
+                if (item is NatureDisplayItem natureDisplayItem)
+                {
+                    selectedNature = natureDisplayItem.Nature;
+                }
+                else if (item is Nature natureByIndex)
                 {
                     selectedNature = natureByIndex;
                 }
@@ -419,16 +434,16 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 }
                 else
                 {
-                    MessageBox.Show($"Invalid nature at index {comboNature.SelectedIndex}: {item}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Error validating nature: {item?.ToString() ?? "null"}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
             }
             else
             {
-                MessageBox.Show("Please select a Nature.", "Missing Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a Nature.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             // Verify nature is valid in NatureData (all 25 natures should be valid)
             // This check ensures the nature exists in the dictionary
             try
@@ -440,12 +455,12 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
             catch (KeyNotFoundException ex)
             {
-                MessageBox.Show($"Nature {selectedNature} is not implemented in NatureData.\n\nError: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Nature {selectedNature} not implemented: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error validating nature {selectedNature}.\n\nError: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error validating nature {selectedNature}: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -474,53 +489,54 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(StatCalculatorRunner.StatCalculationResult result, StatCalculatorRunner.StatCalculationConfig config)
         {
+            var provider = LocalizationManager.Instance;
             // Summary tab
             var summary = new System.Text.StringBuilder();
-            summary.AppendLine($"=== STAT CALCULATION RESULTS ===");
+            summary.AppendLine("=== Stat Calculation Results ===");
             summary.AppendLine();
             summary.AppendLine($"Pokemon: {config.PokemonSpecies.Name}");
             summary.AppendLine($"Level: {config.Level}");
-            summary.AppendLine($"Nature: {config.Nature}");
+            summary.AppendLine($"Nature: {config.Nature.GetDisplayName(provider)}");
             summary.AppendLine();
             summary.AppendLine($"Total EVs: {result.TotalEVs} / {CoreConstants.MaxTotalEV}");
             if (!result.IsValidEVTotal)
-                summary.AppendLine("⚠ WARNING: Total EVs exceeds maximum!");
+                summary.AppendLine("⚠ Warning: Total EVs exceeds maximum");
             summary.AppendLine();
-            summary.AppendLine("=== FINAL STATS ===");
-            
+            summary.AppendLine("=== Final Stats ===");
+
             // Show stats with nature indicators
             var increasedStat = NatureData.GetIncreasedStat(config.Nature);
             var decreasedStat = NatureData.GetDecreasedStat(config.Nature);
-            
-            summary.AppendLine($"HP:       {result.HP.FinalStat,4} (HP not affected by Nature)");
-            summary.AppendLine($"Attack:   {result.Attack.FinalStat,4} {GetNatureIndicator(Stat.Attack, increasedStat, decreasedStat)}");
-            summary.AppendLine($"Defense:  {result.Defense.FinalStat,4} {GetNatureIndicator(Stat.Defense, increasedStat, decreasedStat)}");
-            summary.AppendLine($"Sp.Atk:   {result.SpAttack.FinalStat,4} {GetNatureIndicator(Stat.SpAttack, increasedStat, decreasedStat)}");
-            summary.AppendLine($"Sp.Def:   {result.SpDefense.FinalStat,4} {GetNatureIndicator(Stat.SpDefense, increasedStat, decreasedStat)}");
-            summary.AppendLine($"Speed:    {result.Speed.FinalStat,4} {GetNatureIndicator(Stat.Speed, increasedStat, decreasedStat)}");
+
+            summary.AppendLine($"{Stat.HP.GetDisplayName(provider)}:       {result.HP.FinalStat,4} (HP not affected by nature)");
+            summary.AppendLine($"{Stat.Attack.GetDisplayName(provider)}:   {result.Attack.FinalStat,4} {GetNatureIndicator(Stat.Attack, increasedStat, decreasedStat)}");
+            summary.AppendLine($"{Stat.Defense.GetDisplayName(provider)}:  {result.Defense.FinalStat,4} {GetNatureIndicator(Stat.Defense, increasedStat, decreasedStat)}");
+            summary.AppendLine($"{Stat.SpAttack.GetDisplayName(provider)}:   {result.SpAttack.FinalStat,4} {GetNatureIndicator(Stat.SpAttack, increasedStat, decreasedStat)}");
+            summary.AppendLine($"{Stat.SpDefense.GetDisplayName(provider)}:   {result.SpDefense.FinalStat,4} {GetNatureIndicator(Stat.SpDefense, increasedStat, decreasedStat)}");
+            summary.AppendLine($"{Stat.Speed.GetDisplayName(provider)}:    {result.Speed.FinalStat,4} {GetNatureIndicator(Stat.Speed, increasedStat, decreasedStat)}");
             summary.AppendLine();
-            summary.AppendLine("=== NATURE EFFECTS ===");
+            summary.AppendLine("=== Nature Effects ===");
             if (increasedStat.HasValue)
             {
                 var increasedMultiplier = GetMultiplierForStat(increasedStat.Value, result);
-                summary.AppendLine($"+10% {increasedStat.Value} (multiplier: {increasedMultiplier:F2})");
+                summary.AppendLine($"Increase {increasedStat.Value.GetDisplayName(provider)}: ×{increasedMultiplier:F2}");
             }
             if (decreasedStat.HasValue)
             {
                 var decreasedMultiplier = GetMultiplierForStat(decreasedStat.Value, result);
-                summary.AppendLine($"-10% {decreasedStat.Value} (multiplier: {decreasedMultiplier:F2})");
+                summary.AppendLine($"Decrease {decreasedStat.Value.GetDisplayName(provider)}: ×{decreasedMultiplier:F2}");
             }
             if (!increasedStat.HasValue)
-                summary.AppendLine("Neutral (no stat changes) - All stats use 1.0x multiplier");
-            
+                summary.AppendLine("Neutral nature (no stat changes)");
+
             // Show comparison with raw stats
             summary.AppendLine();
-            summary.AppendLine("=== RAW STATS (before Nature) ===");
-            summary.AppendLine($"Attack:   {result.Attack.RawStat,4} → {result.Attack.FinalStat,4} (×{result.Attack.NatureMultiplier:F2})");
-            summary.AppendLine($"Defense:  {result.Defense.RawStat,4} → {result.Defense.FinalStat,4} (×{result.Defense.NatureMultiplier:F2})");
-            summary.AppendLine($"Sp.Atk:   {result.SpAttack.RawStat,4} → {result.SpAttack.FinalStat,4} (×{result.SpAttack.NatureMultiplier:F2})");
-            summary.AppendLine($"Sp.Def:   {result.SpDefense.RawStat,4} → {result.SpDefense.FinalStat,4} (×{result.SpDefense.NatureMultiplier:F2})");
-            summary.AppendLine($"Speed:    {result.Speed.RawStat,4} → {result.Speed.FinalStat,4} (×{result.Speed.NatureMultiplier:F2})");
+            summary.AppendLine("=== Raw Stats ===");
+            summary.AppendLine($"{Stat.Attack.GetDisplayName(provider)}:   {result.Attack.RawStat,4} → {result.Attack.FinalStat,4} (×{result.Attack.NatureMultiplier:F2})");
+            summary.AppendLine($"{Stat.Defense.GetDisplayName(provider)}:  {result.Defense.RawStat,4} → {result.Defense.FinalStat,4} (×{result.Defense.NatureMultiplier:F2})");
+            summary.AppendLine($"{Stat.SpAttack.GetDisplayName(provider)}:   {result.SpAttack.RawStat,4} → {result.SpAttack.FinalStat,4} (×{result.SpAttack.NatureMultiplier:F2})");
+            summary.AppendLine($"{Stat.SpDefense.GetDisplayName(provider)}:   {result.SpDefense.RawStat,4} → {result.SpDefense.FinalStat,4} (×{result.SpDefense.NatureMultiplier:F2})");
+            summary.AppendLine($"{Stat.Speed.GetDisplayName(provider)}:    {result.Speed.RawStat,4} → {result.Speed.FinalStat,4} (×{result.Speed.NatureMultiplier:F2})");
 
             this.txtSummary.Text = summary.ToString();
 
@@ -559,9 +575,10 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void AddStatRow(StatCalculatorRunner.StatBreakdown breakdown)
         {
+            var provider = LocalizationManager.Instance;
             var row = new DataGridViewRow();
             row.CreateCells(dgvStatsTable,
-                breakdown.Stat.ToString(),
+                breakdown.Stat.GetDisplayName(provider),
                 breakdown.BaseStat,
                 breakdown.IV,
                 breakdown.EV,
@@ -570,13 +587,13 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 breakdown.NatureMultiplier.ToString("F2"),
                 breakdown.RawStat,
                 breakdown.FinalStat);
-            
+
             // Highlight if nature affects this stat
             if (breakdown.NatureMultiplier > 1.0f)
                 row.DefaultCellStyle.BackColor = Color.LightGreen;
             else if (breakdown.NatureMultiplier < 1.0f)
                 row.DefaultCellStyle.BackColor = Color.LightCoral;
-            
+
             dgvStatsTable.Rows.Add(row);
         }
 
@@ -600,6 +617,26 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 Stat.Speed => result.Speed.NatureMultiplier,
                 _ => 1.0f
             };
+        }
+
+        /// <summary>
+        /// Helper class to display Nature with translated names in ComboBox.
+        /// </summary>
+        private class NatureDisplayItem
+        {
+            public Nature Nature { get; }
+            private readonly ILocalizationProvider _provider;
+
+            public NatureDisplayItem(Nature nature, ILocalizationProvider provider)
+            {
+                Nature = nature;
+                _provider = provider;
+            }
+
+            public override string ToString()
+            {
+                return Nature.GetDisplayName(_provider);
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Effects;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.Combat.Effects
 {
@@ -51,7 +52,8 @@ namespace PokemonUltimate.Combat.Effects
                     // Create damage context for counter damage
                     var counterContext = _damageContextFactory.CreateForCounter(user, target, damageToReturn, move, field);
                     actions.Add(new DamageAction(user, target, counterContext));
-                    actions.Add(new MessageAction(string.Format(GameMessages.MoveCountered, user.Pokemon.DisplayName)));
+                    var provider = LocalizationManager.Instance;
+                    actions.Add(new MessageAction(provider.GetString(LocalizationKey.MoveCountered, user.Pokemon.DisplayName)));
                 }
                 // If no damage taken, Counter fails silently (no message)
             }

@@ -10,25 +10,68 @@
 
 The Localization System provides centralized text management and translation support for multiple languages. It follows the same provider pattern as `PokedexDataProvider` and `LearnsetProvider` for consistency.
 
-**Current Status**: ⏳ Planned
+**Current Status**: ✅ Combat System Fully Localized (Phases 1-3 Complete + Full Combat Migration)
+
+**Completed Phases**:
+
+-   ✅ Phase 1: Core Localization Infrastructure
+-   ✅ Phase 2: Content Localization Provider
+-   ✅ Phase 3: BattleMessageFormatter Integration
+-   ✅ **Phase 3.5: Full Combat System Migration** - All `GameMessages` replaced with `LocalizationProvider`
+
+**Remaining Phases**:
+
+-   ⏳ Phase 4: Catalog Descriptions Migration (Move/Ability/Item descriptions)
+-   ⏳ Phase 5: Unity Integration
+
+**Content Localization**:
+
+**Names** (✅ Complete):
+
+-   ✅ Move Names: 36 moves translated (EN, ES, FR)
+-   ✅ Pokemon Names: 26 Pokemon translated (EN, ES, FR)
+-   ✅ Ability Names: 43 abilities translated (EN, ES, FR)
+-   ✅ Item Names: 23 items translated (EN, ES, FR)
+-   ✅ Weather Names: 9 weather types translated (EN, ES, FR)
+-   ✅ Terrain Names: 4 terrain types translated (EN, ES, FR)
+-   ✅ Side Condition Names: 10 side conditions translated (EN, ES, FR)
+-   ✅ Field Effect Names: 8 field effects translated (EN, ES, FR)
+-   ✅ Hazard Names: 4 hazards translated (EN, ES, FR)
+-   ✅ Status Effect Names: All status effects translated (EN, ES, FR)
+
+**Descriptions** (⏳ Pending):
+
+-   ⏳ Move Descriptions: Extension methods ready, translations pending
+-   ⏳ Ability Descriptions: Extension methods ready, translations pending
+-   ⏳ Item Descriptions: Extension methods ready, translations pending
+
+**Total Translated**: 
+- 128 content names (36 moves + 26 Pokemon + 43 abilities + 23 items)
+- 35 battle messages (move execution, status effects, weather, terrain, hazards, etc.)
+- All type effectiveness messages
+- All stat and nature names
+- All move categories
+
+**Total Localization Keys**: ~200+ keys covering all combat messages and content names
 
 ## Problem Statement
 
-Currently, text is hardcoded in English throughout the codebase:
+**Previous State**: Text was hardcoded in English throughout the codebase:
 
--   `GameMessages.cs` - Battle messages in English
--   `BattleMessageFormatter.cs` - Formatted messages in English
--   Move descriptions in `MoveCatalog` - English descriptions
--   Ability descriptions in `AbilityCatalog` - English descriptions
--   Item descriptions in `ItemCatalog` - English descriptions
--   Pokedex data in `PokedexDataProvider` - English descriptions
+-   ~~`GameMessages.cs`~~ - **DEPRECATED**: Battle messages now use `LocalizationProvider` ✅
+-   `BattleMessageFormatter.cs` - **UPDATED**: Now uses `ILocalizationProvider` ✅
+-   All Combat actions - **UPDATED**: Now use `LocalizationProvider` ✅
+-   Move descriptions in `MoveCatalog` - Extension methods ready, translations pending ⏳
+-   Ability descriptions in `AbilityCatalog` - Extension methods ready, translations pending ⏳
+-   Item descriptions in `ItemCatalog` - Extension methods ready, translations pending ⏳
+-   Pokedex data in `PokedexDataProvider` - English descriptions (future work)
 
-**Issues**:
+**Current Status**:
 
--   No support for multiple languages
--   Text changes require code changes
--   Hard to maintain and update translations
--   Violates separation of concerns (logic mixed with presentation)
+-   ✅ **Combat System Fully Localized**: All battle messages use `LocalizationProvider`
+-   ✅ **Multi-language Support**: English, Spanish, French supported
+-   ✅ **No Hardcoded Messages**: All combat messages use localization keys
+-   ⏳ **Content Descriptions**: Extension methods ready, translations pending
 
 ## Solution: Localization Provider System
 
@@ -137,27 +180,37 @@ PokemonUltimate.Unity/ (Future)
 
 ## Usage Examples
 
-### Before (Current - Hardcoded)
+### Before (Deprecated - Hardcoded)
 
 ```csharp
+// ❌ OLD WAY - No longer used in Combat
 // In BattleMessageFormatter.cs
 return $"{pokemon.DisplayName} used {move.Name}!";
 
 // In GameMessages.cs
 public const string MoveMissed = "The attack missed!";
+
+// In ItemListener.cs
+yield return new MessageAction(string.Format(GameMessages.ItemActivated, pokemon.DisplayName, itemName));
 ```
 
-### After (With Localization)
+### After (Current - Localized)
 
 ```csharp
+// ✅ CURRENT WAY - Used throughout Combat system
 // In BattleMessageFormatter.cs
 return _localizationProvider.GetString(
     LocalizationKey.BattleUsedMove,
     pokemon.DisplayName,
-    move.Name
+    move.GetDisplayName(_localizationProvider)
 );
 
-// In LocalizationDataProvider.cs
+// In ItemListener.cs
+var provider = LocalizationManager.Instance;
+var itemName = _itemData.GetLocalizedName(provider);
+yield return new MessageAction(provider.GetString(LocalizationKey.ItemActivated, pokemon.DisplayName, itemName));
+
+// In LocalizationDataProvider.cs (split across partial files)
 Register(LocalizationKey.BattleUsedMove, new Dictionary<string, string>
 {
     { "en", "{0} used {1}!" },
@@ -201,6 +254,17 @@ Register(LocalizationKey.BattleUsedMove, new Dictionary<string, string>
 -   ✅ **Easy Updates**: Change translations without code changes
 -   ✅ **SOLID Principles**: Follows SRP, OCP, DIP
 
+## Documentation
+
+| Document                              | Purpose                             |
+| ------------------------------------- | ----------------------------------- |
+| **[Architecture](architecture.md)**   | Technical specification and design  |
+| **[Roadmap](roadmap.md)**             | Implementation phases and plan      |
+| **[Use Cases](use_cases.md)**         | All scenarios for localization      |
+| **[Testing](testing.md)**             | Testing strategy and test structure |
+| **[Code Location](code_location.md)** | Where code lives in the codebase    |
+| **[Migration Summary](MIGRATION_SUMMARY.md)** | ✅ Complete migration summary of Combat system |
+
 ## Related Features
 
 -   **[Feature 1.14: Enums & Constants](../1-game-data/1.14-enums-constants/)** - Current `GameMessages` class
@@ -209,12 +273,41 @@ Register(LocalizationKey.BattleUsedMove, new Dictionary<string, string>
 -   **[Feature 3.2: Move Expansion](../3-content-expansion/3.2-move-expansion/)** - Move descriptions
 -   **[Feature 4.3: IBattleView Implementation](4.3-ibattleview-implementation/)** - Where localization is used
 
+## Quick Usage Guide
+
+### How to Set Language to Spanish
+
+**In Unity**:
+
+1. Add `LocalizationManager` component to a GameObject in your scene
+2. Set `Default Language` to `"es"` in the Inspector
+3. Configure `BattleManager` → `Language Code` = `"es"`
+
+**In Code**:
+
+```csharp
+var provider = new LocalizationProvider();
+provider.CurrentLanguage = "es"; // Spanish
+```
+
+**See**: [`HOW_TO_USE.md`](HOW_TO_USE.md) for complete usage guide.
+
 ## Related Documents
 
+-   **[HOW_TO_USE.md](HOW_TO_USE.md)** ⭐ - **How to use the localization system**
+-   **[STANDARDIZATION_GUIDE.md](STANDARDIZATION_GUIDE.md)** ⭐⭐ - **Guía para estandarizar el uso del sistema** (NUEVO)
+-   **[Architecture.md](architecture.md)** - Technical specification
+-   **[Roadmap.md](roadmap.md)** - Implementation phases
+-   **[Use Cases.md](use_cases.md)** - All scenarios
+-   **[Testing.md](testing.md)** - Testing strategy
+-   **[Code Location.md](code_location.md)** - Where code lives
+-   **[CONTENT_LOCALIZATION_DESIGN.md](CONTENT_LOCALIZATION_DESIGN.md)** - Content localization design
+-   **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Implementation summary
 -   **[Parent Architecture](../architecture.md)** - Localization strategy section
 -   **[Parent Roadmap](../roadmap.md)** - Implementation phases
 -   **[Parent Code Location](../code_location.md)** - Where localization code will live
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: 2025-01-XX  
+**Migration Complete**: ✅ All Combat system messages now use `LocalizationProvider`

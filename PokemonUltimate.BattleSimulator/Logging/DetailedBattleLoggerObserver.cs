@@ -5,6 +5,8 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.BattleSimulator.Logging
 {
@@ -19,10 +21,12 @@ namespace PokemonUltimate.BattleSimulator.Logging
     public class DetailedBattleLoggerObserver : IBattleActionObserver
     {
         private readonly UIBattleLogger _logger;
+        private readonly ILocalizationProvider _localizationProvider;
 
         public DetailedBattleLoggerObserver(UIBattleLogger logger)
         {
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+            _localizationProvider = LocalizationManager.Instance;
         }
 
         public void OnActionExecuted(BattleAction action, BattleField field, IEnumerable<BattleAction> reactions)
@@ -80,8 +84,9 @@ namespace PokemonUltimate.BattleSimulator.Logging
             var target = action.Target.Pokemon;
             var move = action.Move;
             var side = action.User.Side.IsPlayer ? "Player" : "Enemy";
+            var moveName = move.GetDisplayName(_localizationProvider);
 
-            _logger.LogInfo($"[{side}] {user.DisplayName} used {move.Name} on {target.DisplayName}");
+            _logger.LogInfo($"[{side}] {user.DisplayName} used {moveName} on {target.DisplayName}");
             _logger.LogDebug($"  Move Type: {move.Type}, Category: {move.Category}, Power: {move.Power}, Accuracy: {move.Accuracy}%");
             _logger.LogDebug($"  User HP: {user.CurrentHP}/{user.MaxHP}, Target HP: {target.CurrentHP}/{target.MaxHP}");
         }
@@ -101,14 +106,15 @@ namespace PokemonUltimate.BattleSimulator.Logging
             int hpBefore = defender.CurrentHP + context.FinalDamage;
             int hpAfter = defender.CurrentHP;
             int damageDealt = hpBefore - hpAfter;
+            var moveName = move.GetDisplayName(_localizationProvider);
 
-            _logger.LogInfo($"[{attackerSide}] {attacker.DisplayName}'s {move.Name} dealt {damageDealt} damage to [{defenderSide}] {defender.DisplayName}");
+            _logger.LogInfo($"[{attackerSide}] {attacker.DisplayName}'s {moveName} dealt {damageDealt} damage to [{defenderSide}] {defender.DisplayName}");
             _logger.LogDebug($"  HP: {hpBefore} → {hpAfter} ({defender.CurrentHP}/{defender.MaxHP})");
             _logger.LogDebug($"  Base Damage: {context.BaseDamage}, Multiplier: {context.Multiplier:F2}x, Final: {context.FinalDamage}");
-            
+
             if (context.IsCritical)
                 _logger.LogInfo($"  ⚡ CRITICAL HIT!");
-            
+
             if (context.TypeEffectiveness != 1.0f)
             {
                 string effectiveness = context.TypeEffectiveness switch
@@ -172,14 +178,15 @@ namespace PokemonUltimate.BattleSimulator.Logging
             var target = action.Target.Pokemon;
             var side = action.Target.Side.IsPlayer ? "Player" : "Enemy";
             var status = action.Status;
+            var statusName = status.GetDisplayName(_localizationProvider);
 
-            _logger.LogInfo($"[{side}] {target.DisplayName} was afflicted with {status}");
+            _logger.LogInfo($"[{side}] {target.DisplayName} was afflicted with {statusName}");
         }
 
         public void OnTurnStart(int turnNumber, BattleField field)
         {
             _logger.LogBattleEvent("TurnStart", $"Turn {turnNumber} starting");
-            
+
             // Log Pokemon status at turn start
             LogPokemonStatus(field);
         }
@@ -187,7 +194,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
         public void OnTurnEnd(int turnNumber, BattleField field)
         {
             _logger.LogBattleEvent("TurnEnd", $"Turn {turnNumber} completed");
-            
+
             // Log Pokemon status at turn end
             LogPokemonStatus(field);
         }
@@ -212,7 +219,8 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 if (!slot.IsEmpty && slot.Pokemon != null)
                 {
                     var p = slot.Pokemon;
-                    _logger.LogDebug($"[Player] {p.DisplayName} - HP: {p.CurrentHP}/{p.MaxHP}, Status: {p.Status}");
+                    var statusName = p.Status.GetDisplayName(_localizationProvider);
+                    _logger.LogDebug($"[Player] {p.DisplayName} - HP: {p.CurrentHP}/{p.MaxHP}, Status: {statusName}");
                 }
             }
 
@@ -222,7 +230,8 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 if (!slot.IsEmpty && slot.Pokemon != null)
                 {
                     var p = slot.Pokemon;
-                    _logger.LogDebug($"[Enemy] {p.DisplayName} - HP: {p.CurrentHP}/{p.MaxHP}, Status: {p.Status}");
+                    var statusName = p.Status.GetDisplayName(_localizationProvider);
+                    _logger.LogDebug($"[Enemy] {p.DisplayName} - HP: {p.CurrentHP}/{p.MaxHP}, Status: {statusName}");
                 }
             }
         }

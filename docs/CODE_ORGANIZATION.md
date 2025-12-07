@@ -10,17 +10,18 @@ This document defines how code is organized in Pokemon Ultimate project. With 5+
 
 **Key Principle**: Code is organized by **technical systems** (Core, Combat, Content), while documentation is organized by **features** (Game Data, Combat System, Content Expansion).
 
-**Why**: 
-- Code systems are shared across multiple features
-- Features are logical groupings for development and documentation
-- This separation allows code reuse while maintaining clear feature boundaries
+**Why**:
+
+-   Code systems are shared across multiple features
+-   Features are logical groupings for development and documentation
+-   This separation allows code reuse while maintaining clear feature boundaries
 
 ### 2. Separation of Concerns
 
-- **Core/** → Generic game logic only, NO concrete game data
-- **Content/** → Concrete game data (Pokemon, Moves, Items)
-- **Combat/** → Battle engine and combat systems
-- **Tests/** → Organized by system/feature for easy navigation
+-   **Core/** → Generic game logic only, NO concrete game data
+-   **Content/** → Concrete game data (Pokemon, Moves, Items)
+-   **Combat/** → Battle engine and combat systems
+-   **Tests/** → Organized by system/feature for easy navigation
 
 ### 3. Feature → Code Mapping
 
@@ -73,20 +74,20 @@ PokemonUltimate/
 
 **Maps to**: `PokemonUltimate.Core/`
 
-| Sub-Feature | Namespace | Key Folders | Key Classes |
-|-------------|-----------|-------------|-------------|
-| **1.1**: Pokemon Data | `Core.Blueprints`, `Core.Instances` | `Blueprints/`, `Instances/` | `PokemonSpeciesData`, `PokemonInstance` |
-| **1.2**: Move Data | `Core.Blueprints`, `Core.Instances`, `Core.Effects` | `Blueprints/`, `Instances/`, `Effects/` | `MoveData`, `MoveInstance`, `IMoveEffect` |
-| **1.3**: Ability Data | `Core.Blueprints` | `Blueprints/` | `AbilityData` |
-| **1.4**: Item Data | `Core.Blueprints` | `Blueprints/` | `ItemData` |
-| **1.5-1.10**: Field Conditions | `Core.Blueprints` | `Blueprints/` | `StatusEffectData`, `WeatherData`, `TerrainData`, etc. |
-| **1.11**: Evolution | `Core.Evolution` | `Evolution/` | `Evolution`, `IEvolutionCondition` |
-| **1.12**: Type Effectiveness | `Core.Factories` | `Factories/` | `TypeEffectiveness` |
-| **1.13**: Interfaces | `Core.Blueprints` | `Blueprints/` | `IIdentifiable` |
-| **1.14**: Enums & Constants | `Core.Enums`, `Core.Constants` | `Enums/`, `Constants/` | All enums, `ErrorMessages`, `GameMessages` |
-| **1.15**: Factories | `Core.Factories` | `Factories/` | `StatCalculator`, `PokemonFactory` |
-| **1.16**: Registry | `Core.Registry` | `Registry/` | `IDataRegistry<T>`, `PokemonRegistry` |
-| **1.17**: Builders | `Core.Builders` | `Builders/` | `PokemonBuilder`, `MoveBuilder`, etc. |
+| Sub-Feature                    | Namespace                                           | Key Folders                             | Key Classes                                                               |
+| ------------------------------ | --------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------- |
+| **1.1**: Pokemon Data          | `Core.Blueprints`, `Core.Instances`                 | `Blueprints/`, `Instances/`             | `PokemonSpeciesData`, `PokemonInstance`                                   |
+| **1.2**: Move Data             | `Core.Blueprints`, `Core.Instances`, `Core.Effects` | `Blueprints/`, `Instances/`, `Effects/` | `MoveData`, `MoveInstance`, `IMoveEffect`                                 |
+| **1.3**: Ability Data          | `Core.Blueprints`                                   | `Blueprints/`                           | `AbilityData`                                                             |
+| **1.4**: Item Data             | `Core.Blueprints`                                   | `Blueprints/`                           | `ItemData`                                                                |
+| **1.5-1.10**: Field Conditions | `Core.Blueprints`                                   | `Blueprints/`                           | `StatusEffectData`, `WeatherData`, `TerrainData`, etc.                    |
+| **1.11**: Evolution            | `Core.Evolution`                                    | `Evolution/`                            | `Evolution`, `IEvolutionCondition`                                        |
+| **1.12**: Type Effectiveness   | `Core.Factories`                                    | `Factories/`                            | `TypeEffectiveness`                                                       |
+| **1.13**: Interfaces           | `Core.Blueprints`                                   | `Blueprints/`                           | `IIdentifiable`                                                           |
+| **1.14**: Enums & Constants    | `Core.Enums`, `Core.Constants`                      | `Enums/`, `Constants/`                  | All enums, `ErrorMessages`, `GameMessages` (deprecated - see Feature 4.9) |
+| **1.15**: Factories            | `Core.Factories`                                    | `Factories/`                            | `StatCalculator`, `PokemonFactory`                                        |
+| **1.16**: Registry             | `Core.Registry`                                     | `Registry/`                             | `IDataRegistry<T>`, `PokemonRegistry`                                     |
+| **1.17**: Builders             | `Core.Builders`                                     | `Builders/`                             | `PokemonBuilder`, `MoveBuilder`, etc.                                     |
 
 **Test Location**: `Tests/Systems/GameData/`, `Tests/Blueprints/`
 
@@ -96,21 +97,21 @@ PokemonUltimate/
 
 **Maps to**: `PokemonUltimate.Combat/`
 
-| Sub-Feature | Namespace | Key Folders | Key Classes |
-|-------------|-----------|-------------|-------------|
-| **2.1**: Battle Foundation | `Combat.Field` | `Field/` | `BattleField`, `BattleSlot`, `BattleSide` |
-| **2.2**: Action Queue | `Combat.Engine` | `Engine/` | `BattleQueue`, `BattleAction` |
-| **2.3**: Turn Order | `Combat.Helpers` | `Helpers/` | `TurnOrderResolver` |
-| **2.4**: Damage Pipeline | `Combat.Damage` | `Damage/` | `DamagePipeline`, `IDamageStep` |
-| **2.5**: Combat Actions | `Combat.Actions` | `Actions/` | `UseMoveAction`, `DamageAction`, etc. |
-| **2.6**: Combat Engine | `Combat.Engine` | `Engine/` | `CombatEngine`, `BattleArbiter` |
-| **2.7**: Integration | `Combat.Providers`, `Combat.View` | `Providers/`, `View/` | `IActionProvider`, `IBattleView` |
-| **2.8**: End-of-Turn | `Combat.Engine` | `Engine/` | `EndOfTurnProcessor` |
-| **2.9**: Abilities & Items | `Combat.Events` | `Events/` | `IBattleListener`, `AbilityListener` |
-| **2.10**: Pipeline Hooks | `Combat.Damage` | `Damage/` | `IStatModifier` |
-| **2.11**: Recoil & Drain | `Combat.Actions` | `Actions/` | `DamageAction` (with effects) |
-| **2.12-2.16**: Field Systems | `Combat.Field`, `Combat.Engine` | `Field/`, `Engine/` | Field condition processors |
-| **2.17-2.19**: Advanced Features | `Combat.Events`, `Combat.Field` | `Events/`, `Field/` | Advanced ability/item/format support |
+| Sub-Feature                      | Namespace                         | Key Folders           | Key Classes                               |
+| -------------------------------- | --------------------------------- | --------------------- | ----------------------------------------- |
+| **2.1**: Battle Foundation       | `Combat.Field`                    | `Field/`              | `BattleField`, `BattleSlot`, `BattleSide` |
+| **2.2**: Action Queue            | `Combat.Engine`                   | `Engine/`             | `BattleQueue`, `BattleAction`             |
+| **2.3**: Turn Order              | `Combat.Helpers`                  | `Helpers/`            | `TurnOrderResolver`                       |
+| **2.4**: Damage Pipeline         | `Combat.Damage`                   | `Damage/`             | `DamagePipeline`, `IDamageStep`           |
+| **2.5**: Combat Actions          | `Combat.Actions`                  | `Actions/`            | `UseMoveAction`, `DamageAction`, etc.     |
+| **2.6**: Combat Engine           | `Combat.Engine`                   | `Engine/`             | `CombatEngine`, `BattleArbiter`           |
+| **2.7**: Integration             | `Combat.Providers`, `Combat.View` | `Providers/`, `View/` | `IActionProvider`, `IBattleView`          |
+| **2.8**: End-of-Turn             | `Combat.Engine`                   | `Engine/`             | `EndOfTurnProcessor`                      |
+| **2.9**: Abilities & Items       | `Combat.Events`                   | `Events/`             | `IBattleListener`, `AbilityListener`      |
+| **2.10**: Pipeline Hooks         | `Combat.Damage`                   | `Damage/`             | `IStatModifier`                           |
+| **2.11**: Recoil & Drain         | `Combat.Actions`                  | `Actions/`            | `DamageAction` (with effects)             |
+| **2.12-2.16**: Field Systems     | `Combat.Field`, `Combat.Engine`   | `Field/`, `Engine/`   | Field condition processors                |
+| **2.17-2.19**: Advanced Features | `Combat.Events`, `Combat.Field`   | `Events/`, `Field/`   | Advanced ability/item/format support      |
 
 **Test Location**: `Tests/Systems/Combat/`
 
@@ -120,12 +121,12 @@ PokemonUltimate/
 
 **Maps to**: `PokemonUltimate.Content/` and `PokemonUltimate.Core.Builders/`
 
-| Sub-Feature | Namespace | Key Folders | Key Classes |
-|-------------|-----------|-------------|-------------|
+| Sub-Feature                    | Namespace          | Key Folders | Key Classes                           |
+| ------------------------------ | ------------------ | ----------- | ------------------------------------- |
 | **3.1-3.6**: Content Expansion | `Content.Catalogs` | `Catalogs/` | `PokemonCatalog`, `MoveCatalog`, etc. |
-| **3.7**: Content Validation | `Content.Catalogs` | `Catalogs/` | Validation logic |
-| **3.8**: Content Organization | `Content.Catalogs` | `Catalogs/` | Catalog organization |
-| **3.9**: Builders | `Core.Builders` | `Builders/` | Fluent builder APIs |
+| **3.7**: Content Validation    | `Content.Catalogs` | `Catalogs/` | Validation logic                      |
+| **3.8**: Content Organization  | `Content.Catalogs` | `Catalogs/` | Catalog organization                  |
+| **3.9**: Builders              | `Core.Builders`    | `Builders/` | Fluent builder APIs                   |
 
 **Test Location**: `Tests/Data/` (content-specific tests)
 
@@ -135,8 +136,8 @@ PokemonUltimate/
 
 **Maps to**: Unity project (future)
 
-| Sub-Feature | Namespace | Key Folders | Key Classes |
-|-------------|-----------|-------------|-------------|
+| Sub-Feature                    | Namespace        | Key Folders             | Key Classes                    |
+| ------------------------------ | ---------------- | ----------------------- | ------------------------------ |
 | **4.1-4.8**: Unity Integration | Unity namespaces | Unity project structure | Unity-specific implementations |
 
 **Test Location**: Unity test project (future)
@@ -147,8 +148,8 @@ PokemonUltimate/
 
 **Maps to**: Future projects/modules
 
-| Sub-Feature | Namespace | Key Folders | Key Classes |
-|-------------|-----------|-------------|-------------|
+| Sub-Feature                | Namespace         | Key Folders      | Key Classes                  |
+| -------------------------- | ----------------- | ---------------- | ---------------------------- |
 | **5.1-5.6**: Game Features | Future namespaces | Future structure | Game feature implementations |
 
 **Test Location**: Future test projects
@@ -200,13 +201,15 @@ PokemonUltimate.Tests/
 **Feature**: 3.1 (Pokemon Expansion)
 
 **Code Location**:
-- **Blueprint**: `PokemonUltimate.Core/Blueprints/PokemonSpeciesData.cs` (already exists, just use it)
-- **Content**: `PokemonUltimate.Content/Catalogs/PokemonCatalog.cs` (add new Pokemon)
-- **Builder**: `PokemonUltimate.Core/Builders/PokemonBuilder.cs` (use builder API)
+
+-   **Blueprint**: `PokemonUltimate.Core/Blueprints/PokemonSpeciesData.cs` (already exists, just use it)
+-   **Content**: `PokemonUltimate.Content/Catalogs/PokemonCatalog.cs` (add new Pokemon)
+-   **Builder**: `PokemonUltimate.Core/Builders/PokemonBuilder.cs` (use builder API)
 
 **Test Location**:
-- **Content Test**: `PokemonUltimate.Tests/Data/Pokemon/[NewPokemon]Tests.cs`
-- **Catalog Test**: `PokemonUltimate.Tests/Data/Catalogs/PokemonCatalogTests.cs`
+
+-   **Content Test**: `PokemonUltimate.Tests/Data/Pokemon/[NewPokemon]Tests.cs`
+-   **Catalog Test**: `PokemonUltimate.Tests/Data/Catalogs/PokemonCatalogTests.cs`
 
 **Documentation**: `docs/features/3-content-expansion/3.1-pokemon-expansion/`
 
@@ -217,12 +220,14 @@ PokemonUltimate.Tests/
 **Feature**: 2.5 (Combat Actions)
 
 **Code Location**:
-- **Action Class**: `PokemonUltimate.Combat/Actions/[NewAction].cs`
-- **Integration**: `PokemonUltimate.Combat/Engine/CombatEngine.cs` (use action)
+
+-   **Action Class**: `PokemonUltimate.Combat/Actions/[NewAction].cs`
+-   **Integration**: `PokemonUltimate.Combat/Engine/CombatEngine.cs` (use action)
 
 **Test Location**:
-- **Functional**: `PokemonUltimate.Tests/Systems/Combat/[NewAction]Tests.cs`
-- **Integration**: `PokemonUltimate.Tests/Systems/Combat/Integration/[NewAction]IntegrationTests.cs`
+
+-   **Functional**: `PokemonUltimate.Tests/Systems/Combat/[NewAction]Tests.cs`
+-   **Integration**: `PokemonUltimate.Tests/Systems/Combat/Integration/[NewAction]IntegrationTests.cs`
 
 **Documentation**: `docs/features/2-combat-system/2.5-combat-actions/`
 
@@ -233,12 +238,14 @@ PokemonUltimate.Tests/
 **Feature**: 1.2 (Move Data)
 
 **Code Location**:
-- **Effect Class**: `PokemonUltimate.Core/Effects/[NewEffect].cs`
-- **Interface**: `PokemonUltimate.Core/Effects/IMoveEffect.cs` (implement)
+
+-   **Effect Class**: `PokemonUltimate.Core/Effects/[NewEffect].cs`
+-   **Interface**: `PokemonUltimate.Core/Effects/IMoveEffect.cs` (implement)
 
 **Test Location**:
-- **Blueprint Test**: `PokemonUltimate.Tests/Blueprints/[NewEffect]Tests.cs`
-- **System Test**: `PokemonUltimate.Tests/Systems/GameData/MoveEffectTests.cs`
+
+-   **Blueprint Test**: `PokemonUltimate.Tests/Blueprints/[NewEffect]Tests.cs`
+-   **System Test**: `PokemonUltimate.Tests/Systems/GameData/MoveEffectTests.cs`
 
 **Documentation**: `docs/features/1-game-data/1.2-move-data/`
 
@@ -279,11 +286,10 @@ PokemonUltimate.Tests/
 
 ## Related Documents
 
-- **Feature Documentation**: `docs/features/[N]-[feature-name]/code_location.md` - Detailed code locations per feature
-- **Test Structure**: `ai_workflow/docs/TDD_GUIDE.md` - Complete test structure guidelines
-- **Feature Master List**: `docs/features_master_list.md` - Complete feature reference
+-   **Feature Documentation**: `docs/features/[N]-[feature-name]/code_location.md` - Detailed code locations per feature
+-   **Test Structure**: `ai_workflow/docs/TDD_GUIDE.md` - Complete test structure guidelines
+-   **Feature Master List**: `docs/features_master_list.md` - Complete feature reference
 
 ---
 
 **Last Updated**: 2025-01-XX
-

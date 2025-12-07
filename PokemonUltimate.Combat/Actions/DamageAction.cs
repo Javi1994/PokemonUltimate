@@ -5,9 +5,14 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Extensions;
+using PokemonUltimate.Content.Catalogs.Abilities;
+using PokemonUltimate.Content.Catalogs.Items;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -81,11 +86,13 @@ namespace PokemonUltimate.Combat.Actions
             // Items/abilities can modify the damage amount by checking conditions
             if (wouldFaint && wasAtFullHP)
             {
-                // Check for Focus Sash or Sturdy
-                bool hasFocusSash = Target.Pokemon.HeldItem != null && 
-                                    Target.Pokemon.HeldItem.Name.Equals("Focus Sash", StringComparison.OrdinalIgnoreCase);
-                bool hasSturdy = Target.Pokemon.Ability != null && 
-                                Target.Pokemon.Ability.Name.Equals("Sturdy", StringComparison.OrdinalIgnoreCase);
+                // Check for Focus Sash or Sturdy - use catalog lookup instead of hardcoded strings
+                var focusSashItem = PokemonUltimate.Content.Catalogs.Items.ItemCatalog.GetByName("Focus Sash");
+                bool hasFocusSash = Target.Pokemon.HeldItem != null && focusSashItem != null &&
+                                    Target.Pokemon.HeldItem.Name.Equals(focusSashItem.Name, StringComparison.OrdinalIgnoreCase);
+                var sturdyAbility = PokemonUltimate.Content.Catalogs.Abilities.AbilityCatalog.GetByName("Sturdy");
+                bool hasSturdy = Target.Pokemon.Ability != null && sturdyAbility != null &&
+                                Target.Pokemon.Ability.Name.Equals(sturdyAbility.Name, StringComparison.OrdinalIgnoreCase);
 
                 if (hasFocusSash || hasSturdy)
                 {
@@ -93,20 +100,24 @@ namespace PokemonUltimate.Combat.Actions
                     int newDamage = Target.Pokemon.CurrentHP - 1;
                     if (newDamage < 0)
                         newDamage = 0;
-                    
+
                     damage = newDamage;
 
                     // Consume Focus Sash (Sturdy is an ability, so it doesn't get consumed)
                     if (hasFocusSash)
                     {
                         Target.Pokemon.HeldItem = null; // Consume item
-                        reactions.Add(new MessageAction(string.Format(GameMessages.ItemActivated, Target.Pokemon.DisplayName, "Focus Sash")));
-                        reactions.Add(new MessageAction(string.Format("{0} held on using its {1}!", Target.Pokemon.DisplayName, "Focus Sash")));
+                        var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+                        var itemName = focusSashItem?.GetLocalizedName(provider) ?? "Focus Sash";
+                        reactions.Add(new MessageAction(provider.GetString(LocalizationKey.ItemActivated, Target.Pokemon.DisplayName, itemName)));
+                        reactions.Add(new MessageAction(provider.GetString(LocalizationKey.HeldOnUsingItem, Target.Pokemon.DisplayName, itemName)));
                     }
                     else if (hasSturdy)
                     {
-                        reactions.Add(new MessageAction(string.Format(GameMessages.AbilityActivated, Target.Pokemon.DisplayName, "Sturdy")));
-                        reactions.Add(new MessageAction(string.Format("{0} endured the hit!", Target.Pokemon.DisplayName)));
+                        var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
+                        var abilityName = sturdyAbility?.GetDisplayName(provider) ?? "Sturdy";
+                        reactions.Add(new MessageAction(provider.GetString(LocalizationKey.AbilityActivated, Target.Pokemon.DisplayName, abilityName)));
+                        reactions.Add(new MessageAction(provider.GetString(LocalizationKey.EnduredHit, Target.Pokemon.DisplayName)));
                     }
                 }
             }

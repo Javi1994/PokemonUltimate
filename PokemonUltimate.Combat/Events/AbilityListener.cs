@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Extensions;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
-using PersistentStatus = PokemonUltimate.Core.Enums.PersistentStatus;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
 using ContactDamageAction = PokemonUltimate.Combat.Actions.ContactDamageAction;
+using PersistentStatus = PokemonUltimate.Core.Enums.PersistentStatus;
 
 namespace PokemonUltimate.Combat.Events
 {
@@ -187,7 +190,9 @@ namespace PokemonUltimate.Combat.Events
             var opposingSide = field.GetOppositeSide(holder.Side);
 
             // Message for ability activation
-            yield return new MessageAction(string.Format(GameMessages.AbilityActivated, holder.Pokemon.DisplayName, _abilityData.Name));
+            var provider = LocalizationManager.Instance;
+            var abilityName = _abilityData.GetDisplayName(provider);
+            yield return new MessageAction(provider.GetString(LocalizationKey.AbilityActivated, holder.Pokemon.DisplayName, abilityName));
 
             // Lower stat for all opposing active Pokemon
             foreach (var enemySlot in opposingSide.GetActiveSlots())
@@ -215,7 +220,9 @@ namespace PokemonUltimate.Combat.Events
                 yield break;
 
             // Message for ability activation
-            yield return new MessageAction(string.Format(GameMessages.AbilityActivated, pokemon.DisplayName, _abilityData.Name));
+            var provider = LocalizationManager.Instance;
+            var abilityName = _abilityData.GetDisplayName(provider);
+            yield return new MessageAction(provider.GetString(LocalizationKey.AbilityActivated, pokemon.DisplayName, abilityName));
 
             // Raise own stat
             yield return new StatChangeAction(holder, holder, _abilityData.TargetStat.Value, _abilityData.StatStages);
@@ -235,7 +242,8 @@ namespace PokemonUltimate.Combat.Events
             {
                 // Even turn - block move
                 _truantState[holder] = false; // Reset for next turn
-                yield return new MessageAction(string.Format(GameMessages.TruantLoafing, holder.Pokemon.DisplayName));
+                var provider = LocalizationManager.Instance;
+                yield return new MessageAction(provider.GetString(LocalizationKey.TruantLoafing, holder.Pokemon.DisplayName));
                 // Note: The move will be blocked by returning actions that indicate failure
                 // UseMoveAction should check for TruantLoafing message and return early
             }
@@ -275,7 +283,9 @@ namespace PokemonUltimate.Combat.Events
                 yield break;
 
             // Message for ability activation
-            yield return new MessageAction(string.Format(GameMessages.AbilityActivated, holder.Pokemon.DisplayName, _abilityData.Name));
+            var provider = LocalizationManager.Instance;
+            var abilityName = _abilityData.GetDisplayName(provider);
+            yield return new MessageAction(provider.GetString(LocalizationKey.AbilityActivated, holder.Pokemon.DisplayName, abilityName));
 
             // Raise own stat
             yield return new StatChangeAction(holder, holder, _abilityData.TargetStat.Value, _abilityData.StatStages);
@@ -303,7 +313,9 @@ namespace PokemonUltimate.Combat.Events
                 yield break;
 
             // Message for ability activation
-            yield return new MessageAction(string.Format(GameMessages.AbilityActivated, holder.Pokemon.DisplayName, _abilityData.Name));
+            var provider = LocalizationManager.Instance;
+            var abilityName = _abilityData.GetDisplayName(provider);
+            yield return new MessageAction(provider.GetString(LocalizationKey.AbilityActivated, holder.Pokemon.DisplayName, abilityName));
 
             // Apply status to attacker
             yield return new ApplyStatusAction(holder, attacker, _abilityData.StatusEffect.Value);
@@ -320,16 +332,18 @@ namespace PokemonUltimate.Combat.Events
             // Calculate damage using Multiplier (default 0.125 = 1/8 of attacker's max HP for Rough Skin)
             float damageMultiplier = _abilityData.Multiplier > 0 ? _abilityData.Multiplier : 0.125f;
             int damage = (int)(attacker.Pokemon.MaxHP * damageMultiplier);
-            
+
             // Minimum 1 HP damage
             if (damage < 1)
                 damage = 1;
 
             // Message for ability activation
-            yield return new MessageAction(string.Format(GameMessages.AbilityActivated, holder.Pokemon.DisplayName, _abilityData.Name));
+            var provider = LocalizationManager.Instance;
+            var abilityName = _abilityData.GetDisplayName(provider);
+            yield return new MessageAction(provider.GetString(LocalizationKey.AbilityActivated, holder.Pokemon.DisplayName, abilityName));
 
             // Apply damage using ContactDamageAction (executes when action is executed, not when it's created)
-            yield return new ContactDamageAction(attacker, damage, _abilityData.Name);
+            yield return new ContactDamageAction(attacker, damage, abilityName);
         }
     }
 }

@@ -81,6 +81,12 @@ namespace PokemonUltimate.Core.Constants
 
         #endregion
 
+        #region Localization
+
+        public const string LanguageCodeCannotBeEmpty = "Language code cannot be null or empty";
+
+        #endregion
+
         #region Helpers
 
         /// <summary>

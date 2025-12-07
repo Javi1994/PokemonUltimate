@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -52,7 +53,7 @@ namespace PokemonUltimate.Combat.Actions
         {
             if (field == null)
                 throw new System.ArgumentNullException(nameof(field));
-            
+
             // Check if target is valid (not empty and not fainted)
             // Note: Target is the attacker who made contact, and they receive the contact damage
             if (Target == null || Target.IsEmpty || Target.HasFainted)
@@ -62,7 +63,8 @@ namespace PokemonUltimate.Combat.Actions
             Target.Pokemon.TakeDamage(Damage);
 
             // Return message about damage dealt
-            yield return new MessageAction(string.Format("{0} was hurt by {1}!", Target.Pokemon.DisplayName, Source));
+            var provider = LocalizationManager.Instance;
+            yield return new MessageAction(provider.GetString(LocalizationKey.HurtByContact, Target.Pokemon.DisplayName, Source));
         }
 
         /// <summary>

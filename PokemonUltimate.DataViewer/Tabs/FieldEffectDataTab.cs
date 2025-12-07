@@ -3,7 +3,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Field;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -161,6 +163,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var fieldEffectList = FieldEffectCatalog.All.OrderBy(f => f.Name).ToList();
+            var provider = LocalizationManager.Instance;
 
             foreach (var fieldEffect in fieldEffectList)
             {
@@ -169,7 +172,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvFieldEffect,
-                    fieldEffect.Name,
+                    fieldEffect.GetLocalizedName(provider),
                     typeStr,
                     durationStr);
 
@@ -194,8 +197,9 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not FieldEffectData fieldEffect)
                 return;
 
+            var provider = LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(fieldEffect.Name);
+            details.AppendLine(fieldEffect.GetLocalizedName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {fieldEffect.Type}");
 
@@ -216,10 +220,11 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (fieldEffect.SwapsDefenses)
                 details.AppendLine("Effect: Swaps Defense and Sp. Defense");
 
-            if (!string.IsNullOrEmpty(fieldEffect.Description))
+            var description = fieldEffect.GetLocalizedDescription(provider);
+            if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();
-                details.AppendLine($"Description: {fieldEffect.Description}");
+                details.AppendLine($"Description: {description}");
             }
 
             this.txtDetails.Text = details.ToString();

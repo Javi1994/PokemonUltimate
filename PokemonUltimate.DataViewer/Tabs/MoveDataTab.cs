@@ -5,6 +5,8 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -172,17 +174,17 @@ namespace PokemonUltimate.DataViewer.Tabs
             // Load data
             var moveList = MoveCatalog.All.OrderBy(m => m.Name).ToList();
 
+            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
             foreach (var move in moveList)
             {
-                var categoryStr = move.Category == MoveCategory.Status ? "Status" :
-                                 move.Category == MoveCategory.Physical ? "Physical" : "Special";
+                var categoryStr = move.Category.GetDisplayName(provider);
                 var powerStr = move.Power > 0 ? move.Power.ToString() : "-";
                 var accuracyStr = move.NeverMisses ? "---" : $"{move.Accuracy}%";
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvMoves,
-                    move.Name,
-                    move.Type.ToString(),
+                    move.GetDisplayName(provider),
+                    move.Type.GetDisplayName(provider),
                     categoryStr,
                     powerStr,
                     accuracyStr,
@@ -211,12 +213,13 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not MoveData move)
                 return;
 
+            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(move.Name);
+            details.AppendLine(move.GetDisplayName(provider));
             details.AppendLine();
-            details.AppendLine($"Type: {move.Type}");
-            details.AppendLine($"Category: {move.Category}");
-            
+            details.AppendLine($"Type: {move.Type.GetDisplayName(provider)}");
+            details.AppendLine($"Category: {move.Category.GetDisplayName(provider)}");
+
             if (move.Power > 0)
                 details.AppendLine($"Power: {move.Power}");
             else
@@ -231,10 +234,11 @@ namespace PokemonUltimate.DataViewer.Tabs
             details.AppendLine($"Priority: {move.Priority}");
             details.AppendLine($"Target: {move.TargetScope}");
 
-            if (!string.IsNullOrEmpty(move.Description))
+            var description = move.GetDescription(provider);
+            if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();
-                details.AppendLine($"Description: {move.Description}");
+                details.AppendLine($"Description: {description}");
             }
 
             if (move.Effects.Count > 0)

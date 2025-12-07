@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Extensions;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -160,12 +161,13 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var abilityList = AbilityCatalog.All.OrderBy(a => a.Name).ToList();
+            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
 
             foreach (var ability in abilityList)
             {
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvAbilities,
-                    ability.Name,
+                    ability.GetDisplayName(provider),
                     ability.Id);
 
                 // Store Ability object in row tag
@@ -190,15 +192,17 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not AbilityData ability)
                 return;
 
+            var provider = PokemonUltimate.Core.Localization.LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(ability.Name);
+            details.AppendLine(ability.GetDisplayName(provider));
             details.AppendLine();
             details.AppendLine($"ID: {ability.Id}");
 
-            if (!string.IsNullOrEmpty(ability.Description))
+            var description = ability.GetDescription(provider);
+            if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();
-                details.AppendLine($"Description: {ability.Description}");
+                details.AppendLine($"Description: {description}");
             }
 
             this.txtDetails.Text = details.ToString();

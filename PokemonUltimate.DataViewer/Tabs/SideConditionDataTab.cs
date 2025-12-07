@@ -3,7 +3,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Field;
+using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -161,6 +163,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             // Load data
             var sideConditionList = SideConditionCatalog.All.OrderBy(s => s.Name).ToList();
+            var provider = LocalizationManager.Instance;
 
             foreach (var sideCondition in sideConditionList)
             {
@@ -169,7 +172,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvSideCondition,
-                    sideCondition.Name,
+                    sideCondition.GetLocalizedName(provider),
                     typeStr,
                     durationStr);
 
@@ -194,8 +197,9 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (selectedRow.Tag is not SideConditionData sideCondition)
                 return;
 
+            var provider = LocalizationManager.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(sideCondition.Name);
+            details.AppendLine(sideCondition.GetLocalizedName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {sideCondition.Type}");
 
@@ -210,10 +214,11 @@ namespace PokemonUltimate.DataViewer.Tabs
                 details.AppendLine($"Reduces {sideCondition.ReducesDamageFrom} damage by {reduction:F0}%");
             }
 
-            if (!string.IsNullOrEmpty(sideCondition.Description))
+            var description = sideCondition.GetLocalizedDescription(provider);
+            if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();
-                details.AppendLine($"Description: {sideCondition.Description}");
+                details.AppendLine($"Description: {description}");
             }
 
             this.txtDetails.Text = details.ToString();

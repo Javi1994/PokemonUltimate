@@ -7,7 +7,12 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
+using PokemonUltimate.Core.Effects;
+using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
 using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Localization;
+using PokemonUltimate.DeveloperTools.Localization;
 using PokemonUltimate.DeveloperTools.Runners;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
@@ -59,7 +64,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.dgvActions = new DataGridView();
             this.progressBar = new ProgressBar();
             this.lblStatus = new Label();
-            
+
             this.SuspendLayout();
 
             // UserControl
@@ -92,6 +97,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             int controlWidth = 290;
             int leftMargin = 5;
 
+            var provider = LocalizationManager.Instance;
             var lblTitle = new Label
             {
                 Text = "Configuration",
@@ -101,11 +107,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             };
             yPos += 40;
 
-            var lblMove = new Label 
-            { 
-                Text = "Move to Test:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblMove = new Label
+            {
+                Text = "Move to Test",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.comboMove.Location = new Point(leftMargin, yPos);
@@ -114,11 +120,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.comboMove.Height = 25;
             yPos += spacing;
 
-            var lblAttackerPokemon = new Label 
-            { 
-                Text = "Attacker Pokemon:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblAttackerPokemon = new Label
+            {
+                Text = "Attacker Pokemon",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.comboAttackerPokemon.Location = new Point(leftMargin, yPos);
@@ -127,11 +133,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.comboAttackerPokemon.Height = 25;
             yPos += spacing;
 
-            var lblTargetPokemon = new Label 
-            { 
-                Text = "Target Pokemon:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblTargetPokemon = new Label
+            {
+                Text = "Target Pokemon",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.comboTargetPokemon.Location = new Point(leftMargin, yPos);
@@ -140,11 +146,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.comboTargetPokemon.Height = 25;
             yPos += spacing;
 
-            var lblLevel = new Label 
-            { 
-                Text = "Level:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblLevel = new Label
+            {
+                Text = "Level",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.numericLevel.Location = new Point(leftMargin, yPos);
@@ -154,11 +160,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.numericLevel.Value = 50;
             yPos += spacing;
 
-            var lblTests = new Label 
-            { 
-                Text = "Number of Tests:", 
-                Location = new Point(leftMargin, yPos), 
-                AutoSize = true 
+            var lblTests = new Label
+            {
+                Text = "Number of Tests",
+                Location = new Point(leftMargin, yPos),
+                AutoSize = true
             };
             yPos += 25;
             this.numericTests.Location = new Point(leftMargin, yPos);
@@ -216,7 +222,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.txtSummary.Font = new Font("Consolas", 9);
             this.txtSummary.ReadOnly = true;
             this.txtSummary.Margin = new Padding(10);
-            this.txtSummary.Text = "Configure settings and click 'Run Tests' to see results here.";
+            this.txtSummary.Text = "Configure and run tests";
             this.tabSummary.Controls.Add(this.txtSummary);
 
             // Tab Damage
@@ -269,17 +275,27 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void LoadData()
         {
-            // Cargar movimientos
+            // Cargar movimientos con nombres traducidos
+            var provider = LocalizationManager.Instance;
             var moveList = MoveCatalog.All.OrderBy(m => m.Name).ToList();
             foreach (var move in moveList)
             {
-                this.comboMove.Items.Add(move.Name);
+                this.comboMove.Items.Add(move.GetDisplayName(provider));
             }
             if (this.comboMove.Items.Count > 0)
             {
-                // Seleccionar Thunderbolt por defecto si existe
-                var thunderboltIndex = this.comboMove.Items.IndexOf("Thunderbolt");
-                this.comboMove.SelectedIndex = thunderboltIndex >= 0 ? thunderboltIndex : 0;
+                // Seleccionar Thunderbolt por defecto si existe (buscar por nombre traducido)
+                var thunderbolt = MoveCatalog.All.FirstOrDefault(m => m.Name == "Thunderbolt");
+                if (thunderbolt != null)
+                {
+                    var thunderboltDisplayName = thunderbolt.GetDisplayName(provider);
+                    var thunderboltIndex = this.comboMove.Items.IndexOf(thunderboltDisplayName);
+                    this.comboMove.SelectedIndex = thunderboltIndex >= 0 ? thunderboltIndex : 0;
+                }
+                else
+                {
+                    this.comboMove.SelectedIndex = 0;
+                }
             }
 
             // Cargar Pokemon
@@ -289,13 +305,13 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 this.comboAttackerPokemon.Items.Add(pokemon.Name);
                 this.comboTargetPokemon.Items.Add(pokemon.Name);
             }
-            
+
             if (this.comboAttackerPokemon.Items.Count > 0)
             {
                 var pikachuIndex = this.comboAttackerPokemon.Items.IndexOf("Pikachu");
                 this.comboAttackerPokemon.SelectedIndex = pikachuIndex >= 0 ? pikachuIndex : 0;
             }
-            
+
             if (this.comboTargetPokemon.Items.Count > 0)
             {
                 var charmanderIndex = this.comboTargetPokemon.Items.IndexOf("Charmander");
@@ -305,6 +321,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private async void BtnRun_Click(object? sender, EventArgs e)
         {
+            var provider = LocalizationManager.Instance;
             this.btnRun.Enabled = false;
             this.progressBar.Value = 0;
             this.lblStatus.Text = "Running tests...";
@@ -313,17 +330,18 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             try
             {
                 // Obtener configuración
-                var moveName = this.comboMove.SelectedItem?.ToString();
+                var moveDisplayName = this.comboMove.SelectedItem?.ToString();
                 var attackerName = this.comboAttackerPokemon.SelectedItem?.ToString();
                 var targetName = this.comboTargetPokemon.SelectedItem?.ToString();
 
-                if (moveName == null || attackerName == null || targetName == null)
+                if (moveDisplayName == null || attackerName == null || targetName == null)
                 {
-                    MessageBox.Show("Please select a move, attacker, and target.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Please select move, attacker, and target.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                var move = MoveCatalog.All.FirstOrDefault(m => m.Name == moveName);
+                // Buscar movimiento por nombre traducido
+                var move = MoveCatalog.All.FirstOrDefault(m => m.GetDisplayName(provider) == moveDisplayName);
                 var attackerPokemon = PokemonCatalog.All.FirstOrDefault(p => p.Name == attackerName);
                 var targetPokemon = PokemonCatalog.All.FirstOrDefault(p => p.Name == targetName);
 
@@ -363,7 +381,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.lblStatus.Text = "Error occurred";
                 this.txtSummary.Text = $"Error: {ex.Message}";
             }
@@ -375,6 +393,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void DisplayResults(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
         {
+            var provider = LocalizationManager.Instance;
             var move = config.MoveToTest;
             var attackerName = config.AttackerPokemon.Name;
             var targetName = config.TargetPokemon.Name;
@@ -386,27 +405,41 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             // Mostrar resumen
             this.txtSummary.Clear();
             this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n");
-            this.txtSummary.AppendText("INFORMACIÓN DEL MOVIMIENTO\n");
+            this.txtSummary.AppendText("Move Information\n");
             this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
-            this.txtSummary.AppendText($"Movimiento: {move.Name}\n");
-            this.txtSummary.AppendText($"  Tipo: {move.Type}\n");
-            this.txtSummary.AppendText($"  Poder: {move.Power}\n");
-            this.txtSummary.AppendText($"  Categoría: {move.Category}\n");
-            this.txtSummary.AppendText($"  Precisión: {move.Accuracy}%\n");
+            this.txtSummary.AppendText($"Move: {move.GetDisplayName(provider)}\n");
+            this.txtSummary.AppendText($"  Type: {move.Type.GetDisplayName(provider)}\n");
+            this.txtSummary.AppendText($"  Power: {move.Power}\n");
+            this.txtSummary.AppendText($"  Category: {move.Category.GetDisplayName(provider)}\n");
+            this.txtSummary.AppendText($"  Accuracy: {move.Accuracy}%\n");
             this.txtSummary.AppendText($"  PP: {move.MaxPP}\n");
-            this.txtSummary.AppendText($"  Prioridad: {move.Priority}\n");
-            
+            this.txtSummary.AppendText($"  Priority: {move.Priority}\n");
+
             if (move.Effects != null && move.Effects.Count > 0)
             {
-                this.txtSummary.AppendText("\n  Efectos del movimiento:\n");
+                this.txtSummary.AppendText($"\n  Move Effects:\n");
                 foreach (var effect in move.Effects)
                 {
                     var effectType = effect.GetType().Name.Replace("Effect", "");
-                    this.txtSummary.AppendText($"    - {effectType}: {effect.Description}\n");
+                    string effectDescription = effect.Description;
+
+                    // Traducir estados en la descripción si es un StatusEffect
+                    if (effect is StatusEffect statusEffect)
+                    {
+                        var statusName = statusEffect.Status.GetDisplayName(provider);
+                        effectDescription = effectDescription.Replace(statusEffect.Status.ToString(), statusName);
+                    }
+                    else if (effect is VolatileStatusEffect volatileStatusEffect)
+                    {
+                        var statusName = volatileStatusEffect.Status.GetDisplayName(provider);
+                        effectDescription = effectDescription.Replace(volatileStatusEffect.Status.ToString(), statusName);
+                    }
+
+                    this.txtSummary.AppendText($"    - {effectType}: {effectDescription}\n");
                 }
             }
-            
-            this.txtSummary.AppendText($"\nEfectividad de Tipo: {typeEffectiveness:F2}x\n");
+
+            this.txtSummary.AppendText($"\nType Effectiveness: {typeEffectiveness:F2}x\n");
             this.txtSummary.AppendText("\n");
 
             // Estadísticas de daño
@@ -418,25 +451,25 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 var medianDamage = stats.DamageValues.OrderBy(d => d).Skip(stats.DamageValues.Count / 2).First();
 
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n");
-                this.txtSummary.AppendText("ESTADÍSTICAS DE DAÑO\n");
+                this.txtSummary.AppendText("Damage Statistics\n");
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
-                this.txtSummary.AppendText($"Total de golpes exitosos: {stats.DamageValues.Count} / {config.NumberOfTests}\n");
-                this.txtSummary.AppendText($"Daño promedio: {avgDamage:F1} HP\n");
-                this.txtSummary.AppendText($"Daño mínimo: {minDamage} HP\n");
-                this.txtSummary.AppendText($"Daño máximo: {maxDamage} HP\n");
-                this.txtSummary.AppendText($"Daño mediano: {medianDamage} HP\n");
-                
+                this.txtSummary.AppendText($"Total Successful Hits: {stats.DamageValues.Count} / {config.NumberOfTests}\n");
+                this.txtSummary.AppendText($"Average Damage: {avgDamage:F1} HP\n");
+                this.txtSummary.AppendText($"Min Damage: {minDamage} HP\n");
+                this.txtSummary.AppendText($"Max Damage: {maxDamage} HP\n");
+                this.txtSummary.AppendText($"Median Damage: {medianDamage} HP\n");
+
                 if (stats.CriticalHits > 0)
                 {
                     var critRate = (stats.CriticalHits * 100.0) / stats.DamageValues.Count;
-                    this.txtSummary.AppendText($"Golpes críticos: {stats.CriticalHits} ({critRate:F1}% de los golpes exitosos)\n");
+                    this.txtSummary.AppendText($"Critical Hits: {stats.CriticalHits} ({critRate:F1}% of successful hits)\n");
                 }
             }
 
             if (stats.Misses > 0)
             {
                 var missRate = (stats.Misses * 100.0) / config.NumberOfTests;
-                this.txtSummary.AppendText($"Fallos: {stats.Misses} ({missRate:F1}% del total)\n");
+                this.txtSummary.AppendText($"Misses: {stats.Misses} ({missRate:F1}% of total)\n");
             }
 
             // Estadísticas de efectos de estado
@@ -444,13 +477,14 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             {
                 var totalStatusEffects = stats.StatusEffectsCaused.Values.Sum();
                 this.txtSummary.AppendText("\n═══════════════════════════════════════════════════════════════\n");
-                this.txtSummary.AppendText("EFECTOS DE ESTADO CAUSADOS\n");
+                this.txtSummary.AppendText("Status Effects Caused\n");
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
-                this.txtSummary.AppendText($"Total: {totalStatusEffects} efectos en {config.NumberOfTests} pruebas\n");
+                this.txtSummary.AppendText($"Total: {totalStatusEffects} effects in {config.NumberOfTests} tests\n");
                 foreach (var effect in stats.StatusEffectsCaused.OrderByDescending(e => e.Value))
                 {
                     var percentage = (effect.Value * 100.0) / config.NumberOfTests;
-                    this.txtSummary.AppendText($"  {effect.Key}: {effect.Value} veces ({percentage:F1}%)\n");
+                    var statusName = TranslateStatusName(effect.Key, provider);
+                    this.txtSummary.AppendText($"  {statusName}: {effect.Value} times ({percentage:F1}%)\n");
                 }
             }
 
@@ -458,13 +492,14 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             {
                 var totalVolatileEffects = stats.VolatileStatusEffectsCaused.Values.Sum();
                 this.txtSummary.AppendText("\n═══════════════════════════════════════════════════════════════\n");
-                this.txtSummary.AppendText("ESTADOS VOLÁTILES CAUSADOS\n");
+                this.txtSummary.AppendText("Volatile Status Effects Caused\n");
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
-                this.txtSummary.AppendText($"Total: {totalVolatileEffects} efectos en {config.NumberOfTests} pruebas\n");
+                this.txtSummary.AppendText($"Total: {totalVolatileEffects} effects in {config.NumberOfTests} tests\n");
                 foreach (var effect in stats.VolatileStatusEffectsCaused.OrderByDescending(e => e.Value))
                 {
                     var percentage = (effect.Value * 100.0) / config.NumberOfTests;
-                    this.txtSummary.AppendText($"  {effect.Key}: {effect.Value} veces ({percentage:F1}%)\n");
+                    var statusName = TranslateVolatileStatusName(effect.Key, provider);
+                    this.txtSummary.AppendText($"  {statusName}: {effect.Value} times ({percentage:F1}%)\n");
                 }
             }
 
@@ -473,13 +508,13 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             {
                 var totalActions = stats.ActionsGenerated.Values.Sum();
                 this.txtSummary.AppendText("\n═══════════════════════════════════════════════════════════════\n");
-                this.txtSummary.AppendText("ACCIONES GENERADAS\n");
+                this.txtSummary.AppendText("Actions Generated\n");
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
-                this.txtSummary.AppendText($"Total de acciones generadas: {totalActions}\n");
+                this.txtSummary.AppendText($"Total Actions Generated: {totalActions}\n");
                 foreach (var action in stats.ActionsGenerated.OrderByDescending(a => a.Value))
                 {
                     var percentage = (action.Value * 100.0) / config.NumberOfTests;
-                    this.txtSummary.AppendText($"  {action.Key}: {action.Value} veces ({percentage:F1}% de las pruebas)\n");
+                    this.txtSummary.AppendText($"  {action.Key}: {action.Value} times ({percentage:F1}% of tests)\n");
                 }
             }
 
@@ -491,9 +526,10 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateDamageTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
         {
+            var provider = LocalizationManager.Instance;
             var dataTable = new DataTable();
-            dataTable.Columns.Add("Métrica", typeof(string));
-            dataTable.Columns.Add("Valor", typeof(string));
+            dataTable.Columns.Add("Metric", typeof(string));
+            dataTable.Columns.Add("Value", typeof(string));
 
             if (stats.DamageValues.Count > 0)
             {
@@ -502,23 +538,23 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 var maxDamage = stats.DamageValues.Max();
                 var medianDamage = stats.DamageValues.OrderBy(d => d).Skip(stats.DamageValues.Count / 2).First();
 
-                dataTable.Rows.Add("Total de golpes exitosos", $"{stats.DamageValues.Count} / {config.NumberOfTests}");
-                dataTable.Rows.Add("Daño promedio", $"{avgDamage:F1} HP");
-                dataTable.Rows.Add("Daño mínimo", $"{minDamage} HP");
-                dataTable.Rows.Add("Daño máximo", $"{maxDamage} HP");
-                dataTable.Rows.Add("Daño mediano", $"{medianDamage} HP");
-                
+                dataTable.Rows.Add("Total Successful Hits", $"{stats.DamageValues.Count} / {config.NumberOfTests}");
+                dataTable.Rows.Add("Average Damage", $"{avgDamage:F1} HP");
+                dataTable.Rows.Add("Min Damage", $"{minDamage} HP");
+                dataTable.Rows.Add("Max Damage", $"{maxDamage} HP");
+                dataTable.Rows.Add("Median Damage", $"{medianDamage} HP");
+
                 if (stats.CriticalHits > 0)
                 {
                     var critRate = (stats.CriticalHits * 100.0) / stats.DamageValues.Count;
-                    dataTable.Rows.Add("Golpes críticos", $"{stats.CriticalHits} ({critRate:F1}%)");
+                    dataTable.Rows.Add("Critical Hits", $"{stats.CriticalHits} ({critRate:F1}%)");
                 }
             }
 
             if (stats.Misses > 0)
             {
                 var missRate = (stats.Misses * 100.0) / config.NumberOfTests;
-                dataTable.Rows.Add("Fallos", $"{stats.Misses} ({missRate:F1}%)");
+                dataTable.Rows.Add("Misses", $"{stats.Misses} ({missRate:F1}%)");
             }
 
             this.dgvDamage.DataSource = dataTable;
@@ -526,22 +562,25 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateStatusEffectsTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
         {
+            var provider = LocalizationManager.Instance;
             var dataTable = new DataTable();
-            dataTable.Columns.Add("Tipo", typeof(string));
-            dataTable.Columns.Add("Efecto", typeof(string));
-            dataTable.Columns.Add("Veces", typeof(int));
-            dataTable.Columns.Add("Porcentaje", typeof(string));
+            dataTable.Columns.Add("Type", typeof(string));
+            dataTable.Columns.Add("Effect", typeof(string));
+            dataTable.Columns.Add("Times", typeof(int));
+            dataTable.Columns.Add("Percentage", typeof(string));
 
             foreach (var effect in stats.StatusEffectsCaused.OrderByDescending(e => e.Value))
             {
                 var percentage = (effect.Value * 100.0) / config.NumberOfTests;
-                dataTable.Rows.Add("Persistente", effect.Key, effect.Value, $"{percentage:F1}%");
+                var statusName = TranslateStatusName(effect.Key, provider);
+                dataTable.Rows.Add("Persistent", statusName, effect.Value, $"{percentage:F1}%");
             }
 
             foreach (var effect in stats.VolatileStatusEffectsCaused.OrderByDescending(e => e.Value))
             {
                 var percentage = (effect.Value * 100.0) / config.NumberOfTests;
-                dataTable.Rows.Add("Volátil", effect.Key, effect.Value, $"{percentage:F1}%");
+                var statusName = TranslateVolatileStatusName(effect.Key, provider);
+                dataTable.Rows.Add("Volatile", statusName, effect.Value, $"{percentage:F1}%");
             }
 
             this.dgvStatusEffects.DataSource = dataTable;
@@ -549,10 +588,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
 
         private void UpdateActionsTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
         {
+            var provider = LocalizationManager.Instance;
             var dataTable = new DataTable();
-            dataTable.Columns.Add("Acción", typeof(string));
-            dataTable.Columns.Add("Veces", typeof(int));
-            dataTable.Columns.Add("Porcentaje", typeof(string));
+            dataTable.Columns.Add("Action", typeof(string));
+            dataTable.Columns.Add("Times", typeof(int));
+            dataTable.Columns.Add("Percentage", typeof(string));
 
             foreach (var action in stats.ActionsGenerated.OrderByDescending(a => a.Value))
             {
@@ -561,6 +601,36 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
 
             this.dgvActions.DataSource = dataTable;
+        }
+
+        /// <summary>
+        /// Translates a persistent status name from enum string to localized name.
+        /// </summary>
+        private string TranslateStatusName(string statusName, ILocalizationProvider provider)
+        {
+            if (Enum.TryParse<PersistentStatus>(statusName, out var status))
+            {
+                return status.GetDisplayName(provider);
+            }
+            return statusName; // Fallback to original if parsing fails
+        }
+
+        /// <summary>
+        /// Translates a volatile status name from enum string to localized name.
+        /// Handles the "Volatile_" prefix that may be present.
+        /// </summary>
+        private string TranslateVolatileStatusName(string statusName, ILocalizationProvider provider)
+        {
+            // Remove "Volatile_" prefix if present
+            var cleanName = statusName.StartsWith("Volatile_")
+                ? statusName.Substring("Volatile_".Length)
+                : statusName;
+
+            if (Enum.TryParse<VolatileStatus>(cleanName, out var status))
+            {
+                return status.GetDisplayName(provider);
+            }
+            return statusName; // Fallback to original if parsing fails
         }
     }
 }

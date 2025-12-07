@@ -181,7 +181,7 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `CoreConstants` - Core module constants (ShinyOdds, Friendship values, IV/EV limits, Stat stages, Formula constants)
 -   `CoreValidators` - Centralized validation methods (ValidateLevel, ValidateFriendship, ValidateStatStage, ValidateIV, ValidateEV)
 -   `ErrorMessages` - Error message constants
--   `GameMessages` - In-game message constants
+-   `GameMessages` - ⚠️ **DEPRECATED**: In-game message constants (only used in non-production code). See Feature 4.9 for localization system.
 
 **Key Extensions** (post-refactor):
 
@@ -202,7 +202,7 @@ Game data is organized into logical groups matching the sub-feature structure:
 -   `CoreConstants` - Core module constants (ShinyOdds, Friendship values, IV/EV limits, Stat stages, Formula constants, post-refactor)
 -   `CoreValidators` - Centralized validation methods (ValidateLevel, ValidateFriendship, ValidateStatStage, ValidateIV, ValidateEV, post-refactor)
 -   `ErrorMessages` - Error message constants
--   `GameMessages` - In-game message constants
+-   `GameMessages` - ⚠️ **DEPRECATED**: In-game message constants (only used in non-production code). See Feature 4.9 for localization system.
 -   `LevelExtensions` - Extension methods for level validation (`IsValidLevel()`, post-refactor)
 -   `FriendshipExtensions` - Extension methods for friendship (`ClampFriendship()`, post-refactor)
 
