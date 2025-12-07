@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Domain.Instances;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
-namespace PokemonUltimate.Combat
+namespace PokemonUltimate.Combat.Results
 {
     /// <summary>
     /// Contains detailed information about the result of a battle.

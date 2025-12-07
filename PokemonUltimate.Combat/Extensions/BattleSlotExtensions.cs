@@ -1,3 +1,5 @@
+using PokemonUltimate.Combat.Foundation.Field;
+
 namespace PokemonUltimate.Combat.Extensions
 {
     /// <summary>

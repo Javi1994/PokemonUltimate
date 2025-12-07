@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.AI;
-using PokemonUltimate.Combat.Factories;
+using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Infrastructure.Factories;
+using PokemonUltimate.Combat.Integration.AI;
+using PokemonUltimate.Combat.Integration.View;
+using PokemonUltimate.Combat.Results;
 using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Data.Blueprints;
@@ -113,7 +116,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
             var enemyAI = new RandomAI();
 
             // Crear view (null view para no mostrar nada)
-            var view = Combat.NullBattleView.Instance;
+            var view = NullBattleView.Instance;
 
             // Crear engine
             var engine = CombatEngineFactory.Create();

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Results;
 using PokemonUltimate.Combat.Statistics.Trackers;
 
 namespace PokemonUltimate.Combat.Statistics
@@ -157,7 +159,7 @@ namespace PokemonUltimate.Combat.Statistics
         {
             _trackers.Add(new ActionTypeTracker());
             _trackers.Add(new MoveUsageTracker());
-            _trackers.Add(new DamageTracker());
+            _trackers.Add(new DamageStatisticsTracker());
             _trackers.Add(new StatusEffectTracker());
             _trackers.Add(new FieldEffectTracker());
             _trackers.Add(new HealingTracker());

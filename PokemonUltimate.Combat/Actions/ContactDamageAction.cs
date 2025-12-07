@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Extensions;
-using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Integration.View;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Services;

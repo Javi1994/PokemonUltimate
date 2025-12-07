@@ -2,16 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Constants;
-using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Combat.Effects;
-using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Combat.Execution.Processors;
 using PokemonUltimate.Combat.Extensions;
-using PokemonUltimate.Combat.Factories;
-using PokemonUltimate.Combat.Helpers;
-using PokemonUltimate.Combat.Messages;
-using PokemonUltimate.Combat.Processors.Phases;
-using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Combat.Foundation.Constants;
+using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Infrastructure.Factories;
+using PokemonUltimate.Combat.Infrastructure.Helpers;
+using PokemonUltimate.Combat.Infrastructure.Messages;
+using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Integration.View;
+using PokemonUltimate.Combat.Systems.Damage;
+using PokemonUltimate.Combat.Systems.Effects;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Effects;
@@ -39,7 +40,7 @@ namespace PokemonUltimate.Combat.Actions
         private readonly AccuracyChecker _accuracyChecker;
         private readonly IRandomProvider _randomProvider;
         private readonly IDamagePipeline _damagePipeline;
-        private readonly Effects.MoveEffectProcessorRegistry _effectProcessorRegistry;
+        private readonly MoveEffectProcessorRegistry _effectProcessorRegistry;
         private readonly IBattleMessageFormatter _messageFormatter;
         private readonly BeforeMoveProcessor _beforeMoveProcessor;
         private readonly AfterMoveProcessor _afterMoveProcessor;
@@ -92,7 +93,7 @@ namespace PokemonUltimate.Combat.Actions
             IRandomProvider randomProvider = null,
             AccuracyChecker accuracyChecker = null,
             IDamagePipeline damagePipeline = null,
-            Effects.MoveEffectProcessorRegistry effectProcessorRegistry = null,
+            MoveEffectProcessorRegistry effectProcessorRegistry = null,
             IBattleMessageFormatter messageFormatter = null,
             BeforeMoveProcessor beforeMoveProcessor = null,
             AfterMoveProcessor afterMoveProcessor = null,
@@ -114,7 +115,7 @@ namespace PokemonUltimate.Combat.Actions
 
             // Create MoveEffectProcessorRegistry if not provided (temporary until full DI refactoring)
             var damageContextFactory = new DamageContextFactory();
-            _effectProcessorRegistry = effectProcessorRegistry ?? new Effects.MoveEffectProcessorRegistry(_randomProvider, damageContextFactory);
+            _effectProcessorRegistry = effectProcessorRegistry ?? new MoveEffectProcessorRegistry(_randomProvider, damageContextFactory);
 
             // Create BattleMessageFormatter if not provided
             _messageFormatter = messageFormatter ?? new BattleMessageFormatter();

@@ -12,4 +12,12 @@
       <ProjectReference Include="..\PokemonUltimate.Core\PokemonUltimate.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Engine\Processors\Interfaces\" />
+      <Folder Include="Foundation\" />
+      <Folder Include="Infrastructure\" />
+      <Folder Include="Integration\" />
+      <Folder Include="Systems\" />
+    </ItemGroup>
+
 </Project>

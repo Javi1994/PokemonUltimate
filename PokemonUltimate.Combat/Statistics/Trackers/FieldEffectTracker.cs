@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Statistics.Trackers

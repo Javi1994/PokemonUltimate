@@ -1,4 +1,4 @@
-namespace PokemonUltimate.Combat
+namespace PokemonUltimate.Combat.Results
 {
     /// <summary>
     /// Represents the possible outcomes of a battle.
