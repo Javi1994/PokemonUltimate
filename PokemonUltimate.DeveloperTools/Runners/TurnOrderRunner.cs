@@ -9,6 +9,7 @@ using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Messages;
+using PokemonUltimate.Combat.Processors.Phases;
 using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Content.Catalogs.Field;
 using PokemonUltimate.Core.Blueprints;
@@ -168,7 +169,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
                     pokemonToSlotMap[slot.Pokemon] = slot;
                 }
             }
-            
+
             // Debug: Verify all Pokemon instances are mapped
             // If a Pokemon instance is not in the map, it means it wasn't placed in a slot
             // In that case, we need to manually place it
@@ -236,7 +237,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
 
                 // Find the slot for this Pokemon instance
                 BattleSlot? slot = null;
-                
+
                 // First try: direct Pokemon instance mapping (most reliable)
                 if (pokemonToSlotMap.TryGetValue(pokemon, out var mappedSlot))
                 {
@@ -272,26 +273,26 @@ namespace PokemonUltimate.DeveloperTools.Runners
                         }
                     }
                 }
-                
+
                 // Final fallback: use index if still not found
                 if (slot == null && i < allSlots.Count)
                 {
                     slot = allSlots[i];
                 }
-                
+
                 // If slot is null, try to find any empty slot
                 if (slot == null)
                 {
                     slot = allSlots.FirstOrDefault(s => s.Pokemon == null);
                 }
-                
+
                 // If slot exists but has no Pokemon, place this Pokemon there
                 if (slot != null && slot.Pokemon == null)
                 {
                     slot.SetPokemon(pokemon);
                     pokemonToSlotMap[pokemon] = slot;
                 }
-                
+
                 // If slot is null, try to find a slot by index based on party distribution
                 if (slot == null)
                 {
@@ -324,7 +325,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
                         }
                     }
                 }
-                
+
                 // If still no slot or Pokemon, skip this config
                 if (slot == null || slot.Pokemon == null)
                     continue;
@@ -356,10 +357,10 @@ namespace PokemonUltimate.DeveloperTools.Runners
                 {
                     // Try to learn the move first
                     bool learned = slot.Pokemon.TryLearnMove(config.Move);
-                    
+
                     // Check if it was added to the Pokemon's moves
                     moveInstance = slot.Pokemon.Moves.FirstOrDefault(m => m.Move.Id == config.Move.Id);
-                    
+
                     // If still null (e.g., Pokemon has 4 moves already), create a temporary instance
                     // This is fine for debugging purposes - we just need the move data
                     if (moveInstance == null)
@@ -376,7 +377,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
                     // If no Pokemon slot found, use any other slot (even empty)
                     target = allSlots.FirstOrDefault(s => s != slot);
                 }
-                
+
                 // If still no target found (shouldn't happen with 2+ Pokemon), skip this action
                 if (target == null)
                 {
@@ -395,7 +396,8 @@ namespace PokemonUltimate.DeveloperTools.Runners
                         new DamagePipeline(randomProvider),
                         new MoveEffectProcessorRegistry(randomProvider, new DamageContextFactory()),
                         new BattleMessageFormatter(),
-                        new BattleTriggerProcessor(),
+                        new BeforeMoveProcessor(),
+                        new AfterMoveProcessor(),
                         new TargetResolver()
                     );
 
@@ -409,7 +411,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
             {
                 var config = configs[i];
                 var pokemon = pokemonInstances[i];
-                
+
                 BattleSlot? slot = null;
                 if (pokemonToSlotMap.TryGetValue(pokemon, out var mappedSlot))
                 {
@@ -612,7 +614,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
             reasons.Add($"Speed: {effectiveSpeed:F2}");
 
             // Check if there are ties
-            var samePriority = sortedActions.Where((a, idx) => idx != position && 
+            var samePriority = sortedActions.Where((a, idx) => idx != position &&
                 new TurnOrderResolver(new RandomProvider()).GetPriority(a) == priority).ToList();
             if (samePriority.Count > 0)
             {

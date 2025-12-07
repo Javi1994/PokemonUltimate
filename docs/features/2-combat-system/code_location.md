@@ -103,30 +103,51 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 
 ### `PokemonUltimate.Combat.Events`
 
-**Purpose**: Event-driven ability and item system
+**Purpose**: Event-driven system for statistics and logging (not game logic)
 **Key Classes**:
 
--   `BattleTrigger` - Trigger type enum
--   `IBattleListener` - Listener interface
--   `AbilityListener` - Ability event handler
--   `ItemListener` - Item event handler
--   `BattleTriggerProcessor` - Trigger processor (instance-based, post-refactor)
--   `IBattleTriggerProcessor` - Trigger processor interface
+-   `BattleEvent` - Structured battle event for statistics and logging
 -   `IBattleEventBus` - Event bus interface for decoupled communication
 -   `BattleEventBus` - Event bus implementation
+-   `IBattleEventSubscriber` - Interface for event subscribers
+
+**Note**: The previous trigger-based system (`BattleTrigger`, `IBattleListener`, `AbilityListener`, `ItemListener`, `BattleTriggerProcessor`) has been replaced by phase-based processors in `PokemonUltimate.Combat.Processors.Phases`. The event bus is now used exclusively for statistics collection and logging, not for game logic.
 
 ### `PokemonUltimate.Combat.Engine`
 
 **Purpose**: Engine components
 **Key Classes**:
 
--   `CombatEngine` - Main battle controller (includes weather duration decrement - Sub-Feature 2.12, terrain duration decrement - Sub-Feature 2.13, side condition duration decrement - Sub-Feature 2.16)
+-   `CombatEngine` - Main battle controller (orchestrates battle loop and turn execution)
 -   `BattleQueue` - Action queue processor (uses `LinkedList<BattleAction>` internally)
 -   `BattleArbiter` - Victory/defeat detection
--   `EndOfTurnProcessor` - End-of-turn effects processor (instance-based, post-refactor)
--   `IEndOfTurnProcessor` - End-of-turn processor interface
--   `EntryHazardProcessor` - Entry hazard processing on switch-in (instance-based, post-refactor)
--   `IEntryHazardProcessor` - Entry hazard processor interface
+-   `TurnExecutor` - Orchestrates single turn execution using phase processors
+-   `ActionProcessorObserver` - Observer that detects specific action types and delegates to reactive processors
+
+### `PokemonUltimate.Combat.Processors.Phases`
+
+**Purpose**: Phase-based processors for battle logic (refactored 2024-12-07)
+**Key Classes**:
+
+-   `BattlePhase` - Enumeration of all battle phases/moments
+-   `IBattlePhaseProcessor` - Base interface for all phase processors
+-   `IActionGeneratingPhaseProcessor` - Interface for processors that generate actions
+-   `IStateModifyingPhaseProcessor` - Interface for processors that modify state directly
+-   `TurnStartProcessor` - Processes turn start events
+-   `ActionCollectionProcessor` - Collects actions from all active slots
+-   `ActionSortingProcessor` - Sorts actions by priority and speed
+-   `FaintedPokemonSwitchingProcessor` - Handles automatic switching for fainted Pokemon
+-   `SwitchInProcessor` - Processes entry hazards, abilities, and items on switch-in
+-   `BeforeMoveProcessor` - Processes abilities and items before move execution
+-   `AfterMoveProcessor` - Processes abilities and items after move execution
+-   `ContactReceivedProcessor` - Processes abilities and items when contact is received
+-   `DamageTakenProcessor` - Processes abilities and items when damage is taken
+-   `WeatherChangeProcessor` - Processes abilities and items when weather changes
+-   `EndOfTurnEffectsProcessor` - Processes end-of-turn effects (status damage, weather, terrain)
+-   `TurnEndProcessor` - Processes abilities and items at turn end
+-   `DurationDecrementProcessor` - Decrements durations for weather, terrain, and side conditions
+-   `BattleStartProcessor` - Processes battle start events
+-   `BattleEndProcessor` - Processes battle end events
 
 ### `PokemonUltimate.Combat.Helpers`
 
@@ -328,23 +349,42 @@ PokemonUltimate.Combat/
 │       └── BurnStep.cs                 # Burn penalty
 │
 ├── Engine/
-│   ├── CombatEngine.cs                 # Main battle controller (DI-based, post-refactor)
+│   ├── CombatEngine.cs                 # Main battle controller (orchestrates battle loop)
+│   ├── TurnExecutor.cs                 # Orchestrates single turn execution
+│   ├── ActionProcessorObserver.cs      # Observer for reactive processors
 │   ├── BattleQueue.cs                  # Action queue (uses LinkedList internally)
 │   ├── BattleArbiter.cs                # Victory/defeat detection
-│   ├── EndOfTurnProcessor.cs          # End-of-turn effects (instance-based, post-refactor)
-│   ├── IEndOfTurnProcessor.cs         # End-of-turn processor interface
-│   ├── EntryHazardProcessor.cs        # Entry hazard processing (instance-based, post-refactor)
-│   └── IEntryHazardProcessor.cs       # Entry hazard processor interface
+│   ├── Battle/
+│   │   ├── BattlePhase.cs             # Enumeration of battle phases
+│   │   ├── BattleInitializer.cs       # Battle initialization utilities
+│   │   ├── BattleLoop.cs              # Battle loop orchestration
+│   │   └── BattleUtilities.cs         # Battle utility methods
+│   └── Processors/
+│       ├── Interfaces/
+│       │   ├── IBattlePhaseProcessor.cs              # Base processor interface
+│       │   ├── IActionGeneratingPhaseProcessor.cs    # Action-generating processor interface
+│       │   └── IStateModifyingPhaseProcessor.cs      # State-modifying processor interface
+│       ├── TurnStartProcessor.cs                      # Turn start phase
+│       ├── ActionCollectionProcessor.cs              # Action collection phase
+│       ├── ActionSortingProcessor.cs                 # Action sorting phase
+│       ├── FaintedPokemonSwitchingProcessor.cs       # Fainted Pokemon switching
+│       ├── SwitchInProcessor.cs                      # Switch-in phase (entry hazards, abilities, items)
+│       ├── BeforeMoveProcessor.cs                    # Before move phase (abilities, items)
+│       ├── AfterMoveProcessor.cs                     # After move phase (abilities, items)
+│       ├── ContactReceivedProcessor.cs              # Contact received phase (abilities, items)
+│       ├── DamageTakenProcessor.cs                   # Damage taken phase (abilities, items)
+│       ├── WeatherChangeProcessor.cs                 # Weather change phase (abilities, items)
+│       ├── EndOfTurnEffectsProcessor.cs             # End-of-turn effects (status, weather, terrain)
+│       ├── TurnEndProcessor.cs                       # Turn end phase (abilities, items)
+│       ├── DurationDecrementProcessor.cs            # Duration decrement phase
+│       ├── BattleStartProcessor.cs                   # Battle start phase
+│       └── BattleEndProcessor.cs                     # Battle end phase
 │
 ├── Events/
-│   ├── BattleTrigger.cs                # Trigger enum
-│   ├── IBattleListener.cs              # Listener interface
-│   ├── AbilityListener.cs              # Ability handler
-│   ├── ItemListener.cs                 # Item handler
-│   ├── BattleTriggerProcessor.cs       # Trigger processor (instance-based, post-refactor)
-│   ├── IBattleTriggerProcessor.cs     # Trigger processor interface
+│   ├── BattleEvent.cs                  # Structured battle event for statistics/logging
 │   ├── IBattleEventBus.cs              # Event bus interface
-│   └── BattleEventBus.cs               # Event bus implementation
+│   ├── BattleEventBus.cs               # Event bus implementation
+│   └── IBattleEventSubscriber.cs       # Event subscriber interface
 │
 ├── Field/
 │   ├── BattleField.cs                  # Main battlefield (weather tracking - Sub-Feature 2.12)
@@ -459,9 +499,10 @@ PokemonUltimate.Combat/
 **File**: `PokemonUltimate.Combat/Engine/BattleQueue.cs`
 **Purpose**: Manages sequential processing of battle actions
 **Extended Features** (Sub-Feature 2.20):
-- Observer pattern support - `AddObserver(IBattleActionObserver)`, `RemoveObserver(IBattleActionObserver)`
-- Notifies observers when actions are executed
-**Key Methods**:
+
+-   Observer pattern support - `AddObserver(IBattleActionObserver)`, `RemoveObserver(IBattleActionObserver)`
+-   Notifies observers when actions are executed
+    **Key Methods**:
 
 -   `Enqueue(BattleAction)` - Add action to queue
 -   `EnqueueRange(IEnumerable<BattleAction>)` - Add multiple actions
@@ -582,4 +623,4 @@ See **[Testing](testing.md)** for complete test organization.
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: 2024-12-07 (Processors refactor)

@@ -1,24 +1,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEngine;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Factories;
-using PokemonUltimate.Combat.Providers;
-using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Factories;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Combat.Logging;
 using PokemonUltimate.Combat.Messages;
+using PokemonUltimate.Combat.Providers;
+using PokemonUltimate.Content.Catalogs.Pokemon;
+using PokemonUltimate.Core.Factories;
+using PokemonUltimate.Core.Instances;
 using PokemonUltimate.Core.Localization;
+using UnityEngine;
 
 /// <summary>
 /// Manages battle initialization and execution in Unity.
 /// Creates and configures CombatEngine, handles battle lifecycle.
-/// 
+///
 /// **Feature**: 4: Unity Integration
 /// **Sub-Feature**: 4.3: IBattleView Implementation
 /// **Documentation**: See `docs/features/4-unity-integration/4.3-ibattleview-implementation/README.md`
@@ -186,9 +186,9 @@ public class BattleManager : MonoBehaviour
         var damageContextFactory = new DamageContextFactory();
         var endOfTurnProcessor = new EndOfTurnProcessor(damageContextFactory);
         var battleTriggerProcessor = new BattleTriggerProcessor();
-        
+
         // Create Unity logger for better visibility in Unity Console
-        var logger = new UnityBattleLogger("CombatEngine", logDebug: true, logInfo: true, 
+        var logger = new UnityBattleLogger("CombatEngine", logDebug: true, logInfo: true,
             logWarnings: true, logErrors: true, logBattleEvents: true);
 
         return new CombatEngine(
@@ -220,7 +220,7 @@ public class BattleManager : MonoBehaviour
             var slot = _engine.Field.PlayerSide.Slots[i];
             HPBar hpBar = i == 0 ? battleView.PlayerHPBar : null; // For singles, use first HP bar
             PokemonDisplay display = i == 0 ? battleView.PlayerDisplay : null;
-            
+
             if (hpBar != null)
             {
                 Debug.Log($"[PROCESS] BattleManager - Binding player slot {i} ({slot.Pokemon?.DisplayName}) to UI components...");
@@ -240,7 +240,7 @@ public class BattleManager : MonoBehaviour
             var slot = _engine.Field.EnemySide.Slots[i];
             HPBar hpBar = i == 0 ? battleView.EnemyHPBar : null; // For singles, use first HP bar
             PokemonDisplay display = i == 0 ? battleView.EnemyDisplay : null;
-            
+
             if (hpBar != null)
             {
                 Debug.Log($"[PROCESS] BattleManager - Binding enemy slot {i} ({slot.Pokemon?.DisplayName}) to UI components...");
@@ -285,7 +285,7 @@ public class BattleManager : MonoBehaviour
         {
             Debug.LogWarning("[PROCESS] BattleManager - PlayerDisplay is null, cannot update player display!");
         }
-        
+
         if (battleView.PlayerHPBar != null)
         {
             Debug.Log("[PROCESS] BattleManager - Calling PlayerHPBar.UpdateHP() to update UI...");
@@ -310,7 +310,7 @@ public class BattleManager : MonoBehaviour
         {
             Debug.LogWarning("[PROCESS] BattleManager - EnemyDisplay is null, cannot update enemy display!");
         }
-        
+
         if (battleView.EnemyHPBar != null)
         {
             Debug.Log("[PROCESS] BattleManager - Calling EnemyHPBar.UpdateHP() to update UI...");
@@ -321,7 +321,7 @@ public class BattleManager : MonoBehaviour
         {
             Debug.LogWarning("[PROCESS] BattleManager - EnemyHPBar is null, cannot update enemy HP bar!");
         }
-        
+
         Debug.Log("[PROCESS] BattleManager.UpdateInitialDisplays() - All initial displays updated successfully");
     }
 

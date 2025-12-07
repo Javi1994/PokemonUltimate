@@ -164,16 +164,17 @@ namespace PokemonUltimate.Combat
                 // Phase 1: Execute Logic (instant)
                 var reactions = action.ExecuteLogic(field);
 
-                // Notify observers about action execution
+                // Phase 2: Notify observers about action execution (before inserting reactions)
+                // Observers can insert processor-generated actions that should execute before reactions
                 foreach (var observer in _observers)
                 {
                     observer.OnActionExecuted(action, field, reactions ?? Enumerable.Empty<BattleAction>());
                 }
 
-                // Phase 2: Execute Visual (async)
+                // Phase 3: Execute Visual (async)
                 await action.ExecuteVisual(view);
 
-                // Phase 3: Insert reactions at front (they execute next)
+                // Phase 4: Insert reactions at front (they execute next, after processor actions)
                 if (reactions != null)
                 {
                     InsertAtFront(reactions);

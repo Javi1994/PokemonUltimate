@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Content.Extensions;
@@ -12,49 +12,40 @@ using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Instances;
 using PokemonUltimate.Core.Localization;
 
-namespace PokemonUltimate.Combat.Engine
+namespace PokemonUltimate.Combat.Processors.Phases
 {
     /// <summary>
-    /// Constants for end-of-turn damage calculations.
-    /// </summary>
-    /// <remarks>
-    /// **Feature**: 2: Combat System
-    /// **Sub-Feature**: 2.8: End-of-Turn Effects
-    /// **Documentation**: See `docs/features/2-combat-system/2.8-end-of-turn-effects/architecture.md`
-    /// </remarks>
-    public static class EndOfTurnConstants
-    {
-        public const float BurnDamageFraction = 1f / 16f;      // 0.0625
-        public const float PoisonDamageFraction = 1f / 8f;     // 0.125
-        public const float BadlyPoisonedBaseFraction = 1f / 16f; // 0.0625
-        public const int MinimumDamage = 1;
-    }
-
-    /// <summary>
     /// Processes all end-of-turn effects after action queue is empty.
-    /// Generates actions for status damage, item effects, and other end-of-turn mechanics.
+    /// Generates actions for status damage, weather damage, terrain healing, and other end-of-turn mechanics.
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
     /// **Sub-Feature**: 2.8: End-of-Turn Effects
     /// **Documentation**: See `docs/features/2-combat-system/2.8-end-of-turn-effects/architecture.md`
     /// </remarks>
-    public class EndOfTurnProcessor : IEndOfTurnProcessor
+    public class EndOfTurnEffectsProcessor : IActionGeneratingPhaseProcessor
     {
         private readonly DamageContextFactory _damageContextFactory;
         private readonly Effects.AccumulativeEffectTracker _accumulativeEffectTracker;
 
         /// <summary>
-        /// Creates a new EndOfTurnProcessor with a damage context factory.
+        /// Creates a new EndOfTurnEffectsProcessor.
         /// </summary>
         /// <param name="damageContextFactory">The factory for creating damage contexts. Cannot be null.</param>
         /// <param name="accumulativeEffectTracker">Tracker for accumulative effects. If null, creates a default one.</param>
         /// <exception cref="ArgumentNullException">If damageContextFactory is null.</exception>
-        public EndOfTurnProcessor(DamageContextFactory damageContextFactory, Effects.AccumulativeEffectTracker accumulativeEffectTracker = null)
+        public EndOfTurnEffectsProcessor(
+            DamageContextFactory damageContextFactory,
+            Effects.AccumulativeEffectTracker accumulativeEffectTracker = null)
         {
             _damageContextFactory = damageContextFactory ?? throw new ArgumentNullException(nameof(damageContextFactory), ErrorMessages.FieldCannotBeNull);
             _accumulativeEffectTracker = accumulativeEffectTracker ?? new Effects.AccumulativeEffectTracker();
         }
+
+        /// <summary>
+        /// Gets the phase this processor handles.
+        /// </summary>
+        public BattlePhase Phase => BattlePhase.EndOfTurnEffects;
 
         /// <summary>
         /// Processes all end-of-turn effects for the battlefield.
@@ -63,7 +54,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <param name="field">The battlefield. Cannot be null.</param>
         /// <returns>List of actions to execute for end-of-turn effects.</returns>
         /// <exception cref="ArgumentNullException">If field is null.</exception>
-        public List<BattleAction> ProcessEffects(BattleField field)
+        public async Task<List<BattleAction>> ProcessAsync(BattleField field)
         {
             if (field == null)
                 throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
@@ -76,7 +67,6 @@ namespace PokemonUltimate.Combat.Engine
                 if (!slot.IsActive())
                     continue;
 
-                var pokemon = slot.Pokemon;
                 var statusActions = ProcessStatusEffects(slot, field);
                 actions.AddRange(statusActions);
             }
@@ -109,7 +99,7 @@ namespace PokemonUltimate.Combat.Engine
                 slot.ResetDamageTracking();
             }
 
-            return actions;
+            return await Task.FromResult(actions);
         }
 
         /// <summary>
@@ -179,7 +169,6 @@ namespace PokemonUltimate.Combat.Engine
 
         /// <summary>
         /// Processes Badly Poisoned (Toxic) status: deals escalating damage and increments counter.
-        /// Uses AccumulativeEffectTracker for centralized logic.
         /// </summary>
         private List<BattleAction> ProcessBadlyPoisoned(BattleSlot slot, BattleField field)
         {
@@ -208,7 +197,7 @@ namespace PokemonUltimate.Combat.Engine
         private int CalculateBurnDamage(int maxHP)
         {
             int damage = maxHP / 16;
-            return damage.EnsureMinimumDamage();
+            return Math.Max(1, damage);
         }
 
         /// <summary>
@@ -217,9 +206,8 @@ namespace PokemonUltimate.Combat.Engine
         private int CalculatePoisonDamage(int maxHP)
         {
             int damage = maxHP / 8;
-            return damage.EnsureMinimumDamage();
+            return Math.Max(1, damage);
         }
-
 
         /// <summary>
         /// Creates a DamageAction for status damage using DamageContextFactory.
@@ -232,13 +220,7 @@ namespace PokemonUltimate.Combat.Engine
 
         /// <summary>
         /// Processes weather damage for all active Pokemon on the field.
-        /// Weather like Sandstorm and Hail deal damage to non-immune types.
         /// </summary>
-        /// <remarks>
-        /// **Feature**: 2: Combat System
-        /// **Sub-Feature**: 2.12: Weather System
-        /// **Documentation**: See `docs/features/2-combat-system/2.12-weather-system/README.md`
-        /// </remarks>
         private List<BattleAction> ProcessWeatherDamage(BattleField field)
         {
             var actions = new List<BattleAction>();
@@ -315,7 +297,7 @@ namespace PokemonUltimate.Combat.Engine
             string abilityName = pokemon.Ability.Name;
             foreach (var immuneAbility in weatherData.DamageImmunityAbilities)
             {
-                if (abilityName.Equals(immuneAbility, System.StringComparison.OrdinalIgnoreCase))
+                if (abilityName.Equals(immuneAbility, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
 
@@ -328,7 +310,7 @@ namespace PokemonUltimate.Combat.Engine
         private int CalculateWeatherDamage(int maxHP, float damageFraction)
         {
             int damage = (int)(maxHP * damageFraction);
-            return damage.EnsureMinimumDamage();
+            return Math.Max(1, damage);
         }
 
         /// <summary>
@@ -349,13 +331,7 @@ namespace PokemonUltimate.Combat.Engine
 
         /// <summary>
         /// Processes terrain healing for all active Pokemon on the field.
-        /// Only Grassy Terrain heals Pokemon (1/16 Max HP per turn for grounded Pokemon).
         /// </summary>
-        /// <remarks>
-        /// **Feature**: 2: Combat System
-        /// **Sub-Feature**: 2.13: Terrain System
-        /// **Documentation**: See `docs/features/2-combat-system/2.13-terrain-system/README.md`
-        /// </remarks>
         private List<BattleAction> ProcessTerrainHealing(BattleField field)
         {
             var actions = new List<BattleAction>();
@@ -415,8 +391,7 @@ namespace PokemonUltimate.Combat.Engine
         private int CalculateTerrainHealing(int maxHP, float healingFraction)
         {
             int healing = (int)(maxHP * healingFraction);
-            return System.Math.Max(0, healing); // Minimum 0 (no negative healing)
+            return Math.Max(0, healing); // Minimum 0 (no negative healing)
         }
     }
 }
-

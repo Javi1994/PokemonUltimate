@@ -13,7 +13,6 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Effects;
-using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
@@ -1382,11 +1381,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 var randomProvider = new RandomProvider();
                 var battleFieldFactory = new BattleFieldFactory();
                 var battleQueueFactory = new BattleQueueFactory();
-                var damageContextFactory = new DamageContextFactory();
-                var endOfTurnProcessor = new EndOfTurnProcessor(damageContextFactory);
-                var battleTriggerProcessor = new BattleTriggerProcessor();
                 var accuracyChecker = new AccuracyChecker(randomProvider);
                 var damagePipeline = new DamagePipeline(randomProvider);
+                var damageContextFactory = new DamageContextFactory();
                 var effectProcessorRegistry = new MoveEffectProcessorRegistry(randomProvider, damageContextFactory);
                 var stateValidator = new BattleStateValidator();
 
@@ -1394,8 +1391,6 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     battleFieldFactory,
                     battleQueueFactory,
                     randomProvider,
-                    endOfTurnProcessor,
-                    battleTriggerProcessor,
                     accuracyChecker,
                     damagePipeline,
                     effectProcessorRegistry,

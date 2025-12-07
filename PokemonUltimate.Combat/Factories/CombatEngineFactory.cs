@@ -1,7 +1,5 @@
 using System;
 using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Combat.Engine;
-using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Logging;
 using PokemonUltimate.Combat.Providers;
@@ -38,10 +36,6 @@ namespace PokemonUltimate.Combat.Factories
             var battleQueueFactory = new BattleQueueFactory();
             var damageContextFactory = new DamageContextFactory();
 
-            // Create processors
-            var endOfTurnProcessor = new EndOfTurnProcessor(damageContextFactory);
-            var battleTriggerProcessor = new BattleTriggerProcessor();
-
             // Create helpers
             var accuracyChecker = new AccuracyChecker(randomProvider);
             var damagePipeline = new DamagePipeline(randomProvider);
@@ -58,8 +52,6 @@ namespace PokemonUltimate.Combat.Factories
                 battleFieldFactory,
                 battleQueueFactory,
                 randomProvider,
-                endOfTurnProcessor,
-                battleTriggerProcessor,
                 accuracyChecker,
                 damagePipeline,
                 effectProcessorRegistry,
@@ -83,7 +75,6 @@ namespace PokemonUltimate.Combat.Factories
                 RandomProvider = randomProvider,
                 TurnOrderResolver = new TurnOrderResolver(randomProvider),
                 TargetResolver = new TargetResolver(),
-                BattleTriggerProcessor = new BattleTriggerProcessor(),
                 AccuracyChecker = new AccuracyChecker(randomProvider),
                 DamagePipeline = new DamagePipeline(randomProvider)
             };
@@ -98,7 +89,6 @@ namespace PokemonUltimate.Combat.Factories
         public IRandomProvider RandomProvider { get; set; }
         public TurnOrderResolver TurnOrderResolver { get; set; }
         public TargetResolver TargetResolver { get; set; }
-        public BattleTriggerProcessor BattleTriggerProcessor { get; set; }
         public AccuracyChecker AccuracyChecker { get; set; }
         public IDamagePipeline DamagePipeline { get; set; }
     }

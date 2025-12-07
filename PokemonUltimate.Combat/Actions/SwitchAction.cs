@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Engine;
-using PokemonUltimate.Combat.Events;
-using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
@@ -24,9 +21,6 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class SwitchAction : BattleAction
     {
-        private readonly IEntryHazardProcessor _entryHazardProcessor;
-        private readonly IBattleTriggerProcessor _battleTriggerProcessor;
-
         /// <summary>
         /// The slot being switched.
         /// </summary>
@@ -44,12 +38,6 @@ namespace PokemonUltimate.Combat.Actions
         public PokemonInstance OldPokemon { get; private set; }
 
         /// <summary>
-        /// Optional function to get HazardData by type for entry hazard processing.
-        /// If null, entry hazards will not be processed.
-        /// </summary>
-        public Func<HazardType, HazardData> GetHazardData { get; }
-
-        /// <summary>
         /// Switch actions have highest priority (+6).
         /// </summary>
         public override int Priority => 6;
@@ -64,26 +52,13 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         /// <param name="slot">The slot to switch. Cannot be null.</param>
         /// <param name="newPokemon">The Pokemon to switch in. Cannot be null.</param>
-        /// <param name="getHazardData">Optional function to get HazardData for entry hazard processing. If null, hazards won't be processed.</param>
-        /// <param name="entryHazardProcessor">The entry hazard processor. If null, creates a temporary one.</param>
-        /// <param name="battleTriggerProcessor">The battle trigger processor. If null, creates a temporary one.</param>
         /// <exception cref="ArgumentNullException">If slot or newPokemon is null.</exception>
         public SwitchAction(
             BattleSlot slot,
-            PokemonInstance newPokemon,
-            Func<HazardType, HazardData> getHazardData = null,
-            IEntryHazardProcessor entryHazardProcessor = null,
-            IBattleTriggerProcessor battleTriggerProcessor = null) : base(slot)
+            PokemonInstance newPokemon) : base(slot)
         {
             Slot = slot ?? throw new ArgumentNullException(nameof(slot), ErrorMessages.PokemonCannotBeNull);
             NewPokemon = newPokemon ?? throw new ArgumentNullException(nameof(newPokemon), ErrorMessages.PokemonCannotBeNull);
-            GetHazardData = getHazardData;
-
-            // Create EntryHazardProcessor if not provided (temporary until full DI refactoring)
-            _entryHazardProcessor = entryHazardProcessor ?? new EntryHazardProcessor(new DamageContextFactory());
-
-            // Create BattleTriggerProcessor if not provided (temporary until full DI refactoring)
-            _battleTriggerProcessor = battleTriggerProcessor ?? new BattleTriggerProcessor();
         }
 
         /// <summary>
@@ -122,20 +97,10 @@ namespace PokemonUltimate.Combat.Actions
 
             // Battle state is reset automatically by SetPokemon -> ResetBattleState
 
-            var allActions = new List<BattleAction>();
+            // Note: Switch-in effects (entry hazards + abilities + items) are processed by ActionProcessorObserver
+            // This keeps actions simple and decoupled from processors
 
-            // Process entry hazards if hazard data provider is available
-            if (GetHazardData != null)
-            {
-                var hazardActions = _entryHazardProcessor.ProcessHazards(Slot, NewPokemon, field, GetHazardData);
-                allActions.AddRange(hazardActions);
-            }
-
-            // Trigger OnSwitchIn for abilities and items
-            var switchInActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnSwitchIn, field);
-            allActions.AddRange(switchInActions);
-
-            return allActions;
+            return Enumerable.Empty<BattleAction>();
         }
 
         /// <summary>

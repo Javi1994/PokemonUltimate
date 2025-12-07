@@ -1,4 +1,3 @@
-using PokemonUltimate.Combat.Engine;
 
 namespace PokemonUltimate.Combat.Factories
 {

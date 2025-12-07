@@ -10,6 +10,7 @@ using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Messages;
+using PokemonUltimate.Combat.Processors.Phases;
 using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
@@ -37,7 +38,8 @@ namespace PokemonUltimate.Combat.Actions
         private readonly IDamagePipeline _damagePipeline;
         private readonly Effects.MoveEffectProcessorRegistry _effectProcessorRegistry;
         private readonly IBattleMessageFormatter _messageFormatter;
-        private readonly IBattleTriggerProcessor _battleTriggerProcessor;
+        private readonly BeforeMoveProcessor _beforeMoveProcessor;
+        private readonly AfterMoveProcessor _afterMoveProcessor;
         private readonly ITargetResolver _targetResolver;
 
         /// <summary>
@@ -76,7 +78,8 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="damagePipeline">The damage pipeline. If null, creates a temporary one.</param>
         /// <param name="effectProcessorRegistry">The effect processor registry. If null, creates a temporary one.</param>
         /// <param name="messageFormatter">The message formatter. If null, creates a default one.</param>
-        /// <param name="battleTriggerProcessor">The battle trigger processor. If null, creates a temporary one.</param>
+        /// <param name="beforeMoveProcessor">The before move processor. If null, creates a temporary one.</param>
+        /// <param name="afterMoveProcessor">The after move processor. If null, creates a temporary one.</param>
         /// <param name="targetResolver">The target resolver. If null, creates a temporary one.</param>
         /// <exception cref="ArgumentNullException">If user, target, or moveInstance is null.</exception>
         public UseMoveAction(
@@ -88,7 +91,8 @@ namespace PokemonUltimate.Combat.Actions
             IDamagePipeline damagePipeline = null,
             Effects.MoveEffectProcessorRegistry effectProcessorRegistry = null,
             IBattleMessageFormatter messageFormatter = null,
-            IBattleTriggerProcessor battleTriggerProcessor = null,
+            BeforeMoveProcessor beforeMoveProcessor = null,
+            AfterMoveProcessor afterMoveProcessor = null,
             ITargetResolver targetResolver = null) : base(user)
         {
             if (user == null)
@@ -115,8 +119,9 @@ namespace PokemonUltimate.Combat.Actions
             // Create TargetResolver if not provided
             _targetResolver = targetResolver ?? new TargetResolver();
 
-            // Create BattleTriggerProcessor if not provided (temporary until full DI refactoring)
-            _battleTriggerProcessor = battleTriggerProcessor ?? new BattleTriggerProcessor();
+            // Create processors if not provided (temporary until full DI refactoring)
+            _beforeMoveProcessor = beforeMoveProcessor ?? new BeforeMoveProcessor();
+            _afterMoveProcessor = afterMoveProcessor ?? new AfterMoveProcessor();
         }
 
         /// <summary>
@@ -141,9 +146,10 @@ namespace PokemonUltimate.Combat.Actions
             // Cancel conflicting move states
             CancelConflictingMoveStates();
 
-            // Trigger OnBeforeMove for abilities (e.g., Truant)
+            // Process before-move effects (abilities and items)
             // This happens BEFORE validation so abilities can block the move
-            var beforeMoveActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnBeforeMove, field);
+            var beforeMoveActions = _beforeMoveProcessor.ProcessBeforeMove(User, field);
+            actions.AddRange(beforeMoveActions);
 
             // Check if any ability blocked the move (e.g., Truant)
             // Truant returns a TruantLoafing message - if present, block the move
@@ -153,11 +159,8 @@ namespace PokemonUltimate.Combat.Actions
 
             if (moveBlocked)
             {
-                actions.AddRange(beforeMoveActions);
                 return actions; // Block move execution (PP not consumed)
             }
-
-            actions.AddRange(beforeMoveActions);
 
             // Validate move execution (PP, Flinch, Status)
             var validationResult = ValidateMoveExecution(actions);
@@ -212,11 +215,11 @@ namespace PokemonUltimate.Combat.Actions
             // 12. Process move effects
             ProcessEffects(field, actions);
 
-            // Trigger OnAfterMove for abilities and items (e.g., Moxie, Life Orb recoil)
+            // Process after-move effects (abilities and items, e.g., Moxie, Life Orb recoil)
             // This happens AFTER all effects are processed
             // Note: DamageActions are in the actions list but haven't been executed yet.
             // Life Orb and Moxie will check damage trackers which are updated when DamageActions execute.
-            var afterMoveActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnAfterMove, field);
+            var afterMoveActions = _afterMoveProcessor.ProcessAfterMove(User, field);
             actions.AddRange(afterMoveActions);
 
             return actions;
