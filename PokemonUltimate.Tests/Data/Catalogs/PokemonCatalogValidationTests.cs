@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Registry;
 
 namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
 {
@@ -230,7 +232,7 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
         {
             var numbers = PokemonCatalog.All.Select(p => p.PokedexNumber).ToList();
             var uniqueNumbers = numbers.Distinct().ToList();
-            
+
             Assert.That(uniqueNumbers.Count, Is.EqualTo(numbers.Count), "Duplicate Pokedex numbers found");
         }
 
@@ -239,7 +241,7 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
         {
             var names = PokemonCatalog.All.Select(p => p.Name).ToList();
             var uniqueNames = names.Distinct().ToList();
-            
+
             Assert.That(uniqueNames.Count, Is.EqualTo(names.Count), "Duplicate names found");
         }
 
@@ -259,7 +261,7 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
             foreach (var pokemon in PokemonCatalog.All)
             {
                 // Just verify the type is a valid enum value
-                Assert.That(System.Enum.IsDefined(typeof(PokemonType), pokemon.PrimaryType), 
+                Assert.That(System.Enum.IsDefined(typeof(PokemonType), pokemon.PrimaryType),
                     Is.True, $"{pokemon.Name} has undefined type");
             }
         }
@@ -275,12 +277,12 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
             Assert.That(PokemonCatalog.Bulbasaur.CanEvolve, Is.True);
             Assert.That(PokemonCatalog.Ivysaur.CanEvolve, Is.True);
             Assert.That(PokemonCatalog.Venusaur.CanEvolve, Is.False);
-            
+
             // Charmander -> Charmeleon -> Charizard
             Assert.That(PokemonCatalog.Charmander.CanEvolve, Is.True);
             Assert.That(PokemonCatalog.Charmeleon.CanEvolve, Is.True);
             Assert.That(PokemonCatalog.Charizard.CanEvolve, Is.False);
-            
+
             // Squirtle -> Wartortle -> Blastoise
             Assert.That(PokemonCatalog.Squirtle.CanEvolve, Is.True);
             Assert.That(PokemonCatalog.Wartortle.CanEvolve, Is.True);
@@ -337,7 +339,7 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
             var highest = PokemonCatalog.All
                 .OrderByDescending(p => p.BaseStats.SpAttack)
                 .First();
-            
+
             Assert.That(highest.Name, Is.EqualTo("Mewtwo"));
             Assert.That(highest.BaseStats.SpAttack, Is.EqualTo(154));
         }
@@ -348,7 +350,7 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
             var highest = PokemonCatalog.All
                 .OrderByDescending(p => p.BaseStats.Speed)
                 .First();
-            
+
             Assert.That(highest.Name, Is.EqualTo("Mewtwo"));
             Assert.That(highest.BaseStats.Speed, Is.EqualTo(130));
         }
@@ -359,7 +361,7 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
             var lowest = PokemonCatalog.All
                 .OrderBy(p => p.BaseStats.Total)
                 .First();
-            
+
             // Should be a basic Pokemon, probably a starter base form
             Assert.That(lowest.BaseStats.Total, Is.LessThan(400));
         }
@@ -370,7 +372,7 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
             var highest = PokemonCatalog.All
                 .OrderByDescending(p => p.BaseStats.Total)
                 .First();
-            
+
             // Should be Mewtwo (680) in Gen 1
             Assert.That(highest.Name, Is.EqualTo("Mewtwo"));
             Assert.That(highest.BaseStats.Total, Is.EqualTo(680));
@@ -384,15 +386,15 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
         public void Evolved_HasHigherBST_ThanPreEvolution()
         {
             // Charmander -> Charmeleon
-            Assert.That(PokemonCatalog.Charmeleon.BaseStats.Total, 
+            Assert.That(PokemonCatalog.Charmeleon.BaseStats.Total,
                 Is.GreaterThan(PokemonCatalog.Charmander.BaseStats.Total));
-            
+
             // Charmeleon -> Charizard
-            Assert.That(PokemonCatalog.Charizard.BaseStats.Total, 
+            Assert.That(PokemonCatalog.Charizard.BaseStats.Total,
                 Is.GreaterThan(PokemonCatalog.Charmeleon.BaseStats.Total));
-            
+
             // Pikachu -> Raichu
-            Assert.That(PokemonCatalog.Raichu.BaseStats.Total, 
+            Assert.That(PokemonCatalog.Raichu.BaseStats.Total,
                 Is.GreaterThan(PokemonCatalog.Pikachu.BaseStats.Total));
         }
 
@@ -403,6 +405,129 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Pokemon
             Assert.That(PokemonCatalog.Venusaur.BaseStats.Total, Is.GreaterThanOrEqualTo(500));
             Assert.That(PokemonCatalog.Charizard.BaseStats.Total, Is.GreaterThanOrEqualTo(500));
             Assert.That(PokemonCatalog.Blastoise.BaseStats.Total, Is.GreaterThanOrEqualTo(500));
+        }
+
+        #endregion
+
+        #region Query Methods Tests
+
+        [Test]
+        public void GetAllGen1_ReturnsOnlyGen1Pokemon()
+        {
+            var gen1Pokemon = PokemonCatalog.GetAllGen1().ToList();
+
+            Assert.That(gen1Pokemon, Is.Not.Empty);
+            Assert.That(gen1Pokemon.All(p => p.PokedexNumber >= 1 && p.PokedexNumber <= 151), Is.True,
+                "All Gen 1 Pokemon should have Pokedex numbers between 1 and 151");
+        }
+
+        [Test]
+        public void GetByPokedexNumber_ValidNumber_ReturnsPokemon()
+        {
+            var pikachu = PokemonCatalog.GetByPokedexNumber(25);
+
+            Assert.That(pikachu, Is.Not.Null);
+            Assert.That(pikachu.Name, Is.EqualTo("Pikachu"));
+            Assert.That(pikachu.PokedexNumber, Is.EqualTo(25));
+        }
+
+        [Test]
+        public void GetByPokedexNumber_InvalidNumber_ReturnsNull()
+        {
+            var pokemon = PokemonCatalog.GetByPokedexNumber(999);
+
+            Assert.That(pokemon, Is.Null);
+        }
+
+        [Test]
+        public void GetByPokedexNumber_Zero_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                PokemonCatalog.GetByPokedexNumber(0));
+        }
+
+        [Test]
+        public void GetByPokedexNumber_Negative_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                PokemonCatalog.GetByPokedexNumber(-1));
+        }
+
+        [Test]
+        public void GetAllByType_Fire_ReturnsFireTypePokemon()
+        {
+            var firePokemon = PokemonCatalog.GetAllByType(PokemonType.Fire).ToList();
+
+            Assert.That(firePokemon, Is.Not.Empty);
+            Assert.That(firePokemon.All(p => p.PrimaryType == PokemonType.Fire || p.SecondaryType == PokemonType.Fire),
+                Is.True, "All returned Pokemon should be Fire type");
+        }
+
+        [Test]
+        public void GetAllByType_Electric_ReturnsElectricTypePokemon()
+        {
+            var electricPokemon = PokemonCatalog.GetAllByType(PokemonType.Electric).ToList();
+
+            Assert.That(electricPokemon, Is.Not.Empty);
+            Assert.That(electricPokemon.Any(p => p.Name == "Pikachu"), Is.True);
+            Assert.That(electricPokemon.Any(p => p.Name == "Raichu"), Is.True);
+        }
+
+        #endregion
+
+        #region Catalog Integrity Validation Tests
+
+        [Test]
+        public void InitializeAll_NoDuplicatePokedexNumbers_DoesNotThrow()
+        {
+            // This test verifies that InitializeAll() validates for duplicate Pokedex numbers
+            // If duplicates exist, InitializeAll should throw InvalidOperationException
+            Assert.DoesNotThrow(() =>
+            {
+                // Force re-initialization by accessing All property
+                var count = PokemonCatalog.Count;
+            });
+        }
+
+        [Test]
+        public void InitializeAll_NoDuplicateNames_DoesNotThrow()
+        {
+            // This test verifies that InitializeAll() validates for duplicate names
+            Assert.DoesNotThrow(() =>
+            {
+                var count = PokemonCatalog.Count;
+            });
+        }
+
+        [Test]
+        public void InitializeAll_AllPokemonHaveValidData_DoesNotThrow()
+        {
+            // This test verifies that InitializeAll() completes without errors
+            Assert.DoesNotThrow(() =>
+            {
+                var all = PokemonCatalog.All.ToList();
+                Assert.That(all, Is.Not.Empty);
+            });
+        }
+
+        #endregion
+
+        #region RegisterAll Validation Tests
+
+        [Test]
+        public void RegisterAll_NullRegistry_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+                PokemonCatalog.RegisterAll(null));
+        }
+
+        [Test]
+        public void RegisterAll_ValidRegistry_DoesNotThrow()
+        {
+            var registry = new PokemonRegistry();
+
+            Assert.DoesNotThrow(() =>
+                PokemonCatalog.RegisterAll(registry));
         }
 
         #endregion

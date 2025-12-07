@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using NUnit.Framework;
 using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Registry;
@@ -33,7 +36,7 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Moves
             var allMoves = MoveCatalog.All.ToList();
             var names = allMoves.Select(m => m.Name).ToList();
 
-            Assert.That(names.Distinct().Count(), Is.EqualTo(names.Count), 
+            Assert.That(names.Distinct().Count(), Is.EqualTo(names.Count),
                 "All moves should have unique names");
         }
 
@@ -128,12 +131,12 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Moves
         public void Test_All_Moves_Have_At_Least_One_Effect()
         {
             var movesWithoutEffects = new[] { "Splash", "Teleport" }; // Moves that intentionally have no effects
-            
+
             foreach (var move in MoveCatalog.All)
             {
                 if (movesWithoutEffects.Contains(move.Name))
                     continue; // Skip moves that intentionally have no effects
-                    
+
                 Assert.That(move.Effects.Count, Is.GreaterThan(0),
                     $"{move.Name} should have at least one effect");
             }
@@ -174,15 +177,110 @@ namespace PokemonUltimate.Tests.Data.Catalogs.Moves
             MoveCatalog.RegisterAll(registry);
 
             var types = MoveCatalog.All.Select(m => m.Type).Distinct();
-            
+
             foreach (var type in types)
             {
                 var catalogCount = MoveCatalog.All.Count(m => m.Type == type);
                 var registryCount = registry.GetByType(type).Count();
-                
+
                 Assert.That(registryCount, Is.EqualTo(catalogCount),
                     $"Registry should have same {type} moves as catalog");
             }
+        }
+
+        [Test]
+        public void Test_RegisterAll_NullRegistry_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+                MoveCatalog.RegisterAll(null));
+        }
+
+        [Test]
+        public void Test_RegisterAll_ValidRegistry_DoesNotThrow()
+        {
+            var registry = new MoveRegistry();
+
+            Assert.DoesNotThrow(() =>
+                MoveCatalog.RegisterAll(registry));
+        }
+
+        #endregion
+
+        #region Query Methods Tests
+
+        [Test]
+        public void GetAllByType_Fire_ReturnsFireTypeMoves()
+        {
+            var fireMoves = MoveCatalog.GetAllByType(PokemonType.Fire).ToList();
+
+            Assert.That(fireMoves, Is.Not.Empty);
+            Assert.That(fireMoves.All(m => m.Type == PokemonType.Fire), Is.True,
+                "All returned moves should be Fire type");
+            Assert.That(fireMoves.Any(m => m.Name == "Ember"), Is.True);
+            Assert.That(fireMoves.Any(m => m.Name == "Flamethrower"), Is.True);
+        }
+
+        [Test]
+        public void GetAllByType_Electric_ReturnsElectricTypeMoves()
+        {
+            var electricMoves = MoveCatalog.GetAllByType(PokemonType.Electric).ToList();
+
+            Assert.That(electricMoves, Is.Not.Empty);
+            Assert.That(electricMoves.All(m => m.Type == PokemonType.Electric), Is.True);
+            Assert.That(electricMoves.Any(m => m.Name == "Thunder Shock"), Is.True);
+        }
+
+        [Test]
+        public void GetByName_ValidName_ReturnsMove()
+        {
+            var flamethrower = MoveCatalog.GetByName("Flamethrower");
+
+            Assert.That(flamethrower, Is.Not.Null);
+            Assert.That(flamethrower.Name, Is.EqualTo("Flamethrower"));
+            Assert.That(flamethrower.Type, Is.EqualTo(PokemonType.Fire));
+        }
+
+        [Test]
+        public void GetByName_CaseInsensitive_ReturnsMove()
+        {
+            var flamethrower1 = MoveCatalog.GetByName("flamethrower");
+            var flamethrower2 = MoveCatalog.GetByName("FLAMETHROWER");
+            var flamethrower3 = MoveCatalog.GetByName("Flamethrower");
+
+            Assert.That(flamethrower1, Is.Not.Null);
+            Assert.That(flamethrower2, Is.Not.Null);
+            Assert.That(flamethrower3, Is.Not.Null);
+            Assert.That(flamethrower1.Name, Is.EqualTo(flamethrower2.Name));
+            Assert.That(flamethrower2.Name, Is.EqualTo(flamethrower3.Name));
+        }
+
+        [Test]
+        public void GetByName_InvalidName_ReturnsNull()
+        {
+            var move = MoveCatalog.GetByName("NonExistentMove");
+
+            Assert.That(move, Is.Null);
+        }
+
+        [Test]
+        public void GetByName_Null_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                MoveCatalog.GetByName(null));
+        }
+
+        [Test]
+        public void GetByName_Empty_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                MoveCatalog.GetByName(""));
+        }
+
+        [Test]
+        public void GetByName_Whitespace_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                MoveCatalog.GetByName("   "));
         }
 
         #endregion

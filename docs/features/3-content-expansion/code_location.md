@@ -147,9 +147,19 @@ var allGen1 = PokemonCatalog.GetAllGen1();  // Returns all Gen 1 Pokemon
 
 **Key Methods**:
 
--   `GetAllGen1()` - Get all Gen 1 Pokemon
--   `GetByPokedexNumber(int)` - Get Pokemon by Pokedex number
--   `RegisterAll(IPokemonRegistry)` - Register all Pokemon to registry
+-   `GetAllGen1()` - Get all Gen 1 Pokemon ✅ NEW
+-   `GetByPokedexNumber(int)` - Get Pokemon by Pokedex number ✅ NEW
+-   `GetAllByType(PokemonType)` - Get all Pokemon of a specific type ✅ NEW
+-   `RegisterAll(IPokemonRegistry)` - Register all Pokemon to registry (validates null) ✅ IMPROVED
+-   `All` - Returns `IReadOnlyList<PokemonSpeciesData>` (thread-safe, lazy initialized) ✅ IMPROVED
+-   `Count` - Returns count of all Pokemon (thread-safe) ✅ IMPROVED
+
+**Validation**:
+
+-   Validates duplicate Pokedex numbers during initialization ✅ NEW
+-   Validates duplicate names during initialization ✅ NEW
+-   Validates evolution references exist in catalog ✅ NEW
+-   Validates learnset move references exist in MoveCatalog ✅ NEW
 
 ### MoveCatalog
 
@@ -172,8 +182,11 @@ var fireMoves = MoveCatalog.GetAllByType(PokemonType.Fire);  // Returns all Fire
 
 **Key Methods**:
 
--   `GetAllByType(PokemonType)` - Get all moves of a type
--   `RegisterAll(IMoveRegistry)` - Register all moves to registry
+-   `GetAllByType(PokemonType)` - Get all moves of a type ✅ NEW
+-   `GetByName(string)` - Get move by name (case-insensitive) ✅ NEW
+-   `RegisterAll(IMoveRegistry)` - Register all moves to registry (validates null) ✅ IMPROVED
+-   `All` - Returns `IReadOnlyList<MoveData>` (thread-safe, lazy initialized) ✅ IMPROVED
+-   `Count` - Returns count of all moves (thread-safe) ✅ IMPROVED
 
 ### AbilityCatalog
 
