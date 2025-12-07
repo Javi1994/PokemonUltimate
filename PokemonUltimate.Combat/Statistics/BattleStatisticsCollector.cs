@@ -143,6 +143,10 @@ namespace PokemonUltimate.Combat.Statistics
             _statistics.ItemActivationStats.Clear();
             _statistics.TotalTurns = 0;
             _statistics.TurnDurations.Clear();
+            _statistics.FaintedPokemon.Clear();
+            _statistics.SwitchCount.Clear();
+            _statistics.AIDecisions.Clear();
+            _statistics.TeamStatusHistory.Clear();
         }
 
         /// <summary>
@@ -157,6 +161,7 @@ namespace PokemonUltimate.Combat.Statistics
             _trackers.Add(new FieldEffectTracker());
             _trackers.Add(new HealingTracker());
             _trackers.Add(new StatChangeTracker());
+            _trackers.Add(new TeamBattleTracker());
         }
     }
 }

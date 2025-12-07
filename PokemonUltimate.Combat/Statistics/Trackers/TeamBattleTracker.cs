@@ -1,0 +1,80 @@
+using System.Collections.Generic;
+using System.Linq;
+using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Events;
+
+namespace PokemonUltimate.Combat.Statistics.Trackers
+{
+    /// <summary>
+    /// Tracks team battle statistics including Pokemon faints, switches, and team status.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 2: Combat System
+    /// **Sub-Feature**: 2.20: Statistics System
+    /// **Documentation**: See `docs/features/2-combat-system/2.20-statistics-system/architecture.md`
+    /// </remarks>
+    internal class TeamBattleTracker : IStatisticsTracker
+    {
+        public void TrackAction(BattleAction action, BattleField field, IEnumerable<BattleAction> reactions, BattleStatistics stats)
+        {
+            if (action == null || stats == null || field == null)
+                return;
+
+            // Track Pokemon faints
+            if (action is FaintAction faintAction && faintAction.Target?.Pokemon != null && faintAction.Target.Side != null)
+            {
+                var side = faintAction.Target.Side.IsPlayer;
+                var pokemonName = faintAction.Target.Pokemon.Species.Name;
+
+                if (!stats.FaintedPokemon.ContainsKey(side))
+                    stats.FaintedPokemon[side] = new List<string>();
+
+                if (!stats.FaintedPokemon[side].Contains(pokemonName))
+                    stats.FaintedPokemon[side].Add(pokemonName);
+
+                // Update team status snapshot
+                UpdateTeamStatusSnapshot(field, stats, side);
+            }
+
+            // Track Pokemon switches
+            if (action is SwitchAction switchAction && switchAction.Slot?.Side != null)
+            {
+                var side = switchAction.Slot.Side.IsPlayer;
+
+                if (!stats.SwitchCount.ContainsKey(side))
+                    stats.SwitchCount[side] = 0;
+
+                stats.SwitchCount[side]++;
+            }
+        }
+
+        /// <summary>
+        /// Updates team status snapshot for statistics.
+        /// </summary>
+        private void UpdateTeamStatusSnapshot(BattleField field, BattleStatistics stats, bool isPlayerSide)
+        {
+            var side = isPlayerSide ? field.PlayerSide : field.EnemySide;
+            if (side?.Party == null)
+                return;
+
+            var totalPokemon = side.Party.Count;
+            var faintedCount = side.Party.Count(p => p.IsFainted);
+            var remainingCount = totalPokemon - faintedCount;
+
+            // Store snapshot (could be enhanced to track per-turn)
+            // For now, we'll track the latest state
+            if (!stats.TeamStatusHistory.ContainsKey(0))
+                stats.TeamStatusHistory[0] = new Dictionary<bool, TeamStatusSnapshot>();
+
+            if (!stats.TeamStatusHistory[0].ContainsKey(isPlayerSide))
+                stats.TeamStatusHistory[0][isPlayerSide] = new TeamStatusSnapshot();
+
+            stats.TeamStatusHistory[0][isPlayerSide] = new TeamStatusSnapshot
+            {
+                RemainingPokemon = remainingCount,
+                TotalPokemon = totalPokemon,
+                FaintedCount = faintedCount
+            };
+        }
+    }
+}

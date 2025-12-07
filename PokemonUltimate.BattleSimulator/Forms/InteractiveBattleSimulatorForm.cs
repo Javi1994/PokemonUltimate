@@ -47,6 +47,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
         // Logs Tab controls
         private RichTextBox txtLogs = null!;
         private Button btnClearLogs = null!;
+        private Button btnCopyLogs = null!;
         private CheckBox checkAutoScroll = null!;
         private ComboBox comboLogFilter = null!;
 
@@ -141,12 +142,15 @@ namespace PokemonUltimate.BattleSimulator.Forms
             {
                 Text = "Select a preset battle mode or configure custom slots.\n" +
                        "Common modes:\n" +
-                       "• Singles: 1v1\n" +
-                       "• Doubles: 2v2\n" +
-                       "• Triples: 3v3\n" +
-                       "• Horde: 1v3 or 1v5",
+                       "• Singles: 1v1 (1 active Pokemon per team)\n" +
+                       "• Doubles: 2v2 (2 active Pokemon per team)\n" +
+                       "• Triples: 3v3 (3 active Pokemon per team)\n" +
+                       "• Horde: 1v3 or 1v5\n\n" +
+                       "Note: Each team can have up to 6 Pokemon. When a Pokemon faints,\n" +
+                       "the next Pokemon automatically switches in. Battle ends when all\n" +
+                       "Pokemon of one team are defeated.",
                 Location = new Point(280, 20),
-                Size = new Size(400, 100),
+                Size = new Size(500, 120),
                 AutoSize = false
             };
 
@@ -328,10 +332,18 @@ namespace PokemonUltimate.BattleSimulator.Forms
             };
             this.btnClearLogs.Click += BtnClearLogs_Click;
 
+            this.btnCopyLogs = new Button
+            {
+                Text = "Copy to Clipboard",
+                Location = new Point(230, 10),
+                Size = new Size(120, 30)
+            };
+            this.btnCopyLogs.Click += BtnCopyLogs_Click;
+
             this.checkAutoScroll = new CheckBox
             {
                 Text = "Auto-scroll",
-                Location = new Point(230, 15),
+                Location = new Point(360, 15),
                 Checked = true,
                 AutoSize = true
             };
@@ -339,12 +351,12 @@ namespace PokemonUltimate.BattleSimulator.Forms
             var lblFilter = new Label
             {
                 Text = "Filter:",
-                Location = new Point(330, 15),
+                Location = new Point(460, 15),
                 AutoSize = true
             };
             this.comboLogFilter = new ComboBox
             {
-                Location = new Point(380, 13),
+                Location = new Point(510, 13),
                 Size = new Size(150, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
@@ -354,7 +366,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
             logsHeaderPanel.Controls.AddRange(new Control[]
             {
-                lblLogs, btnClearLogs, checkAutoScroll, lblFilter, comboLogFilter
+                lblLogs, btnClearLogs, btnCopyLogs, checkAutoScroll, lblFilter, comboLogFilter
             });
 
             // Logs TextBox
@@ -572,17 +584,18 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
         private void UpdatePokemonSlots()
         {
-            int playerSlots = (int)this.numericPlayerSlots.Value;
-            int enemySlots = (int)this.numericEnemySlots.Value;
+            // For team battles, allow up to 6 Pokemon per team (full party)
+            // The battle format (slots) determines how many are active at once
+            int maxPokemonPerTeam = PokemonParty.MaxPartySize;
 
             // Clear existing controls
             ClearPokemonSlots();
 
-            // Create Player Pokemon controls
-            CreatePokemonSlotControls(panelPlayerPokemon, playerSlotControls, playerSlots, "Player");
+            // Create Player Pokemon controls (up to 6 Pokemon for full team)
+            CreatePokemonSlotControls(panelPlayerPokemon, playerSlotControls, maxPokemonPerTeam, "Player");
 
-            // Create Enemy Pokemon controls
-            CreatePokemonSlotControls(panelEnemyPokemon, enemySlotControls, enemySlots, "Enemy");
+            // Create Enemy Pokemon controls (up to 6 Pokemon for full team)
+            CreatePokemonSlotControls(panelEnemyPokemon, enemySlotControls, maxPokemonPerTeam, "Enemy");
         }
 
         private void ClearPokemonSlots()
@@ -619,7 +632,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 // GroupBox for this slot
                 controls.GroupBox = new GroupBox
                 {
-                    Text = $"{teamName} Slot {i + 1}",
+                    Text = $"{teamName} Pokemon {i + 1}",
                     Location = new Point(0, yOffset),
                     Width = availableWidth,
                     Height = slotHeight,
@@ -705,39 +718,17 @@ namespace PokemonUltimate.BattleSimulator.Forms
             if (_isBattleRunning)
                 return;
 
-            // Validate selections
-            if (playerSlotControls.Count == 0 || enemySlotControls.Count == 0)
+            // Validate at least one Pokemon is selected per team
+            bool hasPlayerPokemon = playerSlotControls.Any(s => s.ComboPokemon.SelectedItem != null);
+            bool hasEnemyPokemon = enemySlotControls.Any(s => s.ComboPokemon.SelectedItem != null);
+
+            if (!hasPlayerPokemon || !hasEnemyPokemon)
             {
                 MessageBox.Show(
-                    "Please configure Pokemon for each team.",
+                    "Each team must have at least one Pokemon selected.",
                     "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
-            }
-
-            // Validate all Pokemon are selected
-            foreach (var slot in playerSlotControls)
-            {
-                if (slot.ComboPokemon.SelectedItem == null)
-                {
-                    MessageBox.Show(
-                        "Please select Pokemon for all player slots.",
-                        "Validation Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-            }
-
-            foreach (var slot in enemySlotControls)
-            {
-                if (slot.ComboPokemon.SelectedItem == null)
-                {
-                    MessageBox.Show(
-                        "Please select Pokemon for all enemy slots.",
-                        "Validation Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
             }
 
             // Create logger
@@ -764,6 +755,39 @@ namespace PokemonUltimate.BattleSimulator.Forms
         {
             this.txtLogs.Clear();
             _logger?.Clear();
+        }
+
+        private void BtnCopyLogs_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (this.txtLogs.IsDisposed || string.IsNullOrEmpty(this.txtLogs.Text))
+                {
+                    MessageBox.Show(
+                        "No logs to copy.",
+                        "Copy Logs",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    return;
+                }
+
+                // Copy all text to clipboard
+                Clipboard.SetText(this.txtLogs.Text);
+
+                MessageBox.Show(
+                    "Logs copied to clipboard successfully!",
+                    "Copy Logs",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error copying logs to clipboard: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         private void ComboLogFilter_SelectedIndexChanged(object? sender, EventArgs e)
@@ -905,8 +929,8 @@ namespace PokemonUltimate.BattleSimulator.Forms
         {
             try
             {
-                // Create player party from slot controls
-                var playerParty = new List<PokemonInstance>();
+                // Create player party from slot controls using PokemonParty
+                var playerParty = new PokemonParty();
                 foreach (var slot in playerSlotControls)
                 {
                     var pokemonName = slot.ComboPokemon.SelectedItem?.ToString();
@@ -927,11 +951,17 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     if (slot.CheckPerfectIVs.Checked)
                         builder = builder.WithIVs(new IVSet(31, 31, 31, 31, 31, 31));
 
-                    playerParty.Add(builder.Build());
+                    var pokemon = builder.Build();
+                    if (!playerParty.TryAdd(pokemon))
+                    {
+                        // Party is full (shouldn't happen with current UI, but handle gracefully)
+                        if (_logger != null)
+                            _logger.LogWarning($"Player party is full, skipping {pokemonName}");
+                    }
                 }
 
-                // Create enemy party from slot controls
-                var enemyParty = new List<PokemonInstance>();
+                // Create enemy party from slot controls using PokemonParty
+                var enemyParty = new PokemonParty();
                 foreach (var slot in enemySlotControls)
                 {
                     var pokemonName = slot.ComboPokemon.SelectedItem?.ToString();
@@ -952,7 +982,13 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     if (slot.CheckPerfectIVs.Checked)
                         builder = builder.WithIVs(new IVSet(31, 31, 31, 31, 31, 31));
 
-                    enemyParty.Add(builder.Build());
+                    var pokemon = builder.Build();
+                    if (!enemyParty.TryAdd(pokemon))
+                    {
+                        // Party is full (shouldn't happen with current UI, but handle gracefully)
+                        if (_logger != null)
+                            _logger.LogWarning($"Enemy party is full, skipping {pokemonName}");
+                    }
                 }
 
                 if (playerParty.Count == 0 || enemyParty.Count == 0)
@@ -960,9 +996,20 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     throw new InvalidOperationException("Both teams must have at least one Pokemon.");
                 }
 
-                // Create AI
-                var playerAI = new RandomAI();
-                var enemyAI = new RandomAI();
+                // Validate parties are valid for battle
+                if (!playerParty.IsValidForBattle())
+                {
+                    throw new InvalidOperationException("Player party must have at least one active Pokemon.");
+                }
+                if (!enemyParty.IsValidForBattle())
+                {
+                    throw new InvalidOperationException("Enemy party must have at least one active Pokemon.");
+                }
+
+                // Create AI for team battles (handles auto-switch when Pokemon faint)
+                // Note: Event publisher will be set after engine initialization
+                var playerAI = new TeamBattleAI(switchThreshold: 0.3, switchChance: 0.6, logger: _logger);
+                var enemyAI = new TeamBattleAI(switchThreshold: 0.25, switchChance: 0.7, logger: _logger);
 
                 // Create view (null view for simulation)
                 var view = NullBattleView.Instance;
@@ -1000,21 +1047,34 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 };
                 _engine.Initialize(rules, playerParty, enemyParty, playerAI, enemyAI, view);
 
-                // Register detailed logger observer
-                if (_logger != null)
+                // Set event publisher for AIs after engine initialization
+                var eventBus = _engine.EventBus;
+                if (eventBus != null)
                 {
-                    var detailedLogger = new DetailedBattleLoggerObserver(_logger);
+                    playerAI.SetEventPublisher(eventBus);
+                    enemyAI.SetEventPublisher(eventBus);
+                }
+
+                // Register detailed logger observer that publishes events
+                // This observer acts as a bridge: it observes actions and publishes events
+                if (_logger != null && eventBus != null)
+                {
+                    var detailedLogger = new DetailedBattleLoggerObserver(_logger, eventBus);
                     _engine.Queue.AddObserver(detailedLogger);
+                }
+
+                // Subscribe event-based logger to events (converts events to logs)
+                // This is the single source of truth for logging - no hardcoded logs
+                if (_logger != null && eventBus != null)
+                {
+                    var eventLogger = new Logging.EventBasedBattleLogger(_logger);
+                    eventBus.Subscribe(eventLogger);
                 }
 
                 // Run battle (configure await to continue on background thread)
                 var result = await _engine.RunBattle().ConfigureAwait(false);
 
-                // Log result
-                if (_logger != null)
-                {
-                    _logger.LogInfo($"Battle ended: {result.Outcome}");
-                }
+                // Battle end logging and team statistics handled by EventBasedBattleLogger via events
 
                 // Update UI on UI thread
                 if (this.InvokeRequired)

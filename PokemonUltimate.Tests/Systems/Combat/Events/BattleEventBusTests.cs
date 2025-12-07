@@ -23,7 +23,7 @@ namespace PokemonUltimate.Tests.Systems.Combat.Events
     [TestFixture]
     public class BattleEventBusTests
     {
-        private BattleEventBus _eventBus;
+        private IBattleEventBus _eventBus;
         private BattleField _field;
         private TestListener _listener1;
         private TestListener _listener2;

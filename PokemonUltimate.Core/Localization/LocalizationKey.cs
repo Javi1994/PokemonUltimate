@@ -175,6 +175,15 @@ namespace PokemonUltimate.Core.Localization
 
         #endregion
 
+        #region Party Management
+
+        public const string PartyIsFull = "party_is_full";
+        public const string PartyTooSmallForBattle = "party_too_small_for_battle";
+        public const string CannotRemoveLastActivePokemon = "party_cannot_remove_last_active";
+        public const string InvalidPartyIndex = "party_invalid_index";
+
+        #endregion
+
         #region UI - Windows Forms Applications
 
 

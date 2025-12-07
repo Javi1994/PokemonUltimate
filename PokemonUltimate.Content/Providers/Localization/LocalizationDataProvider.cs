@@ -25,6 +25,7 @@ namespace PokemonUltimate.Content.Providers
     /// - LocalizationDataProvider.Types.cs: Type and type effectiveness translations
     /// - LocalizationDataProvider.Natures.cs: Nature translations
     /// - LocalizationDataProvider.Stats.cs: Stat translations
+    /// - LocalizationDataProvider.Party.cs: Party management message translations
     /// - LocalizationDataProvider.Helpers.cs: Helper methods for key generation and registration
     /// </summary>
     /// <remarks>
@@ -58,6 +59,7 @@ namespace PokemonUltimate.Content.Providers
             InitializeFieldEffectNames();
             InitializeHazardNames();
             InitializeStatusEffectNames();
+            InitializeParty();
             InitializeUI();
         }
 

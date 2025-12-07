@@ -13,7 +13,9 @@ using PokemonUltimate.Combat.Logging;
 using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Combat.Validation;
 using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Extensions;
 using PokemonUltimate.Core.Instances;
+using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.Combat
 {
@@ -39,6 +41,7 @@ namespace PokemonUltimate.Combat
         private readonly Effects.MoveEffectProcessorRegistry _effectProcessorRegistry;
         private readonly IBattleStateValidator _stateValidator;
         private readonly IBattleLogger _logger;
+        private readonly Events.BattleEventBus _eventBus;
 
         private IBattleView _view;
         private IActionProvider _playerProvider;
@@ -109,7 +112,16 @@ namespace PokemonUltimate.Combat
 
             // Create BattleLogger if not provided
             _logger = logger ?? new BattleLogger("CombatEngine");
+
+            // Create unified event bus for all battle events (triggers and statistics/logging)
+            _eventBus = new Events.BattleEventBus();
         }
+
+        /// <summary>
+        /// Gets the unified event bus for this battle.
+        /// Handles both BattleTrigger events (abilities/items) and BattleEvent events (statistics/logging).
+        /// </summary>
+        public Events.BattleEventBus EventBus => _eventBus;
 
         /// <summary>
         /// Initializes the combat engine with parties and action providers.
@@ -177,19 +189,97 @@ namespace PokemonUltimate.Combat
             if (Field == null)
                 throw new InvalidOperationException("CombatEngine must be initialized before running battle.");
 
-            _logger.LogInfo("Battle started");
+            // Determine battle mode name
+            string battleMode = DetermineBattleMode(Field.Rules);
+
+            // Collect initial Pokemon information
+            var initialPlayerPokemon = Field.PlayerSide.Slots
+                .Where(s => !s.IsEmpty && s.Pokemon != null)
+                .Select(s => s.Pokemon)
+                .ToList();
+            var initialEnemyPokemon = Field.EnemySide.Slots
+                .Where(s => !s.IsEmpty && s.Pokemon != null)
+                .Select(s => s.Pokemon)
+                .ToList();
+
+            // Publish battle started event with setup information
+            _eventBus.PublishEvent(new Events.BattleEvent(
+                Events.BattleEventType.BattleStarted,
+                turnNumber: 0,
+                isPlayerSide: false,
+                pokemon: initialPlayerPokemon.FirstOrDefault(), // First Pokemon as primary
+                data: new Events.BattleEventData
+                {
+                    PlayerSlots = Field.Rules.PlayerSlots,
+                    EnemySlots = Field.Rules.EnemySlots,
+                    PlayerPartySize = Field.PlayerSide?.Party?.Count ?? 0,
+                    EnemyPartySize = Field.EnemySide?.Party?.Count ?? 0,
+                    BattleMode = battleMode,
+                    // Store initial Pokemon counts in slots
+                    RemainingPokemon = initialPlayerPokemon.Count, // Reuse field for initial active count
+                    TotalPokemon = initialEnemyPokemon.Count // Reuse field for initial enemy active count
+                }));
+
+            // Publish additional events for initial Pokemon in each slot
+            foreach (var slot in Field.PlayerSide.Slots)
+            {
+                if (!slot.IsEmpty && slot.Pokemon != null)
+                {
+                    _eventBus.PublishEvent(new Events.BattleEvent(
+                        Events.BattleEventType.PokemonSwitched,
+                        turnNumber: 0,
+                        isPlayerSide: true,
+                        pokemon: slot.Pokemon,
+                        data: new Events.BattleEventData
+                        {
+                            SwitchedIn = slot.Pokemon,
+                            SlotIndex = slot.SlotIndex
+                        }));
+                }
+            }
+
+            foreach (var slot in Field.EnemySide.Slots)
+            {
+                if (!slot.IsEmpty && slot.Pokemon != null)
+                {
+                    _eventBus.PublishEvent(new Events.BattleEvent(
+                        Events.BattleEventType.PokemonSwitched,
+                        turnNumber: 0,
+                        isPlayerSide: false,
+                        pokemon: slot.Pokemon,
+                        data: new Events.BattleEventData
+                        {
+                            SwitchedIn = slot.Pokemon,
+                            SlotIndex = slot.SlotIndex
+                        }));
+                }
+            }
 
             int turnCount = 0;
 
             while (Outcome == BattleOutcome.Ongoing && turnCount < BattleConstants.MaxTurns)
             {
-                _logger.LogBattleEvent("TurnStart", $"Turn {turnCount + 1} starting");
-                await RunTurn();
+                int currentTurn = turnCount + 1;
+
+                // Publish turn started event (logging handled by EventBasedBattleLogger)
+                _eventBus.PublishEvent(new Events.BattleEvent(
+                    Events.BattleEventType.TurnStarted,
+                    turnNumber: currentTurn,
+                    isPlayerSide: false,
+                    data: new Events.BattleEventData()));
+
+                await RunTurn(currentTurn);
                 turnCount++;
 
                 // Check outcome after each turn
                 Outcome = BattleArbiter.CheckOutcome(Field);
-                _logger.LogBattleEvent("TurnEnd", $"Turn {turnCount} completed. Outcome: {Outcome}");
+
+                // Publish turn ended event (logging handled by EventBasedBattleLogger)
+                _eventBus.PublishEvent(new Events.BattleEvent(
+                    Events.BattleEventType.TurnEnded,
+                    turnNumber: turnCount,
+                    isPlayerSide: false,
+                    data: new Events.BattleEventData()));
             }
 
             // Generate result
@@ -199,7 +289,26 @@ namespace PokemonUltimate.Combat
                 TurnsTaken = turnCount
             };
 
-            _logger.LogInfo($"Battle ended after {turnCount} turns. Outcome: {Outcome}");
+            // Calculate team statistics for battle ended event
+            int playerFainted = Field?.PlayerSide?.Party?.Count(p => p.IsFainted) ?? 0;
+            int playerTotal = Field?.PlayerSide?.Party?.Count ?? 0;
+            int enemyFainted = Field?.EnemySide?.Party?.Count(p => p.IsFainted) ?? 0;
+            int enemyTotal = Field?.EnemySide?.Party?.Count ?? 0;
+
+            // Publish battle ended event (logging handled by EventBasedBattleLogger)
+            _eventBus.PublishEvent(new Events.BattleEvent(
+                Events.BattleEventType.BattleEnded,
+                turnNumber: turnCount,
+                isPlayerSide: false,
+                data: new Events.BattleEventData
+                {
+                    Outcome = Outcome,
+                    TotalTurns = turnCount,
+                    PlayerFainted = playerFainted,
+                    PlayerTotal = playerTotal,
+                    EnemyFainted = enemyFainted,
+                    EnemyTotal = enemyTotal
+                }));
 
             // TODO: Calculate MVP, defeated enemies, EXP, loot (Phase 2.7+)
 
@@ -209,7 +318,8 @@ namespace PokemonUltimate.Combat
         /// <summary>
         /// Executes a single turn of battle.
         /// </summary>
-        public async Task RunTurn()
+        /// <param name="turnNumber">The current turn number (for event publishing).</param>
+        public async Task RunTurn(int turnNumber = 0)
         {
             if (Field == null)
                 throw new InvalidOperationException("CombatEngine must be initialized before running turn.");
@@ -225,7 +335,7 @@ namespace PokemonUltimate.Combat
                     if (action != null)
                     {
                         pendingActions.Add(action);
-                        _logger.LogDebug($"Collected action: {action.GetType().Name} from slot {slot.SlotIndex} (Priority: {action.Priority}, Speed: {_turnOrderResolver.GetEffectiveSpeed(slot, Field):F1})");
+                        // Logging handled by EventBasedBattleLogger via events
                     }
                 }
             }
@@ -233,16 +343,9 @@ namespace PokemonUltimate.Combat
             // 2. Sort by turn order (priority, then speed) (FASE DE ORDENAMIENTO)
             // Ahora se ordenan todas las acciones por prioridad y velocidad
             var sortedActions = _turnOrderResolver.SortActions(pendingActions, Field);
-            
-            // Log del orden final para debugging
-            _logger.LogDebug($"Actions sorted. Execution order:");
-            for (int i = 0; i < sortedActions.Count; i++)
-            {
-                var action = sortedActions[i];
-                var priority = action.Priority;
-                var speed = action.User != null ? _turnOrderResolver.GetEffectiveSpeed(action.User, Field) : 0;
-                _logger.LogDebug($"  {i + 1}. {action.User?.Pokemon?.DisplayName ?? "Unknown"} - Priority: {priority}, Speed: {speed:F1}");
-            }
+
+            // Publish action collection events for debugging (AFTER sorting to show execution order)
+            PublishActionCollectionEvent(sortedActions, turnNumber);
 
             // 3. Enqueue all actions in sorted order (FASE DE EJECUCIÓN)
             Queue.EnqueueRange(sortedActions);
@@ -250,12 +353,19 @@ namespace PokemonUltimate.Combat
             // 4. Process the queue
             await Queue.ProcessQueue(Field, _view);
 
+            // 4.5. Handle automatic switching for fainted Pokemon (team battles)
+            // Note: Turn number tracking would need to be passed - for now using 0
+            await HandleFaintedPokemonSwitching();
+
             // 5. End-of-turn effects (status damage, weather damage)
             var endOfTurnActions = _endOfTurnProcessor.ProcessEffects(Field);
             if (endOfTurnActions.Count > 0)
             {
                 Queue.EnqueueRange(endOfTurnActions);
                 await Queue.ProcessQueue(Field, _view);
+
+                // Check for fainted Pokemon again after end-of-turn effects
+                await HandleFaintedPokemonSwitching();
             }
 
             // 6. Decrement weather duration
@@ -274,10 +384,191 @@ namespace PokemonUltimate.Combat
             {
                 Queue.EnqueueRange(triggerActions);
                 await Queue.ProcessQueue(Field, _view);
+
+                // Check for fainted Pokemon again after triggers
+                await HandleFaintedPokemonSwitching();
             }
 
             // 10. Validate battle state after turn (in debug builds or when enabled)
             ValidateBattleState();
+        }
+
+        /// <summary>
+        /// Handles automatic switching for fainted Pokemon in team battles.
+        /// Checks all slots for fainted Pokemon and forces automatic switching if available.
+        /// </summary>
+        private async Task HandleFaintedPokemonSwitching()
+        {
+            if (Field == null)
+                return;
+
+            var switchActions = new List<BattleAction>();
+            var currentTurn = 0; // Will be set by caller if tracking turns
+
+            // Check all slots (not just active ones) for fainted Pokemon
+            foreach (var slot in Field.PlayerSide.Slots.Concat(Field.EnemySide.Slots))
+            {
+                // Check if slot has a fainted Pokemon
+                bool hasFaintedPokemon = slot.Pokemon != null && slot.Pokemon.IsFainted;
+
+                // Check if slot is empty but party has active Pokemon available
+                bool isEmptyButHasAvailablePokemon = slot.IsEmpty &&
+                    slot.Side != null &&
+                    slot.Side.Party != null &&
+                    slot.Side.Party.Any(p => !p.IsFainted && !slot.Side.Slots.Any(s => s.Pokemon == p));
+
+                if (hasFaintedPokemon || isEmptyButHasAvailablePokemon)
+                {
+                    // Try to get a switch action from the action provider
+                    if (slot.ActionProvider != null)
+                    {
+                        try
+                        {
+                            var action = await slot.ActionProvider.GetAction(Field, slot);
+                            if (action != null && action is SwitchAction switchAction)
+                            {
+                                switchActions.Add(switchAction);
+                                // Logging handled by DetailedBattleLoggerObserver when action executes
+                            }
+                            else if (action == null && hasFaintedPokemon)
+                            {
+                                // No Pokemon available to switch - this is expected when party is exhausted
+                                // Logging handled by EventBasedBattleLogger via events
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"Error getting switch action for fainted Pokemon: {ex.Message}");
+                        }
+                    }
+                }
+            }
+
+            // Execute all switch actions
+            if (switchActions.Count > 0)
+            {
+                // Logging handled by EventBasedBattleLogger via events
+                Queue.EnqueueRange(switchActions);
+                await Queue.ProcessQueue(Field, _view);
+            }
+        }
+
+        private int _currentTurnNumber = 0;
+
+        /// <summary>
+        /// Publishes events for action collection and sorting (for debugging).
+        /// Publishes events AFTER sorting to show the final execution order.
+        /// </summary>
+        private void PublishActionCollectionEvent(List<BattleAction> sortedActions, int turnNumber)
+        {
+            if (_eventBus == null || sortedActions == null)
+                return;
+
+            var actionDetails = new List<string>();
+
+            // Publish event for each action in sorted order (shows execution order)
+            int executionOrder = 1;
+            foreach (var action in sortedActions)
+            {
+                if (action.User?.Pokemon == null)
+                    continue;
+
+                var speed = action.User != null ? _turnOrderResolver.GetEffectiveSpeed(action.User, Field) : 0;
+                var sideName = action.User.Side.IsPlayer ? "Player" : "Enemy";
+                var pokemonName = action.User.Pokemon.DisplayName;
+                var priority = action.Priority;
+
+                // Build detailed action description
+                string actionDescription = $"{executionOrder}. [{sideName}] {pokemonName}";
+
+                // Add action-specific details
+                switch (action)
+                {
+                    case UseMoveAction moveAction:
+                        // Use localized move name
+                        var localizationProvider = LocalizationManager.Instance;
+                        var moveName = moveAction.Move.GetDisplayName(localizationProvider);
+                        var targetName = moveAction.Target?.Pokemon?.DisplayName ?? "Unknown";
+                        actionDescription += $" - {action.GetType().Name}: {moveName} → {targetName}";
+                        break;
+                    case SwitchAction switchAction:
+                        var newPokemonName = switchAction.NewPokemon?.DisplayName ?? "Unknown";
+                        actionDescription += $" - {action.GetType().Name}: switching to {newPokemonName}";
+                        break;
+                    default:
+                        actionDescription += $" - {action.GetType().Name}";
+                        break;
+                }
+
+                actionDescription += $" (Priority: {priority}, Speed: {speed:F1})";
+                actionDetails.Add(actionDescription);
+
+                _eventBus.PublishEvent(new Events.BattleEvent(
+                    Events.BattleEventType.ActionCollected,
+                    turnNumber: turnNumber,
+                    isPlayerSide: action.User.Side.IsPlayer,
+                    pokemon: action.User.Pokemon,
+                    data: new Events.BattleEventData
+                    {
+                        ActionType = action.GetType().Name,
+                        Priority = action.Priority,
+                        Speed = speed,
+                        SlotIndex = action.User.SlotIndex,
+                        ActionCount = executionOrder // Use ActionCount to store execution order
+                    }));
+                executionOrder++;
+            }
+
+            // Publish event for sorted actions summary
+            if (sortedActions.Count > 0)
+            {
+                _eventBus.PublishEvent(new Events.BattleEvent(
+                    Events.BattleEventType.ActionsSorted,
+                    turnNumber: turnNumber,
+                    isPlayerSide: false,
+                    data: new Events.BattleEventData
+                    {
+                        ActionCount = sortedActions.Count,
+                        SortedActionsDetails = actionDetails
+                    }));
+            }
+        }
+
+        /// <summary>
+        /// Determines the battle mode name based on slot configuration.
+        /// </summary>
+        private string DetermineBattleMode(BattleRules rules)
+        {
+            if (rules == null)
+                return "Custom";
+
+            // Standard modes
+            if (rules.PlayerSlots == 1 && rules.EnemySlots == 1)
+                return rules.IsBossBattle ? "Raid (1vBoss)" : "Singles";
+            if (rules.PlayerSlots == 2 && rules.EnemySlots == 2)
+                return "Doubles";
+            if (rules.PlayerSlots == 3 && rules.EnemySlots == 3)
+                return "Triples";
+
+            // Horde modes
+            if (rules.PlayerSlots == 1 && rules.EnemySlots == 2)
+                return "Horde (1v2)";
+            if (rules.PlayerSlots == 1 && rules.EnemySlots == 3)
+                return "Horde (1v3)";
+            if (rules.PlayerSlots == 1 && rules.EnemySlots == 5)
+                return "Horde (1v5)";
+
+            // Raid modes
+            if (rules.IsBossBattle)
+            {
+                if (rules.PlayerSlots == 1 && rules.EnemySlots == 1)
+                    return "Raid (1vBoss)";
+                if (rules.PlayerSlots == 2 && rules.EnemySlots == 1)
+                    return "Raid (2vBoss)";
+            }
+
+            // Custom mode
+            return $"Custom ({rules.PlayerSlots}v{rules.EnemySlots})";
         }
 
         /// <summary>

@@ -78,6 +78,10 @@ namespace PokemonUltimate.Core.Constants
         public const string AbilityCannotBeNull = "Ability cannot be null";
         public const string ItemCannotBeNull = "Item cannot be null";
         public const string ContextCannotBeNull = "Damage context cannot be null";
+        public const string PartyIsFull = "Party is full (maximum {0} Pokemon)";
+        public const string PartyTooSmallForBattle = "Party must have at least {0} active Pokemon for battle";
+        public const string CannotRemoveLastActivePokemon = "Cannot remove last active Pokemon during battle";
+        public const string InvalidPartyIndex = "Party index {0} is invalid (party size: {1})";
 
         #endregion
 

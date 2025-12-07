@@ -38,6 +38,12 @@ namespace PokemonUltimate.Combat.Actions
         public PokemonInstance NewPokemon { get; }
 
         /// <summary>
+        /// The Pokemon that was switched out (set during ExecuteLogic).
+        /// Null if slot was empty or action hasn't executed yet.
+        /// </summary>
+        public PokemonInstance OldPokemon { get; private set; }
+
+        /// <summary>
         /// Optional function to get HazardData by type for entry hazard processing.
         /// If null, entry hazards will not be processed.
         /// </summary>
@@ -100,8 +106,8 @@ namespace PokemonUltimate.Combat.Actions
             // Mark Pokemon as switching out (for Pursuit detection)
             Slot.AddVolatileStatus(VolatileStatus.SwitchingOut);
 
-            // Get the current Pokemon
-            var oldPokemon = Slot.Pokemon;
+            // Get the current Pokemon and store it for observers/logging
+            OldPokemon = Slot.Pokemon;
 
             // Switch Pokemon
             // Note: SetPokemon automatically resets battle state for the new Pokemon

@@ -84,9 +84,7 @@ namespace PokemonUltimate.Content.Providers
 
             // Fire Starter Line - Using available moves only
             Register("Charmander", m => m
-                .StartsWith(MoveCatalog.Scratch, MoveCatalog.Growl)
                 .AtLevel(9, MoveCatalog.Ember)
-                .AtLevel(38, MoveCatalog.Flamethrower)
                 .ByTM(MoveCatalog.FireBlast));
 
             Register("Charmeleon", m => m
