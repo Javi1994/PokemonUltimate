@@ -41,7 +41,7 @@ namespace PokemonUltimate.DataViewer
         public MainForm()
         {
             // Initialize localization (defaults to Spanish)
-            LocalizationManager.Initialize(new LocalizationProvider(), "fr");
+            LocalizationManager.Initialize(new LocalizationProvider(), "es");
 
             InitializeComponent();
         }

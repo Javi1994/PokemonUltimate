@@ -21,15 +21,16 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
             // Track healing from HealAction
             if (action is HealAction healAction && healAction.Target?.Pokemon != null)
             {
-                var pokemonName = healAction.Target.Pokemon.Species.Name;
+                // Use Species.Name for statistics accumulation across multiple battles
+                var pokemonKey = healAction.Target.Pokemon.Species.Name;
                 var healAmount = healAction.Amount;
 
                 if (healAmount > 0)
                 {
-                    if (!stats.HealingStats.ContainsKey(pokemonName))
-                        stats.HealingStats[pokemonName] = new List<int>();
+                    if (!stats.HealingStats.ContainsKey(pokemonKey))
+                        stats.HealingStats[pokemonKey] = new List<int>();
 
-                    stats.HealingStats[pokemonName].Add(healAmount);
+                    stats.HealingStats[pokemonKey].Add(healAmount);
                 }
             }
 
@@ -40,15 +41,16 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
                 {
                     if (reaction is HealAction reactionHeal && reactionHeal.Target?.Pokemon != null)
                     {
-                        var pokemonName = reactionHeal.Target.Pokemon.Species.Name;
+                        // Use Species.Name for statistics accumulation across multiple battles
+                        var pokemonKey = reactionHeal.Target.Pokemon.Species.Name;
                         var healAmount = reactionHeal.Amount;
 
                         if (healAmount > 0)
                         {
-                            if (!stats.HealingStats.ContainsKey(pokemonName))
-                                stats.HealingStats[pokemonName] = new List<int>();
+                            if (!stats.HealingStats.ContainsKey(pokemonKey))
+                                stats.HealingStats[pokemonKey] = new List<int>();
 
-                            stats.HealingStats[pokemonName].Add(healAmount);
+                            stats.HealingStats[pokemonKey].Add(healAmount);
                         }
                     }
                 }

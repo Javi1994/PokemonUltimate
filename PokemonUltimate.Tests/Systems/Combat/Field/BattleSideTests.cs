@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using PokemonUltimate.Combat;
+using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Content.Catalogs.Pokemon;
 
 namespace PokemonUltimate.Tests.Systems.Combat.Field
 {
@@ -233,6 +233,75 @@ namespace PokemonUltimate.Tests.Systems.Combat.Field
 
             Assert.That(available.Count, Is.EqualTo(1));
             Assert.That(available, Contains.Item(_bulbasaur));
+        }
+
+        [Test]
+        public void GetAvailableSwitches_WithReservedPokemon_ExcludesReserved()
+        {
+            var side = new BattleSide(slotCount: 1, isPlayer: true);
+            side.SetParty(_party);
+            side.Slots[0].SetPokemon(_pikachu);
+
+            // Reserve Charmander
+            var reserved = new[] { _charmander };
+
+            var available = side.GetAvailableSwitches(reserved).ToList();
+
+            Assert.That(available.Count, Is.EqualTo(1));
+            Assert.That(available, Contains.Item(_bulbasaur));
+            Assert.That(available, Does.Not.Contain(_charmander));
+            Assert.That(available, Does.Not.Contain(_pikachu));
+        }
+
+        [Test]
+        public void GetAvailableSwitches_WithReservedPokemon_NullReserved_ThrowsException()
+        {
+            var side = new BattleSide(slotCount: 1, isPlayer: true);
+            side.SetParty(_party);
+            side.Slots[0].SetPokemon(_pikachu);
+
+            Assert.Throws<System.ArgumentNullException>(() => side.GetAvailableSwitches(null).ToList());
+        }
+
+        [Test]
+        public void GetAvailableSwitches_WithReservedPokemon_DoublesBattle_ExcludesReserved()
+        {
+            var side = new BattleSide(slotCount: 2, isPlayer: true);
+            side.SetParty(_party);
+            side.Slots[0].SetPokemon(_pikachu);
+            side.Slots[1].SetPokemon(_charmander);
+
+            // Reserve Bulbasaur (the only available one)
+            var reserved = new[] { _bulbasaur };
+
+            var available = side.GetAvailableSwitches(reserved).ToList();
+
+            Assert.That(available, Is.Empty);
+        }
+
+        [Test]
+        public void GetAvailableSwitches_WithReservedPokemon_MultipleReserved_ExcludesAll()
+        {
+            var party = new List<PokemonInstance>
+            {
+                _pikachu,
+                _charmander,
+                _bulbasaur,
+                PokemonFactory.Create(PokemonCatalog.Squirtle, 50)
+            };
+            var side = new BattleSide(slotCount: 1, isPlayer: true);
+            side.SetParty(party);
+            side.Slots[0].SetPokemon(_pikachu);
+
+            // Reserve multiple Pokemon
+            var reserved = new[] { _charmander, _bulbasaur };
+
+            var available = side.GetAvailableSwitches(reserved).ToList();
+
+            Assert.That(available.Count, Is.EqualTo(1));
+            Assert.That(available, Does.Not.Contain(_pikachu));
+            Assert.That(available, Does.Not.Contain(_charmander));
+            Assert.That(available, Does.Not.Contain(_bulbasaur));
         }
 
         #endregion

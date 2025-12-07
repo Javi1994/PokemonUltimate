@@ -171,7 +171,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.numericTests.Width = controlWidth;
             this.numericTests.Minimum = 1;
             this.numericTests.Maximum = 10000;
-            this.numericTests.Value = 100;
+            this.numericTests.Value = 1000;
             yPos += spacing;
 
             this.checkDetailedOutput.Text = "Detailed Output";
@@ -362,11 +362,22 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 };
 
                 // Crear progress reporter
+                // Usar BeginInvoke para evitar bloqueos y stack overflow
                 var progress = new Progress<int>(percent =>
                 {
-                    this.progressBar.Value = percent;
-                    this.lblStatus.Text = $"Running tests... {percent}%";
-                    Application.DoEvents();
+                    if (this.InvokeRequired)
+                    {
+                        this.BeginInvoke(new Action(() =>
+                        {
+                            this.progressBar.Value = Math.Min(100, Math.Max(0, percent));
+                            this.lblStatus.Text = $"Running tests... {percent}%";
+                        }));
+                    }
+                    else
+                    {
+                        this.progressBar.Value = Math.Min(100, Math.Max(0, percent));
+                        this.lblStatus.Text = $"Running tests... {percent}%";
+                    }
                 });
 
                 // Ejecutar pruebas

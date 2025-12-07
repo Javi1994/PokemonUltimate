@@ -25,8 +25,9 @@ namespace PokemonUltimate.Combat.Actions
         /// Creates a message action.
         /// </summary>
         /// <param name="message">The message to display. Cannot be null.</param>
+        /// <param name="user">Optional slot that initiated this message (for logging purposes).</param>
         /// <exception cref="ArgumentNullException">If message is null.</exception>
-        public MessageAction(string message) : base(null)
+        public MessageAction(string message, BattleSlot user = null) : base(user)
         {
             Message = message ?? throw new ArgumentNullException(nameof(message));
         }

@@ -130,6 +130,15 @@ namespace PokemonUltimate.Combat
         }
 
         /// <summary>
+        /// Gets all registered observers.
+        /// </summary>
+        /// <returns>A read-only list of observers.</returns>
+        public IReadOnlyList<IBattleActionObserver> GetObservers()
+        {
+            return _observers.ToList().AsReadOnly();
+        }
+
+        /// <summary>
         /// Processes all actions in the queue until empty.
         /// Each action's Logic is executed first, then Visual.
         /// Reaction actions are inserted at the front of the queue.

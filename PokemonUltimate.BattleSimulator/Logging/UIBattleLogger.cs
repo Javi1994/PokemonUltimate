@@ -17,6 +17,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
     {
         private readonly List<LogEntry> _logs = new List<LogEntry>();
         private readonly object _lockObject = new object();
+        private Dictionary<string, string>? _pokemonNameMapping;
 
         /// <summary>
         /// Event raised when a new log entry is added.
@@ -129,6 +130,29 @@ namespace PokemonUltimate.BattleSimulator.Logging
                     _ => "UNKNOWN"
                 };
                 return $"[{timestamp}] {levelStr} {Message}";
+            }
+        }
+
+        /// <summary>
+        /// Sets the Pokemon name mapping for displaying unique identifiers in logs.
+        /// </summary>
+        /// <param name="mapping">Dictionary mapping InstanceId to display name.</param>
+        public void SetPokemonNameMapping(Dictionary<string, string>? mapping)
+        {
+            lock (_lockObject)
+            {
+                _pokemonNameMapping = mapping;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Pokemon name mapping.
+        /// </summary>
+        public Dictionary<string, string>? GetPokemonNameMapping()
+        {
+            lock (_lockObject)
+            {
+                return _pokemonNameMapping;
             }
         }
 

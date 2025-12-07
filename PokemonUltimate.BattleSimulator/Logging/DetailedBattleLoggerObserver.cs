@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.BattleSimulator.Helpers;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
@@ -28,12 +29,24 @@ namespace PokemonUltimate.BattleSimulator.Logging
         private readonly ILocalizationProvider _localizationProvider;
         private readonly IBattleEventBus _eventBus;
         private int _currentTurn = 0;
+        private Dictionary<string, string>? _pokemonNameMapping;
 
         public DetailedBattleLoggerObserver(UIBattleLogger logger, IBattleEventBus eventBus = null)
         {
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
             _localizationProvider = LocalizationManager.Instance;
             _eventBus = eventBus;
+
+            // Get name mapping from logger if available
+            _pokemonNameMapping = logger.GetPokemonNameMapping();
+        }
+
+        private string GetPokemonDisplayName(PokemonInstance? pokemon)
+        {
+            if (pokemon == null)
+                return "Unknown";
+
+            return PokemonNameMapper.GetDisplayName(pokemon, _pokemonNameMapping);
         }
 
         public void OnActionExecuted(BattleAction action, BattleField field, IEnumerable<BattleAction> reactions)
@@ -76,6 +89,11 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 case ApplyStatusAction statusAction:
                     // Status changes can be published as events
                     PublishStatusAppliedEvent(statusAction, field);
+                    break;
+
+                case MessageAction messageAction:
+                    // Log important messages (paralysis preventing movement, sleep, etc.)
+                    LogMessageAction(messageAction, field);
                     break;
             }
 
@@ -350,7 +368,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
             var side = action.Target.Side.IsPlayer ? "Player" : "Enemy";
             var amount = action.Amount;
 
-            _logger.LogInfo($"[{side}] {target.DisplayName} recovered {amount} HP");
+            _logger.LogInfo($"[{side}] {GetPokemonDisplayName(target)} recovered {amount} HP");
             _logger.LogDebug($"  HP: {target.CurrentHP}/{target.MaxHP}");
         }
 
@@ -365,7 +383,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
             var change = action.Change;
             string direction = change > 0 ? "rose" : "fell";
 
-            _logger.LogInfo($"[{side}] {target.DisplayName}'s {stat} {direction} by {System.Math.Abs(change)} stage(s)");
+            _logger.LogInfo($"[{side}] {GetPokemonDisplayName(target)}'s {stat} {direction} by {System.Math.Abs(change)} stage(s)");
         }
 
         private void LogStatusAction(ApplyStatusAction action, BattleField field)
@@ -378,7 +396,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
             var status = action.Status;
             var statusName = status.GetDisplayName(_localizationProvider);
 
-            _logger.LogInfo($"[{side}] {target.DisplayName} was afflicted with {statusName}");
+            _logger.LogInfo($"[{side}] {GetPokemonDisplayName(target)} was afflicted with {statusName}");
         }
 
         public void OnTurnStart(int turnNumber, BattleField field)
@@ -408,6 +426,78 @@ namespace PokemonUltimate.BattleSimulator.Logging
             LogPokemonStatus(field);
         }
 
+        private void LogMessageAction(MessageAction messageAction, BattleField field)
+        {
+            if (messageAction == null || string.IsNullOrEmpty(messageAction.Message))
+                return;
+
+            // Log important status-related messages (paralysis, sleep, freeze, etc.)
+            // These messages are critical for debugging status effects
+            var message = messageAction.Message;
+
+            // Check if this is a status-related message that should be logged
+            bool isStatusMessage = message.Contains("paralyzed", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("paralizado", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("asleep", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("dormido", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("frozen", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("congelado", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("can't move", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("no puede moverse", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("flinch", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("retrocedió", StringComparison.OrdinalIgnoreCase);
+
+            if (isStatusMessage)
+            {
+                string? pokemonName = null;
+                bool isPlayerSide = false;
+
+                // First, try to use the User from the action if available
+                if (messageAction.User != null && messageAction.User.Pokemon != null)
+                {
+                    pokemonName = GetPokemonDisplayName(messageAction.User.Pokemon);
+                    isPlayerSide = messageAction.User.Side.IsPlayer;
+                }
+                else
+                {
+                    // Fallback: Try to find the Pokemon mentioned in the message
+                    foreach (var slot in field.PlayerSide.Slots)
+                    {
+                        if (!slot.IsEmpty && slot.Pokemon != null && message.Contains(slot.Pokemon.DisplayName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            pokemonName = GetPokemonDisplayName(slot.Pokemon);
+                            isPlayerSide = true;
+                            break;
+                        }
+                    }
+
+                    if (pokemonName == null)
+                    {
+                        foreach (var slot in field.EnemySide.Slots)
+                        {
+                            if (!slot.IsEmpty && slot.Pokemon != null && message.Contains(slot.Pokemon.DisplayName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                pokemonName = GetPokemonDisplayName(slot.Pokemon);
+                                isPlayerSide = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                var sideName = isPlayerSide ? "Player" : "Enemy";
+                if (pokemonName != null)
+                {
+                    _logger.LogInfo($"[{sideName}] {pokemonName}: {message}");
+                }
+                else
+                {
+                    // Log anyway if we can't determine the Pokemon
+                    _logger.LogInfo(message);
+                }
+            }
+        }
+
         private void LogPokemonStatus(BattleField field)
         {
             // Log Player side
@@ -417,7 +507,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 {
                     var p = slot.Pokemon;
                     var statusName = p.Status.GetDisplayName(_localizationProvider);
-                    _logger.LogDebug($"[Player] {p.DisplayName} - HP: {p.CurrentHP}/{p.MaxHP}, Status: {statusName}");
+                    _logger.LogDebug($"[Player] {GetPokemonDisplayName(p)} - HP: {p.CurrentHP}/{p.MaxHP}, Status: {statusName}");
                 }
             }
 
@@ -428,7 +518,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 {
                     var p = slot.Pokemon;
                     var statusName = p.Status.GetDisplayName(_localizationProvider);
-                    _logger.LogDebug($"[Enemy] {p.DisplayName} - HP: {p.CurrentHP}/{p.MaxHP}, Status: {statusName}");
+                    _logger.LogDebug($"[Enemy] {GetPokemonDisplayName(p)} - HP: {p.CurrentHP}/{p.MaxHP}, Status: {statusName}");
                 }
             }
         }

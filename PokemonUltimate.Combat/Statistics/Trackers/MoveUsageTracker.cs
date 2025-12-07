@@ -20,16 +20,18 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
 
             if (action is UseMoveAction moveAction && moveAction.User?.Pokemon != null)
             {
-                var pokemonName = moveAction.User.Pokemon.Species.Name;
+                // Use Species.Name for statistics accumulation across multiple battles
+                // InstanceId is only used for display purposes in single-battle scenarios
+                var pokemonKey = moveAction.User.Pokemon.Species.Name;
                 var moveName = moveAction.Move?.Name ?? "Unknown";
 
-                if (!stats.MoveUsageStats.ContainsKey(pokemonName))
-                    stats.MoveUsageStats[pokemonName] = new Dictionary<string, int>();
+                if (!stats.MoveUsageStats.ContainsKey(pokemonKey))
+                    stats.MoveUsageStats[pokemonKey] = new Dictionary<string, int>();
 
-                if (!stats.MoveUsageStats[pokemonName].ContainsKey(moveName))
-                    stats.MoveUsageStats[pokemonName][moveName] = 0;
+                if (!stats.MoveUsageStats[pokemonKey].ContainsKey(moveName))
+                    stats.MoveUsageStats[pokemonKey][moveName] = 0;
 
-                stats.MoveUsageStats[pokemonName][moveName]++;
+                stats.MoveUsageStats[pokemonKey][moveName]++;
             }
         }
     }

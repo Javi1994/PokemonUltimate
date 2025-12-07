@@ -19,5 +19,10 @@ namespace PokemonUltimate.Combat.Constants
         /// Maximum number of queue iterations before considering infinite loop.
         /// </summary>
         public const int MaxQueueIterations = 1000;
+
+        /// <summary>
+        /// Number of consecutive turns without HP changes before battle is considered stuck (infinite loop).
+        /// </summary>
+        public const int MaxTurnsWithoutHPChange = 20;
     }
 }

@@ -90,6 +90,10 @@ namespace PokemonUltimate.Combat.Statistics
 
         // Team status snapshots (Turn -> Side -> Remaining/Total/Fainted)
         public Dictionary<int, Dictionary<bool, TeamStatusSnapshot>> TeamStatusHistory { get; set; } = new Dictionary<int, Dictionary<bool, TeamStatusSnapshot>>();
+
+        // ===== KILL HISTORY =====
+        // Kill history: List of (Killer Pokemon Name, Victim Pokemon Name, Killer Is Player)
+        public List<(string Killer, string Victim, bool KillerIsPlayer)> KillHistory { get; set; } = new List<(string, string, bool)>();
     }
 
     /// <summary>

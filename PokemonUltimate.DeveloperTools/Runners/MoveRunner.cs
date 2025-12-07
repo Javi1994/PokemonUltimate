@@ -114,9 +114,15 @@ namespace PokemonUltimate.DeveloperTools.Runners
 
                 // Statistics accumulate across all tests (not reset between tests)
 
-                // Actualizar progreso
-                progress?.Report((i + 1) * 100 / config.NumberOfTests);
-                
+                // Actualizar progreso solo cada 1% o cada 10 tests (lo que sea menor)
+                // Esto previene stack overflow con muchas simulaciones
+                var currentPercent = (i + 1) * 100 / config.NumberOfTests;
+                var reportInterval = Math.Max(1, config.NumberOfTests / 100); // Al menos cada 1%
+                if (progress != null && ((i + 1) % reportInterval == 0 || i == config.NumberOfTests - 1))
+                {
+                    progress.Report(currentPercent);
+                }
+
                 // Permitir que la UI se actualice
                 await Task.Yield();
             }
@@ -153,7 +159,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
             // Create a temporary queue to use the statistics system
             var queue = new BattleQueue();
             queue.AddObserver(statisticsCollector);
-            
+
             // Note: We don't call OnBattleStart here because it resets statistics
             // Statistics will accumulate across all tests in the batch
             // Reset() is called once at the start of RunTestsAsync

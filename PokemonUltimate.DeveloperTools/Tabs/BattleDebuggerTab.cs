@@ -148,7 +148,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.numericBattles.Width = controlWidth;
             this.numericBattles.Minimum = 1;
             this.numericBattles.Maximum = 10000;
-            this.numericBattles.Value = 100;
+            this.numericBattles.Value = 1000;
             yPos += spacing;
 
             this.checkDetailedOutput.Text = "Detailed Output";
@@ -297,11 +297,22 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 };
 
                 // Crear progress reporter
+                // Usar BeginInvoke para evitar bloqueos y stack overflow
                 var progress = new Progress<int>(percent =>
                 {
-                    this.progressBar.Value = percent;
-                    this.lblStatus.Text = $"Running battles... {percent}%";
-                    Application.DoEvents();
+                    if (this.InvokeRequired)
+                    {
+                        this.BeginInvoke(new Action(() =>
+                        {
+                            this.progressBar.Value = Math.Min(100, Math.Max(0, percent));
+                            this.lblStatus.Text = $"Running battles... {percent}%";
+                        }));
+                    }
+                    else
+                    {
+                        this.progressBar.Value = Math.Min(100, Math.Max(0, percent));
+                        this.lblStatus.Text = $"Running battles... {percent}%";
+                    }
                 });
 
                 // Ejecutar batallas

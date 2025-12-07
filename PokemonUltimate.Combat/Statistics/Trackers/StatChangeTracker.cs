@@ -21,19 +21,20 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
             // Track stat changes from StatChangeAction
             if (action is StatChangeAction statAction && statAction.Target?.Pokemon != null)
             {
-                var pokemonName = statAction.Target.Pokemon.Species.Name;
+                // Use Species.Name for statistics accumulation across multiple battles
+                var pokemonKey = statAction.Target.Pokemon.Species.Name;
                 var statName = statAction.Stat.ToString();
                 var stageChange = statAction.Change;
 
                 if (stageChange != 0)
                 {
-                    if (!stats.StatChangeStats.ContainsKey(pokemonName))
-                        stats.StatChangeStats[pokemonName] = new Dictionary<string, List<int>>();
+                    if (!stats.StatChangeStats.ContainsKey(pokemonKey))
+                        stats.StatChangeStats[pokemonKey] = new Dictionary<string, List<int>>();
 
-                    if (!stats.StatChangeStats[pokemonName].ContainsKey(statName))
-                        stats.StatChangeStats[pokemonName][statName] = new List<int>();
+                    if (!stats.StatChangeStats[pokemonKey].ContainsKey(statName))
+                        stats.StatChangeStats[pokemonKey][statName] = new List<int>();
 
-                    stats.StatChangeStats[pokemonName][statName].Add(stageChange);
+                    stats.StatChangeStats[pokemonKey][statName].Add(stageChange);
                 }
             }
 
@@ -44,19 +45,20 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
                 {
                     if (reaction is StatChangeAction reactionStat && reactionStat.Target?.Pokemon != null)
                     {
-                        var pokemonName = reactionStat.Target.Pokemon.Species.Name;
+                        // Use Species.Name for statistics accumulation across multiple battles
+                        var pokemonKey = reactionStat.Target.Pokemon.Species.Name;
                         var statName = reactionStat.Stat.ToString();
                         var stageChange = reactionStat.Change;
 
                         if (stageChange != 0)
                         {
-                            if (!stats.StatChangeStats.ContainsKey(pokemonName))
-                                stats.StatChangeStats[pokemonName] = new Dictionary<string, List<int>>();
+                            if (!stats.StatChangeStats.ContainsKey(pokemonKey))
+                                stats.StatChangeStats[pokemonKey] = new Dictionary<string, List<int>>();
 
-                            if (!stats.StatChangeStats[pokemonName].ContainsKey(statName))
-                                stats.StatChangeStats[pokemonName][statName] = new List<int>();
+                            if (!stats.StatChangeStats[pokemonKey].ContainsKey(statName))
+                                stats.StatChangeStats[pokemonKey][statName] = new List<int>();
 
-                            stats.StatChangeStats[pokemonName][statName].Add(stageChange);
+                            stats.StatChangeStats[pokemonKey][statName].Add(stageChange);
                         }
                     }
                 }

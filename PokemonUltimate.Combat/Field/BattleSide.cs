@@ -122,6 +122,30 @@ namespace PokemonUltimate.Combat
         }
 
         /// <summary>
+        /// Gets Pokemon from the party that can be switched in.
+        /// Excludes currently active Pokemon, fainted Pokemon, and reserved Pokemon.
+        /// </summary>
+        /// <param name="reservedPokemon">Pokemon that are already reserved for switching in the same turn. Cannot be null.</param>
+        /// <returns>Pokemon available for switching.</returns>
+        public IEnumerable<PokemonInstance> GetAvailableSwitches(IEnumerable<PokemonInstance> reservedPokemon)
+        {
+            if (_party == null)
+                return Enumerable.Empty<PokemonInstance>();
+
+            if (reservedPokemon == null)
+                throw new ArgumentNullException(nameof(reservedPokemon));
+
+            var activePokemon = _slots
+                .Where(s => !s.IsEmpty)
+                .Select(s => s.Pokemon)
+                .ToHashSet();
+
+            var reservedSet = reservedPokemon.ToHashSet();
+
+            return _party.Where(p => !p.IsFainted && !activePokemon.Contains(p) && !reservedSet.Contains(p));
+        }
+
+        /// <summary>
         /// Checks if this side has at least one active (non-fainted) Pokemon on the field.
         /// </summary>
         /// <returns>True if there's at least one active Pokemon.</returns>

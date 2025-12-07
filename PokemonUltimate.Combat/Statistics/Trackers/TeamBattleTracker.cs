@@ -24,13 +24,23 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
             if (action is FaintAction faintAction && faintAction.Target?.Pokemon != null && faintAction.Target.Side != null)
             {
                 var side = faintAction.Target.Side.IsPlayer;
-                var pokemonName = faintAction.Target.Pokemon.Species.Name;
+                // Use Species.Name for statistics accumulation across multiple battles
+                var pokemonKey = faintAction.Target.Pokemon.Species.Name;
 
                 if (!stats.FaintedPokemon.ContainsKey(side))
                     stats.FaintedPokemon[side] = new List<string>();
 
-                if (!stats.FaintedPokemon[side].Contains(pokemonName))
-                    stats.FaintedPokemon[side].Add(pokemonName);
+                if (!stats.FaintedPokemon[side].Contains(pokemonKey))
+                    stats.FaintedPokemon[side].Add(pokemonKey);
+
+                // Track kill history (who killed whom)
+                if (faintAction.User?.Pokemon != null && faintAction.User.Side != null)
+                {
+                    var killerName = faintAction.User.Pokemon.DisplayName;
+                    var victimName = faintAction.Target.Pokemon.DisplayName;
+                    var killerIsPlayer = faintAction.User.Side.IsPlayer;
+                    stats.KillHistory.Add((killerName, victimName, killerIsPlayer));
+                }
 
                 // Update team status snapshot
                 UpdateTeamStatusSnapshot(field, stats, side);

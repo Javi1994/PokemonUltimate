@@ -21,15 +21,16 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
 
             if (action is DamageAction damageAction && damageAction.Target?.Pokemon != null && damageAction.Context != null)
             {
-                var pokemonName = damageAction.Target.Pokemon.Species.Name;
+                // Use Species.Name for statistics accumulation across multiple battles
+                var pokemonKey = damageAction.Target.Pokemon.Species.Name;
                 var damage = damageAction.Context.FinalDamage;
 
                 if (damage > 0)
                 {
-                    if (!stats.DamageStats.ContainsKey(pokemonName))
-                        stats.DamageStats[pokemonName] = new List<int>();
+                    if (!stats.DamageStats.ContainsKey(pokemonKey))
+                        stats.DamageStats[pokemonKey] = new List<int>();
 
-                    stats.DamageStats[pokemonName].Add(damage);
+                    stats.DamageStats[pokemonKey].Add(damage);
 
                     // Track critical hits if applicable
                     if (damageAction.Context.IsCritical)

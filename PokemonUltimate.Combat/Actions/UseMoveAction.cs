@@ -466,7 +466,7 @@ namespace PokemonUltimate.Combat.Actions
             // Check Flinch (volatile status)
             if (User.HasVolatileStatus(VolatileStatus.Flinch))
             {
-                actions.Add(new MessageAction(_messageFormatter.Format(LocalizationKey.BattleFlinched, User.Pokemon.DisplayName)));
+                actions.Add(new MessageAction(_messageFormatter.Format(LocalizationKey.BattleFlinched, User.Pokemon.DisplayName), User));
                 User.RemoveVolatileStatus(VolatileStatus.Flinch); // Consume flinch
                 return actions;
             }
@@ -492,17 +492,17 @@ namespace PokemonUltimate.Combat.Actions
             switch (pokemon.Status)
             {
                 case PersistentStatus.Sleep:
-                    return new MessageAction(_messageFormatter.Format(LocalizationKey.BattleAsleep, pokemon.DisplayName));
+                    return new MessageAction(_messageFormatter.Format(LocalizationKey.BattleAsleep, pokemon.DisplayName), User);
 
                 case PersistentStatus.Freeze:
                     var provider = LocalizationManager.Instance;
-                    return new MessageAction(provider.GetString(LocalizationKey.BattleFrozen, pokemon.DisplayName));
+                    return new MessageAction(provider.GetString(LocalizationKey.BattleFrozen, pokemon.DisplayName), User);
 
                 case PersistentStatus.Paralysis:
                     // 25% chance to be fully paralyzed
                     if (_randomProvider.Next(100) < StatusConstants.ParalysisFullParalysisChance)
                     {
-                        return new MessageAction(_messageFormatter.Format(LocalizationKey.BattleParalyzed, pokemon.DisplayName));
+                        return new MessageAction(_messageFormatter.Format(LocalizationKey.BattleParalyzed, pokemon.DisplayName), User);
                     }
                     break;
             }

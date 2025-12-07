@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PokemonUltimate.Content.Catalogs.Status;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
 
@@ -54,8 +55,36 @@ namespace PokemonUltimate.Combat.Actions
             if (Target.IsEmpty)
                 return Enumerable.Empty<BattleAction>();
 
-            // Safeguard prevents status application (but allows clearing status)
-            if (Status != PersistentStatus.None && Target.Side.HasSideCondition(SideCondition.Safeguard))
+            // Check if clearing status (Status.None)
+            if (Status == PersistentStatus.None)
+            {
+                Target.Pokemon.Status = Status;
+                return Enumerable.Empty<BattleAction>();
+            }
+
+            // Check if Pokemon already has a status
+            if (Target.Pokemon.Status != PersistentStatus.None)
+            {
+                // Pokemon already has a status, cannot apply another
+                return Enumerable.Empty<BattleAction>();
+            }
+
+            // Get status effect data to check immunities
+            var statusData = StatusCatalog.GetByStatus(Status);
+            if (statusData != null)
+            {
+                // Check type immunities (e.g., Fire types immune to Burn)
+                var pokemon = Target.Pokemon;
+                if (statusData.IsTypeImmune(pokemon.Species.PrimaryType) ||
+                    (pokemon.Species.SecondaryType.HasValue && statusData.IsTypeImmune(pokemon.Species.SecondaryType.Value)))
+                {
+                    // Pokemon is immune to this status - don't apply it
+                    return Enumerable.Empty<BattleAction>();
+                }
+            }
+
+            // Safeguard prevents status application
+            if (Target.Side.HasSideCondition(SideCondition.Safeguard))
             {
                 var safeguardData = Target.Side.GetSideConditionData(SideCondition.Safeguard);
                 if (safeguardData != null && safeguardData.PreventsStatus)
@@ -65,6 +94,7 @@ namespace PokemonUltimate.Combat.Actions
                 }
             }
 
+            // Apply the status
             Target.Pokemon.Status = Status;
 
             return Enumerable.Empty<BattleAction>();

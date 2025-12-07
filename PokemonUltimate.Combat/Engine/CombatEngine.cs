@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Engine;
@@ -256,6 +257,9 @@ namespace PokemonUltimate.Combat
             }
 
             int turnCount = 0;
+            int turnsWithoutHPChange = 0;
+            int previousPlayerTotalHP = GetTotalHP(Field.PlayerSide);
+            int previousEnemyTotalHP = GetTotalHP(Field.EnemySide);
 
             while (Outcome == BattleOutcome.Ongoing && turnCount < BattleConstants.MaxTurns)
             {
@@ -268,11 +272,43 @@ namespace PokemonUltimate.Combat
                     isPlayerSide: false,
                     data: new Events.BattleEventData()));
 
+                // Notify observers about turn start
+                foreach (var observer in Queue.GetObservers())
+                {
+                    observer.OnTurnStart(currentTurn, Field);
+                }
+
                 await RunTurn(currentTurn);
                 turnCount++;
 
                 // Check outcome after each turn
                 Outcome = BattleArbiter.CheckOutcome(Field);
+
+                // Check for infinite loop: detect if HP hasn't changed
+                int currentPlayerTotalHP = GetTotalHP(Field.PlayerSide);
+                int currentEnemyTotalHP = GetTotalHP(Field.EnemySide);
+
+                bool hpChanged = (currentPlayerTotalHP != previousPlayerTotalHP) ||
+                                 (currentEnemyTotalHP != previousEnemyTotalHP);
+
+                if (hpChanged)
+                {
+                    turnsWithoutHPChange = 0;
+                    previousPlayerTotalHP = currentPlayerTotalHP;
+                    previousEnemyTotalHP = currentEnemyTotalHP;
+                }
+                else
+                {
+                    turnsWithoutHPChange++;
+
+                    // If no HP changes for many turns, consider it an infinite loop
+                    if (turnsWithoutHPChange >= BattleConstants.MaxTurnsWithoutHPChange)
+                    {
+                        _logger.LogWarning($"Battle detected as infinite loop: {turnsWithoutHPChange} turns without HP changes. Ending in draw.");
+                        Outcome = BattleOutcome.Draw;
+                        break;
+                    }
+                }
 
                 // Publish turn ended event (logging handled by EventBasedBattleLogger)
                 _eventBus.PublishEvent(new Events.BattleEvent(
@@ -280,6 +316,19 @@ namespace PokemonUltimate.Combat
                     turnNumber: turnCount,
                     isPlayerSide: false,
                     data: new Events.BattleEventData()));
+
+                // Notify observers about turn end
+                foreach (var observer in Queue.GetObservers())
+                {
+                    observer.OnTurnEnd(turnCount, Field);
+                }
+            }
+
+            // If we reached max turns without a conclusion, end in draw
+            if (Outcome == BattleOutcome.Ongoing && turnCount >= BattleConstants.MaxTurns)
+            {
+                _logger.LogWarning($"Battle reached maximum turn limit ({BattleConstants.MaxTurns}). Ending in draw.");
+                Outcome = BattleOutcome.Draw;
             }
 
             // Generate result
@@ -326,19 +375,11 @@ namespace PokemonUltimate.Combat
 
             // 1. Collect actions from all active slots (FASE DE SELECCIÓN)
             // En Pokémon, ambos jugadores eligen simultáneamente antes de ejecutar
+            // Coordinate switches per side to avoid duplicate Pokemon selections
             var pendingActions = new List<BattleAction>();
-            foreach (var slot in Field.GetAllActiveSlots())
-            {
-                if (slot.ActionProvider != null)
-                {
-                    var action = await slot.ActionProvider.GetAction(Field, slot);
-                    if (action != null)
-                    {
-                        pendingActions.Add(action);
-                        // Logging handled by EventBasedBattleLogger via events
-                    }
-                }
-            }
+
+            // Collect actions with coordination for strategic switches
+            await CollectActionsWithCoordination(pendingActions);
 
             // 2. Sort by turn order (priority, then speed) (FASE DE ORDENAMIENTO)
             // Ahora se ordenan todas las acciones por prioridad y velocidad
@@ -396,6 +437,7 @@ namespace PokemonUltimate.Combat
         /// <summary>
         /// Handles automatic switching for fainted Pokemon in team battles.
         /// Checks all slots for fainted Pokemon and forces automatic switching if available.
+        /// Coordinates switches per side to avoid duplicate Pokemon selections in doubles battles.
         /// </summary>
         private async Task HandleFaintedPokemonSwitching()
         {
@@ -403,46 +445,10 @@ namespace PokemonUltimate.Combat
                 return;
 
             var switchActions = new List<BattleAction>();
-            var currentTurn = 0; // Will be set by caller if tracking turns
 
-            // Check all slots (not just active ones) for fainted Pokemon
-            foreach (var slot in Field.PlayerSide.Slots.Concat(Field.EnemySide.Slots))
-            {
-                // Check if slot has a fainted Pokemon
-                bool hasFaintedPokemon = slot.Pokemon != null && slot.Pokemon.IsFainted;
-
-                // Check if slot is empty but party has active Pokemon available
-                bool isEmptyButHasAvailablePokemon = slot.IsEmpty &&
-                    slot.Side != null &&
-                    slot.Side.Party != null &&
-                    slot.Side.Party.Any(p => !p.IsFainted && !slot.Side.Slots.Any(s => s.Pokemon == p));
-
-                if (hasFaintedPokemon || isEmptyButHasAvailablePokemon)
-                {
-                    // Try to get a switch action from the action provider
-                    if (slot.ActionProvider != null)
-                    {
-                        try
-                        {
-                            var action = await slot.ActionProvider.GetAction(Field, slot);
-                            if (action != null && action is SwitchAction switchAction)
-                            {
-                                switchActions.Add(switchAction);
-                                // Logging handled by DetailedBattleLoggerObserver when action executes
-                            }
-                            else if (action == null && hasFaintedPokemon)
-                            {
-                                // No Pokemon available to switch - this is expected when party is exhausted
-                                // Logging handled by EventBasedBattleLogger via events
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError($"Error getting switch action for fainted Pokemon: {ex.Message}");
-                        }
-                    }
-                }
-            }
+            // Process switches per side to coordinate and avoid duplicates
+            await ProcessSideSwitches(Field.PlayerSide, switchActions);
+            await ProcessSideSwitches(Field.EnemySide, switchActions);
 
             // Execute all switch actions
             if (switchActions.Count > 0)
@@ -453,7 +459,205 @@ namespace PokemonUltimate.Combat
             }
         }
 
-        private int _currentTurnNumber = 0;
+        /// <summary>
+        /// Processes switches for a single side, coordinating to avoid duplicate Pokemon selections.
+        /// </summary>
+        private async Task ProcessSideSwitches(BattleSide side, List<BattleAction> switchActions)
+        {
+            if (side == null)
+                return;
+
+            // Find all slots that need switching
+            var slotsNeedingSwitch = new List<BattleSlot>();
+            foreach (var slot in side.Slots)
+            {
+                // Check if slot has a fainted Pokemon
+                bool hasFaintedPokemon = slot.Pokemon != null && slot.Pokemon.IsFainted;
+
+                // Check if slot is empty but party has active Pokemon available
+                bool isEmptyButHasAvailablePokemon = slot.IsEmpty &&
+                    side.Party != null &&
+                    side.Party.Any(p => !p.IsFainted && !side.Slots.Any(s => s.Pokemon == p));
+
+                if (hasFaintedPokemon || isEmptyButHasAvailablePokemon)
+                {
+                    slotsNeedingSwitch.Add(slot);
+                }
+            }
+
+            // If no slots need switching, return early
+            if (slotsNeedingSwitch.Count == 0)
+                return;
+
+            // Track Pokemon already selected for switching to avoid duplicates
+            var reservedPokemon = new HashSet<PokemonInstance>();
+
+            // Process each slot that needs switching
+            foreach (var slot in slotsNeedingSwitch)
+            {
+                if (slot.ActionProvider == null)
+                    continue;
+
+                try
+                {
+                    // Get available switches excluding already reserved Pokemon
+                    var availableSwitches = side.GetAvailableSwitches(reservedPokemon).ToList();
+
+                    // If no Pokemon available, skip this slot
+                    if (availableSwitches.Count == 0)
+                        continue;
+
+                    // Select a Pokemon for this slot
+                    PokemonInstance selectedPokemon;
+
+                    // For TeamBattleAI, we can simulate its selection logic
+                    // Otherwise, get action from provider and validate
+                    if (slot.ActionProvider is TeamBattleAI)
+                    {
+                        // Use random selection similar to TeamBattleAI
+                        int index = _randomProvider.Next(0, availableSwitches.Count);
+                        selectedPokemon = availableSwitches[index];
+                    }
+                    else
+                    {
+                        // For other AI types, get action normally but validate no duplicates
+                        var action = await slot.ActionProvider.GetAction(Field, slot);
+                        if (action != null && action is SwitchAction providerSwitchAction)
+                        {
+                            // Check if this Pokemon is already reserved
+                            if (reservedPokemon.Contains(providerSwitchAction.NewPokemon))
+                            {
+                                // Try to find an alternative from available switches
+                                if (availableSwitches.Count > 0)
+                                {
+                                    int index = _randomProvider.Next(0, availableSwitches.Count);
+                                    selectedPokemon = availableSwitches[index];
+                                }
+                                else
+                                {
+                                    // No alternative available, skip this slot
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                selectedPokemon = providerSwitchAction.NewPokemon;
+                            }
+                        }
+                        else
+                        {
+                            // No action returned, skip this slot
+                            continue;
+                        }
+                    }
+
+                    // Reserve this Pokemon and create switch action
+                    reservedPokemon.Add(selectedPokemon);
+                    var newSwitchAction = new SwitchAction(slot, selectedPokemon);
+                    switchActions.Add(newSwitchAction);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error getting switch action for fainted Pokemon: {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Collects actions from all active slots with coordination for strategic switches.
+        /// Prevents duplicate Pokemon selections when multiple slots want to switch.
+        /// </summary>
+        private async Task CollectActionsWithCoordination(List<BattleAction> pendingActions)
+        {
+            // Collect actions per side to coordinate switches
+            var playerActions = new List<(BattleSlot slot, BattleAction action)>();
+            var enemyActions = new List<(BattleSlot slot, BattleAction action)>();
+
+            // First pass: collect all actions
+            foreach (var slot in Field.GetAllActiveSlots())
+            {
+                if (slot.ActionProvider == null)
+                    continue;
+
+                var action = await slot.ActionProvider.GetAction(Field, slot);
+                if (action != null)
+                {
+                    if (slot.Side.IsPlayer)
+                        playerActions.Add((slot, action));
+                    else
+                        enemyActions.Add((slot, action));
+                }
+            }
+
+            // Coordinate switches for player side
+            var coordinatedPlayerActions = CoordinateSwitches(playerActions, Field.PlayerSide);
+            pendingActions.AddRange(coordinatedPlayerActions);
+
+            // Coordinate switches for enemy side
+            var coordinatedEnemyActions = CoordinateSwitches(enemyActions, Field.EnemySide);
+            pendingActions.AddRange(coordinatedEnemyActions);
+        }
+
+        /// <summary>
+        /// Coordinates switches for a side to prevent duplicate Pokemon selections.
+        /// </summary>
+        private List<BattleAction> CoordinateSwitches(
+            List<(BattleSlot slot, BattleAction action)> actions,
+            BattleSide side)
+        {
+            var coordinatedActions = new List<BattleAction>();
+            var reservedPokemon = new HashSet<PokemonInstance>();
+
+            // Separate switch actions from other actions
+            var switchActions = new List<(BattleSlot slot, SwitchAction action)>();
+            var otherActions = new List<BattleAction>();
+
+            foreach (var (slot, action) in actions)
+            {
+                if (action is SwitchAction switchAction)
+                {
+                    switchActions.Add((slot, switchAction));
+                }
+                else
+                {
+                    otherActions.Add(action);
+                }
+            }
+
+            // Process switch actions with coordination
+            foreach (var (slot, switchAction) in switchActions)
+            {
+                // Check if the selected Pokemon is already reserved
+                if (reservedPokemon.Contains(switchAction.NewPokemon))
+                {
+                    // Find an alternative Pokemon
+                    var availableSwitches = side.GetAvailableSwitches(reservedPokemon).ToList();
+                    if (availableSwitches.Count > 0)
+                    {
+                        // Select a different Pokemon
+                        int index = _randomProvider.Next(0, availableSwitches.Count);
+                        var alternativePokemon = availableSwitches[index];
+                        reservedPokemon.Add(alternativePokemon);
+
+                        // Create new switch action with alternative Pokemon
+                        var coordinatedSwitch = new SwitchAction(slot, alternativePokemon);
+                        coordinatedActions.Add(coordinatedSwitch);
+                    }
+                    // If no alternative available, skip this switch (shouldn't happen in normal gameplay)
+                }
+                else
+                {
+                    // Pokemon not reserved, use original switch action
+                    reservedPokemon.Add(switchAction.NewPokemon);
+                    coordinatedActions.Add(switchAction);
+                }
+            }
+
+            // Add non-switch actions (they don't need coordination)
+            coordinatedActions.AddRange(otherActions);
+
+            return coordinatedActions;
+        }
 
         /// <summary>
         /// Publishes events for action collection and sorting (for debugging).
@@ -569,6 +773,25 @@ namespace PokemonUltimate.Combat
 
             // Custom mode
             return $"Custom ({rules.PlayerSlots}v{rules.EnemySlots})";
+        }
+
+        /// <summary>
+        /// Gets the total HP of all active Pokemon on a side.
+        /// </summary>
+        private int GetTotalHP(BattleSide side)
+        {
+            if (side == null || side.Slots == null)
+                return 0;
+
+            int totalHP = 0;
+            foreach (var slot in side.Slots)
+            {
+                if (slot.Pokemon != null && !slot.Pokemon.IsFainted)
+                {
+                    totalHP += slot.Pokemon.CurrentHP;
+                }
+            }
+            return totalHP;
         }
 
         /// <summary>

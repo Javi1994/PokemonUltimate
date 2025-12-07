@@ -1,6 +1,6 @@
 # Sub-Feature 6.7: Data Viewer
 
-> Simple console application for quickly viewing game data (Pokemon, Moves, Items, Abilities).
+> Windows Forms application for visually viewing and exploring all game data (Pokemon, Moves, Items, Abilities, Status Effects, Weather, Terrain, Hazards, Side Conditions, Field Effects).
 
 **Feature Number**: 6  
 **Sub-Feature Number**: 6.7  
@@ -10,16 +10,17 @@
 
 ## Overview
 
-The Data Viewer is a simple console application that allows developers to quickly browse and view game data from the catalogs. It provides a fast way to inspect Pokemon, Moves, Items, and Abilities without needing to open the full Developer Tools application.
+The Data Viewer is a Windows Forms application that provides a visual interface for browsing and exploring all game data from the catalogs. It offers an intuitive tabbed interface to inspect Pokemon, Moves, Items, Abilities, Status Effects, Weather, Terrain, Hazards, Side Conditions, and Field Effects.
 
-**Status**: 🎯 In Progress
+**Status**: ✅ Complete
 
 ## Purpose
 
-- **Quick Data Access**: View game data quickly from command line
-- **Simple Interface**: No complex UI, just console output
-- **Fast Navigation**: Browse catalogs efficiently
+- **Visual Data Access**: View game data through an intuitive graphical interface
+- **Complete Coverage**: Access to all game data types in one application
+- **Interactive Exploration**: Click on items to see detailed information
 - **Development Tool**: Help developers verify data during development
+- **Quick Reference**: Fast access to game data without searching through code
 
 ## Features
 
@@ -33,9 +34,10 @@ The Data Viewer is a simple console application that allows developers to quickl
 - View all Hazards in catalog
 - View all Side Conditions in catalog
 - View all Field Effects in catalog
-- Interactive selection - click rows to see detailed information
-- Search by name (future enhancement)
-- Filter by type (future enhancement)
+- **Interactive selection**: Click rows to see detailed information in the details panel
+- **Data grids**: Tabular view of all items with sortable columns
+- **Details panel**: Shows complete information for selected items
+- **Consistent interface**: All tabs follow the same layout pattern
 
 ## Project Structure
 
@@ -59,11 +61,15 @@ PokemonUltimate.DataViewer/
 ## Features
 
 - **Visual Interface**: Windows Forms application with tabbed interface
-- **Data Grids**: DataGridView controls for displaying data in tables
+- **Data Grids**: DataGridView controls for displaying data in tables with sortable columns
 - **Details Panel**: RichTextBox showing detailed information for selected items
-- **Ten Tabs**: Pokemon, Moves, Items, Abilities, Status Effects, Weather, Terrain, Hazards, Side Conditions, and Field Effects
-- **Interactive**: Click on any row to see detailed information
-- **Consistent Layout**: All tabs follow the same pattern with title, count, and data grid
+- **Ten Tabs**: 
+  - Pokemon, Moves, Items, Abilities (core game data)
+  - Status Effects, Weather, Terrain (field conditions)
+  - Hazards, Side Conditions, Field Effects (battle field effects)
+- **Interactive**: Click on any row to see detailed information in the details panel
+- **Consistent Layout**: All tabs follow the same pattern with title, count, data grid, and details panel
+- **Localization Support**: Uses localization system (defaults to Spanish)
 
 ## Usage
 
@@ -90,6 +96,8 @@ The application will open a Windows Forms window with tabs for each data type.
 ### With Content
 
 - Uses `PokemonCatalog`, `MoveCatalog`, `ItemCatalog`, `AbilityCatalog` from `PokemonUltimate.Content.Catalogs`
+- Uses `StatusCatalog`, `WeatherCatalog`, `TerrainCatalog` from `PokemonUltimate.Content.Catalogs`
+- Uses `HazardCatalog`, `SideConditionCatalog`, `FieldEffectCatalog` from `PokemonUltimate.Content.Catalogs`
 
 ## Related Documents
 
@@ -99,5 +107,14 @@ The application will open a Windows Forms window with tabs for each data type.
 
 ---
 
-**Last Updated**: January 2025
+## Related Documentation
+
+- **[README](../../PokemonUltimate.DataViewer/README.md)** - Module README with complete documentation
+- **[Feature 6: Development Tools](../README.md)** - Parent feature
+- **[Feature 6 Architecture](../architecture.md)** - Technical specification
+- **[Feature 1: Game Data](../../1-game-data/README.md)** - Game data structures
+
+---
+
+**Last Updated**: December 2025
 

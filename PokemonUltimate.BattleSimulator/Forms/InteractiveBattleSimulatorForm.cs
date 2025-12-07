@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PokemonUltimate.BattleSimulator.Helpers;
 using PokemonUltimate.BattleSimulator.Logging;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
@@ -43,6 +47,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
         private TabPage tabBattleMode = null!;
         private TabPage tabPokemon = null!;
         private TabPage tabLogs = null!;
+        private TabPage tabResults = null!;
 
         // Logs Tab controls
         private RichTextBox txtLogs = null!;
@@ -61,6 +66,11 @@ namespace PokemonUltimate.BattleSimulator.Forms
         private Panel panelEnemyPokemon = null!;
         private List<PokemonSlotControls> playerSlotControls = new List<PokemonSlotControls>();
         private List<PokemonSlotControls> enemySlotControls = new List<PokemonSlotControls>();
+        private CheckBox checkRandomPlayerTeam = null!;
+        private CheckBox checkRandomEnemyTeam = null!;
+        private NumericUpDown numericRandomTeamLevel = null!;
+        private NumericUpDown numericBatchSimulations = null!;
+        private CheckBox checkExportLogs = null!;
 
         // Helper class to hold controls for each Pokemon slot
         private class PokemonSlotControls
@@ -82,6 +92,19 @@ namespace PokemonUltimate.BattleSimulator.Forms
         private Task? _battleTask;
         private bool _isBattleRunning = false;
         private bool _isUpdatingSlots = false; // Flag to prevent recursive updates
+        private bool _isGeneratingRandomTeam = false; // Flag to prevent manual selection logic during random generation
+        private BattleStatisticsCollector? _statisticsCollector;
+        private Dictionary<string, string>? _pokemonNameMapping;
+
+        // Results Tab controls - Two separate tabs for each team
+        private TabPage tabPlayerResults = null!;
+        private TabPage tabEnemyResults = null!;
+        private RichTextBox txtPlayerResults = null!;
+        private RichTextBox txtEnemyResults = null!;
+        private Button btnRefreshPlayerResults = null!;
+        private Button btnRefreshEnemyResults = null!;
+        private Button btnCopyPlayerResults = null!;
+        private Button btnCopyEnemyResults = null!;
 
         public InteractiveBattleSimulatorForm()
         {
@@ -98,9 +121,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
             // Form
             this.Text = "Interactive Battle Simulator";
-            this.Size = new Size(1000, 600);
+            this.Size = new Size(1000, 750);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.MinimumSize = new Size(900, 550);
+            this.MinimumSize = new Size(900, 700);
 
             // Main Panel
             var mainPanel = new Panel
@@ -157,7 +180,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
             var groupSlots = new GroupBox
             {
                 Text = "Custom Slots Configuration",
-                Location = new Point(10, 85),
+                Location = new Point(10, 100),
                 Size = new Size(400, 120),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left
@@ -199,9 +222,102 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 lblEnemySlots, numericEnemySlots
             });
 
+            // Random Team Selection GroupBox
+            var groupRandomTeams = new GroupBox
+            {
+                Text = "Random Team Selection",
+                Location = new Point(10, 230),
+                Size = new Size(500, 270),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+
+            this.checkRandomPlayerTeam = new CheckBox
+            {
+                Text = "Random Player Team",
+                Location = new Point(20, 30),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9),
+                Checked = true
+            };
+            this.checkRandomPlayerTeam.CheckedChanged += CheckRandomPlayerTeam_CheckedChanged;
+
+            this.checkRandomEnemyTeam = new CheckBox
+            {
+                Text = "Random Enemy Team",
+                Location = new Point(20, 60),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9),
+                Checked = true
+            };
+            this.checkRandomEnemyTeam.CheckedChanged += CheckRandomEnemyTeam_CheckedChanged;
+
+            var lblRandomLevel = new Label
+            {
+                Text = "Level:",
+                Location = new Point(20, 95),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9)
+            };
+
+            this.numericRandomTeamLevel = new NumericUpDown
+            {
+                Location = new Point(80, 93),
+                Size = new Size(100, 25),
+                Minimum = 1,
+                Maximum = 100,
+                Value = 50
+            };
+
+            // Batch Simulation GroupBox
+            var groupBatchSimulation = new GroupBox
+            {
+                Text = "Batch Simulation",
+                Location = new Point(15, 130),
+                Size = new Size(470, 140),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+
+            var lblBatchSimulations = new Label
+            {
+                Text = "Number of Battles:",
+                Location = new Point(20, 30),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9)
+            };
+
+            this.numericBatchSimulations = new NumericUpDown
+            {
+                Location = new Point(20, 55),
+                Size = new Size(150, 25),
+                Minimum = 1,
+                Maximum = 10000,
+                Value = 1
+            };
+
+            this.checkExportLogs = new CheckBox
+            {
+                Text = "Export Logs to File",
+                Location = new Point(20, 90),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9),
+                Checked = false
+            };
+
+            groupBatchSimulation.Controls.AddRange(new Control[]
+            {
+                lblBatchSimulations, numericBatchSimulations, checkExportLogs
+            });
+
+            groupRandomTeams.Controls.AddRange(new Control[]
+            {
+                checkRandomPlayerTeam, checkRandomEnemyTeam, lblRandomLevel, numericRandomTeamLevel, groupBatchSimulation
+            });
+
             this.tabBattleMode.Controls.AddRange(new Control[]
             {
-                lblBattleMode, comboBattleMode, lblModeInfo, groupSlots
+                lblBattleMode, comboBattleMode, lblModeInfo, groupSlots, groupRandomTeams
             });
 
             // Tab 2: Pokemon Configuration
@@ -384,8 +500,140 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 txtLogs, logsHeaderPanel
             });
 
+            // Tab 4: Player Results
+            this.tabPlayerResults = new TabPage("Equipo Jugador")
+            {
+                Padding = new Padding(10),
+                UseVisualStyleBackColor = true
+            };
+
+            // Header Panel for Player Results
+            var playerResultsHeaderPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 50,
+                Padding = new Padding(5)
+            };
+
+            var lblPlayerResults = new Label
+            {
+                Text = "Estadísticas del Equipo Jugador:",
+                Location = new Point(10, 15),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            };
+
+            this.btnRefreshPlayerResults = new Button
+            {
+                Text = "Actualizar",
+                Location = new Point(300, 10),
+                Size = new Size(100, 30)
+            };
+            this.btnRefreshPlayerResults.Click += BtnRefreshPlayerResults_Click;
+
+            this.btnCopyPlayerResults = new Button
+            {
+                Text = "Copiar al Portapapeles",
+                Location = new Point(410, 10),
+                Size = new Size(150, 30)
+            };
+            this.btnCopyPlayerResults.Click += BtnCopyPlayerResults_Click;
+
+            playerResultsHeaderPanel.Controls.AddRange(new Control[]
+            {
+                lblPlayerResults, btnRefreshPlayerResults, btnCopyPlayerResults
+            });
+
+            // Player Results TextBox
+            this.txtPlayerResults = new RichTextBox
+            {
+                Dock = DockStyle.Fill,
+                Font = new Font("Consolas", 9),
+                ReadOnly = true,
+                BackColor = Color.White,
+                ForeColor = Color.Black,
+                ScrollBars = RichTextBoxScrollBars.Vertical
+            };
+
+            var panelPlayerResults = new Panel
+            {
+                Dock = DockStyle.Fill
+            };
+            panelPlayerResults.Controls.AddRange(new Control[]
+            {
+                txtPlayerResults, playerResultsHeaderPanel
+            });
+
+            this.tabPlayerResults.Controls.Add(panelPlayerResults);
+
+            // Tab 5: Enemy Results
+            this.tabEnemyResults = new TabPage("Equipo Enemigo")
+            {
+                Padding = new Padding(10),
+                UseVisualStyleBackColor = true
+            };
+
+            // Header Panel for Enemy Results
+            var enemyResultsHeaderPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 50,
+                Padding = new Padding(5)
+            };
+
+            var lblEnemyResults = new Label
+            {
+                Text = "Estadísticas del Equipo Enemigo:",
+                Location = new Point(10, 15),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            };
+
+            this.btnRefreshEnemyResults = new Button
+            {
+                Text = "Actualizar",
+                Location = new Point(300, 10),
+                Size = new Size(100, 30)
+            };
+            this.btnRefreshEnemyResults.Click += BtnRefreshEnemyResults_Click;
+
+            this.btnCopyEnemyResults = new Button
+            {
+                Text = "Copiar al Portapapeles",
+                Location = new Point(410, 10),
+                Size = new Size(150, 30)
+            };
+            this.btnCopyEnemyResults.Click += BtnCopyEnemyResults_Click;
+
+            enemyResultsHeaderPanel.Controls.AddRange(new Control[]
+            {
+                lblEnemyResults, btnRefreshEnemyResults, btnCopyEnemyResults
+            });
+
+            // Enemy Results TextBox
+            this.txtEnemyResults = new RichTextBox
+            {
+                Dock = DockStyle.Fill,
+                Font = new Font("Consolas", 9),
+                ReadOnly = true,
+                BackColor = Color.White,
+                ForeColor = Color.Black,
+                ScrollBars = RichTextBoxScrollBars.Vertical
+            };
+
+            var panelEnemyResults = new Panel
+            {
+                Dock = DockStyle.Fill
+            };
+            panelEnemyResults.Controls.AddRange(new Control[]
+            {
+                txtEnemyResults, enemyResultsHeaderPanel
+            });
+
+            this.tabEnemyResults.Controls.Add(panelEnemyResults);
+
             // Add tabs to TabControl
-            this.tabControl.TabPages.AddRange(new TabPage[] { tabBattleMode, tabPokemon, tabLogs });
+            this.tabControl.TabPages.AddRange(new TabPage[] { tabBattleMode, tabPokemon, tabLogs, tabPlayerResults, tabEnemyResults });
 
             // Control Buttons Panel (outside tabs, at bottom)
             var buttonPanel = new Panel
@@ -447,6 +695,16 @@ namespace PokemonUltimate.BattleSimulator.Forms
             // Initialize with default slots (1v1) - this will be triggered by LoadBattleModes setting SelectedIndex
             // But we also call it explicitly to ensure initial state
             UpdatePokemonSlots();
+
+            // Generate random teams by default since checkboxes are checked
+            // Use a small delay to ensure controls are fully initialized
+            this.Load += (s, e) =>
+            {
+                if (checkRandomPlayerTeam.Checked)
+                    GenerateRandomTeam(playerSlotControls, isPlayerTeam: true);
+                if (checkRandomEnemyTeam.Checked)
+                    GenerateRandomTeam(enemySlotControls, isPlayerTeam: false);
+            };
         }
 
         private void LoadPokemonList()
@@ -654,6 +912,8 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     DropDownStyle = ComboBoxStyle.DropDownList
                 };
                 LoadPokemonList(controls.ComboPokemon);
+                // Subscribe to selection change to disable random when manually selecting
+                controls.ComboPokemon.SelectedIndexChanged += (s, e) => OnPokemonManuallySelected(teamName);
 
                 // Level NumericUpDown
                 var lblLevel = new Label
@@ -713,10 +973,95 @@ namespace PokemonUltimate.BattleSimulator.Forms
             parentPanel.Height = yOffset;
         }
 
+        private void CheckRandomPlayerTeam_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (checkRandomPlayerTeam.Checked)
+            {
+                GenerateRandomTeam(playerSlotControls, isPlayerTeam: true);
+            }
+        }
+
+        private void CheckRandomEnemyTeam_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (checkRandomEnemyTeam.Checked)
+            {
+                GenerateRandomTeam(enemySlotControls, isPlayerTeam: false);
+            }
+        }
+
+        private void OnPokemonManuallySelected(string teamName)
+        {
+            // Skip if we're currently generating random teams
+            if (_isGeneratingRandomTeam)
+                return;
+
+            // When user manually selects a Pokemon, disable random team for that team
+            if (teamName == "Player" && checkRandomPlayerTeam.Checked)
+            {
+                // Temporarily disable event to avoid recursion
+                checkRandomPlayerTeam.CheckedChanged -= CheckRandomPlayerTeam_CheckedChanged;
+                checkRandomPlayerTeam.Checked = false;
+                checkRandomPlayerTeam.CheckedChanged += CheckRandomPlayerTeam_CheckedChanged;
+            }
+            else if (teamName == "Enemy" && checkRandomEnemyTeam.Checked)
+            {
+                // Temporarily disable event to avoid recursion
+                checkRandomEnemyTeam.CheckedChanged -= CheckRandomEnemyTeam_CheckedChanged;
+                checkRandomEnemyTeam.Checked = false;
+                checkRandomEnemyTeam.CheckedChanged += CheckRandomEnemyTeam_CheckedChanged;
+            }
+        }
+
+        private void GenerateRandomTeam(List<PokemonSlotControls> slotControls, bool isPlayerTeam)
+        {
+            var random = new Random();
+            var allPokemon = PokemonCatalog.All.ToList();
+
+            if (allPokemon.Count == 0)
+                return;
+
+            // Set flag to prevent manual selection logic from interfering
+            _isGeneratingRandomTeam = true;
+
+            try
+            {
+                // Get the level from the random team level field
+                int level = (int)numericRandomTeamLevel.Value;
+
+                // Generate random Pokemon for each slot
+                // If random is enabled, always randomize (overwrite manual selections)
+                foreach (var slot in slotControls)
+                {
+                    var randomPokemon = allPokemon[random.Next(allPokemon.Count)];
+                    slot.ComboPokemon.SelectedItem = randomPokemon.Name;
+
+                    // Set level from the random team level field
+                    slot.NumericLevel.Value = level;
+
+                    // Randomize nature (keep "Random" selected)
+                    slot.ComboNature.SelectedIndex = 0;
+                }
+            }
+            finally
+            {
+                _isGeneratingRandomTeam = false;
+            }
+        }
+
         private void BtnStartBattle_Click(object? sender, EventArgs e)
         {
             if (_isBattleRunning)
                 return;
+
+            // Generate random teams if enabled
+            if (checkRandomPlayerTeam.Checked)
+            {
+                GenerateRandomTeam(playerSlotControls, isPlayerTeam: true);
+            }
+            if (checkRandomEnemyTeam.Checked)
+            {
+                GenerateRandomTeam(enemySlotControls, isPlayerTeam: false);
+            }
 
             // Validate at least one Pokemon is selected per team
             bool hasPlayerPokemon = playerSlotControls.Any(s => s.ComboPokemon.SelectedItem != null);
@@ -731,6 +1076,11 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 return;
             }
 
+            int numberOfBattles = (int)numericBatchSimulations.Value;
+
+            // Note: Automatic log saving happens in SaveLogsToFile() for each battle
+            // checkExportLogs is for optional consolidated export (handled automatically in RunBatchBattlesAsync)
+
             // Create logger
             _logger = new UIBattleLogger();
 
@@ -741,14 +1091,27 @@ namespace PokemonUltimate.BattleSimulator.Forms
             this.txtLogs.Clear();
             RefreshLogDisplay();
 
+            // Clear statistics display
+            this.txtPlayerResults.Clear();
+            this.txtPlayerResults.Text = "Las estadísticas se mostrarán al finalizar el combate.";
+            this.txtEnemyResults.Clear();
+            this.txtEnemyResults.Text = "Las estadísticas se mostrarán al finalizar el combate.";
+
             // Update UI
             this.btnStartBattle.Enabled = false;
             this.btnStopBattle.Enabled = true;
-            this.lblStatus.Text = "Battle running...";
+            this.lblStatus.Text = numberOfBattles > 1 ? $"Running {numberOfBattles} battles..." : "Battle running...";
             _isBattleRunning = true;
 
-            // Start battle in background thread to avoid blocking UI
-            _battleTask = Task.Run(async () => await RunBattleAsync());
+            // Start battle(s) in background thread to avoid blocking UI
+            if (numberOfBattles > 1)
+            {
+                _battleTask = Task.Run(async () => await RunBatchBattlesAsync(numberOfBattles));
+            }
+            else
+            {
+                _battleTask = Task.Run(async () => await RunBattleAsync());
+            }
         }
 
         private void BtnClearLogs_Click(object? sender, EventArgs e)
@@ -925,7 +1288,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
         }
 
 
-        private async Task RunBattleAsync()
+        private async Task<BattleResult> RunSingleBattleAsync(bool updateUI = true)
         {
             try
             {
@@ -1063,6 +1426,27 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     _engine.Queue.AddObserver(detailedLogger);
                 }
 
+                // Register statistics collector
+                // For batch mode, collector is created outside and Reset() is called once
+                // For single battle, create new collector
+                if (_statisticsCollector == null)
+                {
+                    _statisticsCollector = new BattleStatisticsCollector();
+                    _statisticsCollector.OnBattleStart(_engine.Field);
+                }
+                // Note: For batch mode, OnBattleStart (which calls Reset) is NOT called here
+                // to allow statistics to accumulate across battles
+                _engine.Queue.AddObserver(_statisticsCollector);
+
+                // Create Pokemon name mapping for logs and statistics
+                _pokemonNameMapping = PokemonNameMapper.CreateNameMapping(_engine.Field);
+
+                // Update logger with name mapping if it supports it
+                if (_logger is UIBattleLogger uiLogger)
+                {
+                    uiLogger.SetPokemonNameMapping(_pokemonNameMapping);
+                }
+
                 // Subscribe event-based logger to events (converts events to logs)
                 // This is the single source of truth for logging - no hardcoded logs
                 if (_logger != null && eventBus != null)
@@ -1076,33 +1460,57 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
                 // Battle end logging and team statistics handled by EventBasedBattleLogger via events
 
-                // Update UI on UI thread
-                if (this.InvokeRequired)
+                // Notify statistics collector that battle ended
+                if (_statisticsCollector != null && _engine.Field != null)
                 {
-                    try
+                    _statisticsCollector.OnBattleEnd(result.Outcome, _engine.Field);
+                }
+
+                // Save logs automatically to Logs folder (always for single battles)
+                // Note: For batch battles, SaveLogsToFile is called in RunBatchBattlesAsync for each battle
+                if (_logger != null && updateUI) // Single battle mode
+                {
+                    SaveLogsToFile(_logger, result.Outcome);
+                }
+
+                // Update UI only if requested (not during batch)
+                if (updateUI)
+                {
+                    if (this.InvokeRequired)
                     {
-                        this.Invoke(new Action(() =>
+                        try
                         {
-                            if (!_isBattleRunning) return; // Battle was stopped
-                            this.btnStartBattle.Enabled = true;
-                            this.btnStopBattle.Enabled = false;
-                            this.lblStatus.Text = $"Battle ended: {result.Outcome}";
-                            _isBattleRunning = false;
-                        }));
+                            this.Invoke(new Action(() =>
+                            {
+                                if (!_isBattleRunning) return; // Battle was stopped
+                                this.btnStartBattle.Enabled = true;
+                                this.btnStopBattle.Enabled = false;
+                                this.lblStatus.Text = $"Battle ended: {result.Outcome}";
+                                _isBattleRunning = false;
+                                UpdateStatisticsDisplay();
+                                // Switch to player results tab after battle
+                                this.tabControl.SelectedTab = tabPlayerResults;
+                            }));
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            // Form is closing, ignore
+                        }
                     }
-                    catch (ObjectDisposedException)
+                    else
                     {
-                        // Form is closing, ignore
+                        if (!_isBattleRunning) return result; // Battle was stopped
+                        this.btnStartBattle.Enabled = true;
+                        this.btnStopBattle.Enabled = false;
+                        this.lblStatus.Text = result.Outcome.ToString();
+                        _isBattleRunning = false;
+                        UpdateStatisticsDisplay();
+                        // Switch to player results tab after battle
+                        this.tabControl.SelectedTab = tabPlayerResults;
                     }
                 }
-                else
-                {
-                    if (!_isBattleRunning) return; // Battle was stopped
-                    this.btnStartBattle.Enabled = true;
-                    this.btnStopBattle.Enabled = false;
-                    this.lblStatus.Text = result.Outcome.ToString();
-                    _isBattleRunning = false;
-                }
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -1111,7 +1519,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     _logger.LogError($"Battle error: {ex.Message}");
                 }
 
-                if (this.InvokeRequired)
+                if (updateUI && this.InvokeRequired)
                 {
                     this.Invoke(new Action(() =>
                     {
@@ -1125,9 +1533,599 @@ namespace PokemonUltimate.BattleSimulator.Forms
                         _isBattleRunning = false;
                     }));
                 }
+
+                throw; // Re-throw for batch handling
             }
         }
 
+        private async Task RunBattleAsync()
+        {
+            await RunSingleBattleAsync(updateUI: true);
+        }
+
+        private async Task RunBatchBattlesAsync(int numberOfBattles)
+        {
+            try
+            {
+                var allBattleLogs = new List<string>();
+                var summaryStats = new Dictionary<BattleOutcome, int>();
+                int completedBattles = 0;
+
+                // Create shared statistics collector for batch and reset once
+                _statisticsCollector = new BattleStatisticsCollector();
+                _statisticsCollector.Reset(); // Reset once at the start of batch
+
+                for (int i = 0; i < numberOfBattles; i++)
+                {
+                    if (!_isBattleRunning) break; // User stopped
+
+                    // Update status
+                    if (this.InvokeRequired)
+                    {
+                        this.Invoke(new Action(() =>
+                        {
+                            this.lblStatus.Text = $"Running battle {i + 1} of {numberOfBattles}...";
+                        }));
+                    }
+
+                    // Create new logger for each battle
+                    var battleLogger = new UIBattleLogger();
+                    battleLogger.LogAdded += Logger_LogAdded;
+                    _logger = battleLogger;
+
+                    // Clean up previous engine observers if exists
+                    if (_engine != null)
+                    {
+                        // Remove observers from previous battle
+                        _engine.Queue.RemoveObserver(_statisticsCollector);
+                        // Note: DetailedLoggerObserver and EventLogger are recreated each battle
+                    }
+
+                    // Clear previous engine reference
+                    _engine = null;
+
+                    // Run single battle without UI updates
+                    var result = await RunSingleBattleAsync(updateUI: false);
+
+                    // Clean up observers after battle
+                    if (_engine != null && _statisticsCollector != null)
+                    {
+                        _engine.Queue.RemoveObserver(_statisticsCollector);
+                    }
+
+                    // Unsubscribe logger for cleanup
+                    battleLogger.LogAdded -= Logger_LogAdded;
+
+                    // Track outcome
+                    if (!summaryStats.ContainsKey(result.Outcome))
+                    {
+                        summaryStats[result.Outcome] = 0;
+                    }
+                    summaryStats[result.Outcome]++;
+
+                    // Save logs automatically to Logs folder for each battle
+                    if (_logger != null)
+                    {
+                        SaveLogsToFile(_logger, result.Outcome, battleNumber: i + 1, totalBattles: numberOfBattles);
+                    }
+
+                    // Collect logs for this battle (for batch export if enabled)
+                    if (_logger != null && checkExportLogs.Checked)
+                    {
+                        var battleLog = new StringBuilder();
+                        battleLog.AppendLine($"═══════════════════════════════════════════════════════════════");
+                        battleLog.AppendLine($"BATTLE #{i + 1} of {numberOfBattles}");
+                        battleLog.AppendLine($"═══════════════════════════════════════════════════════════════");
+                        battleLog.AppendLine($"Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                        battleLog.AppendLine($"Outcome: {result.Outcome}");
+                        battleLog.AppendLine();
+
+                        foreach (var logEntry in _logger.Logs)
+                        {
+                            battleLog.AppendLine(logEntry.ToString());
+                        }
+
+                        battleLog.AppendLine();
+                        battleLog.AppendLine($"═══════════════════════════════════════════════════════════════");
+                        battleLog.AppendLine($"END OF BATTLE #{i + 1} - Outcome: {result.Outcome}");
+                        battleLog.AppendLine($"═══════════════════════════════════════════════════════════════");
+                        battleLog.AppendLine();
+                        battleLog.AppendLine();
+
+                        allBattleLogs.Add(battleLog.ToString());
+                    }
+
+                    // Clear logger for next battle
+                    _logger?.Clear();
+                    _logger = null;
+
+                    completedBattles++;
+
+                    // Small delay to allow UI updates
+                    await Task.Delay(10);
+                }
+
+                // Export consolidated logs if requested (automatic, no dialog)
+                if (checkExportLogs.Checked && allBattleLogs.Count > 0)
+                {
+                    try
+                    {
+                        // Generate automatic path in Logs folder (project directory)
+                        var projectDir = GetProjectDirectory();
+                        var logsFolder = Path.Combine(projectDir, "Logs");
+                        if (!Directory.Exists(logsFolder))
+                        {
+                            Directory.CreateDirectory(logsFolder);
+                        }
+
+                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                        var consolidatedFileName = $"battle_logs_batch_{timestamp}_{numberOfBattles}battles.txt";
+                        var consolidatedPath = Path.Combine(logsFolder, consolidatedFileName);
+
+                        var fullLog = new StringBuilder();
+                        fullLog.AppendLine($"BATCH BATTLE SIMULATION REPORT");
+                        fullLog.AppendLine($"═══════════════════════════════════════════════════════════════");
+                        fullLog.AppendLine($"Total Battles: {completedBattles}");
+                        fullLog.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                        fullLog.AppendLine();
+
+                        // Add summary statistics
+                        if (summaryStats.Count > 0)
+                        {
+                            fullLog.AppendLine("SUMMARY:");
+                            foreach (var stat in summaryStats.OrderByDescending(s => s.Value))
+                            {
+                                var percentage = (stat.Value * 100.0) / completedBattles;
+                                fullLog.AppendLine($"  {stat.Key}: {stat.Value} ({percentage.ToString("F1", CultureInfo.InvariantCulture)}%)");
+                            }
+                            fullLog.AppendLine();
+                            fullLog.AppendLine();
+                        }
+
+                        foreach (var battleLog in allBattleLogs)
+                        {
+                            fullLog.Append(battleLog);
+                        }
+
+                        File.WriteAllText(consolidatedPath, fullLog.ToString(), Encoding.UTF8);
+
+                        if (this.InvokeRequired)
+                        {
+                            this.Invoke(new Action(() =>
+                            {
+                                MessageBox.Show(
+                                    $"Successfully exported consolidated log with {completedBattles} battles to:\n{consolidatedPath}",
+                                    "Export Complete",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+                            }));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (this.InvokeRequired)
+                        {
+                            this.Invoke(new Action(() =>
+                            {
+                                MessageBox.Show(
+                                    $"Error exporting consolidated logs: {ex.Message}",
+                                    "Export Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                            }));
+                        }
+                    }
+                }
+
+                // Update UI on UI thread
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        if (!_isBattleRunning) return; // Battle was stopped
+                        this.btnStartBattle.Enabled = true;
+                        this.btnStopBattle.Enabled = false;
+                        this.lblStatus.Text = $"Completed {completedBattles} battles";
+                        _isBattleRunning = false;
+                        UpdateStatisticsDisplay();
+                        // Switch to player results tab after batch
+                        this.tabControl.SelectedTab = tabPlayerResults;
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                if (_logger != null)
+                {
+                    _logger.LogError($"Batch battle error: {ex.Message}");
+                }
+
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(
+                            $"Batch battle error: {ex.Message}",
+                            "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.btnStartBattle.Enabled = true;
+                        this.btnStopBattle.Enabled = false;
+                        this.lblStatus.Text = "Error occurred";
+                        _isBattleRunning = false;
+                    }));
+                }
+            }
+        }
+
+        private void BtnRefreshPlayerResults_Click(object? sender, EventArgs e)
+        {
+            UpdateStatisticsDisplay();
+        }
+
+        private void BtnRefreshEnemyResults_Click(object? sender, EventArgs e)
+        {
+            UpdateStatisticsDisplay();
+        }
+
+        private void BtnCopyPlayerResults_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (this.txtPlayerResults.IsDisposed || string.IsNullOrEmpty(this.txtPlayerResults.Text))
+                {
+                    MessageBox.Show(
+                        "No hay estadísticas para copiar.",
+                        "Copiar Estadísticas",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    return;
+                }
+
+                Clipboard.SetText(this.txtPlayerResults.Text);
+
+                MessageBox.Show(
+                    "Estadísticas copiadas al portapapeles exitosamente!",
+                    "Copiar Estadísticas",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error al copiar estadísticas: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnCopyEnemyResults_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (this.txtEnemyResults.IsDisposed || string.IsNullOrEmpty(this.txtEnemyResults.Text))
+                {
+                    MessageBox.Show(
+                        "No hay estadísticas para copiar.",
+                        "Copiar Estadísticas",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    return;
+                }
+
+                Clipboard.SetText(this.txtEnemyResults.Text);
+
+                MessageBox.Show(
+                    "Estadísticas copiadas al portapapeles exitosamente!",
+                    "Copiar Estadísticas",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error al copiar estadísticas: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private void UpdateStatisticsDisplay()
+        {
+            try
+            {
+                if (_statisticsCollector == null || _engine?.Field == null)
+                    return;
+
+                var stats = _statisticsCollector.GetStatistics();
+
+                // Get battle outcome
+                var outcome = _engine.Outcome;
+                string outcomeText = outcome switch
+                {
+                    BattleOutcome.Victory => "VICTORIA DEL JUGADOR",
+                    BattleOutcome.Defeat => "VICTORIA DEL ENEMIGO",
+                    BattleOutcome.Draw => "EMPATE",
+                    _ => "EN CURSO"
+                };
+
+                // Get Pokemon status for both teams
+                var playerAlive = new List<string>();
+                var playerFainted = new List<string>();
+                var enemyAlive = new List<string>();
+                var enemyFainted = new List<string>();
+
+                if (_engine.Field.PlayerSide?.Party != null)
+                {
+                    foreach (var pokemon in _engine.Field.PlayerSide.Party)
+                    {
+                        if (pokemon.IsFainted)
+                            playerFainted.Add(pokemon.DisplayName);
+                        else
+                            playerAlive.Add(pokemon.DisplayName);
+                    }
+                }
+
+                if (_engine.Field.EnemySide?.Party != null)
+                {
+                    foreach (var pokemon in _engine.Field.EnemySide.Party)
+                    {
+                        if (pokemon.IsFainted)
+                            enemyFainted.Add(pokemon.DisplayName);
+                        else
+                            enemyAlive.Add(pokemon.DisplayName);
+                    }
+                }
+
+                // Calculate kills (enemy fainted = player kills, player fainted = enemy kills)
+                int playerKills = enemyFainted.Count;
+                int enemyKills = playerFainted.Count;
+
+                // Get kill history separated by team
+                var playerKillHistory = stats.KillHistory.Where(k => k.KillerIsPlayer).ToList();
+                var enemyKillHistory = stats.KillHistory.Where(k => !k.KillerIsPlayer).ToList();
+
+                const int boxWidth = 60;
+
+                // ===== EQUIPO JUGADOR - Player Results Tab =====
+                var playerSb = new StringBuilder();
+                playerSb.AppendLine("═══════════════════════════════════════════════════════════════");
+                playerSb.AppendLine("                    RESULTADO DEL COMBATE");
+                playerSb.AppendLine("═══════════════════════════════════════════════════════════════");
+                playerSb.AppendLine();
+                playerSb.AppendLine($"RESULTADO: {outcomeText}");
+                playerSb.AppendLine($"Turnos totales: {stats.TotalTurns}");
+                playerSb.AppendLine();
+                playerSb.AppendLine("EQUIPO JUGADOR");
+                playerSb.AppendLine(new string('─', 60));
+                playerSb.AppendLine();
+                playerSb.AppendLine($"Kills: {playerKills}");
+                playerSb.AppendLine();
+
+                // Pokémon Vivos
+                if (playerAlive.Count > 0)
+                {
+                    playerSb.AppendLine("Pokémon Vivos:");
+                    foreach (var pokemon in playerAlive)
+                        playerSb.AppendLine($"  ✓ {pokemon}");
+                    playerSb.AppendLine();
+                }
+
+                // Pokémon Muertos
+                if (playerFainted.Count > 0)
+                {
+                    playerSb.AppendLine("Pokémon Muertos:");
+                    foreach (var pokemon in playerFainted)
+                        playerSb.AppendLine($"  ✗ {pokemon}");
+                    playerSb.AppendLine();
+                }
+
+                // Historial de Kills
+                if (playerKillHistory.Count > 0)
+                {
+                    playerSb.AppendLine("Historial de Kills:");
+                    foreach (var kill in playerKillHistory)
+                        playerSb.AppendLine($"  {kill.Killer} → {kill.Victim}");
+                    playerSb.AppendLine();
+                }
+
+                playerSb.AppendLine("═══════════════════════════════════════════════════════════════");
+
+                if (!this.txtPlayerResults.IsDisposed)
+                    this.txtPlayerResults.Text = playerSb.ToString();
+
+                // ===== EQUIPO ENEMIGO - Enemy Results Tab =====
+                var enemySb = new StringBuilder();
+                enemySb.AppendLine("═══════════════════════════════════════════════════════════════");
+                enemySb.AppendLine("                    RESULTADO DEL COMBATE");
+                enemySb.AppendLine("═══════════════════════════════════════════════════════════════");
+                enemySb.AppendLine();
+                enemySb.AppendLine($"RESULTADO: {outcomeText}");
+                enemySb.AppendLine($"Turnos totales: {stats.TotalTurns}");
+                enemySb.AppendLine();
+                enemySb.AppendLine("EQUIPO ENEMIGO");
+                enemySb.AppendLine(new string('─', 60));
+                enemySb.AppendLine();
+                enemySb.AppendLine($"Kills: {enemyKills}");
+                enemySb.AppendLine();
+
+                // Pokémon Vivos
+                if (enemyAlive.Count > 0)
+                {
+                    enemySb.AppendLine("Pokémon Vivos:");
+                    foreach (var pokemon in enemyAlive)
+                        enemySb.AppendLine($"  ✓ {pokemon}");
+                    enemySb.AppendLine();
+                }
+
+                // Pokémon Muertos
+                if (enemyFainted.Count > 0)
+                {
+                    enemySb.AppendLine("Pokémon Muertos:");
+                    foreach (var pokemon in enemyFainted)
+                        enemySb.AppendLine($"  ✗ {pokemon}");
+                    enemySb.AppendLine();
+                }
+
+                // Historial de Kills
+                if (enemyKillHistory.Count > 0)
+                {
+                    enemySb.AppendLine("Historial de Kills:");
+                    foreach (var kill in enemyKillHistory)
+                        enemySb.AppendLine($"  {kill.Killer} → {kill.Victim}");
+                    enemySb.AppendLine();
+                }
+
+                enemySb.AppendLine("═══════════════════════════════════════════════════════════════");
+
+                if (!this.txtEnemyResults.IsDisposed)
+                    this.txtEnemyResults.Text = enemySb.ToString();
+            }
+            catch (Exception ex)
+            {
+                if (!this.txtPlayerResults.IsDisposed)
+                    this.txtPlayerResults.Text = $"Error al cargar estadísticas: {ex.Message}";
+                if (!this.txtEnemyResults.IsDisposed)
+                    this.txtEnemyResults.Text = $"Error al cargar estadísticas: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Gets the project directory path (PokemonUltimate.BattleSimulator folder).
+        /// Navigates up from bin/Debug/netX.X/ to find the project root.
+        /// </summary>
+        private string GetProjectDirectory()
+        {
+            // Start from the executable directory
+            var currentDir = Application.StartupPath;
+
+            // Navigate up from bin/Debug/netX.X/ or bin/Release/netX.X/ to project root
+            var directory = new DirectoryInfo(currentDir);
+
+            // Look for the project directory by checking for:
+            // 1. Directory name contains "BattleSimulator"
+            // 2. Has Logs folder OR Forms folder OR BattleSimulator.csproj file
+            while (directory != null)
+            {
+                var directoryName = directory.Name;
+                var logsPath = Path.Combine(directory.FullName, "Logs");
+                var formsPath = Path.Combine(directory.FullName, "Forms");
+                var csprojFiles = directory.GetFiles("*.csproj");
+
+                // Check if this directory name contains "BattleSimulator"
+                bool isBattleSimulatorDir = directoryName.Contains("BattleSimulator", StringComparison.OrdinalIgnoreCase);
+
+                // Check if this directory has BattleSimulator.csproj
+                bool hasBattleSimulatorProject = csprojFiles.Any(f =>
+                    f.Name.Contains("BattleSimulator", StringComparison.OrdinalIgnoreCase));
+
+                // Check if this is the project directory
+                if (isBattleSimulatorDir &&
+                    (Directory.Exists(logsPath) || Directory.Exists(formsPath) || hasBattleSimulatorProject))
+                {
+                    return directory.FullName;
+                }
+
+                directory = directory.Parent;
+            }
+
+            // Fallback: if we can't find project directory, use a relative path from executable
+            // Try going up 3 levels (bin/Debug/netX.X/ -> bin/ -> project/)
+            var fallbackPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..", "..", ".."));
+
+            // Verify fallback path has Logs folder or create it
+            var fallbackLogsPath = Path.Combine(fallbackPath, "Logs");
+            if (!Directory.Exists(fallbackLogsPath))
+            {
+                Directory.CreateDirectory(fallbackLogsPath);
+            }
+
+            return fallbackPath;
+        }
+
+        /// <summary>
+        /// Saves battle logs automatically to the Logs folder.
+        /// </summary>
+        /// <param name="logger">The logger containing the battle logs.</param>
+        /// <param name="outcome">The battle outcome.</param>
+        /// <param name="battleNumber">Optional battle number for batch simulations.</param>
+        /// <param name="totalBattles">Optional total battles count for batch simulations.</param>
+        private void SaveLogsToFile(UIBattleLogger logger, BattleOutcome outcome, int? battleNumber = null, int? totalBattles = null)
+        {
+            try
+            {
+                // Get the Logs folder path relative to the project directory
+                var projectDir = GetProjectDirectory();
+                var logsFolder = Path.Combine(projectDir, "Logs");
+
+                // Ensure the Logs directory exists
+                if (!Directory.Exists(logsFolder))
+                {
+                    Directory.CreateDirectory(logsFolder);
+                }
+
+                // Generate filename with timestamp
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string fileName;
+                if (battleNumber.HasValue && totalBattles.HasValue)
+                {
+                    fileName = $"battle_logs_{timestamp}_battle{battleNumber.Value}of{totalBattles.Value}.txt";
+                }
+                else
+                {
+                    fileName = $"battle_logs_{timestamp}.txt";
+                }
+
+                var filePath = Path.Combine(logsFolder, fileName);
+
+                // Build log content
+                var logContent = new StringBuilder();
+                logContent.AppendLine("═══════════════════════════════════════════════════════════════");
+                if (battleNumber.HasValue && totalBattles.HasValue)
+                {
+                    logContent.AppendLine($"BATTLE #{battleNumber.Value} of {totalBattles.Value}");
+                }
+                else
+                {
+                    logContent.AppendLine("BATTLE LOG");
+                }
+                logContent.AppendLine("═══════════════════════════════════════════════════════════════");
+                logContent.AppendLine($"Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                logContent.AppendLine($"Outcome: {outcome}");
+                logContent.AppendLine();
+
+                // Add all log entries
+                foreach (var logEntry in logger.Logs)
+                {
+                    logContent.AppendLine(logEntry.ToString());
+                }
+
+                logContent.AppendLine();
+                logContent.AppendLine("═══════════════════════════════════════════════════════════════");
+                logContent.AppendLine($"END OF BATTLE - Outcome: {outcome}");
+                logContent.AppendLine("═══════════════════════════════════════════════════════════════");
+
+                // Write to file
+                File.WriteAllText(filePath, logContent.ToString(), Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't interrupt battle flow
+                // Try to log to UI logger if available, otherwise silently fail
+                try
+                {
+                    if (logger != null)
+                    {
+                        logger.LogWarning($"Failed to save logs to file: {ex.Message}");
+                    }
+                }
+                catch
+                {
+                    // Ignore errors during error logging
+                }
+            }
+        }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {

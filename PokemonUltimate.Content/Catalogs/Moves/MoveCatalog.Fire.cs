@@ -17,10 +17,10 @@ namespace PokemonUltimate.Content.Catalogs.Moves
         public static readonly MoveData Ember = Move.Define("Ember")
             .Description("The target is attacked with small flames. May also leave the target with a burn.")
             .Type(PokemonType.Fire)
-            .Special(40, 50, 25)
+            .Special(40, 100, 25)
             .WithEffects(e => e
                 .Damage()
-                .MayBurn(100))
+                .MayBurn(10))
             .Build();
 
         public static readonly MoveData Flamethrower = Move.Define("Flamethrower")

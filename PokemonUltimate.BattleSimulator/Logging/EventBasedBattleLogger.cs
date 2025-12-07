@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.BattleSimulator.Helpers;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Logging;
@@ -23,11 +25,26 @@ namespace PokemonUltimate.BattleSimulator.Logging
         private readonly IBattleLogger _logger;
         private readonly ILocalizationProvider _localizationProvider;
         private int _currentTurn = 0;
+        private Dictionary<string, string>? _pokemonNameMapping;
 
         public EventBasedBattleLogger(IBattleLogger logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _localizationProvider = LocalizationManager.Instance;
+
+            // Try to get name mapping from UIBattleLogger if available
+            if (logger is UIBattleLogger uiLogger)
+            {
+                _pokemonNameMapping = uiLogger.GetPokemonNameMapping();
+            }
+        }
+
+        private string GetPokemonDisplayName(PokemonInstance? pokemon)
+        {
+            if (pokemon == null)
+                return "Unknown";
+
+            return PokemonNameMapper.GetDisplayName(pokemon, _pokemonNameMapping);
         }
 
         public void OnBattleEvent(BattleEvent @event)
@@ -107,9 +124,9 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 return;
 
             var sideName = @event.IsPlayerSide ? "Player" : "Enemy";
-            var attacker = @event.Data.DefeatedBy?.DisplayName ?? "Unknown";
+            var attacker = GetPokemonDisplayName(@event.Data.DefeatedBy);
 
-            _logger.LogWarning($"[{sideName}] {@event.Pokemon.DisplayName} fainted! (Defeated by {attacker})");
+            _logger.LogWarning($"[{sideName}] {GetPokemonDisplayName(@event.Pokemon)} fainted! (Defeated by {attacker})");
             _logger.LogInfo($"  Final HP: {@event.Pokemon.CurrentHP}/{@event.Pokemon.MaxHP}");
 
             // Log team status from event data
@@ -134,33 +151,24 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 {
                     // Initial send out - show slot info
                     var slotInfo = @event.Data.SlotIndex >= 0 ? $" (Slot {@event.Data.SlotIndex + 1})" : "";
-                    switchMessage = $"[{sideName}] Sent out {newPokemon?.DisplayName ?? "Unknown"}{slotInfo}";
+                    switchMessage = $"[{sideName}] Sent out {GetPokemonDisplayName(newPokemon)}{slotInfo}";
                 }
                 else
                 {
-                    switchMessage = $"[{sideName}] Sent out {newPokemon?.DisplayName ?? "Unknown"}";
+                    switchMessage = $"[{sideName}] Sent out {GetPokemonDisplayName(newPokemon)}";
                 }
             }
             else if (newPokemon == null)
             {
                 // Pokemon being withdrawn (shouldn't happen in normal gameplay)
-                switchMessage = $"[{sideName}] Withdrew {oldPokemon.DisplayName}";
+                switchMessage = $"[{sideName}] Withdrew {GetPokemonDisplayName(oldPokemon)}";
             }
             else
             {
-                // Normal switch: show HP to distinguish between instances
-                var oldHp = oldPokemon.IsFainted ? "0" : $"{oldPokemon.CurrentHP}/{oldPokemon.MaxHP}";
-                var newHp = $"{newPokemon.CurrentHP}/{newPokemon.MaxHP}";
-
-                // If same name, add HP to distinguish
-                if (oldPokemon.DisplayName == newPokemon.DisplayName)
-                {
-                    switchMessage = $"[{sideName}] Switched {oldPokemon.DisplayName} (HP: {oldHp}) out, {newPokemon.DisplayName} (HP: {newHp}) in";
-                }
-                else
-                {
-                    switchMessage = $"[{sideName}] Switched {oldPokemon.DisplayName} out, {newPokemon.DisplayName} in";
-                }
+                // Normal switch: use unique names from mapping
+                var oldName = GetPokemonDisplayName(oldPokemon);
+                var newName = GetPokemonDisplayName(newPokemon);
+                switchMessage = $"[{sideName}] Switched {oldName} out, {newName} in";
             }
 
             _logger.LogInfo(switchMessage);
@@ -178,7 +186,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 return;
 
             var sideName = @event.IsPlayerSide ? "Player" : "Enemy";
-            var pokemonName = @event.Pokemon.DisplayName;
+            var pokemonName = GetPokemonDisplayName(@event.Pokemon);
             var decisionType = @event.Data.DecisionType ?? "UNKNOWN";
             var reason = @event.Data.DecisionReason ?? "";
 
@@ -192,9 +200,9 @@ namespace PokemonUltimate.BattleSimulator.Logging
 
             var sideName = @event.IsPlayerSide ? "Player" : "Enemy";
             var moveName = @event.Data.MoveName ?? "Unknown";
-            var targetName = @event.Data.TargetPokemon?.DisplayName ?? "Unknown";
+            var targetName = GetPokemonDisplayName(@event.Data.TargetPokemon);
 
-            _logger.LogInfo($"[{sideName}] {@event.Pokemon.DisplayName} used {moveName} on {targetName}");
+            _logger.LogInfo($"[{sideName}] {GetPokemonDisplayName(@event.Pokemon)} used {moveName} on {targetName}");
         }
 
         private void LogDamageDealt(BattleEvent @event)
@@ -203,9 +211,9 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 return;
 
             var attackerSide = @event.IsPlayerSide ? "Player" : "Enemy";
-            var attackerName = @event.Pokemon.DisplayName;
+            var attackerName = GetPokemonDisplayName(@event.Pokemon);
             var moveName = @event.Data.MoveName ?? "Unknown";
-            var targetName = @event.Data.TargetPokemon?.DisplayName ?? "Unknown";
+            var targetName = GetPokemonDisplayName(@event.Data.TargetPokemon);
             var damage = @event.Data.DamageAmount;
 
             // Determine target side: for self-damage (status damage, recoil, etc.), target is same as attacker
@@ -274,7 +282,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
             var priority = @event.Data.Priority;
             var speed = @event.Data.Speed;
             var slotIndex = @event.Data.SlotIndex;
-            var pokemonName = @event.Pokemon.DisplayName;
+            var pokemonName = GetPokemonDisplayName(@event.Pokemon);
             var executionOrder = @event.Data.ActionCount; // Used to store execution order
             var sideName = @event.IsPlayerSide ? "Player" : "Enemy";
 
@@ -312,7 +320,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 return;
 
             var sideName = @event.IsPlayerSide ? "Player" : "Enemy";
-            var pokemonName = @event.Pokemon.DisplayName;
+            var pokemonName = GetPokemonDisplayName(@event.Pokemon);
             var moveName = @event.Data.MoveName ?? "Unknown";
             var actionTypes = @event.Data.GeneratedActionTypes ?? "None";
             var actionCount = @event.Data.GeneratedActionCount;
@@ -342,9 +350,9 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 return;
 
             var sideName = @event.IsPlayerSide ? "Player" : "Enemy";
-            var pokemonName = @event.Pokemon.DisplayName;
+            var pokemonName = GetPokemonDisplayName(@event.Pokemon);
             var moveName = @event.Data.MoveName ?? "Unknown";
-            var targetName = @event.Data.TargetPokemon?.DisplayName ?? "Unknown";
+            var targetName = GetPokemonDisplayName(@event.Data.TargetPokemon);
 
             _logger.LogInfo($"[{sideName}] {pokemonName}'s {moveName} missed {targetName}!");
         }
@@ -355,7 +363,7 @@ namespace PokemonUltimate.BattleSimulator.Logging
                 return;
 
             var sideName = @event.IsPlayerSide ? "Player" : "Enemy";
-            var pokemonName = @event.Pokemon.DisplayName;
+            var pokemonName = GetPokemonDisplayName(@event.Pokemon);
             var statusName = @event.Data.StatusName ?? "Unknown";
 
             _logger.LogInfo($"[{sideName}] {pokemonName} was afflicted with {statusName}!");

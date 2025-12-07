@@ -147,6 +147,7 @@ namespace PokemonUltimate.Combat.Statistics
             _statistics.SwitchCount.Clear();
             _statistics.AIDecisions.Clear();
             _statistics.TeamStatusHistory.Clear();
+            _statistics.KillHistory.Clear();
         }
 
         /// <summary>

@@ -69,10 +69,10 @@ namespace PokemonUltimate.DeveloperTools.Runners
             var statisticsCollector = new BattleStatisticsCollector();
             var internalStats = statisticsCollector.GetStatistics();
             var stats = new BattleStatistics(internalStats);
-            
+
             // Reset statistics at the start of the batch
             statisticsCollector.Reset();
-            
+
             // Seleccionar Pokemon aleatorios una sola vez si son null
             var selectedPlayerPokemon = config.PlayerPokemon ?? _availablePokemon[_random.Next(_availablePokemon.Count)];
             var selectedEnemyPokemon = config.EnemyPokemon ?? _availablePokemon[_random.Next(_availablePokemon.Count)];
@@ -85,8 +85,14 @@ namespace PokemonUltimate.DeveloperTools.Runners
                 // Outcome is tracked in OnBattleEnd
                 // Statistics accumulate across battles (not reset between battles)
 
-                // Actualizar progreso
-                progress?.Report((i + 1) * 100 / config.NumberOfBattles);
+                // Actualizar progreso solo cada 1% o cada 10 batallas (lo que sea menor)
+                // Esto previene stack overflow con muchas simulaciones
+                var currentPercent = (i + 1) * 100 / config.NumberOfBattles;
+                var reportInterval = Math.Max(1, config.NumberOfBattles / 100); // Al menos cada 1%
+                if (progress != null && ((i + 1) % reportInterval == 0 || i == config.NumberOfBattles - 1))
+                {
+                    progress.Report(currentPercent);
+                }
             }
 
             return stats;
@@ -118,7 +124,7 @@ namespace PokemonUltimate.DeveloperTools.Runners
 
             // Register statistics observer BEFORE battle starts
             engine.Queue.AddObserver(statisticsCollector);
-            
+
             // Note: We don't call OnBattleStart here because it resets statistics
             // Statistics will accumulate across all battles in the batch
             // Reset() is called once at the start of RunBattlesAsync
