@@ -113,10 +113,43 @@ namespace PokemonUltimate.Tests.Data.Models
         }
 
         [Test]
-        public void NoMoves_Instance_HasNoMoves()
+        public void NoMoves_Instance_HasTackleAsDefault()
         {
             var pokemon = PokemonFactory.Create(_pokemonWithNoMoves, 50);
+            // When Pokemon has no learnset, it should have Tackle as default move
+            Assert.That(pokemon.Moves, Is.Not.Empty);
+            Assert.That(pokemon.Moves.Count, Is.EqualTo(1));
+            Assert.That(pokemon.Moves[0].Move.Name, Is.EqualTo("Tackle"));
+        }
+
+        [Test]
+        public void NoMoves_WithNoMovesExplicit_ReturnsEmptyMoveset()
+        {
+            // When explicitly calling WithNoMoves(), should still return empty moveset
+            var pokemon = PokemonInstanceBuilder.Create(_pokemonWithNoMoves, 50)
+                .WithNoMoves()
+                .Build();
             Assert.That(pokemon.Moves, Is.Empty);
+        }
+
+        [Test]
+        public void LearnsetWithNoMovesUpToLevel_HasTackleAsDefault()
+        {
+            // Pokemon with learnset but no moves available at low level
+            var pokemonWithHighLevelMoves = PokemonBuilder.Define("HighLevelPokemon", 804)
+                .Type(PokemonType.Normal)
+                .Stats(100, 100, 100, 100, 100, 100)
+                .Moves(m => m
+                    .AtLevel(50, MoveCatalog.Flamethrower))  // Only learns at level 50
+                .Build();
+
+            // Create at level 10 - no moves available yet
+            var pokemon = PokemonFactory.Create(pokemonWithHighLevelMoves, 10);
+            
+            // Should have Tackle as default since no moves available at level 10
+            Assert.That(pokemon.Moves, Is.Not.Empty);
+            Assert.That(pokemon.Moves.Count, Is.EqualTo(1));
+            Assert.That(pokemon.Moves[0].Move.Name, Is.EqualTo("Tackle"));
         }
 
         #endregion

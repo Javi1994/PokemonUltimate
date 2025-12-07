@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
+using PokemonUltimate.Core.Effects;
 using PokemonUltimate.Core.Enums;
 using PokemonUltimate.Core.Factories.MoveSelection;
 using PokemonUltimate.Core.Factories.Strategies.NatureBoosting;
@@ -1059,14 +1060,31 @@ namespace PokemonUltimate.Core.Factories
 
         private List<MoveInstance> SelectMoves()
         {
+            List<MoveInstance> moves;
+
             // Specific moves provided
             if (_specificMoves != null)
             {
-                return SelectSpecificMoves();
+                moves = SelectSpecificMoves();
+                // If explicitly set to empty (WithNoMoves()), don't assign default Tackle
+                if (moves.Count == 0 && _specificMoves.Count == 0)
+                {
+                    return moves; // Return empty list as requested
+                }
+            }
+            else
+            {
+                // Select from learnset
+                moves = SelectFromLearnset();
             }
 
-            // Select from learnset
-            return SelectFromLearnset();
+            // If no moves available and not explicitly set to empty, assign Tackle as default
+            if (moves.Count == 0)
+            {
+                moves = new List<MoveInstance> { new MoveInstance(CreateDefaultTackle()) };
+            }
+
+            return moves;
         }
 
         /// <summary>
@@ -1104,6 +1122,28 @@ namespace PokemonUltimate.Core.Factories
             return selectedMoves
                 .Select(m => new MoveInstance(m.Move))
                 .ToList();
+        }
+
+        /// <summary>
+        /// Creates a default Tackle move for Pokemon without available moves.
+        /// This prevents infinite battles when Pokemon have no moves.
+        /// </summary>
+        private static MoveData CreateDefaultTackle()
+        {
+            return new MoveData
+            {
+                Name = "Tackle",
+                Description = "A physical attack in which the user charges and slams into the target.",
+                Type = PokemonType.Normal,
+                Category = MoveCategory.Physical,
+                Power = 40,
+                Accuracy = 100,
+                MaxPP = 35,
+                Priority = 0,
+                TargetScope = TargetScope.SingleEnemy,
+                MakesContact = true,
+                Effects = new List<IMoveEffect> { new DamageEffect() }
+            };
         }
 
         /// <summary>

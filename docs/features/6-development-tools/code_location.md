@@ -32,6 +32,13 @@ PokemonUltimate.DeveloperTools/
     ├── StatusEffectDebuggerTab.cs # Status effect UserControl (6.3)
     └── TurnOrderDebuggerTab.cs   # Turn order UserControl (6.4)
 
+PokemonUltimate.BattleSimulator/
+├── Program.cs                     # Application entry point 🎯 (6.8)
+├── Forms/
+│   └── InteractiveBattleSimulatorForm.cs # Interactive battle simulator form 🎯 (6.8)
+└── Logging/
+    └── UIBattleLogger.cs         # UI logger for battle logs 🎯 (6.8)
+
 PokemonUltimate.DataViewer/
 ├── Program.cs                     # Application entry point ✅ (6.7)
 ├── MainForm.cs                    # Main form with TabControl ✅ (6.7)
@@ -160,6 +167,42 @@ PokemonUltimate.DataViewer/
 **Key Methods**:
 - `CalculateTurnOrder(...)` - Calculates turn order for given Pokemon configurations
 - Returns `TurnOrderResult` with speed calculations, priority info, and final turn order
+
+### Interactive Battle Simulator (6.8) 🎯
+
+**Project**: `PokemonUltimate.BattleSimulator` (separate Windows Forms application)
+
+**Namespace**: `PokemonUltimate.BattleSimulator.Forms`
+**File**: `PokemonUltimate.BattleSimulator/Forms/InteractiveBattleSimulatorForm.cs`
+**Purpose**: Tabbed interface form for interactive battle simulation with real-time logs
+
+**Key Components**:
+- TabControl with three tabs: Battle Mode, Pokemon, Logs
+- Battle Mode tab: Battle format selection (Singles, Doubles, Triples, Horde, Custom) and custom slots configuration
+- Pokemon tab: Inner TabControl with Player Team and Enemy Team sub-tabs, dynamic Pokemon slot controls
+- Logs tab: Real-time log display RichTextBox with filtering and auto-scroll
+- Bottom panel: Battle control buttons (Start, Stop) and status label
+- Dynamic UI generation: Pokemon slots are created/removed based on battle mode selection
+
+**UIBattleLogger**:
+- **Namespace**: `PokemonUltimate.BattleSimulator.Logging`
+- **File**: `PokemonUltimate.BattleSimulator/Logging/UIBattleLogger.cs`
+- **Purpose**: Custom IBattleLogger implementation that captures logs for UI display
+- **Key Methods**:
+  - `LogDebug(string)` - Logs debug messages
+  - `LogInfo(string)` - Logs info messages
+  - `LogWarning(string)` - Logs warnings
+  - `LogError(string)` - Logs errors
+  - `LogBattleEvent(string, string)` - Logs battle events
+  - `LogAdded` event - Notifies UI when new log is added
+
+**Usage**:
+```bash
+# Run the application
+dotnet run --project PokemonUltimate.BattleSimulator
+```
+
+**See**: [`6.8-interactive-battle-simulator/README.md`](6.8-interactive-battle-simulator/README.md) for complete documentation
 
 ### Data Viewer (6.7) ✅
 

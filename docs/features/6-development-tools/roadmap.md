@@ -20,6 +20,7 @@ This roadmap outlines the implementation phases for new debugger tabs in the uni
 - ✅ **Phase 6.3**: Status Effect Debugger - Complete
 - ✅ **Phase 6.4**: Turn Order Debugger - Complete
 - ✅ **Phase 6.7**: Data Viewer - Complete
+- 🎯 **Phase 6.8**: Interactive Battle Simulator - In Progress
 
 ## Phase 6.5: Battle Debugger ✅ Complete
 
@@ -378,6 +379,70 @@ The application opens a Windows Forms window with tabs for each data type. Click
 - Integration: Verify data matches catalogs (ready for manual testing)
 
 **See**: [`6.7-data-viewer/README.md`](6.7-data-viewer/README.md) for complete documentation
+
+---
+
+## Phase 6.8: Interactive Battle Simulator 🎯 In Progress
+
+**Goal**: Create two-window battle simulator with configurable parameters and real-time battle logs.
+
+**Dependencies**: Feature 2: Combat System, Feature 2.6: Combat Engine
+
+### Components
+
+| Component | Project | File | Description |
+|-----------|---------|------|-------------|
+| `InteractiveBattleSimulatorForm` | `PokemonUltimate.BattleSimulator` | `Forms/InteractiveBattleSimulatorForm.cs` | Main form with two windows (configuration and logs) 🎯 |
+| `UIBattleLogger` | `PokemonUltimate.BattleSimulator` | `Logging/UIBattleLogger.cs` | Custom IBattleLogger that captures logs for UI display 🎯 |
+| `Program` | `PokemonUltimate.BattleSimulator` | `Program.cs` | Application entry point 🎯 |
+
+### UI Components
+
+**Window 1: Battle Configuration**:
+- Player Pokemon dropdown 🎯
+- Enemy Pokemon dropdown 🎯
+- Level inputs (1-100) 🎯
+- Start Battle button 🎯
+- Stop Battle button 🎯
+- Status label 🎯
+
+**Window 2: Battle Logs**:
+- RichTextBox with formatted log display 🎯
+- Color-coded log levels 🎯
+- Auto-scroll checkbox 🎯
+- Log filter dropdown 🎯
+- Clear logs button 🎯
+
+### Implementation Steps
+
+1. ✅ Create feature documentation
+2. ✅ Create new project `PokemonUltimate.BattleSimulator`
+3. ✅ Create `UIBattleLogger` class
+4. ✅ Create `InteractiveBattleSimulatorForm` form
+5. ✅ Create `Program.cs` entry point
+6. ✅ Add project to solution
+7. ✅ Test battle execution (ready for manual testing)
+8. ✅ Test log capture and display (ready for manual testing)
+9. ✅ Update documentation
+
+### Usage
+
+```bash
+# Run the application
+dotnet run --project PokemonUltimate.BattleSimulator
+
+# Or build and run
+dotnet build PokemonUltimate.BattleSimulator
+dotnet run --project PokemonUltimate.BattleSimulator
+```
+
+### Tests
+
+- Functional: Run battle and view logs in real-time (ready for manual testing)
+- Edge Cases: Stop battle mid-execution, filter logs, clear logs (ready for manual testing)
+- Integration: Verify logs match IBattleLogger interface (ready for manual testing)
+
+**See**: [`6.8-interactive-battle-simulator/README.md`](6.8-interactive-battle-simulator/README.md) for complete documentation
 
 ---
 

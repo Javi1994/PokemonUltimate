@@ -716,7 +716,10 @@ namespace PokemonUltimate.Tests.Systems.Core.Factories
 
             var pokemon = Pokemon.Create(noMoves, 25).Build();
 
-            Assert.That(pokemon.Moves, Is.Empty);
+            // When Pokemon has no learnset, it should have Tackle as default move to prevent infinite battles
+            Assert.That(pokemon.Moves, Is.Not.Empty);
+            Assert.That(pokemon.Moves.Count, Is.EqualTo(1));
+            Assert.That(pokemon.Moves[0].Move.Name, Is.EqualTo("Tackle"));
         }
 
         [Test]
