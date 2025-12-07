@@ -1,64 +1,110 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Content.Catalogs.Abilities;
+using PokemonUltimate.Content.Catalogs.Field;
 using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Blueprints;
 using PokemonUltimate.Core.Constants;
 using PokemonUltimate.Core.Enums;
+using PokemonUltimate.Core.Extensions;
 using PokemonUltimate.Core.Factories;
 using PokemonUltimate.Core.Instances;
 using PokemonUltimate.Core.Localization;
 
-namespace PokemonUltimate.Combat.Engine
+namespace PokemonUltimate.Combat.Processors.Phases
 {
     /// <summary>
-    /// Processes entry hazards when a Pokemon switches in.
-    /// Generates actions for damage, status application, and stat changes.
+    /// Processes everything that happens when a Pokemon switches in:
+    /// - Entry hazards (Spikes, Stealth Rock, etc.)
+    /// - Abilities (Intimidate, etc.)
+    /// - Items (Focus Sash preparation, etc.)
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
-    /// **Sub-Feature**: 2.14: Hazards System
-    /// **Documentation**: See `docs/features/2-combat-system/2.14-hazards-system/README.md`
+    /// **Sub-Feature**: 2.6: Combat Engine
+    /// **Documentation**: See `docs/features/2-combat-system/2.6-combat-engine/architecture.md`
     /// </remarks>
-    public class EntryHazardProcessor : IEntryHazardProcessor
+    public class SwitchInProcessor : IActionGeneratingPhaseProcessor
     {
         private readonly DamageContextFactory _damageContextFactory;
 
         /// <summary>
-        /// Creates a new EntryHazardProcessor with a damage context factory.
+        /// Creates a new SwitchInProcessor.
         /// </summary>
         /// <param name="damageContextFactory">The factory for creating damage contexts. Cannot be null.</param>
         /// <exception cref="ArgumentNullException">If damageContextFactory is null.</exception>
-        public EntryHazardProcessor(DamageContextFactory damageContextFactory)
+        public SwitchInProcessor(DamageContextFactory damageContextFactory)
         {
             _damageContextFactory = damageContextFactory ?? throw new ArgumentNullException(nameof(damageContextFactory), ErrorMessages.FieldCannotBeNull);
         }
 
         /// <summary>
-        /// Processes all entry hazards on the opposing side when a Pokemon switches in.
+        /// Gets the phase this processor handles.
+        /// </summary>
+        public BattlePhase Phase => BattlePhase.SwitchIn;
+
+        /// <summary>
+        /// Processes everything that happens when a Pokemon switches in.
         /// </summary>
         /// <param name="slot">The slot the Pokemon is switching into.</param>
         /// <param name="pokemon">The Pokemon switching in.</param>
         /// <param name="field">The battlefield.</param>
-        /// <param name="getHazardData">Function to get HazardData by type. Cannot be null.</param>
-        /// <returns>List of actions to execute for entry hazards.</returns>
-        public List<BattleAction> ProcessHazards(BattleSlot slot, PokemonInstance pokemon, BattleField field, Func<HazardType, HazardData> getHazardData)
+        /// <returns>List of actions to execute.</returns>
+        public List<BattleAction> ProcessSwitchIn(BattleSlot slot, PokemonInstance pokemon, BattleField field)
         {
             if (slot == null)
                 throw new ArgumentNullException(nameof(slot));
             if (pokemon == null)
                 throw new ArgumentNullException(nameof(pokemon));
             if (field == null)
-                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
-            if (getHazardData == null)
-                throw new ArgumentNullException(nameof(getHazardData));
+                throw new ArgumentNullException(nameof(field), Core.Constants.ErrorMessages.FieldCannotBeNull);
 
             var actions = new List<BattleAction>();
+
+            // 1. Process entry hazards first
+            var hazardActions = ProcessEntryHazards(slot, pokemon, field);
+            actions.AddRange(hazardActions);
+
+            // 2. Process ability (if exists)
+            if (pokemon.Ability != null)
+            {
+                var abilityActions = ProcessAbility(pokemon.Ability, slot, field);
+                actions.AddRange(abilityActions);
+            }
+
+            // 3. Process item (if exists)
+            // Note: Items don't typically activate on switch-in, only abilities do
+            // If needed in the future, add item processing here
+
+            return actions;
+        }
+
+        /// <summary>
+        /// Processes the switch-in phase (required by interface, but not used directly).
+        /// </summary>
+        /// <param name="field">The battlefield.</param>
+        /// <returns>Empty list (use ProcessSwitchIn instead).</returns>
+        public async Task<List<BattleAction>> ProcessAsync(BattleField field)
+        {
+            // This processor is called via ProcessSwitchIn method
+            return await Task.FromResult(new List<BattleAction>());
+        }
+
+        /// <summary>
+        /// Processes all entry hazards on the opposing side when a Pokemon switches in.
+        /// </summary>
+        private List<BattleAction> ProcessEntryHazards(BattleSlot slot, PokemonInstance pokemon, BattleField field)
+        {
+            var actions = new List<BattleAction>();
             var opposingSide = field.GetOppositeSide(slot.Side);
+            Func<HazardType, HazardData> getHazardData = HazardCatalog.GetByType;
 
             // Process each hazard type
             ProcessSpikes(opposingSide, slot, pokemon, field, getHazardData, actions);
@@ -188,7 +234,7 @@ namespace PokemonUltimate.Combat.Engine
             {
                 int stages = hazardData.StatStages;
 
-                // Check for Contrary ability (reverses stat changes) - use catalog lookup instead of hardcoded string
+                // Check for Contrary ability (reverses stat changes)
                 var contraryAbility = AbilityCatalog.GetByName("Contrary");
                 if (pokemon.Ability != null && contraryAbility != null &&
                     pokemon.Ability.Name.Equals(contraryAbility.Name, StringComparison.OrdinalIgnoreCase))
@@ -233,6 +279,61 @@ namespace PokemonUltimate.Combat.Engine
             var context = _damageContextFactory.CreateForHazardDamage(slot, damage, field);
             return new DamageAction(null, slot, context); // null user = system action
         }
+
+        /// <summary>
+        /// Processes an ability for switch-in effects.
+        /// </summary>
+        private List<BattleAction> ProcessAbility(AbilityData ability, BattleSlot slot, BattleField field)
+        {
+            var actions = new List<BattleAction>();
+
+            // Check if this ability listens to OnSwitchIn trigger
+            if (!ability.ListensTo(AbilityTrigger.OnSwitchIn))
+                return actions;
+
+            // Process based on ability effect
+            switch (ability.Effect)
+            {
+                case AbilityEffect.LowerOpponentStat:
+                    // Example: Intimidate
+                    actions.AddRange(ProcessLowerOpponentStat(ability, slot, field));
+                    break;
+
+                    // Add other ability effects as needed
+            }
+
+            return actions;
+        }
+
+        /// <summary>
+        /// Processes LowerOpponentStat ability effect (e.g., Intimidate).
+        /// </summary>
+        private List<BattleAction> ProcessLowerOpponentStat(AbilityData ability, BattleSlot slot, BattleField field)
+        {
+            var actions = new List<BattleAction>();
+
+            if (ability.TargetStat == null)
+                return actions;
+
+            var opposingSide = field.GetOppositeSide(slot.Side);
+
+            // Message for ability activation
+            var provider = Core.Localization.LocalizationManager.Instance;
+            var abilityName = ability.GetDisplayName(provider);
+            actions.Add(new MessageAction(
+                provider.GetString(Core.Localization.LocalizationKey.AbilityActivated, slot.Pokemon.DisplayName, abilityName)));
+
+            // Lower stat for all opposing active Pokemon
+            foreach (var enemySlot in opposingSide.GetActiveSlots())
+            {
+                if (enemySlot.IsActive())
+                {
+                    actions.Add(new StatChangeAction(
+                        slot, enemySlot, ability.TargetStat.Value, ability.StatStages));
+                }
+            }
+
+            return actions;
+        }
     }
 }
-

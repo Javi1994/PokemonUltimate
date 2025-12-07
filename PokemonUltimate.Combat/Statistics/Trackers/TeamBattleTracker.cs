@@ -34,7 +34,8 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
                     stats.FaintedPokemon[side].Add(pokemonKey);
 
                 // Track kill history (who killed whom)
-                if (faintAction.User?.Pokemon != null && faintAction.User.Side != null)
+                // Only track kills where the killer is different from the victim (exclude self-inflicted deaths from status effects)
+                if (faintAction.User?.Pokemon != null && faintAction.User.Side != null && faintAction.User != faintAction.Target)
                 {
                     var killerName = faintAction.User.Pokemon.DisplayName;
                     var victimName = faintAction.Target.Pokemon.DisplayName;

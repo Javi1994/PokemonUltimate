@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Constants;
 using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
 using PokemonUltimate.Combat.Logging;
+using PokemonUltimate.Combat.Processors.Phases;
 using PokemonUltimate.Combat.Providers;
 using PokemonUltimate.Combat.Validation;
 using PokemonUltimate.Core.Constants;
-using PokemonUltimate.Core.Extensions;
 using PokemonUltimate.Core.Instances;
-using PokemonUltimate.Core.Localization;
 
 namespace PokemonUltimate.Combat
 {
@@ -34,19 +31,20 @@ namespace PokemonUltimate.Combat
         private readonly IBattleFieldFactory _battleFieldFactory;
         private readonly IBattleQueueFactory _battleQueueFactory;
         private readonly IRandomProvider _randomProvider;
-        private readonly IEndOfTurnProcessor _endOfTurnProcessor;
-        private readonly IBattleTriggerProcessor _battleTriggerProcessor;
-        private readonly TurnOrderResolver _turnOrderResolver;
-        private readonly AccuracyChecker _accuracyChecker;
-        private readonly IDamagePipeline _damagePipeline;
-        private readonly Effects.MoveEffectProcessorRegistry _effectProcessorRegistry;
         private readonly IBattleStateValidator _stateValidator;
         private readonly IBattleLogger _logger;
-        private readonly Events.BattleEventBus _eventBus;
+
+        // New processors and services
+        private readonly BattleInitializer _battleInitializer;
+        private readonly BattleStartProcessor _battleStartProcessor;
+        private readonly BattleEndProcessor _battleEndProcessor;
+        private BattleLoop _battleLoop;
+        private TurnExecutor _turnExecutor;
 
         private IBattleView _view;
         private IActionProvider _playerProvider;
         private IActionProvider _enemyProvider;
+        private Events.BattleEventBus _eventBus;
 
         /// <summary>
         /// The battlefield for this battle.
@@ -69,8 +67,6 @@ namespace PokemonUltimate.Combat
         /// <param name="battleFieldFactory">Factory for creating BattleField instances. Cannot be null.</param>
         /// <param name="battleQueueFactory">Factory for creating BattleQueue instances. Cannot be null.</param>
         /// <param name="randomProvider">Random provider for random operations. Cannot be null.</param>
-        /// <param name="endOfTurnProcessor">Processor for end-of-turn effects. Cannot be null.</param>
-        /// <param name="battleTriggerProcessor">Processor for battle triggers. Cannot be null.</param>
         /// <param name="accuracyChecker">Accuracy checker for move accuracy. If null, creates a temporary one.</param>
         /// <param name="damagePipeline">Damage pipeline for damage calculation. If null, creates a temporary one.</param>
         /// <param name="effectProcessorRegistry">Effect processor registry. If null, creates a temporary one.</param>
@@ -81,8 +77,6 @@ namespace PokemonUltimate.Combat
             IBattleFieldFactory battleFieldFactory,
             IBattleQueueFactory battleQueueFactory,
             IRandomProvider randomProvider,
-            IEndOfTurnProcessor endOfTurnProcessor,
-            IBattleTriggerProcessor battleTriggerProcessor,
             AccuracyChecker accuracyChecker = null,
             IDamagePipeline damagePipeline = null,
             Effects.MoveEffectProcessorRegistry effectProcessorRegistry = null,
@@ -92,35 +86,32 @@ namespace PokemonUltimate.Combat
             _battleFieldFactory = battleFieldFactory ?? throw new ArgumentNullException(nameof(battleFieldFactory));
             _battleQueueFactory = battleQueueFactory ?? throw new ArgumentNullException(nameof(battleQueueFactory));
             _randomProvider = randomProvider ?? throw new ArgumentNullException(nameof(randomProvider));
-            _endOfTurnProcessor = endOfTurnProcessor ?? throw new ArgumentNullException(nameof(endOfTurnProcessor));
-            _battleTriggerProcessor = battleTriggerProcessor ?? throw new ArgumentNullException(nameof(battleTriggerProcessor));
 
-            // Create TurnOrderResolver with RandomProvider
-            _turnOrderResolver = new TurnOrderResolver(_randomProvider);
-
-            // Create AccuracyChecker if not provided (temporary until full DI refactoring)
-            _accuracyChecker = accuracyChecker ?? new AccuracyChecker(_randomProvider);
-
-            // Create DamagePipeline if not provided (temporary until full DI refactoring)
-            _damagePipeline = damagePipeline ?? new DamagePipeline(_randomProvider);
-
-            // Create MoveEffectProcessorRegistry if not provided (temporary until full DI refactoring)
-            var damageContextFactory = new DamageContextFactory();
-            _effectProcessorRegistry = effectProcessorRegistry ?? new Effects.MoveEffectProcessorRegistry(_randomProvider, damageContextFactory);
-
-            // Create BattleStateValidator if not provided
+            // Create dependencies
             _stateValidator = stateValidator ?? new BattleStateValidator();
-
-            // Create BattleLogger if not provided
             _logger = logger ?? new BattleLogger("CombatEngine");
-
-            // Create unified event bus for all battle events (triggers and statistics/logging)
             _eventBus = new Events.BattleEventBus();
+
+            // Create processors (will be initialized with Queue/View in Initialize)
+            _battleInitializer = new Processors.Phases.BattleInitializer(_battleFieldFactory, _battleQueueFactory, _stateValidator);
+            _battleStartProcessor = new Processors.Phases.BattleStartProcessor(_eventBus);
+            _battleEndProcessor = new Processors.Phases.BattleEndProcessor(_eventBus);
+
+            // Processors will be created in Initialize after Queue and View are available
+            _turnExecutor = null;
+            _battleLoop = null;
+
+            // Keep unused dependencies for compatibility (used elsewhere in the system)
+            _ = accuracyChecker ?? new AccuracyChecker(_randomProvider);
+            _ = damagePipeline ?? new DamagePipeline(_randomProvider);
+            var damageContextFactory = new DamageContextFactory();
+            _ = effectProcessorRegistry ?? new Effects.MoveEffectProcessorRegistry(_randomProvider, damageContextFactory);
         }
 
         /// <summary>
-        /// Gets the unified event bus for this battle.
-        /// Handles both BattleTrigger events (abilities/items) and BattleEvent events (statistics/logging).
+        /// Gets the event bus for this battle.
+        /// Handles BattleEvent events for statistics/logging.
+        /// Processors handle abilities/items directly without using the event bus.
         /// </summary>
         public Events.BattleEventBus EventBus => _eventBus;
 
@@ -159,26 +150,55 @@ namespace PokemonUltimate.Combat
             _enemyProvider = enemyProvider;
             _view = view;
 
-            // Create BattleField using factory
-            Field = _battleFieldFactory.Create(rules, playerParty, enemyParty);
+            // Use BattleInitializer
+            (Field, Queue) = _battleInitializer.Initialize(
+                rules, playerParty, enemyParty, playerProvider, enemyProvider);
 
-            // Assign action providers to slots
-            foreach (var slot in Field.PlayerSide.Slots)
-            {
-                slot.ActionProvider = _playerProvider;
-            }
-
-            foreach (var slot in Field.EnemySide.Slots)
-            {
-                slot.ActionProvider = _enemyProvider;
-            }
-
-            // Create BattleQueue using factory
-            Queue = _battleQueueFactory.Create();
             Outcome = BattleOutcome.Ongoing;
 
-            // Validate initial battle state
-            ValidateBattleState();
+            // Create processors that need Queue/View (now available)
+            var turnOrderResolver = new TurnOrderResolver(_randomProvider);
+            var turnStartProcessor = new Processors.Phases.TurnStartProcessor(_eventBus);
+            var actionCollectionProcessor = new Processors.Phases.ActionCollectionProcessor(_randomProvider);
+            var actionSortingProcessor = new Processors.Phases.ActionSortingProcessor(turnOrderResolver);
+            var faintedSwitchingProcessor = new Processors.Phases.FaintedPokemonSwitchingProcessor(_randomProvider, _logger);
+
+            var damageContextFactory = new DamageContextFactory();
+            var endOfTurnEffectsProcessor = new Processors.Phases.EndOfTurnEffectsProcessor(damageContextFactory);
+            var durationDecrementProcessor = new Processors.Phases.DurationDecrementProcessor();
+            var turnEndProcessor = new Processors.Phases.TurnEndProcessor();
+
+            // Create processors for ActionProcessorObserver
+            var damageTakenProcessor = new Processors.Phases.DamageTakenProcessor();
+            var contactReceivedProcessor = new Processors.Phases.ContactReceivedProcessor();
+            var weatherChangeProcessor = new Processors.Phases.WeatherChangeProcessor();
+            var switchInProcessor = new Processors.Phases.SwitchInProcessor(damageContextFactory);
+
+            // Create TurnExecutor
+            _turnExecutor = new Processors.Phases.TurnExecutor(
+                turnStartProcessor,
+                actionCollectionProcessor,
+                actionSortingProcessor,
+                faintedSwitchingProcessor,
+                endOfTurnEffectsProcessor,
+                durationDecrementProcessor,
+                turnEndProcessor,
+                _eventBus,
+                Queue,
+                view,
+                _stateValidator,
+                _logger,
+                turnOrderResolver,
+                damageTakenProcessor,
+                contactReceivedProcessor,
+                weatherChangeProcessor,
+                switchInProcessor);
+
+            // Create BattleLoop
+            _battleLoop = new Processors.Phases.BattleLoop(
+                _eventBus,
+                _logger,
+                async (turnNumber) => await _turnExecutor.ExecuteTurn(Field, turnNumber));
         }
 
         /// <summary>
@@ -190,176 +210,17 @@ namespace PokemonUltimate.Combat
             if (Field == null)
                 throw new InvalidOperationException("CombatEngine must be initialized before running battle.");
 
-            // Determine battle mode name
-            string battleMode = DetermineBattleMode(Field.Rules);
+            // Process battle start
+            await _battleStartProcessor.ProcessAsync(Field);
 
-            // Collect initial Pokemon information
-            var initialPlayerPokemon = Field.PlayerSide.Slots
-                .Where(s => !s.IsEmpty && s.Pokemon != null)
-                .Select(s => s.Pokemon)
-                .ToList();
-            var initialEnemyPokemon = Field.EnemySide.Slots
-                .Where(s => !s.IsEmpty && s.Pokemon != null)
-                .Select(s => s.Pokemon)
-                .ToList();
+            // Run battle loop
+            var result = await _battleLoop.RunBattle(Field, Outcome);
 
-            // Publish battle started event with setup information
-            _eventBus.PublishEvent(new Events.BattleEvent(
-                Events.BattleEventType.BattleStarted,
-                turnNumber: 0,
-                isPlayerSide: false,
-                pokemon: initialPlayerPokemon.FirstOrDefault(), // First Pokemon as primary
-                data: new Events.BattleEventData
-                {
-                    PlayerSlots = Field.Rules.PlayerSlots,
-                    EnemySlots = Field.Rules.EnemySlots,
-                    PlayerPartySize = Field.PlayerSide?.Party?.Count ?? 0,
-                    EnemyPartySize = Field.EnemySide?.Party?.Count ?? 0,
-                    BattleMode = battleMode,
-                    // Store initial Pokemon counts in slots
-                    RemainingPokemon = initialPlayerPokemon.Count, // Reuse field for initial active count
-                    TotalPokemon = initialEnemyPokemon.Count // Reuse field for initial enemy active count
-                }));
+            // Update outcome from result
+            Outcome = result.Outcome;
 
-            // Publish additional events for initial Pokemon in each slot
-            foreach (var slot in Field.PlayerSide.Slots)
-            {
-                if (!slot.IsEmpty && slot.Pokemon != null)
-                {
-                    _eventBus.PublishEvent(new Events.BattleEvent(
-                        Events.BattleEventType.PokemonSwitched,
-                        turnNumber: 0,
-                        isPlayerSide: true,
-                        pokemon: slot.Pokemon,
-                        data: new Events.BattleEventData
-                        {
-                            SwitchedIn = slot.Pokemon,
-                            SlotIndex = slot.SlotIndex
-                        }));
-                }
-            }
-
-            foreach (var slot in Field.EnemySide.Slots)
-            {
-                if (!slot.IsEmpty && slot.Pokemon != null)
-                {
-                    _eventBus.PublishEvent(new Events.BattleEvent(
-                        Events.BattleEventType.PokemonSwitched,
-                        turnNumber: 0,
-                        isPlayerSide: false,
-                        pokemon: slot.Pokemon,
-                        data: new Events.BattleEventData
-                        {
-                            SwitchedIn = slot.Pokemon,
-                            SlotIndex = slot.SlotIndex
-                        }));
-                }
-            }
-
-            int turnCount = 0;
-            int turnsWithoutHPChange = 0;
-            int previousPlayerTotalHP = GetTotalHP(Field.PlayerSide);
-            int previousEnemyTotalHP = GetTotalHP(Field.EnemySide);
-
-            while (Outcome == BattleOutcome.Ongoing && turnCount < BattleConstants.MaxTurns)
-            {
-                int currentTurn = turnCount + 1;
-
-                // Publish turn started event (logging handled by EventBasedBattleLogger)
-                _eventBus.PublishEvent(new Events.BattleEvent(
-                    Events.BattleEventType.TurnStarted,
-                    turnNumber: currentTurn,
-                    isPlayerSide: false,
-                    data: new Events.BattleEventData()));
-
-                // Notify observers about turn start
-                foreach (var observer in Queue.GetObservers())
-                {
-                    observer.OnTurnStart(currentTurn, Field);
-                }
-
-                await RunTurn(currentTurn);
-                turnCount++;
-
-                // Check outcome after each turn
-                Outcome = BattleArbiter.CheckOutcome(Field);
-
-                // Check for infinite loop: detect if HP hasn't changed
-                int currentPlayerTotalHP = GetTotalHP(Field.PlayerSide);
-                int currentEnemyTotalHP = GetTotalHP(Field.EnemySide);
-
-                bool hpChanged = (currentPlayerTotalHP != previousPlayerTotalHP) ||
-                                 (currentEnemyTotalHP != previousEnemyTotalHP);
-
-                if (hpChanged)
-                {
-                    turnsWithoutHPChange = 0;
-                    previousPlayerTotalHP = currentPlayerTotalHP;
-                    previousEnemyTotalHP = currentEnemyTotalHP;
-                }
-                else
-                {
-                    turnsWithoutHPChange++;
-
-                    // If no HP changes for many turns, consider it an infinite loop
-                    if (turnsWithoutHPChange >= BattleConstants.MaxTurnsWithoutHPChange)
-                    {
-                        _logger.LogWarning($"Battle detected as infinite loop: {turnsWithoutHPChange} turns without HP changes. Ending in draw.");
-                        Outcome = BattleOutcome.Draw;
-                        break;
-                    }
-                }
-
-                // Publish turn ended event (logging handled by EventBasedBattleLogger)
-                _eventBus.PublishEvent(new Events.BattleEvent(
-                    Events.BattleEventType.TurnEnded,
-                    turnNumber: turnCount,
-                    isPlayerSide: false,
-                    data: new Events.BattleEventData()));
-
-                // Notify observers about turn end
-                foreach (var observer in Queue.GetObservers())
-                {
-                    observer.OnTurnEnd(turnCount, Field);
-                }
-            }
-
-            // If we reached max turns without a conclusion, end in draw
-            if (Outcome == BattleOutcome.Ongoing && turnCount >= BattleConstants.MaxTurns)
-            {
-                _logger.LogWarning($"Battle reached maximum turn limit ({BattleConstants.MaxTurns}). Ending in draw.");
-                Outcome = BattleOutcome.Draw;
-            }
-
-            // Generate result
-            var result = new BattleResult
-            {
-                Outcome = Outcome,
-                TurnsTaken = turnCount
-            };
-
-            // Calculate team statistics for battle ended event
-            int playerFainted = Field?.PlayerSide?.Party?.Count(p => p.IsFainted) ?? 0;
-            int playerTotal = Field?.PlayerSide?.Party?.Count ?? 0;
-            int enemyFainted = Field?.EnemySide?.Party?.Count(p => p.IsFainted) ?? 0;
-            int enemyTotal = Field?.EnemySide?.Party?.Count ?? 0;
-
-            // Publish battle ended event (logging handled by EventBasedBattleLogger)
-            _eventBus.PublishEvent(new Events.BattleEvent(
-                Events.BattleEventType.BattleEnded,
-                turnNumber: turnCount,
-                isPlayerSide: false,
-                data: new Events.BattleEventData
-                {
-                    Outcome = Outcome,
-                    TotalTurns = turnCount,
-                    PlayerFainted = playerFainted,
-                    PlayerTotal = playerTotal,
-                    EnemyFainted = enemyFainted,
-                    EnemyTotal = enemyTotal
-                }));
-
-            // TODO: Calculate MVP, defeated enemies, EXP, loot (Phase 2.7+)
+            // Process battle end
+            _battleEndProcessor.ProcessBattleEnd(Field, result);
 
             return result;
         }
@@ -373,441 +234,9 @@ namespace PokemonUltimate.Combat
             if (Field == null)
                 throw new InvalidOperationException("CombatEngine must be initialized before running turn.");
 
-            // 1. Collect actions from all active slots (FASE DE SELECCIÓN)
-            // En Pokémon, ambos jugadores eligen simultáneamente antes de ejecutar
-            // Coordinate switches per side to avoid duplicate Pokemon selections
-            var pendingActions = new List<BattleAction>();
-
-            // Collect actions with coordination for strategic switches
-            await CollectActionsWithCoordination(pendingActions);
-
-            // 2. Sort by turn order (priority, then speed) (FASE DE ORDENAMIENTO)
-            // Ahora se ordenan todas las acciones por prioridad y velocidad
-            var sortedActions = _turnOrderResolver.SortActions(pendingActions, Field);
-
-            // Publish action collection events for debugging (AFTER sorting to show execution order)
-            PublishActionCollectionEvent(sortedActions, turnNumber);
-
-            // 3. Enqueue all actions in sorted order (FASE DE EJECUCIÓN)
-            Queue.EnqueueRange(sortedActions);
-
-            // 4. Process the queue
-            await Queue.ProcessQueue(Field, _view);
-
-            // 4.5. Handle automatic switching for fainted Pokemon (team battles)
-            // Note: Turn number tracking would need to be passed - for now using 0
-            await HandleFaintedPokemonSwitching();
-
-            // 5. End-of-turn effects (status damage, weather damage)
-            var endOfTurnActions = _endOfTurnProcessor.ProcessEffects(Field);
-            if (endOfTurnActions.Count > 0)
-            {
-                Queue.EnqueueRange(endOfTurnActions);
-                await Queue.ProcessQueue(Field, _view);
-
-                // Check for fainted Pokemon again after end-of-turn effects
-                await HandleFaintedPokemonSwitching();
-            }
-
-            // 6. Decrement weather duration
-            Field.DecrementWeatherDuration();
-
-            // 7. Decrement terrain duration
-            Field.DecrementTerrainDuration();
-
-            // 8. Decrement side condition durations
-            Field.PlayerSide.DecrementAllSideConditionDurations();
-            Field.EnemySide.DecrementAllSideConditionDurations();
-
-            // 9. End-of-turn triggers (abilities and items)
-            var triggerActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnTurnEnd, Field);
-            if (triggerActions.Count > 0)
-            {
-                Queue.EnqueueRange(triggerActions);
-                await Queue.ProcessQueue(Field, _view);
-
-                // Check for fainted Pokemon again after triggers
-                await HandleFaintedPokemonSwitching();
-            }
-
-            // 10. Validate battle state after turn (in debug builds or when enabled)
-            ValidateBattleState();
+            await _turnExecutor.ExecuteTurn(Field, turnNumber);
         }
 
-        /// <summary>
-        /// Handles automatic switching for fainted Pokemon in team battles.
-        /// Checks all slots for fainted Pokemon and forces automatic switching if available.
-        /// Coordinates switches per side to avoid duplicate Pokemon selections in doubles battles.
-        /// </summary>
-        private async Task HandleFaintedPokemonSwitching()
-        {
-            if (Field == null)
-                return;
-
-            var switchActions = new List<BattleAction>();
-
-            // Process switches per side to coordinate and avoid duplicates
-            await ProcessSideSwitches(Field.PlayerSide, switchActions);
-            await ProcessSideSwitches(Field.EnemySide, switchActions);
-
-            // Execute all switch actions
-            if (switchActions.Count > 0)
-            {
-                // Logging handled by EventBasedBattleLogger via events
-                Queue.EnqueueRange(switchActions);
-                await Queue.ProcessQueue(Field, _view);
-            }
-        }
-
-        /// <summary>
-        /// Processes switches for a single side, coordinating to avoid duplicate Pokemon selections.
-        /// </summary>
-        private async Task ProcessSideSwitches(BattleSide side, List<BattleAction> switchActions)
-        {
-            if (side == null)
-                return;
-
-            // Find all slots that need switching
-            var slotsNeedingSwitch = new List<BattleSlot>();
-            foreach (var slot in side.Slots)
-            {
-                // Check if slot has a fainted Pokemon
-                bool hasFaintedPokemon = slot.Pokemon != null && slot.Pokemon.IsFainted;
-
-                // Check if slot is empty but party has active Pokemon available
-                bool isEmptyButHasAvailablePokemon = slot.IsEmpty &&
-                    side.Party != null &&
-                    side.Party.Any(p => !p.IsFainted && !side.Slots.Any(s => s.Pokemon == p));
-
-                if (hasFaintedPokemon || isEmptyButHasAvailablePokemon)
-                {
-                    slotsNeedingSwitch.Add(slot);
-                }
-            }
-
-            // If no slots need switching, return early
-            if (slotsNeedingSwitch.Count == 0)
-                return;
-
-            // Track Pokemon already selected for switching to avoid duplicates
-            var reservedPokemon = new HashSet<PokemonInstance>();
-
-            // Process each slot that needs switching
-            foreach (var slot in slotsNeedingSwitch)
-            {
-                if (slot.ActionProvider == null)
-                    continue;
-
-                try
-                {
-                    // Get available switches excluding already reserved Pokemon
-                    var availableSwitches = side.GetAvailableSwitches(reservedPokemon).ToList();
-
-                    // If no Pokemon available, skip this slot
-                    if (availableSwitches.Count == 0)
-                        continue;
-
-                    // Select a Pokemon for this slot
-                    PokemonInstance selectedPokemon;
-
-                    // For TeamBattleAI, we can simulate its selection logic
-                    // Otherwise, get action from provider and validate
-                    if (slot.ActionProvider is TeamBattleAI)
-                    {
-                        // Use random selection similar to TeamBattleAI
-                        int index = _randomProvider.Next(0, availableSwitches.Count);
-                        selectedPokemon = availableSwitches[index];
-                    }
-                    else
-                    {
-                        // For other AI types, get action normally but validate no duplicates
-                        var action = await slot.ActionProvider.GetAction(Field, slot);
-                        if (action != null && action is SwitchAction providerSwitchAction)
-                        {
-                            // Check if this Pokemon is already reserved
-                            if (reservedPokemon.Contains(providerSwitchAction.NewPokemon))
-                            {
-                                // Try to find an alternative from available switches
-                                if (availableSwitches.Count > 0)
-                                {
-                                    int index = _randomProvider.Next(0, availableSwitches.Count);
-                                    selectedPokemon = availableSwitches[index];
-                                }
-                                else
-                                {
-                                    // No alternative available, skip this slot
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                selectedPokemon = providerSwitchAction.NewPokemon;
-                            }
-                        }
-                        else
-                        {
-                            // No action returned, skip this slot
-                            continue;
-                        }
-                    }
-
-                    // Reserve this Pokemon and create switch action
-                    reservedPokemon.Add(selectedPokemon);
-                    var newSwitchAction = new SwitchAction(slot, selectedPokemon);
-                    switchActions.Add(newSwitchAction);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error getting switch action for fainted Pokemon: {ex.Message}");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Collects actions from all active slots with coordination for strategic switches.
-        /// Prevents duplicate Pokemon selections when multiple slots want to switch.
-        /// </summary>
-        private async Task CollectActionsWithCoordination(List<BattleAction> pendingActions)
-        {
-            // Collect actions per side to coordinate switches
-            var playerActions = new List<(BattleSlot slot, BattleAction action)>();
-            var enemyActions = new List<(BattleSlot slot, BattleAction action)>();
-
-            // First pass: collect all actions
-            foreach (var slot in Field.GetAllActiveSlots())
-            {
-                if (slot.ActionProvider == null)
-                    continue;
-
-                var action = await slot.ActionProvider.GetAction(Field, slot);
-                if (action != null)
-                {
-                    if (slot.Side.IsPlayer)
-                        playerActions.Add((slot, action));
-                    else
-                        enemyActions.Add((slot, action));
-                }
-            }
-
-            // Coordinate switches for player side
-            var coordinatedPlayerActions = CoordinateSwitches(playerActions, Field.PlayerSide);
-            pendingActions.AddRange(coordinatedPlayerActions);
-
-            // Coordinate switches for enemy side
-            var coordinatedEnemyActions = CoordinateSwitches(enemyActions, Field.EnemySide);
-            pendingActions.AddRange(coordinatedEnemyActions);
-        }
-
-        /// <summary>
-        /// Coordinates switches for a side to prevent duplicate Pokemon selections.
-        /// </summary>
-        private List<BattleAction> CoordinateSwitches(
-            List<(BattleSlot slot, BattleAction action)> actions,
-            BattleSide side)
-        {
-            var coordinatedActions = new List<BattleAction>();
-            var reservedPokemon = new HashSet<PokemonInstance>();
-
-            // Separate switch actions from other actions
-            var switchActions = new List<(BattleSlot slot, SwitchAction action)>();
-            var otherActions = new List<BattleAction>();
-
-            foreach (var (slot, action) in actions)
-            {
-                if (action is SwitchAction switchAction)
-                {
-                    switchActions.Add((slot, switchAction));
-                }
-                else
-                {
-                    otherActions.Add(action);
-                }
-            }
-
-            // Process switch actions with coordination
-            foreach (var (slot, switchAction) in switchActions)
-            {
-                // Check if the selected Pokemon is already reserved
-                if (reservedPokemon.Contains(switchAction.NewPokemon))
-                {
-                    // Find an alternative Pokemon
-                    var availableSwitches = side.GetAvailableSwitches(reservedPokemon).ToList();
-                    if (availableSwitches.Count > 0)
-                    {
-                        // Select a different Pokemon
-                        int index = _randomProvider.Next(0, availableSwitches.Count);
-                        var alternativePokemon = availableSwitches[index];
-                        reservedPokemon.Add(alternativePokemon);
-
-                        // Create new switch action with alternative Pokemon
-                        var coordinatedSwitch = new SwitchAction(slot, alternativePokemon);
-                        coordinatedActions.Add(coordinatedSwitch);
-                    }
-                    // If no alternative available, skip this switch (shouldn't happen in normal gameplay)
-                }
-                else
-                {
-                    // Pokemon not reserved, use original switch action
-                    reservedPokemon.Add(switchAction.NewPokemon);
-                    coordinatedActions.Add(switchAction);
-                }
-            }
-
-            // Add non-switch actions (they don't need coordination)
-            coordinatedActions.AddRange(otherActions);
-
-            return coordinatedActions;
-        }
-
-        /// <summary>
-        /// Publishes events for action collection and sorting (for debugging).
-        /// Publishes events AFTER sorting to show the final execution order.
-        /// </summary>
-        private void PublishActionCollectionEvent(List<BattleAction> sortedActions, int turnNumber)
-        {
-            if (_eventBus == null || sortedActions == null)
-                return;
-
-            var actionDetails = new List<string>();
-
-            // Publish event for each action in sorted order (shows execution order)
-            int executionOrder = 1;
-            foreach (var action in sortedActions)
-            {
-                if (action.User?.Pokemon == null)
-                    continue;
-
-                var speed = action.User != null ? _turnOrderResolver.GetEffectiveSpeed(action.User, Field) : 0;
-                var sideName = action.User.Side.IsPlayer ? "Player" : "Enemy";
-                var pokemonName = action.User.Pokemon.DisplayName;
-                var priority = action.Priority;
-
-                // Build detailed action description
-                string actionDescription = $"{executionOrder}. [{sideName}] {pokemonName}";
-
-                // Add action-specific details
-                switch (action)
-                {
-                    case UseMoveAction moveAction:
-                        // Use localized move name
-                        var localizationProvider = LocalizationManager.Instance;
-                        var moveName = moveAction.Move.GetDisplayName(localizationProvider);
-                        var targetName = moveAction.Target?.Pokemon?.DisplayName ?? "Unknown";
-                        actionDescription += $" - {action.GetType().Name}: {moveName} → {targetName}";
-                        break;
-                    case SwitchAction switchAction:
-                        var newPokemonName = switchAction.NewPokemon?.DisplayName ?? "Unknown";
-                        actionDescription += $" - {action.GetType().Name}: switching to {newPokemonName}";
-                        break;
-                    default:
-                        actionDescription += $" - {action.GetType().Name}";
-                        break;
-                }
-
-                actionDescription += $" (Priority: {priority}, Speed: {speed:F1})";
-                actionDetails.Add(actionDescription);
-
-                _eventBus.PublishEvent(new Events.BattleEvent(
-                    Events.BattleEventType.ActionCollected,
-                    turnNumber: turnNumber,
-                    isPlayerSide: action.User.Side.IsPlayer,
-                    pokemon: action.User.Pokemon,
-                    data: new Events.BattleEventData
-                    {
-                        ActionType = action.GetType().Name,
-                        Priority = action.Priority,
-                        Speed = speed,
-                        SlotIndex = action.User.SlotIndex,
-                        ActionCount = executionOrder // Use ActionCount to store execution order
-                    }));
-                executionOrder++;
-            }
-
-            // Publish event for sorted actions summary
-            if (sortedActions.Count > 0)
-            {
-                _eventBus.PublishEvent(new Events.BattleEvent(
-                    Events.BattleEventType.ActionsSorted,
-                    turnNumber: turnNumber,
-                    isPlayerSide: false,
-                    data: new Events.BattleEventData
-                    {
-                        ActionCount = sortedActions.Count,
-                        SortedActionsDetails = actionDetails
-                    }));
-            }
-        }
-
-        /// <summary>
-        /// Determines the battle mode name based on slot configuration.
-        /// </summary>
-        private string DetermineBattleMode(BattleRules rules)
-        {
-            if (rules == null)
-                return "Custom";
-
-            // Standard modes
-            if (rules.PlayerSlots == 1 && rules.EnemySlots == 1)
-                return rules.IsBossBattle ? "Raid (1vBoss)" : "Singles";
-            if (rules.PlayerSlots == 2 && rules.EnemySlots == 2)
-                return "Doubles";
-            if (rules.PlayerSlots == 3 && rules.EnemySlots == 3)
-                return "Triples";
-
-            // Horde modes
-            if (rules.PlayerSlots == 1 && rules.EnemySlots == 2)
-                return "Horde (1v2)";
-            if (rules.PlayerSlots == 1 && rules.EnemySlots == 3)
-                return "Horde (1v3)";
-            if (rules.PlayerSlots == 1 && rules.EnemySlots == 5)
-                return "Horde (1v5)";
-
-            // Raid modes
-            if (rules.IsBossBattle)
-            {
-                if (rules.PlayerSlots == 1 && rules.EnemySlots == 1)
-                    return "Raid (1vBoss)";
-                if (rules.PlayerSlots == 2 && rules.EnemySlots == 1)
-                    return "Raid (2vBoss)";
-            }
-
-            // Custom mode
-            return $"Custom ({rules.PlayerSlots}v{rules.EnemySlots})";
-        }
-
-        /// <summary>
-        /// Gets the total HP of all active Pokemon on a side.
-        /// </summary>
-        private int GetTotalHP(BattleSide side)
-        {
-            if (side == null || side.Slots == null)
-                return 0;
-
-            int totalHP = 0;
-            foreach (var slot in side.Slots)
-            {
-                if (slot.Pokemon != null && !slot.Pokemon.IsFainted)
-                {
-                    totalHP += slot.Pokemon.CurrentHP;
-                }
-            }
-            return totalHP;
-        }
-
-        /// <summary>
-        /// Validates the current battle state and throws an exception if invalid.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">If battle state is invalid.</exception>
-        private void ValidateBattleState()
-        {
-            var errors = _stateValidator.ValidateField(Field);
-            if (errors.Count > 0)
-            {
-                var errorMessage = "Battle state validation failed:\n" + string.Join("\n", errors);
-                _logger.LogError(errorMessage);
-                throw new InvalidOperationException(errorMessage);
-            }
-        }
     }
 }
 

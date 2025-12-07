@@ -13,7 +13,6 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Effects;
-using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Factories;
 using PokemonUltimate.Combat.Helpers;
@@ -1382,11 +1381,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 var randomProvider = new RandomProvider();
                 var battleFieldFactory = new BattleFieldFactory();
                 var battleQueueFactory = new BattleQueueFactory();
-                var damageContextFactory = new DamageContextFactory();
-                var endOfTurnProcessor = new EndOfTurnProcessor(damageContextFactory);
-                var battleTriggerProcessor = new BattleTriggerProcessor();
                 var accuracyChecker = new AccuracyChecker(randomProvider);
                 var damagePipeline = new DamagePipeline(randomProvider);
+                var damageContextFactory = new DamageContextFactory();
                 var effectProcessorRegistry = new MoveEffectProcessorRegistry(randomProvider, damageContextFactory);
                 var stateValidator = new BattleStateValidator();
 
@@ -1394,8 +1391,6 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     battleFieldFactory,
                     battleQueueFactory,
                     randomProvider,
-                    endOfTurnProcessor,
-                    battleTriggerProcessor,
                     accuracyChecker,
                     damagePipeline,
                     effectProcessorRegistry,
@@ -1433,6 +1428,13 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 {
                     _statisticsCollector = new BattleStatisticsCollector();
                     _statisticsCollector.OnBattleStart(_engine.Field);
+                }
+                else
+                {
+                    // For single battle mode, always reset kill history to show only current battle
+                    // (other stats may accumulate if needed, but kill history should be per-battle)
+                    var stats = _statisticsCollector.GetStatistics();
+                    stats.KillHistory.Clear();
                 }
                 // Note: For batch mode, OnBattleStart (which calls Reset) is NOT called here
                 // to allow statistics to accumulate across battles
@@ -1583,6 +1585,14 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
                     // Clear previous engine reference
                     _engine = null;
+
+                    // Reset kill history before each battle in batch mode (but keep other accumulated stats)
+                    // This ensures each battle shows only its own kill history
+                    if (_statisticsCollector != null)
+                    {
+                        var stats = _statisticsCollector.GetStatistics();
+                        stats.KillHistory.Clear();
+                    }
 
                     // Run single battle without UI updates
                     var result = await RunSingleBattleAsync(updateUI: false);
@@ -1878,13 +1888,13 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     }
                 }
 
-                // Calculate kills (enemy fainted = player kills, player fainted = enemy kills)
-                int playerKills = enemyFainted.Count;
-                int enemyKills = playerFainted.Count;
-
                 // Get kill history separated by team
                 var playerKillHistory = stats.KillHistory.Where(k => k.KillerIsPlayer).ToList();
                 var enemyKillHistory = stats.KillHistory.Where(k => !k.KillerIsPlayer).ToList();
+
+                // Calculate kills based on kill history (excludes self-inflicted deaths from status effects)
+                int playerKills = playerKillHistory.Count;
+                int enemyKills = enemyKillHistory.Count;
 
                 const int boxWidth = 60;
 
@@ -1926,7 +1936,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 {
                     playerSb.AppendLine("Historial de Kills:");
                     foreach (var kill in playerKillHistory)
-                        playerSb.AppendLine($"  {kill.Killer} → {kill.Victim}");
+                        playerSb.AppendLine($"  {kill.Killer} -> {kill.Victim}");
                     playerSb.AppendLine();
                 }
 
@@ -1973,7 +1983,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 {
                     enemySb.AppendLine("Historial de Kills:");
                     foreach (var kill in enemyKillHistory)
-                        enemySb.AppendLine($"  {kill.Killer} → {kill.Victim}");
+                        enemySb.AppendLine($"  {kill.Killer} -> {kill.Victim}");
                     enemySb.AppendLine();
                 }
 

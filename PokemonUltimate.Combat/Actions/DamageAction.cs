@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Content.Catalogs.Items;
@@ -38,23 +37,17 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public DamageContext Context { get; }
 
-        private readonly IBattleTriggerProcessor _battleTriggerProcessor;
-
         /// <summary>
         /// Creates a new damage action.
         /// </summary>
         /// <param name="user">The slot that initiated this damage (attacker).</param>
         /// <param name="target">The slot receiving damage. Cannot be null.</param>
         /// <param name="context">The damage context with calculated damage. Cannot be null.</param>
-        /// <param name="battleTriggerProcessor">The battle trigger processor. If null, creates a temporary one.</param>
         /// <exception cref="ArgumentNullException">If target or context is null.</exception>
-        public DamageAction(BattleSlot user, BattleSlot target, DamageContext context, IBattleTriggerProcessor battleTriggerProcessor = null) : base(user)
+        public DamageAction(BattleSlot user, BattleSlot target, DamageContext context) : base(user)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
             Context = context ?? throw new ArgumentNullException(nameof(context));
-
-            // Create BattleTriggerProcessor if not provided (temporary until full DI refactoring)
-            _battleTriggerProcessor = battleTriggerProcessor ?? new BattleTriggerProcessor();
         }
 
         /// <summary>
@@ -144,32 +137,8 @@ namespace PokemonUltimate.Combat.Actions
                 Target.MarkHitWhileFocusing();
             }
 
-            // Trigger OnDamageTaken for abilities (e.g., Static, Rough Skin)
-            // This happens AFTER damage is applied
-            var damageTakenActions = _battleTriggerProcessor.ProcessTrigger(BattleTrigger.OnDamageTaken, field);
-            reactions.AddRange(damageTakenActions);
-
-            // Trigger OnContactReceived if move makes contact (e.g., Static, Rough Skin, Rocky Helmet)
-            // This happens AFTER damage is applied
-            // Only process for the TARGET that received contact
-            // Pass the attacker (User) as context
-            if (Context.Move != null && Context.Move.MakesContact && actualDamage > 0)
-            {
-                // Process OnContactReceived only for the target slot, passing attacker context
-                if (Target.Pokemon.Ability != null)
-                {
-                    var abilityListener = new AbilityListener(Target.Pokemon.Ability);
-                    var abilityActions = abilityListener.OnTrigger(BattleTrigger.OnContactReceived, Target, field, User);
-                    reactions.AddRange(abilityActions);
-                }
-
-                if (Target.Pokemon.HeldItem != null)
-                {
-                    var itemListener = new ItemListener(Target.Pokemon.HeldItem);
-                    var itemActions = itemListener.OnTrigger(BattleTrigger.OnContactReceived, Target, field, User);
-                    reactions.AddRange(itemActions);
-                }
-            }
+            // Note: Damage-taken and contact-received effects are processed by ActionProcessorObserver
+            // This keeps actions simple and decoupled from processors
 
             // Check if Pokemon fainted (after OnWouldFaint triggers may have prevented it)
             if (Target.Pokemon.IsFainted)
