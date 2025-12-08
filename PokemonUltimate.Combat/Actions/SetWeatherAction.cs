@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Actions.Validation;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Enums;
@@ -21,7 +21,7 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class SetWeatherAction : BattleAction
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// The weather condition to set.
@@ -45,13 +45,13 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="weather">The weather to set. Use Weather.None to clear.</param>
         /// <param name="duration">Duration in turns. 0 means infinite duration.</param>
         /// <param name="weatherData">The weather data for this weather condition. Can be null if not available.</param>
-        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
-        public SetWeatherAction(BattleSlot user, Weather weather, int duration, WeatherData weatherData = null, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a default one.</param>
+        public SetWeatherAction(BattleSlot user, Weather weather, int duration, WeatherData weatherData = null, CombatEffectHandlerRegistry handlerRegistry = null) : base(user)
         {
             Weather = weather;
             Duration = duration;
             WeatherData = weatherData;
-            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace PokemonUltimate.Combat.Actions
                 return Enumerable.Empty<BattleAction>();
             }
 
-            // Use Field Condition Checker to validate weather can be set (eliminates complex validation logic)
-            var fieldChecker = _behaviorRegistry.GetFieldConditionChecker();
-            if (!fieldChecker.CanSetWeather(field, Weather, WeatherData))
+            // Use Field Condition Handler to validate weather can be set (eliminates complex validation logic)
+            var fieldHandler = _handlerRegistry.GetFieldConditionHandler();
+            if (!fieldHandler.CanSetWeather(field, Weather, WeatherData))
             {
                 // Weather cannot be set (e.g., trying to overwrite primal weather)
                 return Enumerable.Empty<BattleAction>();

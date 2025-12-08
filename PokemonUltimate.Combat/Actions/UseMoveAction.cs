@@ -2,20 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Actions.Validation;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Definition;
-using PokemonUltimate.Combat.Effects.Registry;
+using PokemonUltimate.Combat.Damage.Processors;
 using PokemonUltimate.Combat.Engine.Processors;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Infrastructure.Factories;
 using PokemonUltimate.Combat.Infrastructure.Messages;
 using PokemonUltimate.Combat.Infrastructure.Messages.Definition;
 using PokemonUltimate.Combat.Infrastructure.Providers;
 using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Combat.Moves.Definition;
+using PokemonUltimate.Combat.Moves.MoveModifier;
 using PokemonUltimate.Combat.Moves.Orchestrator;
+using PokemonUltimate.Combat.Moves.Processors;
 using PokemonUltimate.Combat.Moves.Steps;
 using PokemonUltimate.Combat.Utilities;
 using PokemonUltimate.Combat.Utilities.Definition;
@@ -38,7 +40,7 @@ namespace PokemonUltimate.Combat.Actions
     public class UseMoveAction : BattleAction
     {
         private readonly MoveExecutionOrchestrator _executionOrchestrator;
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
         private readonly BeforeMoveProcessor _beforeMoveProcessor;
         private readonly AfterMoveProcessor _afterMoveProcessor;
         private readonly IBattleMessageFormatter _messageFormatter;
@@ -77,12 +79,11 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="randomProvider">The random provider. If null, creates a temporary one.</param>
         /// <param name="accuracyChecker">The accuracy checker. If null, creates a temporary one.</param>
         /// <param name="damagePipeline">The damage pipeline. If null, creates a temporary one.</param>
-        /// <param name="effectProcessorRegistry">The effect processor registry. If null, creates a temporary one.</param>
         /// <param name="messageFormatter">The message formatter. If null, creates a default one.</param>
         /// <param name="beforeMoveProcessor">The before move processor. If null, creates a temporary one.</param>
         /// <param name="afterMoveProcessor">The after move processor. If null, creates a temporary one.</param>
         /// <param name="targetResolver">The target resolver. If null, creates a temporary one.</param>
-        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a default one.</param>
         /// <param name="executionOrchestrator">The move execution orchestrator. If null, creates one with default steps.</param>
         /// <exception cref="ArgumentNullException">If user, target, or moveInstance is null.</exception>
         public UseMoveAction(
@@ -92,12 +93,11 @@ namespace PokemonUltimate.Combat.Actions
             IRandomProvider randomProvider = null,
             AccuracyChecker accuracyChecker = null,
             IDamagePipeline damagePipeline = null,
-            MoveEffectProcessorRegistry effectProcessorRegistry = null,
             IBattleMessageFormatter messageFormatter = null,
             BeforeMoveProcessor beforeMoveProcessor = null,
             AfterMoveProcessor afterMoveProcessor = null,
             ITargetResolver targetResolver = null,
-            BehaviorCheckerRegistry behaviorRegistry = null,
+            CombatEffectHandlerRegistry handlerRegistry = null,
             MoveExecutionOrchestrator executionOrchestrator = null) : base(user)
         {
             ActionValidators.ValidateUser(user, nameof(user));
@@ -113,40 +113,65 @@ namespace PokemonUltimate.Combat.Actions
             var damagePipelineInstance = damagePipeline ?? new DamagePipeline(randomProviderInstance);
 
             var damageContextFactory = new DamageContextFactory();
-            var effectProcessorRegistryInstance = effectProcessorRegistry ?? new MoveEffectProcessorRegistry(randomProviderInstance, damageContextFactory);
             _messageFormatter = messageFormatter ?? new BattleMessageFormatter();
             var targetResolverInstance = targetResolver ?? new TargetResolver();
-            _beforeMoveProcessor = beforeMoveProcessor ?? new BeforeMoveProcessor();
-            _afterMoveProcessor = afterMoveProcessor ?? new AfterMoveProcessor();
-            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
 
-            // Initialize processors in registry (they need dependencies)
-            // This creates the MoveEffectOrchestrator internally
-            _behaviorRegistry.InitializeProcessors(damagePipelineInstance, randomProviderInstance, targetResolverInstance, effectProcessorRegistryInstance, accuracyCheckerInstance, _messageFormatter);
+            // Asegurar que el registry esté inicializado con las dependencias necesarias para efectos
+            if (!_handlerRegistry.IsInitialized)
+            {
+                _handlerRegistry.Initialize(randomProviderInstance, damageContextFactory);
+            }
 
-            // Get move effect orchestrator from registry
-            var moveEffectOrchestrator = _behaviorRegistry.GetMoveEffectOrchestrator();
+            _beforeMoveProcessor = beforeMoveProcessor ?? new BeforeMoveProcessor(_handlerRegistry);
+            _afterMoveProcessor = afterMoveProcessor ?? new AfterMoveProcessor(_handlerRegistry);
+
+            // Create move effect orchestrator (needs handler registry for damage processor)
+            var moveEffectOrchestrator = CreateMoveEffectOrchestrator(
+                damagePipelineInstance, randomProviderInstance, targetResolverInstance, accuracyCheckerInstance);
 
             // Create execution orchestrator if not provided
-            _executionOrchestrator = executionOrchestrator ?? CreateDefaultOrchestrator(moveEffectOrchestrator);
+            _executionOrchestrator = executionOrchestrator ?? CreateDefaultOrchestrator(moveEffectOrchestrator, randomProviderInstance, accuracyCheckerInstance);
+        }
+
+
+        /// <summary>
+        /// Creates the move effect orchestrator with all dependencies.
+        /// </summary>
+        private MoveEffectOrchestrator CreateMoveEffectOrchestrator(
+            IDamagePipeline damagePipeline,
+            IRandomProvider randomProvider,
+            ITargetResolver targetResolver,
+            AccuracyChecker accuracyChecker)
+        {
+            var modificationApplier = new MoveModificationApplier(_messageFormatter);
+            var damageProcessor = new MoveDamageProcessor(
+                damagePipeline, randomProvider, targetResolver, _handlerRegistry, _messageFormatter, modificationApplier);
+            var semiInvulnerableProcessor = new SemiInvulnerableMoveProcessor(_handlerRegistry);
+
+            // Usar el registry unificado para procesar efectos
+            return new MoveEffectOrchestrator(_handlerRegistry, damageProcessor, semiInvulnerableProcessor, modificationApplier);
         }
 
         /// <summary>
         /// Creates the default execution orchestrator with all standard steps.
         /// </summary>
-        private MoveExecutionOrchestrator CreateDefaultOrchestrator(MoveEffectOrchestrator moveEffectOrchestrator)
+        private MoveExecutionOrchestrator CreateDefaultOrchestrator(
+            MoveEffectOrchestrator moveEffectOrchestrator,
+            IRandomProvider randomProvider,
+            AccuracyChecker accuracyChecker)
         {
             var steps = new List<IMoveExecutionStep>
             {
                 new InitialValidationStep(),
-                new CancelConflictingStatesStep(_behaviorRegistry),
+                new CancelConflictingStatesStep(_handlerRegistry),
                 new BeforeMoveProcessingStep(_beforeMoveProcessor),
-                new MoveExecutionValidationStep(_behaviorRegistry),
-                new SpecialBehaviorProcessingStep(_behaviorRegistry),
+                new MoveExecutionValidationStep(_handlerRegistry, randomProvider),
+                new SpecialBehaviorProcessingStep(_handlerRegistry),
                 new PPConsumptionStep(_messageFormatter),
-                new ProtectionCheckStep(_behaviorRegistry),
-                new SemiInvulnerableCheckStep(_behaviorRegistry),
-                new AccuracyCheckStep(_behaviorRegistry),
+                new ProtectionCheckStep(_handlerRegistry),
+                new SemiInvulnerableCheckStep(_handlerRegistry),
+                new AccuracyCheckStep(_handlerRegistry, accuracyChecker),
                 new EffectProcessingStep(moveEffectOrchestrator),
                 new AfterMoveProcessingStep(_afterMoveProcessor)
             };

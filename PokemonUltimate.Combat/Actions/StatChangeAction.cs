@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Actions.Validation;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
@@ -22,7 +22,7 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class StatChangeAction : BattleAction
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// The slot whose stat is being modified.
@@ -46,10 +46,10 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="target">The slot whose stat is being modified. Cannot be null.</param>
         /// <param name="stat">The stat to modify. Cannot be HP.</param>
         /// <param name="change">The amount to change (+/-).</param>
-        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a default one.</param>
         /// <exception cref="ArgumentNullException">If target is null.</exception>
         /// <exception cref="ArgumentException">If stat is HP.</exception>
-        public StatChangeAction(BattleSlot user, BattleSlot target, Stat stat, int change, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
+        public StatChangeAction(BattleSlot user, BattleSlot target, Stat stat, int change, CombatEffectHandlerRegistry handlerRegistry = null) : base(user)
         {
             ActionValidators.ValidateTargetNotNull(target, nameof(target));
 
@@ -59,7 +59,7 @@ namespace PokemonUltimate.Combat.Actions
             Target = target;
             Stat = stat;
             Change = change;
-            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace PokemonUltimate.Combat.Actions
             if (!ActionValidators.ShouldExecute(field, Target) || Change == 0)
                 return Enumerable.Empty<BattleAction>();
 
-            // Use Stat Change Application Checker to validate if change can be applied (eliminates complex Mist logic)
-            var statChangeChecker = _behaviorRegistry.GetStatChangeApplicationChecker();
-            if (!statChangeChecker.CanApplyStatChange(Target, User, Change, field))
+            // Use Stat Change Application Handler to validate if change can be applied (eliminates complex Mist logic)
+            var statChangeHandler = _handlerRegistry.GetStatChangeApplicationHandler();
+            if (!statChangeHandler.CanApplyStatChange(Target, User, Change, field))
             {
                 // Stat change blocked (e.g., by Mist)
                 return Enumerable.Empty<BattleAction>();

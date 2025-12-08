@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Definition;
-using PokemonUltimate.Combat.Effects.Registry;
 using PokemonUltimate.Combat.Engine.Processors;
 using PokemonUltimate.Combat.Engine.Validation;
 using PokemonUltimate.Combat.Engine.Validation.Definition;
 using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Infrastructure.Constants;
 using PokemonUltimate.Combat.Infrastructure.Factories;
 using PokemonUltimate.Combat.Infrastructure.Factories.Definition;
@@ -74,7 +74,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <param name="randomProvider">Random provider for random operations. Cannot be null.</param>
         /// <param name="accuracyChecker">Accuracy checker for move accuracy. If null, creates a temporary one.</param>
         /// <param name="damagePipeline">Damage pipeline for damage calculation. If null, creates a temporary one.</param>
-        /// <param name="effectProcessorRegistry">Effect processor registry. If null, creates a temporary one.</param>
+        /// <param name="handlerRegistry">Unified handler registry. If null, creates and initializes a default one.</param>
         /// <param name="stateValidator">Battle state validator. If null, creates a default one.</param>
         /// <param name="logger">Battle logger. If null, creates a default one.</param>
         /// <exception cref="ArgumentNullException">If any required parameter is null.</exception>
@@ -84,7 +84,7 @@ namespace PokemonUltimate.Combat.Engine
             IRandomProvider randomProvider,
             AccuracyChecker accuracyChecker = null,
             IDamagePipeline damagePipeline = null,
-            MoveEffectProcessorRegistry effectProcessorRegistry = null,
+            CombatEffectHandlerRegistry handlerRegistry = null,
             IBattleStateValidator stateValidator = null,
             IBattleLogger logger = null)
         {
@@ -109,8 +109,7 @@ namespace PokemonUltimate.Combat.Engine
             // Keep unused dependencies for compatibility (used elsewhere in the system)
             _ = accuracyChecker ?? new AccuracyChecker(_randomProvider);
             _ = damagePipeline ?? new DamagePipeline(_randomProvider);
-            var damageContextFactory = new DamageContextFactory();
-            _ = effectProcessorRegistry ?? new MoveEffectProcessorRegistry(_randomProvider, damageContextFactory);
+            // Handler registry is now created and initialized in UseMoveAction when needed
         }
 
         /// <summary>

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Actions.Validation;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Enums;
@@ -20,7 +20,7 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class SetTerrainAction : BattleAction
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// The terrain condition to set.
@@ -44,13 +44,13 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="terrain">The terrain to set. Use Terrain.None to clear.</param>
         /// <param name="duration">Duration in turns. 0 means infinite duration.</param>
         /// <param name="terrainData">The terrain data for this terrain condition. Can be null if not available.</param>
-        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
-        public SetTerrainAction(BattleSlot user, Terrain terrain, int duration, TerrainData terrainData = null, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a default one.</param>
+        public SetTerrainAction(BattleSlot user, Terrain terrain, int duration, TerrainData terrainData = null, CombatEffectHandlerRegistry handlerRegistry = null) : base(user)
         {
             Terrain = terrain;
             Duration = duration;
             TerrainData = terrainData;
-            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
         }
 
         /// <summary>
@@ -67,9 +67,9 @@ namespace PokemonUltimate.Combat.Actions
                 return Enumerable.Empty<BattleAction>();
             }
 
-            // Use Field Condition Checker to validate terrain can be set (for consistency, even though terrains can always be overwritten)
-            var fieldChecker = _behaviorRegistry.GetFieldConditionChecker();
-            if (!fieldChecker.CanSetTerrain(field, Terrain))
+            // Use Field Condition Handler to validate terrain can be set (for consistency, even though terrains can always be overwritten)
+            var fieldHandler = _handlerRegistry.GetFieldConditionHandler();
+            if (!fieldHandler.CanSetTerrain(field, Terrain))
             {
                 return Enumerable.Empty<BattleAction>();
             }

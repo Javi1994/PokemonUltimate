@@ -5,14 +5,10 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine.Processors.Definition;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Utilities.Extensions;
-using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Core.Domain.Instances.Pokemon;
-using PokemonUltimate.Localization.Constants;
-using PokemonUltimate.Localization.Extensions;
-using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.Combat.Engine.Processors
 {
@@ -28,6 +24,17 @@ namespace PokemonUltimate.Combat.Engine.Processors
     /// </remarks>
     public class TurnEndProcessor : IActionGeneratingPhaseProcessor
     {
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
+
+        /// <summary>
+        /// Creates a new TurnEndProcessor.
+        /// </summary>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a new one.</param>
+        public TurnEndProcessor(CombatEffectHandlerRegistry handlerRegistry = null)
+        {
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
+        }
+
         /// <summary>
         /// Gets the phase this processor handles.
         /// </summary>
@@ -56,135 +63,24 @@ namespace PokemonUltimate.Combat.Engine.Processors
             {
                 var pokemon = slot.Pokemon;
 
-                // Process ability (if exists)
+                // Process ability (if exists) using handler registry
                 if (pokemon.Ability != null)
                 {
-                    var abilityActions = ProcessAbility(pokemon.Ability, slot, field);
+                    var abilityActions = _handlerRegistry.ProcessAbility(
+                        pokemon.Ability, slot, field, AbilityTrigger.OnTurnEnd);
                     actions.AddRange(abilityActions);
                 }
 
-                // Process held item (if exists)
+                // Process held item (if exists) using handler registry
                 if (pokemon.HeldItem != null)
                 {
-                    var itemActions = ProcessItem(pokemon.HeldItem, slot, field);
+                    var itemActions = _handlerRegistry.ProcessItem(
+                        pokemon.HeldItem, slot, field, ItemTrigger.OnTurnEnd);
                     actions.AddRange(itemActions);
                 }
             }
 
             return await Task.FromResult(actions);
-        }
-
-        /// <summary>
-        /// Processes an ability for end-of-turn effects.
-        /// </summary>
-        private List<BattleAction> ProcessAbility(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            // Check if this ability listens to OnTurnEnd trigger
-            if (!ability.ListensTo(AbilityTrigger.OnTurnEnd))
-                return actions;
-
-            // Process based on ability effect
-            switch (ability.Effect)
-            {
-                case AbilityEffect.RaiseOwnStat:
-                    // Example: Speed Boost
-                    actions.AddRange(ProcessRaiseOwnStat(ability, slot, field));
-                    break;
-
-                    // Add other ability effects as needed
-            }
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes an item for end-of-turn effects.
-        /// </summary>
-        private List<BattleAction> ProcessItem(ItemData item, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            // Check if this item listens to OnTurnEnd trigger
-            if (!item.ListensTo(ItemTrigger.OnTurnEnd))
-                return actions;
-
-            // Process healing items (Leftovers, Black Sludge)
-            if (item.HealAmount > 0)
-            {
-                actions.AddRange(ProcessHealEachTurn(item, slot, field));
-            }
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes RaiseOwnStat ability effect (e.g., Speed Boost).
-        /// </summary>
-        private List<BattleAction> ProcessRaiseOwnStat(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (ability.TargetStat == null)
-                return actions;
-
-            var pokemon = slot.Pokemon;
-            var currentStatStage = slot.GetStatStage(ability.TargetStat.Value);
-
-            // Check if stat is already maxed (+6 stages)
-            if (currentStatStage >= 6)
-                return actions;
-
-            // Message for ability activation
-            var provider = LocalizationService.Instance;
-            var abilityName = ability.GetDisplayName(provider);
-            actions.Add(new MessageAction(
-                provider.GetString(LocalizationKey.AbilityActivated, pokemon.DisplayName, abilityName)));
-
-            // Raise own stat
-            actions.Add(new StatChangeAction(slot, slot, ability.TargetStat.Value, ability.StatStages));
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes HealEachTurn item effect (e.g., Leftovers, Black Sludge).
-        /// </summary>
-        private List<BattleAction> ProcessHealEachTurn(ItemData item, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-            var pokemon = slot.Pokemon;
-
-            // Don't heal if already at full HP
-            if (pokemon.CurrentHP >= pokemon.MaxHP)
-                return actions;
-
-            // Calculate heal amount
-            int healAmount = CalculateHealAmount(item, pokemon);
-
-            // Message for item activation
-            var provider = LocalizationService.Instance;
-            var itemName = item.GetDisplayName(provider);
-            actions.Add(new MessageAction(
-                provider.GetString(LocalizationKey.ItemActivated, pokemon.DisplayName, itemName)));
-
-            // Healing action
-            actions.Add(new HealAction(slot, slot, healAmount));
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Calculates heal amount for an item.
-        /// </summary>
-        private int CalculateHealAmount(ItemData item, PokemonInstance pokemon)
-        {
-            if (item.HealAmount > 0)
-                return item.HealAmount;
-
-            // Default: Leftovers-style (1/16)
-            return Math.Max(1, pokemon.MaxHP / 16);
         }
     }
 }

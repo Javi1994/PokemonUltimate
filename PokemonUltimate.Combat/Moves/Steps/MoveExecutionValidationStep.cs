@@ -1,11 +1,12 @@
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Handlers.Registry;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Combat.Moves.Definition;
 
 namespace PokemonUltimate.Combat.Moves.Steps
 {
     /// <summary>
-    /// Validates move execution (PP, Flinch, Status) using Move Execution Checker.
+    /// Validates move execution (PP, Flinch, Status) using Move Execution Handler.
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
@@ -14,15 +15,18 @@ namespace PokemonUltimate.Combat.Moves.Steps
     /// </remarks>
     public class MoveExecutionValidationStep : IMoveExecutionStep
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
+        private readonly IRandomProvider _randomProvider;
 
         /// <summary>
         /// Creates a new move execution validation step.
         /// </summary>
-        /// <param name="behaviorRegistry">The behavior checker registry. Cannot be null.</param>
-        public MoveExecutionValidationStep(BehaviorCheckerRegistry behaviorRegistry)
+        /// <param name="handlerRegistry">The handler registry. Cannot be null.</param>
+        /// <param name="randomProvider">The random provider. If null, creates a temporary one.</param>
+        public MoveExecutionValidationStep(CombatEffectHandlerRegistry handlerRegistry, IRandomProvider randomProvider = null)
         {
-            _behaviorRegistry = behaviorRegistry ?? throw new System.ArgumentNullException(nameof(behaviorRegistry));
+            _handlerRegistry = handlerRegistry ?? throw new System.ArgumentNullException(nameof(handlerRegistry));
+            _randomProvider = randomProvider ?? new Infrastructure.Providers.RandomProvider();
         }
 
         /// <summary>
@@ -35,8 +39,8 @@ namespace PokemonUltimate.Combat.Moves.Steps
         /// </summary>
         public MoveExecutionStepResult Process(MoveExecutionContext context)
         {
-            var moveExecutionChecker = _behaviorRegistry.GetMoveExecutionChecker();
-            var validationResult = moveExecutionChecker.ValidateExecution(context.MoveInstance, context.User.Pokemon, context.User);
+            var moveExecutionHandler = _handlerRegistry.GetMoveExecutionHandler(_randomProvider);
+            var validationResult = moveExecutionHandler.ValidateExecution(context.MoveInstance, context.User.Pokemon, context.User);
 
             if (!validationResult.CanExecute)
             {

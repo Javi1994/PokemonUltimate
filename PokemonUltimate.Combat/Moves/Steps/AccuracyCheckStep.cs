@@ -1,12 +1,13 @@
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Moves.Definition;
+using PokemonUltimate.Combat.Utilities;
 
 namespace PokemonUltimate.Combat.Moves.Steps
 {
     /// <summary>
-    /// Checks accuracy using Move Accuracy Checker (skip if target is fainted).
+    /// Checks accuracy using Move Accuracy Handler (skip if target is fainted).
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
@@ -15,15 +16,18 @@ namespace PokemonUltimate.Combat.Moves.Steps
     /// </remarks>
     public class AccuracyCheckStep : IMoveExecutionStep
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
+        private readonly AccuracyChecker _accuracyChecker;
 
         /// <summary>
         /// Creates a new accuracy check step.
         /// </summary>
-        /// <param name="behaviorRegistry">The behavior checker registry. Cannot be null.</param>
-        public AccuracyCheckStep(BehaviorCheckerRegistry behaviorRegistry)
+        /// <param name="handlerRegistry">The handler registry. Cannot be null.</param>
+        /// <param name="accuracyChecker">The accuracy checker. If null, creates a temporary one.</param>
+        public AccuracyCheckStep(CombatEffectHandlerRegistry handlerRegistry, AccuracyChecker accuracyChecker = null)
         {
-            _behaviorRegistry = behaviorRegistry ?? throw new System.ArgumentNullException(nameof(behaviorRegistry));
+            _handlerRegistry = handlerRegistry ?? throw new System.ArgumentNullException(nameof(handlerRegistry));
+            _accuracyChecker = accuracyChecker ?? new AccuracyChecker(new Infrastructure.Providers.RandomProvider());
         }
 
         /// <summary>
@@ -36,26 +40,26 @@ namespace PokemonUltimate.Combat.Moves.Steps
         /// </summary>
         public MoveExecutionStepResult Process(MoveExecutionContext context)
         {
-            // Check accuracy using Move Accuracy Checker (skip if target is fainted - move still executes but deals no damage)
+            // Check accuracy using Move Accuracy Handler (skip if target is fainted - move still executes but deals no damage)
             if (ActionValidators.ValidateActiveTarget(context.Target))
             {
-                var moveAccuracyChecker = _behaviorRegistry.GetMoveAccuracyChecker();
-                var accuracyResult = moveAccuracyChecker.CheckAccuracy(context.User, context.Target, context.Move, context.Field);
+                var moveAccuracyHandler = _handlerRegistry.GetMoveAccuracyHandler(_accuracyChecker);
+                var accuracyResult = moveAccuracyHandler.CheckAccuracy(context.User, context.Target, context.Move, context.Field);
 
                 if (!accuracyResult.Hit)
                 {
                     context.Actions.Add(new MessageAction(accuracyResult.MissMessage));
-                    moveAccuracyChecker.CleanupOnFailure(context.User, context.HasFocusPunchEffect, context.HasMultiTurnEffect);
+                    moveAccuracyHandler.CleanupOnFailure(context.User, context.HasFocusPunchEffect, context.HasMultiTurnEffect);
                     context.ShouldStop = true;
                     return MoveExecutionStepResult.Stop;
                 }
             }
 
-            // Remove focusing status if Focus Punch succeeds (using Behavior Checker)
+            // Remove focusing status if Focus Punch succeeds
             if (context.HasFocusPunchEffect)
             {
-                var focusPunchChecker = _behaviorRegistry.GetFocusPunchChecker();
-                focusPunchChecker.CleanupOnSuccess(context.User);
+                var focusPunchHandler = _handlerRegistry.GetFocusPunchHandler();
+                focusPunchHandler.CleanupOnSuccess(context.User);
             }
 
             return MoveExecutionStepResult.Continue;

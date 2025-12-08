@@ -46,10 +46,6 @@ namespace PokemonUltimate.Combat.Actions
             if (!ActionValidators.ShouldExecute(field, Target))
                 return Enumerable.Empty<BattleAction>();
 
-            // Pokemon should already be at 0 HP (set by DamageAction)
-            // This action just handles the visual and any cleanup
-            // Battle end check will be handled by CombatEngine
-
             return Enumerable.Empty<BattleAction>();
         }
 

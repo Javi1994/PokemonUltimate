@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Engine.Processors.Definition;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Infrastructure.Factories;
 using PokemonUltimate.Combat.Utilities.Extensions;
 using PokemonUltimate.Content.Catalogs.Field;
@@ -33,18 +33,20 @@ namespace PokemonUltimate.Combat.Engine.Processors
     public class SwitchInProcessor : IActionGeneratingPhaseProcessor
     {
         private readonly DamageContextFactory _damageContextFactory;
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// Creates a new SwitchInProcessor.
         /// </summary>
         /// <param name="damageContextFactory">The factory for creating damage contexts. Cannot be null.</param>
-        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a new one.</param>
         /// <exception cref="ArgumentNullException">If damageContextFactory is null.</exception>
-        public SwitchInProcessor(DamageContextFactory damageContextFactory, BehaviorCheckerRegistry behaviorRegistry = null)
+        public SwitchInProcessor(
+            DamageContextFactory damageContextFactory,
+            CombatEffectHandlerRegistry handlerRegistry = null)
         {
             _damageContextFactory = damageContextFactory ?? throw new ArgumentNullException(nameof(damageContextFactory), ErrorMessages.FieldCannotBeNull);
-            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
         }
 
         /// <summary>
@@ -74,10 +76,11 @@ namespace PokemonUltimate.Combat.Engine.Processors
             var hazardActions = ProcessEntryHazards(slot, pokemon, field);
             actions.AddRange(hazardActions);
 
-            // 2. Process ability (if exists)
+            // 2. Process ability (if exists) using handler registry
             if (pokemon.Ability != null)
             {
-                var abilityActions = ProcessAbility(pokemon.Ability, slot, field);
+                var abilityActions = _handlerRegistry.ProcessAbility(
+                    pokemon.Ability, slot, field, AbilityTrigger.OnSwitchIn);
                 actions.AddRange(abilityActions);
             }
 
@@ -236,9 +239,9 @@ namespace PokemonUltimate.Combat.Engine.Processors
             {
                 int stages = hazardData.StatStages;
 
-                // Use Behavior Checker to reverse stat changes if Pokemon has Contrary (eliminates hardcoding)
-                var reversalChecker = _behaviorRegistry.GetStatChangeReversalChecker();
-                stages = reversalChecker.ReverseStatChange(pokemon, stages);
+                // Use Handler to reverse stat changes if Pokemon has Contrary (eliminates hardcoding)
+                var reversalHandler = _handlerRegistry.GetStatChangeReversalHandler();
+                stages = reversalHandler.ReverseStatChange(pokemon, stages);
 
                 var provider = LocalizationService.Instance;
                 var hazardName = hazardData.GetDisplayName(provider);
@@ -278,60 +281,5 @@ namespace PokemonUltimate.Combat.Engine.Processors
             return new DamageAction(null, slot, context); // null user = system action
         }
 
-        /// <summary>
-        /// Processes an ability for switch-in effects.
-        /// </summary>
-        private List<BattleAction> ProcessAbility(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            // Check if this ability listens to OnSwitchIn trigger
-            if (!ability.ListensTo(AbilityTrigger.OnSwitchIn))
-                return actions;
-
-            // Process based on ability effect
-            switch (ability.Effect)
-            {
-                case AbilityEffect.LowerOpponentStat:
-                    // Example: Intimidate
-                    actions.AddRange(ProcessLowerOpponentStat(ability, slot, field));
-                    break;
-
-                    // Add other ability effects as needed
-            }
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes LowerOpponentStat ability effect (e.g., Intimidate).
-        /// </summary>
-        private List<BattleAction> ProcessLowerOpponentStat(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (ability.TargetStat == null)
-                return actions;
-
-            var opposingSide = field.GetOppositeSide(slot.Side);
-
-            // Message for ability activation
-            var provider = LocalizationService.Instance;
-            var abilityName = ability.GetDisplayName(provider);
-            actions.Add(new MessageAction(
-                provider.GetString(LocalizationKey.AbilityActivated, slot.Pokemon.DisplayName, abilityName)));
-
-            // Lower stat for all opposing active Pokemon
-            foreach (var enemySlot in opposingSide.GetActiveSlots())
-            {
-                if (enemySlot.IsActive())
-                {
-                    actions.Add(new StatChangeAction(
-                        slot, enemySlot, ability.TargetStat.Value, ability.StatStages));
-                }
-            }
-
-            return actions;
-        }
     }
 }

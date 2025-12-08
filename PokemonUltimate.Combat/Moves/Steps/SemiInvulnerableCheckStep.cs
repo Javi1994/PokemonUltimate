@@ -1,11 +1,11 @@
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Moves.Definition;
 
 namespace PokemonUltimate.Combat.Moves.Steps
 {
     /// <summary>
-    /// Checks semi-invulnerable status using Semi-Invulnerable Checker.
+    /// Checks semi-invulnerable status using Semi-Invulnerable Handler.
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
@@ -14,15 +14,15 @@ namespace PokemonUltimate.Combat.Moves.Steps
     /// </remarks>
     public class SemiInvulnerableCheckStep : IMoveExecutionStep
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// Creates a new semi-invulnerable check step.
         /// </summary>
-        /// <param name="behaviorRegistry">The behavior checker registry. Cannot be null.</param>
-        public SemiInvulnerableCheckStep(BehaviorCheckerRegistry behaviorRegistry)
+        /// <param name="handlerRegistry">The handler registry. Cannot be null.</param>
+        public SemiInvulnerableCheckStep(CombatEffectHandlerRegistry handlerRegistry)
         {
-            _behaviorRegistry = behaviorRegistry ?? throw new System.ArgumentNullException(nameof(behaviorRegistry));
+            _handlerRegistry = handlerRegistry ?? throw new System.ArgumentNullException(nameof(handlerRegistry));
         }
 
         /// <summary>
@@ -35,14 +35,15 @@ namespace PokemonUltimate.Combat.Moves.Steps
         /// </summary>
         public MoveExecutionStepResult Process(MoveExecutionContext context)
         {
-            var semiInvulnerableChecker = _behaviorRegistry.GetSemiInvulnerableChecker();
-            var semiInvulnerableResult = semiInvulnerableChecker.CheckSemiInvulnerable(context.Target, context.Move);
+            var semiInvulnerableHandler = _handlerRegistry.GetSemiInvulnerableHandler();
+            var semiInvulnerableResult = semiInvulnerableHandler.CheckSemiInvulnerable(context.Target, context.Move);
 
             if (semiInvulnerableResult.MissedDueToSemiInvulnerable)
             {
                 context.Actions.Add(new MessageAction(semiInvulnerableResult.MissMessage));
-                var moveAccuracyChecker = _behaviorRegistry.GetMoveAccuracyChecker();
-                moveAccuracyChecker.CleanupOnFailure(context.User, context.HasFocusPunchEffect, context.HasMultiTurnEffect);
+                var accuracyChecker = new Utilities.AccuracyChecker(new Infrastructure.Providers.RandomProvider());
+                var moveAccuracyHandler = _handlerRegistry.GetMoveAccuracyHandler(accuracyChecker);
+                moveAccuracyHandler.CleanupOnFailure(context.User, context.HasFocusPunchEffect, context.HasMultiTurnEffect);
                 context.ShouldStop = true;
                 return MoveExecutionStepResult.Stop;
             }

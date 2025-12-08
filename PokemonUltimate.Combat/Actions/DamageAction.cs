@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Actions.Validation;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.View.Definition;
 
 namespace PokemonUltimate.Combat.Actions
@@ -22,7 +22,7 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class DamageAction : BattleAction
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// The slot receiving damage.
@@ -40,16 +40,17 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="user">The slot that initiated this damage (attacker).</param>
         /// <param name="target">The slot receiving damage. Cannot be null.</param>
         /// <param name="context">The damage context with calculated damage. Cannot be null.</param>
-        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a default one.</param>
         /// <exception cref="ArgumentNullException">If target or context is null.</exception>
-        public DamageAction(BattleSlot user, BattleSlot target, DamageContext context, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
+        public DamageAction(BattleSlot user, BattleSlot target, DamageContext context, CombatEffectHandlerRegistry handlerRegistry = null) : base(user)
         {
             ActionValidators.ValidateTargetNotNull(target, nameof(target));
             ActionValidators.ValidateDamageContext(context, nameof(context));
             Target = target;
             Context = context;
-            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
         }
+
 
         /// <summary>
         /// Applies damage to the target Pokemon.
@@ -60,9 +61,9 @@ namespace PokemonUltimate.Combat.Actions
             if (!ActionValidators.ShouldExecute(field, Target, checkActive: true))
                 return Enumerable.Empty<BattleAction>();
 
-            // Use Damage Application Checker to process all damage logic (OHKO prevention, messages, etc.)
-            var damageChecker = _behaviorRegistry.GetDamageApplicationChecker();
-            var damageResult = damageChecker.ProcessDamageApplication(Target, Context.FinalDamage, field);
+            // Use Damage Application Handler to process all damage logic (OHKO prevention, messages, etc.)
+            var damageHandler = _handlerRegistry.GetDamageApplicationHandler();
+            var damageResult = damageHandler.ProcessDamageApplication(Target, Context.FinalDamage, field);
 
             // No damage to apply (immune or status move)
             if (damageResult.ModifiedDamage == 0)
@@ -73,9 +74,9 @@ namespace PokemonUltimate.Combat.Actions
             // Apply damage (may have been modified by Focus Sash/Sturdy)
             int actualDamage = Target.Pokemon.TakeDamage(damageResult.ModifiedDamage);
 
-            // Record damage taken for Counter/Mirror Coat and Focus Punch (using checker)
+            // Record damage taken for Counter/Mirror Coat and Focus Punch (using handler)
             // Note: Context.Move is never null (validated in DamageContext constructor)
-            damageChecker.RecordDamageTaken(Target, actualDamage, Context.Move.Category);
+            damageHandler.RecordDamageTaken(Target, actualDamage, Context.Move.Category);
 
             // Note: Damage-taken and contact-received effects are processed by ActionProcessorObserver
             // This keeps actions simple and decoupled from processors

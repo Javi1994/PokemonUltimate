@@ -1,10 +1,10 @@
-using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Moves.Definition;
 
 namespace PokemonUltimate.Combat.Moves.Steps
 {
     /// <summary>
-    /// Cancels conflicting move states using Move State Checker.
+    /// Cancels conflicting move states using Move State Handler.
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
@@ -13,15 +13,15 @@ namespace PokemonUltimate.Combat.Moves.Steps
     /// </remarks>
     public class CancelConflictingStatesStep : IMoveExecutionStep
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// Creates a new cancel conflicting states step.
         /// </summary>
-        /// <param name="behaviorRegistry">The behavior checker registry. Cannot be null.</param>
-        public CancelConflictingStatesStep(BehaviorCheckerRegistry behaviorRegistry)
+        /// <param name="handlerRegistry">The handler registry. Cannot be null.</param>
+        public CancelConflictingStatesStep(CombatEffectHandlerRegistry handlerRegistry)
         {
-            _behaviorRegistry = behaviorRegistry ?? throw new System.ArgumentNullException(nameof(behaviorRegistry));
+            _handlerRegistry = handlerRegistry ?? throw new System.ArgumentNullException(nameof(handlerRegistry));
         }
 
         /// <summary>
@@ -34,8 +34,8 @@ namespace PokemonUltimate.Combat.Moves.Steps
         /// </summary>
         public MoveExecutionStepResult Process(MoveExecutionContext context)
         {
-            var moveStateChecker = _behaviorRegistry.GetMoveStateChecker();
-            moveStateChecker.CancelConflictingMoveStates(context.User, context.Move);
+            var moveStateHandler = _handlerRegistry.GetMoveStateHandler();
+            moveStateHandler.CancelConflictingMoveStates(context.User, context.Move);
             return MoveExecutionStepResult.Continue;
         }
     }

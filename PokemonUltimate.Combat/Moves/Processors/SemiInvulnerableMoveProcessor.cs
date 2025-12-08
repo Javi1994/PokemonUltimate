@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Effects;
 using PokemonUltimate.Core.Data.Enums;
@@ -19,14 +19,14 @@ namespace PokemonUltimate.Combat.Moves.Processors
     /// </remarks>
     public class SemiInvulnerableMoveProcessor
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// Crea una nueva instancia del procesador de movimientos semi-invulnerables.
         /// </summary>
-        public SemiInvulnerableMoveProcessor(BehaviorCheckerRegistry behaviorRegistry)
+        public SemiInvulnerableMoveProcessor(CombatEffectHandlerRegistry handlerRegistry)
         {
-            _behaviorRegistry = behaviorRegistry ?? throw new System.ArgumentNullException(nameof(behaviorRegistry));
+            _handlerRegistry = handlerRegistry ?? throw new System.ArgumentNullException(nameof(handlerRegistry));
         }
 
         /// <summary>
@@ -102,9 +102,9 @@ namespace PokemonUltimate.Combat.Moves.Processors
                 // This is turn 1 - charge turn (no damage, just message)
                 user.AddVolatileStatus(VolatileStatus.SemiInvulnerable);
                 user.SetSemiInvulnerableMove(move.Name, isCharging: true);
-                // Message varies by move (e.g., "flew up high!" for Fly) using Semi-Invulnerable Checker
-                var semiInvulnerableChecker = _behaviorRegistry.GetSemiInvulnerableChecker();
-                string message = semiInvulnerableChecker.FormatSemiInvulnerableMessage(move.Name, user.Pokemon, move);
+                // Message varies by move (e.g., "flew up high!" for Fly) using Semi-Invulnerable Handler
+                var semiInvulnerableHandler = _handlerRegistry.GetSemiInvulnerableHandler();
+                string message = semiInvulnerableHandler.FormatSemiInvulnerableMessage(move.Name, user.Pokemon, move);
                 actions.Add(new MessageAction(message));
                 // Charge turn handled - stop processing effects
                 return true;

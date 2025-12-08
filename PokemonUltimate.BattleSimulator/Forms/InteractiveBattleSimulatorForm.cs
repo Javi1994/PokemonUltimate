@@ -12,7 +12,6 @@ using PokemonUltimate.BattleSimulator.Logging;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Combat.Effects.Registry;
 using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Engine.Validation;
 using PokemonUltimate.Combat.Field;
@@ -1388,8 +1387,6 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 var battleQueueFactory = new BattleQueueFactory();
                 var accuracyChecker = new AccuracyChecker(randomProvider);
                 var damagePipeline = new DamagePipeline(randomProvider);
-                var damageContextFactory = new DamageContextFactory();
-                var effectProcessorRegistry = new MoveEffectProcessorRegistry(randomProvider, damageContextFactory);
                 var stateValidator = new BattleStateValidator();
 
                 _engine = new CombatEngine(
@@ -1398,7 +1395,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     randomProvider,
                     accuracyChecker,
                     damagePipeline,
-                    effectProcessorRegistry,
+                    handlerRegistry: null, // Will be created automatically when needed
                     stateValidator,
                     _logger);
 

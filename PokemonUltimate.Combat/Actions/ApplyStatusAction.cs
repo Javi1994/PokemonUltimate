@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Actions.Validation;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Enums;
 
@@ -21,7 +21,7 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class ApplyStatusAction : BattleAction
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// The slot receiving the status condition.
@@ -39,14 +39,14 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="user">The slot that initiated this status application. Can be null for system actions.</param>
         /// <param name="target">The slot receiving the status. Cannot be null.</param>
         /// <param name="status">The status condition to apply.</param>
-        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a default one.</param>
         /// <exception cref="ArgumentNullException">If target is null.</exception>
-        public ApplyStatusAction(BattleSlot user, BattleSlot target, PersistentStatus status, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
+        public ApplyStatusAction(BattleSlot user, BattleSlot target, PersistentStatus status, CombatEffectHandlerRegistry handlerRegistry = null) : base(user)
         {
             ActionValidators.ValidateTargetNotNull(target, nameof(target));
             Target = target;
             Status = status;
-            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
         }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace PokemonUltimate.Combat.Actions
             if (!ActionValidators.ShouldExecute(field, Target))
                 return Enumerable.Empty<BattleAction>();
 
-            // Use Status Application Checker to validate and apply status (eliminates complex validation logic)
-            var statusChecker = _behaviorRegistry.GetStatusApplicationChecker();
-            var result = statusChecker.CanApplyStatus(Target, Status, field);
+            // Use Status Application Handler to validate and apply status (eliminates complex validation logic)
+            var statusHandler = _handlerRegistry.GetStatusApplicationHandler();
+            var result = statusHandler.CanApplyStatus(Target, Status, field);
 
             if (!result.CanApply)
             {

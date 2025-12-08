@@ -1,6 +1,5 @@
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Definition;
-using PokemonUltimate.Combat.Effects.Registry;
 using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Engine.Validation;
 using PokemonUltimate.Combat.Infrastructure.Logging;
@@ -43,21 +42,19 @@ namespace PokemonUltimate.Combat.Infrastructure.Factories
             var accuracyChecker = new AccuracyChecker(randomProvider);
             var damagePipeline = new DamagePipeline(randomProvider);
 
-            // Create effect processor registry
-            var effectProcessorRegistry = new MoveEffectProcessorRegistry(randomProvider, damageContextFactory);
-
             // Create validators and loggers
             var stateValidator = new BattleStateValidator();
             var logger = new BattleLogger("CombatEngine");
 
             // Create and return CombatEngine with all dependencies
+            // Note: Handler registry is now created and initialized automatically in UseMoveAction
             return new CombatEngine(
                 battleFieldFactory,
                 battleQueueFactory,
                 randomProvider,
                 accuracyChecker,
                 damagePipeline,
-                effectProcessorRegistry,
+                handlerRegistry: null, // Will be created automatically when needed
                 stateValidator,
                 logger);
         }

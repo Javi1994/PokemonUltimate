@@ -4,7 +4,6 @@ using System.Linq;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Combat.Effects.Registry;
 using PokemonUltimate.Combat.Engine.Processors;
 using PokemonUltimate.Combat.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
@@ -14,9 +13,9 @@ using PokemonUltimate.Combat.Utilities;
 using PokemonUltimate.Content.Catalogs.Field;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances;
 using PokemonUltimate.Core.Domain.Instances.Move;
 using PokemonUltimate.Core.Infrastructure.Factories;
-using PokemonUltimate.Core.Domain.Instances;
 using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.DeveloperTools.Runners
@@ -396,11 +395,11 @@ namespace PokemonUltimate.DeveloperTools.Runners
                         randomProvider,
                         new AccuracyChecker(randomProvider),
                         new DamagePipeline(randomProvider),
-                        new MoveEffectProcessorRegistry(randomProvider, new DamageContextFactory()),
-                        new BattleMessageFormatter(),
-                        new BeforeMoveProcessor(),
-                        new AfterMoveProcessor(),
-                        new TargetResolver()
+                        messageFormatter: new BattleMessageFormatter(),
+                        beforeMoveProcessor: null, // Will be created automatically
+                        afterMoveProcessor: null, // Will be created automatically
+                        targetResolver: new TargetResolver(),
+                        handlerRegistry: null // Will be created and initialized automatically
                     );
 
                     actions.Add(action);

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine.Processors.Definition;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Utilities.Extensions;
-using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 
@@ -24,6 +24,17 @@ namespace PokemonUltimate.Combat.Engine.Processors
     /// </remarks>
     public class WeatherChangeProcessor : IActionGeneratingPhaseProcessor
     {
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
+
+        /// <summary>
+        /// Creates a new WeatherChangeProcessor.
+        /// </summary>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a new one.</param>
+        public WeatherChangeProcessor(CombatEffectHandlerRegistry handlerRegistry = null)
+        {
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
+        }
+
         /// <summary>
         /// Gets the phase this processor handles.
         /// </summary>
@@ -51,19 +62,16 @@ namespace PokemonUltimate.Combat.Engine.Processors
             {
                 var pokemon = slot.Pokemon;
 
-                // Process ability
+                // Process ability using handler registry
                 if (pokemon.Ability != null)
                 {
-                    var abilityActions = ProcessAbility(pokemon.Ability, slot, field);
+                    var abilityActions = _handlerRegistry.ProcessAbility(
+                        pokemon.Ability, slot, field, AbilityTrigger.OnWeatherChange);
                     actions.AddRange(abilityActions);
                 }
 
-                // Process item
-                if (pokemon.HeldItem != null)
-                {
-                    var itemActions = ProcessItem(pokemon.HeldItem, slot, field);
-                    actions.AddRange(itemActions);
-                }
+                // Note: Items don't typically activate on weather change
+                // Most weather-related effects are passive abilities handled in speed calculations
             }
 
             return actions;
@@ -77,45 +85,6 @@ namespace PokemonUltimate.Combat.Engine.Processors
         public async Task<List<BattleAction>> ProcessAsync(BattleField field)
         {
             return await Task.FromResult(ProcessWeatherChange(field));
-        }
-
-        /// <summary>
-        /// Processes an ability for weather-change effects.
-        /// </summary>
-        private List<BattleAction> ProcessAbility(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (!ability.ListensTo(AbilityTrigger.OnWeatherChange))
-                return actions;
-
-            // Most weather-related abilities are passive (SpeedBoostInWeather)
-            // and don't need active processing here. They're handled in speed calculations.
-            // This processor is for any active effects that need to happen on weather change.
-
-            switch (ability.Effect)
-            {
-                // Add ability effects that need active processing on weather change
-                // Most are passive and handled elsewhere
-                default:
-                    // No active effects for weather change
-                    break;
-            }
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes an item for weather-change effects.
-        /// </summary>
-        private List<BattleAction> ProcessItem(ItemData item, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            // Items typically don't activate on weather change
-            // Add item effects as needed
-
-            return actions;
         }
     }
 }

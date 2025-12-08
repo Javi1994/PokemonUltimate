@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine.Processors.Definition;
 using PokemonUltimate.Combat.Field;
-using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Localization.Constants;
-using PokemonUltimate.Localization.Extensions;
-using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.Combat.Engine.Processors
 {
@@ -24,6 +20,17 @@ namespace PokemonUltimate.Combat.Engine.Processors
     /// </remarks>
     public class AfterMoveProcessor : IActionGeneratingPhaseProcessor
     {
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
+
+        /// <summary>
+        /// Creates a new AfterMoveProcessor.
+        /// </summary>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a new one.</param>
+        public AfterMoveProcessor(CombatEffectHandlerRegistry handlerRegistry = null)
+        {
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
+        }
+
         /// <summary>
         /// Gets the phase this processor handles.
         /// </summary>
@@ -48,17 +55,19 @@ namespace PokemonUltimate.Combat.Engine.Processors
             if (pokemon == null)
                 return actions;
 
-            // Process ability
+            // Process ability using handler registry
             if (pokemon.Ability != null)
             {
-                var abilityActions = ProcessAbility(pokemon.Ability, slot, field);
+                var abilityActions = _handlerRegistry.ProcessAbility(
+                    pokemon.Ability, slot, field, AbilityTrigger.OnAfterMove);
                 actions.AddRange(abilityActions);
             }
 
-            // Process item
+            // Process item using handler registry
             if (pokemon.HeldItem != null)
             {
-                var itemActions = ProcessItem(pokemon.HeldItem, slot, field);
+                var itemActions = _handlerRegistry.ProcessItem(
+                    pokemon.HeldItem, slot, field, ItemTrigger.OnDamageDealt);
                 actions.AddRange(itemActions);
             }
 
@@ -73,111 +82,6 @@ namespace PokemonUltimate.Combat.Engine.Processors
         public async Task<List<BattleAction>> ProcessAsync(BattleField field)
         {
             return await Task.FromResult(new List<BattleAction>());
-        }
-
-        /// <summary>
-        /// Processes an ability for after-move effects.
-        /// </summary>
-        private List<BattleAction> ProcessAbility(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (!ability.ListensTo(AbilityTrigger.OnAfterMove))
-                return actions;
-
-            switch (ability.Effect)
-            {
-                case AbilityEffect.RaiseStatOnKO:
-                    // Example: Moxie
-                    actions.AddRange(ProcessRaiseStatOnKO(ability, slot, field));
-                    break;
-
-                    // Add other ability effects as needed
-            }
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes an item for after-move effects.
-        /// </summary>
-        private List<BattleAction> ProcessItem(ItemData item, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (!item.ListensTo(ItemTrigger.OnDamageDealt))
-                return actions;
-
-            // Check if item has recoil (Life Orb)
-            if (item.RecoilPercent > 0)
-            {
-                actions.AddRange(ProcessRecoilDamage(item, slot, field));
-            }
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes RaiseStatOnKO ability effect (e.g., Moxie).
-        /// </summary>
-        private List<BattleAction> ProcessRaiseStatOnKO(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (ability.TargetStat == null)
-                return actions;
-
-            // Check if any opponent Pokemon fainted this turn
-            var opposingSide = field.GetOppositeSide(slot.Side);
-            bool anyFainted = opposingSide.Slots.Any(s => !s.IsEmpty && s.Pokemon.IsFainted);
-
-            if (!anyFainted)
-                return actions;
-
-            // Message for ability activation
-            var provider = LocalizationService.Instance;
-            var abilityName = ability.GetDisplayName(provider);
-            actions.Add(new MessageAction(
-                provider.GetString(LocalizationKey.AbilityActivated, slot.Pokemon.DisplayName, abilityName)));
-
-            // Raise own stat
-            actions.Add(new StatChangeAction(slot, slot, ability.TargetStat.Value, ability.StatStages));
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes RecoilDamage item effect (e.g., Life Orb).
-        /// </summary>
-        private List<BattleAction> ProcessRecoilDamage(ItemData item, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            // Check if damage was dealt this turn
-            var opposingSide = field.GetOppositeSide(slot.Side);
-            bool damageWasDealt = opposingSide.GetActiveSlots()
-                .Any(s => s.PhysicalDamageTakenThisTurn > 0 || s.SpecialDamageTakenThisTurn > 0);
-
-            if (!damageWasDealt)
-                return actions;
-
-            // Calculate recoil damage (typically 10% of max HP for Life Orb)
-            int recoilDamage = slot.Pokemon.MaxHP / 10;
-            if (recoilDamage < 1)
-                recoilDamage = 1;
-
-            // Message for item activation
-            var provider = LocalizationService.Instance;
-            var itemName = item.GetDisplayName(provider);
-            actions.Add(new MessageAction(
-                provider.GetString(LocalizationKey.ItemActivated, slot.Pokemon.DisplayName, itemName)));
-
-            // Apply recoil damage directly
-            slot.Pokemon.TakeDamage(recoilDamage);
-            actions.Add(new MessageAction(
-                provider.GetString(LocalizationKey.HurtByRecoil, slot.Pokemon.DisplayName)));
-
-            return actions;
         }
     }
 }

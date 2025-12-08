@@ -1,12 +1,12 @@
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Moves.Definition;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Moves.Steps
 {
     /// <summary>
-    /// Checks protection using Protection Checker.
+    /// Checks protection using Protection Handler.
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
@@ -15,15 +15,15 @@ namespace PokemonUltimate.Combat.Moves.Steps
     /// </remarks>
     public class ProtectionCheckStep : IMoveExecutionStep
     {
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
 
         /// <summary>
         /// Creates a new protection check step.
         /// </summary>
-        /// <param name="behaviorRegistry">The behavior checker registry. Cannot be null.</param>
-        public ProtectionCheckStep(BehaviorCheckerRegistry behaviorRegistry)
+        /// <param name="handlerRegistry">The handler registry. Cannot be null.</param>
+        public ProtectionCheckStep(CombatEffectHandlerRegistry handlerRegistry)
         {
-            _behaviorRegistry = behaviorRegistry ?? throw new System.ArgumentNullException(nameof(behaviorRegistry));
+            _handlerRegistry = handlerRegistry ?? throw new System.ArgumentNullException(nameof(handlerRegistry));
         }
 
         /// <summary>
@@ -36,8 +36,8 @@ namespace PokemonUltimate.Combat.Moves.Steps
         /// </summary>
         public MoveExecutionStepResult Process(MoveExecutionContext context)
         {
-            var protectionChecker = _behaviorRegistry.GetProtectionChecker();
-            var protectionResult = protectionChecker.CheckProtection(context.Target, context.Move, context.CanBeBlocked);
+            var protectionHandler = _handlerRegistry.GetProtectionHandler();
+            var protectionResult = protectionHandler.CheckProtection(context.Target, context.Move, context.CanBeBlocked);
 
             if (protectionResult.IsProtected)
             {

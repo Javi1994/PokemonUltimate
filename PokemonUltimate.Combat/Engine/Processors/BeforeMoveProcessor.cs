@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine.Processors.Definition;
 using PokemonUltimate.Combat.Field;
-using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 
@@ -20,6 +20,17 @@ namespace PokemonUltimate.Combat.Engine.Processors
     /// </remarks>
     public class BeforeMoveProcessor : IActionGeneratingPhaseProcessor
     {
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
+
+        /// <summary>
+        /// Creates a new BeforeMoveProcessor.
+        /// </summary>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a new one.</param>
+        public BeforeMoveProcessor(CombatEffectHandlerRegistry handlerRegistry = null)
+        {
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
+        }
+
         /// <summary>
         /// Gets the phase this processor handles.
         /// </summary>
@@ -44,17 +55,19 @@ namespace PokemonUltimate.Combat.Engine.Processors
             if (pokemon == null)
                 return actions;
 
-            // Process ability
+            // Process ability using handler registry
             if (pokemon.Ability != null)
             {
-                var abilityActions = ProcessAbility(pokemon.Ability, slot, field);
+                var abilityActions = _handlerRegistry.ProcessAbility(
+                    pokemon.Ability, slot, field, AbilityTrigger.OnBeforeMove);
                 actions.AddRange(abilityActions);
             }
 
-            // Process item
+            // Process item using handler registry
             if (pokemon.HeldItem != null)
             {
-                var itemActions = ProcessItem(pokemon.HeldItem, slot, field);
+                var itemActions = _handlerRegistry.ProcessItem(
+                    pokemon.HeldItem, slot, field, ItemTrigger.OnMoveUsed);
                 actions.AddRange(itemActions);
             }
 
@@ -69,55 +82,6 @@ namespace PokemonUltimate.Combat.Engine.Processors
         public async Task<List<BattleAction>> ProcessAsync(BattleField field)
         {
             return await Task.FromResult(new List<BattleAction>());
-        }
-
-        /// <summary>
-        /// Processes an ability for before-move effects.
-        /// </summary>
-        private List<BattleAction> ProcessAbility(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (!ability.ListensTo(AbilityTrigger.OnBeforeMove))
-                return actions;
-
-            switch (ability.Effect)
-            {
-                case AbilityEffect.SkipTurn:
-                    // Example: Truant
-                    actions.AddRange(ProcessSkipTurn(ability, slot, field));
-                    break;
-
-                    // Add other ability effects as needed
-            }
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes an item for before-move effects.
-        /// </summary>
-        private List<BattleAction> ProcessItem(ItemData item, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            // Items typically don't activate before moves
-            // Add item effects as needed
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes SkipTurn ability effect (e.g., Truant).
-        /// </summary>
-        private List<BattleAction> ProcessSkipTurn(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            // Implementation would check Truant state and potentially block the move
-            // This is a simplified version - full implementation would track state
-
-            return actions;
         }
     }
 }

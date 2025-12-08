@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Actions.Registry;
 using PokemonUltimate.Combat.Damage.Definition;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Infrastructure.Messages.Definition;
 using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Combat.Moves.MoveModifier;
@@ -27,7 +27,7 @@ namespace PokemonUltimate.Combat.Damage.Processors
         private readonly IDamagePipeline _damagePipeline;
         private readonly IRandomProvider _randomProvider;
         private readonly ITargetResolver _targetResolver;
-        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
         private readonly IBattleMessageFormatter _messageFormatter;
         private readonly MoveModificationApplier _modificationApplier;
 
@@ -38,14 +38,14 @@ namespace PokemonUltimate.Combat.Damage.Processors
             IDamagePipeline damagePipeline,
             IRandomProvider randomProvider,
             ITargetResolver targetResolver,
-            BehaviorCheckerRegistry behaviorRegistry,
+            CombatEffectHandlerRegistry handlerRegistry,
             IBattleMessageFormatter messageFormatter,
             MoveModificationApplier modificationApplier)
         {
             _damagePipeline = damagePipeline ?? throw new System.ArgumentNullException(nameof(damagePipeline));
             _randomProvider = randomProvider ?? throw new System.ArgumentNullException(nameof(randomProvider));
             _targetResolver = targetResolver ?? throw new System.ArgumentNullException(nameof(targetResolver));
-            _behaviorRegistry = behaviorRegistry ?? throw new System.ArgumentNullException(nameof(behaviorRegistry));
+            _handlerRegistry = handlerRegistry ?? throw new System.ArgumentNullException(nameof(handlerRegistry));
             _messageFormatter = messageFormatter ?? throw new System.ArgumentNullException(nameof(messageFormatter));
             _modificationApplier = modificationApplier ?? throw new System.ArgumentNullException(nameof(modificationApplier));
         }
@@ -146,10 +146,10 @@ namespace PokemonUltimate.Combat.Damage.Processors
             BattleField field,
             List<BattleAction> actions)
         {
-            // Check if this is a spread move (hits multiple targets) using Move State Checker
+            // Check if this is a spread move (hits multiple targets) using Move State Handler
             var validTargets = _targetResolver.GetValidTargets(user, move, field);
-            var moveStateChecker = _behaviorRegistry.GetMoveStateChecker();
-            bool isSpreadMove = moveStateChecker.IsSpreadMove(move, field, validTargets.Count);
+            var moveStateHandler = _handlerRegistry.GetMoveStateHandler();
+            bool isSpreadMove = moveStateHandler.IsSpreadMove(move, field, validTargets.Count);
 
             if (isSpreadMove && validTargets.Count > 1)
             {

@@ -4,13 +4,10 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Engine.Processors.Definition;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Utilities.Extensions;
-using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Localization.Constants;
-using PokemonUltimate.Localization.Extensions;
-using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.Combat.Engine.Processors
 {
@@ -25,6 +22,17 @@ namespace PokemonUltimate.Combat.Engine.Processors
     /// </remarks>
     public class DamageTakenProcessor : IActionGeneratingPhaseProcessor
     {
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
+
+        /// <summary>
+        /// Creates a new DamageTakenProcessor.
+        /// </summary>
+        /// <param name="handlerRegistry">The handler registry. If null, creates and initializes a new one.</param>
+        public DamageTakenProcessor(CombatEffectHandlerRegistry handlerRegistry = null)
+        {
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
+        }
+
         /// <summary>
         /// Gets the phase this processor handles.
         /// </summary>
@@ -49,17 +57,20 @@ namespace PokemonUltimate.Combat.Engine.Processors
             if (pokemon == null || !slot.IsActive())
                 return actions;
 
-            // Process ability
+            // Process ability using handler registry
             if (pokemon.Ability != null)
             {
-                var abilityActions = ProcessAbility(pokemon.Ability, slot, field);
+                var abilityActions = _handlerRegistry.ProcessAbility(
+                    pokemon.Ability, slot, field, AbilityTrigger.OnDamageTaken);
                 actions.AddRange(abilityActions);
             }
 
-            // Process item
+            // Process item using handler registry
             if (pokemon.HeldItem != null)
             {
-                var itemActions = ProcessItem(pokemon.HeldItem, slot, field);
+                // Items typically don't activate on damage taken, but check anyway
+                var itemActions = _handlerRegistry.ProcessItem(
+                    pokemon.HeldItem, slot, field, ItemTrigger.OnLowHP);
                 actions.AddRange(itemActions);
             }
 
@@ -74,113 +85,6 @@ namespace PokemonUltimate.Combat.Engine.Processors
         public async Task<List<BattleAction>> ProcessAsync(BattleField field)
         {
             return await Task.FromResult(new List<BattleAction>());
-        }
-
-        /// <summary>
-        /// Processes an ability for damage-taken effects.
-        /// </summary>
-        private List<BattleAction> ProcessAbility(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (!ability.ListensTo(AbilityTrigger.OnDamageTaken))
-                return actions;
-
-            switch (ability.Effect)
-            {
-                default:
-                    // No ability effects implemented yet for OnDamageTaken
-                    break;
-            }
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes an item for damage-taken effects.
-        /// </summary>
-        private List<BattleAction> ProcessItem(ItemData item, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            // Items typically don't activate on damage taken
-            // Add item effects as needed
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes RaiseStatOnDamage ability effect (e.g., Anger Point).
-        /// </summary>
-        private List<BattleAction> ProcessRaiseStatOnDamage(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (ability.TargetStat == null)
-                return actions;
-
-            // Check if this was a critical hit (Anger Point only activates on crit)
-            // Note: This would need to be tracked in DamageContext or slot state
-            // For now, this is a placeholder implementation
-            bool wasCriticalHit = false; // TODO: Get from damage context or slot state
-
-            if (!wasCriticalHit)
-                return actions;
-
-            var pokemon = slot.Pokemon;
-            var currentStatStage = slot.GetStatStage(ability.TargetStat.Value);
-
-            // Check if stat is already maxed (+6 stages)
-            if (currentStatStage >= 6)
-                return actions;
-
-            // Message for ability activation
-            var provider = LocalizationService.Instance;
-            var abilityName = ability.GetDisplayName(provider);
-            actions.Add(new MessageAction(
-                provider.GetString(LocalizationKey.AbilityActivated, pokemon.DisplayName, abilityName)));
-
-            // Raise stat to maximum (+6 stages)
-            int stagesToRaise = 6 - currentStatStage;
-            actions.Add(new StatChangeAction(slot, slot, ability.TargetStat.Value, stagesToRaise));
-
-            return actions;
-        }
-
-        /// <summary>
-        /// Processes RaiseStatOnLowHP ability effect (e.g., Berserk).
-        /// </summary>
-        private List<BattleAction> ProcessRaiseStatOnLowHP(AbilityData ability, BattleSlot slot, BattleField field)
-        {
-            var actions = new List<BattleAction>();
-
-            if (ability.TargetStat == null)
-                return actions;
-
-            var pokemon = slot.Pokemon;
-            float hpPercent = (float)pokemon.CurrentHP / pokemon.MaxHP;
-
-            // Berserk activates when HP drops below 50%
-            float threshold = ability.Multiplier > 0 ? ability.Multiplier : 0.5f;
-            if (hpPercent >= threshold)
-                return actions;
-
-            var currentStatStage = slot.GetStatStage(ability.TargetStat.Value);
-
-            // Check if stat is already maxed (+6 stages)
-            if (currentStatStage >= 6)
-                return actions;
-
-            // Message for ability activation
-            var provider = LocalizationService.Instance;
-            var abilityName = ability.GetDisplayName(provider);
-            actions.Add(new MessageAction(
-                provider.GetString(LocalizationKey.AbilityActivated, pokemon.DisplayName, abilityName)));
-
-            // Raise own stat
-            actions.Add(new StatChangeAction(slot, slot, ability.TargetStat.Value, ability.StatStages));
-
-            return actions;
         }
     }
 }

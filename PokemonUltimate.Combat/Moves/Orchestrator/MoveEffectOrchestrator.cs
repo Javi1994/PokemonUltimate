@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage.Processors;
-using PokemonUltimate.Combat.Effects.Registry;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Moves.MoveModifier;
 using PokemonUltimate.Combat.Moves.Processors;
 using PokemonUltimate.Core.Data.Blueprints;
@@ -20,7 +20,7 @@ namespace PokemonUltimate.Combat.Moves.Orchestrator
     /// </remarks>
     public class MoveEffectOrchestrator
     {
-        private readonly MoveEffectProcessorRegistry _effectProcessorRegistry;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
         private readonly MoveDamageProcessor _damageProcessor;
         private readonly SemiInvulnerableMoveProcessor _semiInvulnerableProcessor;
         private readonly MoveModificationApplier _modificationApplier;
@@ -28,17 +28,17 @@ namespace PokemonUltimate.Combat.Moves.Orchestrator
         /// <summary>
         /// Crea una nueva instancia del orquestador de efectos.
         /// </summary>
-        /// <param name="effectProcessorRegistry">El registry de procesadores de efectos. No puede ser null.</param>
+        /// <param name="handlerRegistry">El registry unificado de handlers. No puede ser null.</param>
         /// <param name="damageProcessor">El procesador de daño. No puede ser null.</param>
         /// <param name="semiInvulnerableProcessor">El procesador de movimientos semi-invulnerables. No puede ser null.</param>
         /// <param name="modificationApplier">El aplicador de modificaciones. No puede ser null.</param>
         public MoveEffectOrchestrator(
-            MoveEffectProcessorRegistry effectProcessorRegistry,
+            CombatEffectHandlerRegistry handlerRegistry,
             MoveDamageProcessor damageProcessor,
             SemiInvulnerableMoveProcessor semiInvulnerableProcessor,
             MoveModificationApplier modificationApplier)
         {
-            _effectProcessorRegistry = effectProcessorRegistry ?? throw new System.ArgumentNullException(nameof(effectProcessorRegistry));
+            _handlerRegistry = handlerRegistry ?? throw new System.ArgumentNullException(nameof(handlerRegistry));
             _damageProcessor = damageProcessor ?? throw new System.ArgumentNullException(nameof(damageProcessor));
             _semiInvulnerableProcessor = semiInvulnerableProcessor ?? throw new System.ArgumentNullException(nameof(semiInvulnerableProcessor));
             _modificationApplier = modificationApplier ?? throw new System.ArgumentNullException(nameof(modificationApplier));
@@ -126,7 +126,7 @@ namespace PokemonUltimate.Combat.Moves.Orchestrator
             }
             result.TotalDamage = damageDealt;
 
-            // Process all other effects
+            // Process all other effects using unified handler registry
             foreach (var effect in move.Effects)
             {
                 // Skip DamageEffect (already processed)
@@ -137,16 +137,9 @@ namespace PokemonUltimate.Combat.Moves.Orchestrator
                 if (effect is SemiInvulnerableEffect)
                     continue;
 
-                // Try to process effect using registry
-                bool processed = _effectProcessorRegistry.Process(effect, user, target, move, field, damageDealt, actions);
-
-                // If not processed by registry, it's an effect type we don't have a processor for yet
-                // This allows for graceful handling of new effect types without breaking existing code
-                if (!processed)
-                {
-                    // Unknown effect type - log or handle as needed
-                    // For now, we silently skip it (could add logging in the future)
-                }
+                // Process effect using unified handler registry
+                var effectActions = _handlerRegistry.ProcessMoveEffect(effect, user, target, move, field, damageDealt);
+                actions.AddRange(effectActions);
             }
 
             return result;

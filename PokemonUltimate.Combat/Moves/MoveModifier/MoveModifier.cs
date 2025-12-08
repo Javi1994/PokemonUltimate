@@ -1,5 +1,5 @@
 using System;
-using PokemonUltimate.Combat.Effects.Definition;
+using PokemonUltimate.Combat.Moves.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Enums;
 
