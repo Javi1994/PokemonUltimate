@@ -11,14 +11,14 @@ This document provides a quick, parseable index of all features for fast AI scan
 
 ## Quick Feature Reference
 
-| #     | Name              | Folder                 | Status           | Description                                              |
-| ----- | ----------------- | ---------------------- | ---------------- | -------------------------------------------------------- |
-| **1** | Game Data         | `1-game-data/`         | ✅ Core Complete<br>⏳ Phase 4 Pending | Game data structures (blueprints) and supporting systems<br>Pending: IVs/EVs, Breeding, Ownership/Tracking |
-| **2** | Combat System     | `2-combat-system/`     | ✅ Core Complete | Complete Pokemon battle engine                           |
-| **3** | Content Expansion | `3-content-expansion/` | 🎯 In Progress   | Adding Pokemon, Moves, Items, Abilities                  |
-| **4** | Unity Integration | `4-unity-integration/` | ✅ Basic Complete<br>⏳ Phases 4.4-4.8 Pending | Unity UI and integration<br>Complete: DLL integration, UI Foundation, IBattleView |
-| **5** | Game Features     | `5-game-features/`     | ⏳ Planned       | Progression, roguelike, meta-game                        |
-| **7** | Game Implementation | `7-game-implementation/` | ⏳ Planned   | Text-based demo game to test all features before Unity |
+| #     | Name                | Folder                   | Status                                         | Description                                                                                                |
+| ----- | ------------------- | ------------------------ | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **1** | Game Data           | `1-game-data/`           | ✅ Core Complete<br>⏳ Phase 4 Pending         | Game data structures (blueprints) and supporting systems<br>Pending: IVs/EVs, Breeding, Ownership/Tracking |
+| **2** | Combat System       | `2-combat-system/`       | ✅ Core Complete                               | Complete Pokemon battle engine                                                                             |
+| **3** | Content Expansion   | `3-content-expansion/`   | 🎯 In Progress                                 | Adding Pokemon, Moves, Items, Abilities                                                                    |
+| **4** | Unity Integration   | `4-unity-integration/`   | ✅ Basic Complete<br>⏳ Phases 4.4-4.8 Pending | Unity UI and integration<br>Complete: DLL integration, UI Foundation, IBattleView                          |
+| **5** | Game Features       | `5-game-features/`       | ⏳ Planned                                     | Progression, roguelike, meta-game                                                                          |
+| **7** | Game Implementation | `7-game-implementation/` | ⏳ Planned                                     | Text-based demo game to test all features before Unity                                                     |
 
 ---
 
@@ -32,9 +32,9 @@ This document provides a quick, parseable index of all features for fast AI scan
 
 ### Feature 2: Combat System
 
-**Keywords**: battle, combat, fight, turn, action, damage, calculation, pipeline, engine, queue, order, priority, speed, status, effect, weather, terrain, hazard, ability, item, trigger, event
+**Keywords**: battle, combat, fight, turn, action, damage, calculation, pipeline, engine, queue, order, priority, speed, status, effect, weather, terrain, hazard, ability, item, trigger, event, step, handler, registry, statistics, simulation, value object, logging, message
 
-**Sub-Features**: 2.1 (Battle Foundation), 2.2 (Action Queue), 2.3 (Turn Order), 2.4 (Damage Pipeline), 2.5 (Combat Actions), 2.6 (Combat Engine), 2.7 (Integration), 2.8 (End-of-Turn), 2.9 (Abilities & Items), 2.10 (Pipeline Hooks), 2.11 (Recoil & Drain), 2.12 (Weather), 2.13 (Terrain), 2.14 (Hazards), 2.15 (Advanced Moves), 2.16 (Field Conditions), 2.17 (Advanced Abilities), 2.18 (Advanced Items), 2.19 (Battle Formats)
+**Sub-Features**: 2.1 (Battle Foundation), 2.2 (Action Queue), 2.3 (Turn Order), 2.4 (Damage Pipeline - 11 steps), 2.5 (Combat Actions - 13 types), 2.6 (Combat Engine - Battle Flow 8 steps, Turn Flow 23 steps), 2.7 (Integration - 6 AIs), 2.8 (End-of-Turn), 2.9 (Abilities & Items - 34 handlers), 2.10 (Pipeline Hooks), 2.11 (Recoil & Drain), 2.12 (Weather), 2.13 (Terrain), 2.14 (Hazards), 2.15 (Advanced Moves), 2.16 (Field Conditions), 2.17 (Advanced Abilities), 2.18 (Advanced Items), 2.19 (Battle Formats), 2.20 (Statistics System)
 
 ### Feature 3: Content Expansion
 

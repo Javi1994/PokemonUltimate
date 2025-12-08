@@ -13,7 +13,17 @@ The Combat System is divided into **multiple phases**, each building on the prev
 **Core Phases (2.1-2.11)**: ✅ Complete  
 **Extended Phases (2.12-2.19)**: ⏳ Planned
 
-> **📋 Refactoring Completed (2024-12-05)**: A comprehensive refactoring was completed following SOLID principles and clean code practices. The refactoring included Dependency Injection, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, Validation, and more. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for complete details. All phases 0-13 of the refactoring plan were completed (42 of 44 tasks, 95.5%).
+> **📋 Refactoring Completed (2024-12-05)**: A comprehensive refactoring was completed following SOLID principles and clean code practices. The system now uses a **step-based pipeline architecture** with:
+>
+> -   **Battle Flow**: 8 steps for battle lifecycle (setup → execution → cleanup)
+> -   **Turn Flow**: 23 unique steps (34 total) for turn execution
+> -   **Damage Pipeline**: 11 steps for damage calculation
+> -   **Handler Registry**: 34 handlers (4 abilities + 3 items + 12 effects + 15 checkers)
+> -   **Action System**: 13 action types implementing Command Pattern
+> -   **AI System**: 6 AI implementations
+> -   **Infrastructure**: Event system, Statistics collection, Simulation tools, Value Objects (8), Logging, Message formatting
+>
+> The refactoring included Dependency Injection, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, Validation, and more. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for complete details. All phases 0-13 of the refactoring plan were completed (42 of 44 tasks, 95.5%).
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -51,32 +61,33 @@ The Combat System is divided into **multiple phases**, each building on the prev
 
 ## Current Status
 
-| Phase                     | Status      | Tests    | Notes                                                  |
-| ------------------------- | ----------- | -------- | ------------------------------------------------------ |
-| 2.1 Battle Foundation     | ✅ Complete | 133      | BattleSlot, BattleSide, BattleField                    |
-| 2.2 Action Queue          | ✅ Complete | 77       | BattleAction, BattleQueue                              |
-| 2.3 Turn Order            | ✅ Complete | 48       | TurnOrderResolver                                      |
-| 2.4 Damage Calculation    | ✅ Complete | 65       | DamagePipeline                                         |
-| **Data Layer**            | ✅ Complete | 170      | AbilityData, ItemData, StatusEffectData                |
-| 2.5 Combat Actions        | ✅ Complete | 47       | All actions implemented                                |
-| 2.6 Combat Engine         | ✅ Complete | 30       | CombatEngine, BattleArbiter, IActionProvider           |
-| 2.7 Integration           | ✅ Complete | 38       | RandomAI, AlwaysAttackAI, TargetResolver, Full battles |
-| 2.8 End-of-Turn Effects   | ✅ Complete | 25       | EndOfTurnProcessor, Status damage                      |
-| 2.9 Abilities & Items     | ✅ Complete | 12       | BattleTrigger system, AbilityListener, ItemListener    |
-| 2.11 Recoil & Drain       | ✅ Complete | -        | RecoilEffect, DrainEffect                              |
-| **Core Total**            | **10/10**   | **645+** | Combat module only (Note: 2.10 consolidated into 2.4)  |
-| 2.12 Extended End-of-Turn | ⏳ Planned  | ~30      | Leech Seed, Wish, Perish Song, Binding                 |
-| 2.13 Additional Triggers  | ⏳ Planned  | ~30      | OnBeforeMove, OnAfterMove, OnDamageTaken               |
-| 2.14 Volatile Status      | ⏳ Planned  | ~30      | Confusion, Infatuation, Taunt, Encore, Disable         |
-| 2.12 Weather System       | ✅ Complete | 35+      | Sun, Rain, Sandstorm, Hail                             |
-| 2.13 Terrain System       | ✅ Complete | 35+      | Electric, Grassy, Psychic, Misty                       |
-| 2.14 Entry Hazards        | ✅ Complete | 25+      | Spikes, Stealth Rock, Toxic Spikes, Sticky Web         |
-| 2.15 Advanced Moves       | ✅ Core Complete | 35+      | Protect, Counter, Pursuit, Focus Punch, Semi-Invulnerable, Multi-Hit, Multi-Turn |
-| 2.16 Field Conditions     | ✅ Complete | 40+      | Screens, Tailwind, Safeguard, Mist                     |
-| 2.17 Advanced Abilities   | ✅ ~95% Complete | 29      | Truant, Speed Boost, Static, Rough Skin, Swift Swim, Chlorophyll, Moxie |
-| 2.18 Advanced Items       | ✅ Complete | 21      | Life Orb, Focus Sash, Rocky Helmet, Black Sludge       |
-| 2.19 Battle Formats       | ✅ Complete | 48      | Doubles ✅, Horde ✅, Raid ✅, Triples ✅, Integration Tests ✅ |
-| **Future Total**          | **8/8**     | **~298** | Extended features (all complete)                          |
+| Phase                     | Status           | Tests    | Notes                                                                                                 |
+| ------------------------- | ---------------- | -------- | ----------------------------------------------------------------------------------------------------- |
+| 2.1 Battle Foundation     | ✅ Complete      | 133      | BattleSlot, BattleSide, BattleField                                                                   |
+| 2.2 Action Queue          | ✅ Complete      | 77       | BattleAction, BattleQueue                                                                             |
+| 2.3 Turn Order            | ✅ Complete      | 48       | TurnOrderResolver                                                                                     |
+| 2.4 Damage Calculation    | ✅ Complete      | 65       | DamagePipeline                                                                                        |
+| **Data Layer**            | ✅ Complete      | 170      | AbilityData, ItemData, StatusEffectData                                                               |
+| 2.5 Combat Actions        | ✅ Complete      | 47       | All actions implemented                                                                               |
+| 2.6 Combat Engine         | ✅ Complete      | 30       | CombatEngine (Battle Flow: 8 steps), TurnEngine (Turn Flow: 23 steps), BattleArbiter, IActionProvider |
+| 2.7 Integration           | ✅ Complete      | 38       | RandomAI, AlwaysAttackAI, TargetResolver, Full battles                                                |
+| 2.8 End-of-Turn Effects   | ✅ Complete      | 25       | EndOfTurnProcessor, Status damage                                                                     |
+| 2.9 Abilities & Items     | ✅ Complete      | 12       | BattleTrigger system, AbilityListener, ItemListener                                                   |
+| 2.11 Recoil & Drain       | ✅ Complete      | -        | RecoilEffect, DrainEffect                                                                             |
+| **Core Total**            | **10/10**        | **645+** | Combat module only (Note: 2.10 consolidated into 2.4)                                                 |
+| 2.12 Extended End-of-Turn | ⏳ Planned       | ~30      | Leech Seed, Wish, Perish Song, Binding                                                                |
+| 2.13 Additional Triggers  | ⏳ Planned       | ~30      | OnBeforeMove, OnAfterMove, OnDamageTaken                                                              |
+| 2.14 Volatile Status      | ⏳ Planned       | ~30      | Confusion, Infatuation, Taunt, Encore, Disable                                                        |
+| 2.12 Weather System       | ✅ Complete      | 35+      | Sun, Rain, Sandstorm, Hail                                                                            |
+| 2.13 Terrain System       | ✅ Complete      | 35+      | Electric, Grassy, Psychic, Misty                                                                      |
+| 2.14 Entry Hazards        | ✅ Complete      | 25+      | Spikes, Stealth Rock, Toxic Spikes, Sticky Web                                                        |
+| 2.15 Advanced Moves       | ✅ Core Complete | 35+      | Protect, Counter, Pursuit, Focus Punch, Semi-Invulnerable, Multi-Hit, Multi-Turn                      |
+| 2.16 Field Conditions     | ✅ Complete      | 40+      | Screens, Tailwind, Safeguard, Mist                                                                    |
+| 2.17 Advanced Abilities   | ✅ ~95% Complete | 29       | Truant, Speed Boost, Static, Rough Skin, Swift Swim, Chlorophyll, Moxie                               |
+| 2.18 Advanced Items       | ✅ Complete      | 21       | Life Orb, Focus Sash, Rocky Helmet, Black Sludge                                                      |
+| 2.19 Battle Formats       | ✅ Complete      | 48       | Doubles ✅, Horde ✅, Raid ✅, Triples ✅, Integration Tests ✅                                       |
+| 2.20 Statistics System    | ✅ Complete      | -        | BattleStatistics, BattleStatisticsCollector, Event-driven collection                                  |
+| **Future Total**          | **9/9**          | **~298** | Extended features (all complete)                                                                      |
 
 ---
 
@@ -633,26 +644,56 @@ Tests/Combat/Actions/SwitchActionTests.cs
 
 ## Phase 2.6: Combat Engine
 
-**Goal**: Orchestrate the full battle loop.
+**Goal**: Orchestrate the full battle loop using step-based pipeline architecture.
 
 **Depends on**: Phases 2.1-2.5
 
 ### Components
 
-| Component       | File                      | Description              |
-| --------------- | ------------------------- | ------------------------ |
-| `CombatEngine`  | `Combat/CombatEngine.cs`  | Main controller          |
-| `BattleArbiter` | `Combat/BattleArbiter.cs` | Victory/defeat detection |
-| `BattleOutcome` | `Combat/BattleOutcome.cs` | Battle result enum       |
-| `BattleResult`  | `Combat/BattleResult.cs`  | Detailed result data     |
+| Component            | File                              | Description                                              |
+| -------------------- | --------------------------------- | -------------------------------------------------------- |
+| `CombatEngine`       | `Combat/Engine/CombatEngine.cs`   | Main controller (orchestrates Battle Flow: 8 steps)      |
+| `TurnEngine`         | `Combat/Engine/TurnEngine.cs`     | Turn execution engine (orchestrates Turn Flow: 23 steps) |
+| `BattleFlowExecutor` | `Combat/Engine/BattleFlow/`       | Executes battle flow steps                               |
+| `TurnStepExecutor`   | `Combat/Engine/TurnFlow/`         | Executes turn flow steps                                 |
+| `BattleArbiter`      | `Combat/Engine/BattleArbiter.cs`  | Victory/defeat detection                                 |
+| `BattleOutcome`      | `Combat/Results/BattleOutcome.cs` | Battle result enum                                       |
+| `BattleResult`       | `Combat/Results/BattleResult.cs`  | Detailed result data                                     |
 
 ### CombatEngine Specification
+
+The engine uses a **step-based pipeline architecture**:
+
+**Battle Flow** (8 steps):
+
+1. CreateFieldStep - Creates BattleField
+2. AssignActionProvidersStep - Assigns providers
+3. CreateQueueStep - Creates BattleQueueService
+4. ValidateInitialStateStep - Validates state
+5. CreateDependenciesStep - Creates TurnEngine
+6. BattleStartFlowStep - Battle start effects
+7. ExecuteBattleLoopStep - Main battle loop
+8. BattleEndFlowStep - Battle end handling
+
+**Turn Flow** (23 unique steps, 34 total):
+
+-   Preparation: TurnStart, ActionCollection, TargetResolution, ActionSorting
+-   Move Validation: MoveValidation, MoveProtectionCheck, MoveAccuracyCheck
+-   Before Move Effects: BeforeMoveEffects, ProcessGeneratedActions
+-   Damage: MoveDamageCalculation, MoveDamageApplication, ProcessGeneratedActions
+-   Animations: MoveAnimation
+-   Reactive Effects: DamageTakenEffects, ContactReceivedEffects, ProcessGeneratedActions
+-   Move Effects: MoveEffectProcessing, ProcessGeneratedActions
+-   After Move Effects: AfterMoveEffects, ProcessGeneratedActions
+-   Other Actions: SwitchActions, SwitchInEffects, StatusActions, ProcessGeneratedActions
+-   Fainted Check: FaintedPokemonCheck (appears 3 times)
+-   End of Turn: EndOfTurnEffects, DurationDecrement, TurnEnd, ProcessGeneratedActions
 
 ```csharp
 public class CombatEngine
 {
     public BattleField Field { get; }
-    public BattleQueue Queue { get; }
+    public BattleQueueService Queue { get; }
     public BattleOutcome Outcome { get; private set; }
 
     public void Initialize(BattleRules rules,

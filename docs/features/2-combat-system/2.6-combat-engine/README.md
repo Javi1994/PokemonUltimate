@@ -8,37 +8,59 @@
 
 ## Overview
 
-The Combat Engine orchestrates the entire battle, including:
+The Combat Engine orchestrates the entire battle using a **step-based pipeline architecture**:
 
--   **CombatEngine**: Main battle loop controller (orchestrates battle loop and turn execution)
--   **TurnExecutor**: Orchestrates single turn execution using phase-based processors
+-   **CombatEngine**: Main battle controller (orchestrates Battle Flow: 8 steps)
+-   **TurnEngine**: Turn execution engine (orchestrates Turn Flow: 23 unique steps, 34 total)
+-   **BattleFlowExecutor**: Executes battle flow steps
+-   **TurnStepExecutor**: Executes turn flow steps
 -   **BattleArbiter**: Victory/defeat detection
--   **Phase Processors**: Specialized processors for each battle phase/moment
--   **ActionProcessorObserver**: Observer pattern for reactive processors (damage, contact, weather, switch-in)
 -   **Battle Outcome**: Determines battle result
--   **Dependencies**: Uses factories for BattleField and BattleQueue creation, injects processors and helpers
+-   **Dependencies**: Uses factories for BattleField and BattleQueueService creation, injects handlers, validators, and helpers
 
 ## Architecture
 
-The engine uses a **phase-based processor system** where each battle phase/moment has a dedicated processor:
+The engine uses a **step-based pipeline architecture** with two levels:
 
--   **Turn Phases**: `TurnStartProcessor`, `ActionCollectionProcessor`, `ActionSortingProcessor`, `FaintedPokemonSwitchingProcessor`, `EndOfTurnEffectsProcessor`, `TurnEndProcessor`, `DurationDecrementProcessor`
--   **Reactive Phases**: `SwitchInProcessor`, `BeforeMoveProcessor`, `AfterMoveProcessor`, `ContactReceivedProcessor`, `DamageTakenProcessor`, `WeatherChangeProcessor`
--   **Battle Phases**: `BattleStartProcessor`, `BattleEndProcessor`
+### Battle Flow (8 Steps)
 
-Processors are organized by the `BattlePhase` enum and implement interfaces:
+High-level battle lifecycle managed by `CombatEngine`:
 
--   `IBattlePhaseProcessor` - Base interface
--   `IActionGeneratingPhaseProcessor` - For processors that generate actions
--   `IStateModifyingPhaseProcessor` - For processors that modify state directly
+1. **CreateFieldStep** - Creates BattleField with both sides
+2. **AssignActionProvidersStep** - Assigns action providers to battle sides
+3. **CreateQueueStep** - Creates BattleQueueService
+4. **ValidateInitialStateStep** - Validates initial battle state
+5. **CreateDependenciesStep** - Creates TurnEngine and dependencies
+6. **BattleStartFlowStep** - Executes battle start effects
+7. **ExecuteBattleLoopStep** - Executes main battle loop
+8. **BattleEndFlowStep** - Handles battle end
 
-The `ActionProcessorObserver` detects specific action types (`DamageAction`, `SwitchAction`, `SetWeatherAction`) and delegates to appropriate reactive processors, decoupling actions from processors.
+### Turn Flow (23 Unique Steps, 34 Total)
+
+Detailed turn execution managed by `TurnEngine`:
+
+-   **Preparation**: TurnStart, ActionCollection, TargetResolution, ActionSorting
+-   **Move Validation**: MoveValidation, MoveProtectionCheck, MoveAccuracyCheck
+-   **Before Move Effects**: BeforeMoveEffects, ProcessGeneratedActions
+-   **Damage**: MoveDamageCalculation, MoveDamageApplication, ProcessGeneratedActions
+-   **Animations**: MoveAnimation
+-   **Reactive Effects**: DamageTakenEffects, ContactReceivedEffects, ProcessGeneratedActions
+-   **Move Effects**: MoveEffectProcessing, ProcessGeneratedActions
+-   **After Move Effects**: AfterMoveEffects, ProcessGeneratedActions
+-   **Other Actions**: SwitchActions, SwitchInEffects, StatusActions, ProcessGeneratedActions
+-   **Fainted Check**: FaintedPokemonCheck (appears 3 times)
+-   **End of Turn**: EndOfTurnEffects, DurationDecrement, TurnEnd, ProcessGeneratedActions
+
+Steps implement interfaces:
+
+-   `IBattleFlowStep` - Base interface for battle flow steps
+-   `ITurnStep` - Base interface for turn flow steps
 
 ## Current Status
 
--   ✅ **Implemented**: Complete battle engine with phase-based processors (refactored 2024-12-07)
+-   ✅ **Implemented**: Complete battle engine with step-based pipeline architecture (refactored 2024-12-05)
 -   ✅ **Tested**: Comprehensive test coverage
--   ✅ **Refactored**: Phase-based architecture, improved separation of concerns and maintainability
+-   ✅ **Refactored**: Step-based pipeline architecture (Battle Flow + Turn Flow), improved separation of concerns and maintainability
 
 ## Documentation
 
@@ -58,9 +80,10 @@ The `ActionProcessorObserver` detects specific action types (`DamageAction`, `Sw
 
 ## Quick Links
 
--   **Key Classes**: `CombatEngine`, `BattleArbiter`
+-   **Key Classes**: `CombatEngine`, `TurnEngine`, `BattleFlowExecutor`, `TurnStepExecutor`, `BattleArbiter`
 -   **Status**: ✅ Complete (Phase 2.6)
+-   **Architecture**: Step-based pipeline (Battle Flow: 8 steps, Turn Flow: 23 unique steps, 34 total)
 
 ---
 
-**Last Updated**: 2024-12-07 (Phase-based processors refactor)
+**Last Updated**: January 2025 (Step-based pipeline architecture refactor: 2024-12-05)

@@ -87,20 +87,30 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 **Status**: ✅ Core Complete (Phases 2.1-2.11, 2.12-2.15, 2.16, 2.17 ~95%, 2.18 Complete)  
 **Description**: Complete Pokemon battle engine implementation
 
-> **📋 Refactoring Completed (2024-12-05)**: Comprehensive refactoring completed following SOLID principles. All major components now use Dependency Injection, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, and Validation. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details.
+> **📋 Refactoring Completed (2024-12-05)**: Comprehensive refactoring completed following SOLID principles. All major components now use Dependency Injection, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, and Validation. The system uses a step-based pipeline architecture with 8 battle flow steps and 23 turn flow steps (34 total including repetitions). See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details.
+
+**Architecture Highlights**:
+
+-   **Step-Based Pipeline**: Battle Flow (8 steps) and Turn Flow (23 unique steps, 34 total)
+-   **Action System**: 13 action types implementing Command Pattern
+-   **Damage Pipeline**: 11 modular damage calculation steps
+-   **Handler Registry**: 34 handlers (4 abilities + 3 items + 12 move effects + 15 checkers)
+-   **AI System**: 6 AI implementations (RandomAI, SmartAI, TeamBattleAI, etc.)
+-   **Infrastructure**: Event system, Statistics collection, Simulation tools, Value Objects (8), Logging, Message formatting
 
 **Sub-Features**:
 
 -   **2.1**: Battle Foundation - BattleField, Slots, Sides, Rules
--   **2.2**: Action Queue System - BattleQueue, BattleAction
+-   **2.2**: Action Queue System - BattleQueueService, BattleAction (13 types)
 -   **2.3**: Turn Order Resolution - Priority, Speed, Random sorting
--   **2.4**: Damage Calculation Pipeline - Modular damage calculation (includes stat/damage modifiers)
--   **2.5**: Combat Actions - UseMove, Damage, Status, Heal, Switch, Faint
--   **2.6**: Combat Engine - Battle loop, turn execution, outcome detection
--   **2.7**: Integration - AI providers, Player input, Full battles
--   **2.8**: End-of-Turn Effects - Status damage, effects processing
--   **2.9**: Abilities & Items - Event-driven system, triggers
--   **2.11**: Recoil & Drain - Recoil damage, HP drain effects
+-   **2.4**: Damage Calculation Pipeline - Modular damage calculation with 11 steps (includes stat/damage modifiers)
+-   **2.5**: Combat Actions - 13 action types: UseMove, Damage, Status, Heal, Switch, Faint, etc.
+-   **2.6**: Combat Engine - Battle loop with Battle Flow (8 steps) and Turn Flow (23 unique steps, 34 total), outcome detection
+-   **2.7**: Integration - AI providers (6 implementations), Player input, Full battles
+-   **2.8**: End-of-Turn Effects - Status damage, effects processing (via Turn Flow steps)
+-   **2.9**: Abilities & Items - Handler registry system with 34 handlers (4 abilities + 3 items + 12 effects + 15 checkers)
+-   **2.10**: Pipeline Hooks - Damage pipeline hooks for modifiers (via damage steps)
+-   **2.11**: Recoil & Drain - Recoil damage, HP drain effects (via effect handlers)
 -   **2.12**: Weather System - Weather conditions and effects ✅ Core Complete (advanced features pending dependent systems)
 -   **2.13**: Terrain System - Terrain conditions and effects ✅ Core Complete (advanced features pending dependent systems)
 -   **2.14**: Hazards System - Stealth Rock, Spikes, etc. ✅ Core Complete (hazard removal actions pending move-specific implementation)
@@ -109,7 +119,7 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 -   **2.17**: Advanced Abilities - Complex ability interactions (Planned)
 -   **2.18**: Advanced Items - Complex item interactions (Planned)
 -   **2.19**: Battle Formats - Doubles, Triples, Rotation (Planned)
--   **2.20**: Statistics System - Event-driven statistics collection system 🎯 In Progress
+-   **2.20**: Statistics System - Event-driven statistics collection system ✅ Complete
 
 **Related Roadmap**: `docs/features/2-combat-system/roadmap.md`
 
@@ -192,13 +202,13 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 **Sub-Features**:
 
-- **6.5**: Battle Debugger - Run multiple battles and analyze statistics ✅ Complete
-- **6.6**: Move Debugger - Test moves multiple times and collect statistics ✅ Complete
-- **Existing**: Type Matchup Debugger ✅ Complete
-- **6.1**: Stat Calculator Debugger - Calculate and visualize Pokemon stats with different configurations ✅ Complete
-- **6.2**: Damage Calculator Debugger - Step-by-step damage calculation pipeline visualization ✅ Complete
-- **6.3**: Status Effect Debugger - Test status effects and their interactions ✅ Complete
-- **6.4**: Turn Order Debugger - Visualize turn order determination with speed and priority ✅ Complete
+-   **6.5**: Battle Debugger - Run multiple battles and analyze statistics ✅ Complete
+-   **6.6**: Move Debugger - Test moves multiple times and collect statistics ✅ Complete
+-   **Existing**: Type Matchup Debugger ✅ Complete
+-   **6.1**: Stat Calculator Debugger - Calculate and visualize Pokemon stats with different configurations ✅ Complete
+-   **6.2**: Damage Calculator Debugger - Step-by-step damage calculation pipeline visualization ✅ Complete
+-   **6.3**: Status Effect Debugger - Test status effects and their interactions ✅ Complete
+-   **6.4**: Turn Order Debugger - Visualize turn order determination with speed and priority ✅ Complete
 
 **Related Roadmap**: `docs/features/6-development-tools/roadmap.md`
 
@@ -227,15 +237,15 @@ Features are numbered sequentially (1, 2, 3...) and sub-features use decimal not
 
 ## Feature Reference Table
 
-| #     | Feature Name      | Folder                 | Status           | Roadmap                                                  |
-| ----- | ----------------- | ---------------------- | ---------------- | -------------------------------------------------------- |
-| **1** | Game Data         | `1-game-data/`         | ✅ Complete | Game data structures (blueprints) and supporting systems<br>All phases complete including Phase 4 enhancements |
-| **2** | Combat System     | `2-combat-system/`     | ✅ Core Complete<br>✅ Advanced Moves Complete | [roadmap.md](../features/2-combat-system/roadmap.md)<br>Phases 2.1-2.15, 2.16 complete. 2.17-2.19 pending |
-| **3** | Content Expansion | `3-content-expansion/` | 🎯 In Progress   | [roadmap.md](../features/3-content-expansion/roadmap.md) |
-| **4** | Unity Integration | `4-unity-integration/` | ⏳ Planned       | [roadmap.md](../features/4-unity-integration/roadmap.md) |
-| **5** | Game Features     | `5-game-features/`     | ⏳ Planned       | [roadmap.md](../features/5-game-features/roadmap.md)     |
-| **6** | Development Tools | `6-development-tools/` | 🎯 In Progress   | [roadmap.md](../features/6-development-tools/roadmap.md) |
-| **7** | Game Implementation | `7-game-implementation/` | ⏳ Planned   | [roadmap.md](../features/7-game-implementation/roadmap.md) |
+| #     | Feature Name        | Folder                   | Status                                                                   | Roadmap                                                                                                                                                                                                                              |
+| ----- | ------------------- | ------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **1** | Game Data           | `1-game-data/`           | ✅ Complete                                                              | Game data structures (blueprints) and supporting systems<br>All phases complete including Phase 4 enhancements                                                                                                                       |
+| **2** | Combat System       | `2-combat-system/`       | ✅ Core Complete<br>✅ Advanced Moves Complete<br>✅ Statistics Complete | [roadmap.md](../features/2-combat-system/roadmap.md)<br>Phases 2.1-2.16, 2.20 complete. 2.17-2.19 pending<br>Architecture: Step-based pipeline (8 battle flow + 23 turn flow steps), 13 actions, 11 damage steps, 34 handlers, 6 AIs |
+| **3** | Content Expansion   | `3-content-expansion/`   | 🎯 In Progress                                                           | [roadmap.md](../features/3-content-expansion/roadmap.md)                                                                                                                                                                             |
+| **4** | Unity Integration   | `4-unity-integration/`   | ⏳ Planned                                                               | [roadmap.md](../features/4-unity-integration/roadmap.md)                                                                                                                                                                             |
+| **5** | Game Features       | `5-game-features/`       | ⏳ Planned                                                               | [roadmap.md](../features/5-game-features/roadmap.md)                                                                                                                                                                                 |
+| **6** | Development Tools   | `6-development-tools/`   | 🎯 In Progress                                                           | [roadmap.md](../features/6-development-tools/roadmap.md)                                                                                                                                                                             |
+| **7** | Game Implementation | `7-game-implementation/` | ⏳ Planned                                                               | [roadmap.md](../features/7-game-implementation/roadmap.md)                                                                                                                                                                           |
 
 ---
 

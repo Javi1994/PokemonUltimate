@@ -16,9 +16,19 @@ This feature implements the core Pokemon battle system, including:
 -   End-of-turn effects processing
 -   Abilities and items integration
 
-**Status**: Core phases complete (2.1-2.9, 2.11), extended phases implemented (2.12-2.14, 2.16)
+**Status**: Core phases complete (2.1-2.9, 2.11), extended phases implemented (2.12-2.14, 2.16), statistics system complete (2.20)
 
-> **📋 Refactoring Completed (2024-12-05)**: A comprehensive refactoring was completed following SOLID principles. All major components now use Dependency Injection, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, and Validation. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details.
+> **📋 Refactoring Completed (2024-12-05)**: A comprehensive refactoring was completed following SOLID principles. The system now uses a **step-based pipeline architecture** with:
+>
+> -   **Battle Flow**: 8 steps for battle lifecycle
+> -   **Turn Flow**: 23 unique steps (34 total) for turn execution
+> -   **Damage Pipeline**: 11 steps for damage calculation
+> -   **Action System**: 13 action types implementing Command Pattern
+> -   **Handler Registry**: 34 handlers (4 abilities + 3 items + 12 effects + 15 checkers)
+> -   **AI System**: 6 AI implementations
+> -   **Infrastructure**: Event system, Statistics collection, Simulation tools, Value Objects (8), Logging, Message formatting
+>
+> All major components use Dependency Injection, Value Objects, Strategy Pattern, Factory Pattern, Event System, Logging, and Validation. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for details.
 
 ## Current Status
 
@@ -28,6 +38,7 @@ This feature implements the core Pokemon battle system, including:
 -   ✅ **Advanced Moves**: Protect, Counter, Pursuit, Focus Punch, Semi-Invulnerable, Multi-Hit, Multi-Turn (2.15 Core Complete)
 -   ✅ **Advanced Abilities**: Truant, Speed Boost, Static, Rough Skin, Swift Swim, Chlorophyll, Moxie (2.17 ~95% Complete)
 -   ✅ **Advanced Items**: Life Orb, Focus Sash, Rocky Helmet, Black Sludge (2.18 Complete)
+-   ✅ **Statistics System**: Event-driven statistics collection (2.20 Complete)
 -   ⏳ **Planned**: Battle formats (2.19)
 
 ## Documentation
@@ -69,9 +80,9 @@ This feature implements the core Pokemon battle system, including:
 -   **[2.18: Advanced Items](2.18-advanced-items/)** - Complex item interactions ⏳
 -   **[2.19: Battle Formats](2.19-battle-formats/)** - Doubles, Triples, Horde, Raid 🚧
 
-### In Progress (2.20)
+### Complete (2.20)
 
--   **[2.20: Statistics System](2.20-statistics-system/)** - Event-driven statistics collection system 🎯
+-   **[2.20: Statistics System](2.20-statistics-system/)** - Event-driven statistics collection system ✅ Complete
 
 ## Related Features
 
@@ -83,8 +94,9 @@ This feature implements the core Pokemon battle system, including:
 
 ## Quick Links
 
--   **Phases Complete**: 2.1-2.9, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16 (Core combat + Weather + Terrain + Hazards + Advanced Moves + Field Conditions - note: 2.10 consolidated into 2.4)
+-   **Phases Complete**: 2.1-2.9, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.20 (Core combat + Weather + Terrain + Hazards + Advanced Moves + Field Conditions + Statistics - note: 2.10 consolidated into 2.4)
 -   **Phases Planned**: 2.17-2.19 (Advanced Abilities, Advanced Items, Battle Formats)
+-   **Architecture**: Step-based pipeline (8 battle flow + 23 turn flow steps), 13 actions, 11 damage steps, 34 handlers, 6 AIs
 -   **Tests**: 2,528+ passing tests (see [testing](testing.md))
 -   **Key Classes**: See [code location](code_location.md) for implementation details
 -   **Use Cases**: See [use_cases.md](use_cases.md) for all battle scenarios

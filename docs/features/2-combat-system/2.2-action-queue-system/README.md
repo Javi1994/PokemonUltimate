@@ -12,10 +12,10 @@ The Action Queue System implements the core philosophy: "Everything is an Action
 
 **Key Components**:
 
--   **BattleQueue**: Processes actions sequentially (uses `LinkedList<BattleAction>` internally, post-refactor)
--   **BattleAction**: Base class for all battle events
+-   **BattleQueueService**: Processes actions sequentially (uses `LinkedList<BattleAction>` internally)
+-   **BattleAction**: Base class for all battle events (13 action types)
 -   **Action Processing**: Two-phase execution (Logic + Visual)
--   **IBattleQueueFactory**: Factory interface for BattleQueue creation (post-refactor)
+-   **IBattleQueueFactory**: Factory interface for BattleQueueService creation
 
 ## Current Status
 
@@ -41,8 +41,9 @@ The Action Queue System implements the core philosophy: "Everything is an Action
 
 ## Quick Links
 
--   **Key Classes**: `BattleQueue`, `BattleAction`
+-   **Key Classes**: `BattleQueueService`, `BattleAction` (13 action types)
 -   **Status**: ✅ Complete (Phase 2.2)
+-   **Action Types**: UseMoveAction, DamageAction, HealAction, ApplyStatusAction, FaintAction, StatChangeAction, SetWeatherAction, SetTerrainAction, SetSideConditionAction, SwitchAction, MessageAction, ContactDamageAction, BattleAction (base)
 
 ---
 

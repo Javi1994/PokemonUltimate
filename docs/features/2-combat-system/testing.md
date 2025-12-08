@@ -16,7 +16,23 @@ The combat system uses a comprehensive three-phase testing approach:
 
 **Coverage**: 2,561+ passing tests covering all combat phases (2.1-2.14, 2.16, 2.20)
 
-> **📋 Post-Refactoring Note (2024-12-05)**: After the comprehensive refactoring, all components now use Dependency Injection, making them highly testable. Mock implementations can be easily injected for testing (e.g., `NullBattleLogger`, `NullBattleView`). The refactoring improved testability significantly by removing static dependencies and direct object creation. See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for refactoring details.
+**Architecture**: Tests cover the step-based pipeline architecture:
+
+-   Battle Flow steps (8 steps)
+-   Turn Flow steps (23 unique steps, 34 total)
+-   Damage Pipeline steps (11 steps)
+-   Handler Registry (34 handlers)
+-   Action System (13 action types)
+
+> **📋 Post-Refactoring Note (2024-12-05)**: After the comprehensive refactoring, the system now uses a **step-based pipeline architecture** that makes testing easier:
+>
+> -   **Battle Flow** (8 steps) and **Turn Flow** (23 unique steps, 34 total) can be tested step-by-step
+> -   Each step can be tested independently with mock contexts
+> -   All components use Dependency Injection, making them highly testable
+> -   Mock implementations can be easily injected (e.g., `NullBattleLogger`, `NullBattleView`)
+> -   The refactoring improved testability significantly by removing static dependencies and direct object creation
+>
+> See `PokemonUltimate.Combat/ANALISIS_COMPLETO_Y_PLAN_IMPLEMENTACION.md` for refactoring details.
 
 ## Test Structure
 
@@ -89,30 +105,31 @@ PokemonUltimate.Tests/
 
 **Unified Debugger Application** - Single Windows Forms application with tabbed interface:
 
-- **[DeveloperTools](../../../PokemonUltimate.DeveloperTools/)** - Integrated debugger application
-  - **Battle Debugger Tab**: Run multiple battles and analyze statistics
-    - Uses new Statistics System (Sub-Feature 2.20) for automatic tracking
-    - Move usage statistics (most used moves per Pokemon)
-    - Status effect statistics (effects caused per Pokemon)
-    - Win/loss/draw rates
-    - Progress tracking during execution
-    - Results displayed in tables and formatted text
-  - **Move Debugger Tab**: Test moves multiple times and collect statistics
-    - Uses new Statistics System (Sub-Feature 2.20) for automatic tracking
-    - Damage statistics (average, min, max, median)
-    - Critical hit rates
-    - Miss rates
-    - Status effect application rates
-    - Action generation tracking (what actions the move creates)
-    - Progress tracking during execution
-    - Results displayed in tables and formatted text
-  - **Type Matchup Tab**: Calculate type effectiveness
-    - Type chart verification
-    - Dual-type effectiveness
-    - Immunity checks
-    - Complete type chart visualization
+-   **[DeveloperTools](../../../PokemonUltimate.DeveloperTools/)** - Integrated debugger application
+    -   **Battle Debugger Tab**: Run multiple battles and analyze statistics
+        -   Uses new Statistics System (Sub-Feature 2.20) for automatic tracking
+        -   Move usage statistics (most used moves per Pokemon)
+        -   Status effect statistics (effects caused per Pokemon)
+        -   Win/loss/draw rates
+        -   Progress tracking during execution
+        -   Results displayed in tables and formatted text
+    -   **Move Debugger Tab**: Test moves multiple times and collect statistics
+        -   Uses new Statistics System (Sub-Feature 2.20) for automatic tracking
+        -   Damage statistics (average, min, max, median)
+        -   Critical hit rates
+        -   Miss rates
+        -   Status effect application rates
+        -   Action generation tracking (what actions the move creates)
+        -   Progress tracking during execution
+        -   Results displayed in tables and formatted text
+    -   **Type Matchup Tab**: Calculate type effectiveness
+        -   Type chart verification
+        -   Dual-type effectiveness
+        -   Immunity checks
+        -   Complete type chart visualization
 
 **Usage**:
+
 ```bash
 dotnet run --project PokemonUltimate.DeveloperTools
 ```
@@ -156,6 +173,9 @@ See [`../../../docs/DEBUGGERS.md`](../../../docs/DEBUGGERS.md) for complete debu
 
 -   ✅ `CombatEngineTests.cs` - Battle loop, turn execution
 -   ✅ `BattleArbiterTests.cs` - Victory/defeat detection
+-   ✅ `BattleFlowTests.cs` - Battle flow steps (8 steps)
+-   ✅ `TurnFlowTests.cs` - Turn flow steps (23 unique steps, 34 total)
+-   ✅ `TurnEngineTests.cs` - Turn execution engine
 
 ### Integration (Phase 2.7)
 
@@ -384,6 +404,7 @@ The following testing systems are planned to enhance test coverage with real-wor
 **Goal**: Test specific real-world battle scenarios with actual Pokemon matchups.
 
 **Proposed Structure**:
+
 ```
 Tests/Systems/Combat/Integration/Scenarios/
 ├── RealBattleScenariosTests.cs
@@ -397,43 +418,49 @@ Tests/Systems/Combat/Integration/Scenarios/
 **Proposed Tests**:
 
 #### RealBattleScenariosTests.cs
-- `Pikachu_Thunderbolt_Against_Charmander_IsSuperEffective()`
-- `Squirtle_WaterGun_Against_Charmander_IsSuperEffective()`
-- `Bulbasaur_VineWhip_Against_Squirtle_IsSuperEffective()`
-- `Pikachu_Thunderbolt_Against_Bulbasaur_IsSuperEffective()`
-- `Charmander_Ember_Against_Bulbasaur_IsSuperEffective()`
-- `NormalMove_Against_Ghost_IsImmune()`
-- `GroundMove_Against_Flying_IsImmune()`
+
+-   `Pikachu_Thunderbolt_Against_Charmander_IsSuperEffective()`
+-   `Squirtle_WaterGun_Against_Charmander_IsSuperEffective()`
+-   `Bulbasaur_VineWhip_Against_Squirtle_IsSuperEffective()`
+-   `Pikachu_Thunderbolt_Against_Bulbasaur_IsSuperEffective()`
+-   `Charmander_Ember_Against_Bulbasaur_IsSuperEffective()`
+-   `NormalMove_Against_Ghost_IsImmune()`
+-   `GroundMove_Against_Flying_IsImmune()`
 
 #### MoveEffectivenessTests.cs
-- `Thunderbolt_Against_Pikachu_IsNormalEffective()` // Electric vs Electric
-- `Thunderbolt_Against_Gyarados_IsSuperEffective()` // Electric vs Water/Flying
-- `Ember_Against_Bulbasaur_IsSuperEffective()` // Fire vs Grass/Poison
-- `VineWhip_Against_Rhydon_IsSuperEffective()` // Grass vs Ground/Rock
+
+-   `Thunderbolt_Against_Pikachu_IsNormalEffective()` // Electric vs Electric
+-   `Thunderbolt_Against_Gyarados_IsSuperEffective()` // Electric vs Water/Flying
+-   `Ember_Against_Bulbasaur_IsSuperEffective()` // Fire vs Grass/Poison
+-   `VineWhip_Against_Rhydon_IsSuperEffective()` // Grass vs Ground/Rock
 
 #### TypeMatchupScenariosTests.cs
-- `Electric_Against_Water_IsSuperEffective()`
-- `Electric_Against_Ground_IsImmune()`
-- `Fire_Against_Water_IsNotVeryEffective()`
-- `Water_Against_Fire_IsSuperEffective()`
-- `Grass_Against_Fire_IsNotVeryEffective()`
-- Complete coverage for all 18 types
+
+-   `Electric_Against_Water_IsSuperEffective()`
+-   `Electric_Against_Ground_IsImmune()`
+-   `Fire_Against_Water_IsNotVeryEffective()`
+-   `Water_Against_Fire_IsSuperEffective()`
+-   `Grass_Against_Fire_IsNotVeryEffective()`
+-   Complete coverage for all 18 types
 
 #### STABScenariosTests.cs
-- `Pikachu_Thunderbolt_HasSTAB()` // Electric Pokemon using Electric move
-- `Charmander_Ember_HasSTAB()` // Fire Pokemon using Fire move
-- `Pikachu_Tackle_NoSTAB()` // Electric Pokemon using Normal move
+
+-   `Pikachu_Thunderbolt_HasSTAB()` // Electric Pokemon using Electric move
+-   `Charmander_Ember_HasSTAB()` // Fire Pokemon using Fire move
+-   `Pikachu_Tackle_NoSTAB()` // Electric Pokemon using Normal move
 
 #### DualTypeScenariosTests.cs
-- `Bulbasaur_GrassPoison_Against_Fire_IsSuperEffective()` // 2x weakness
-- `Bulbasaur_GrassPoison_Against_Water_IsNormalEffective()` // Resist + Weak = Normal
-- `Gyarados_WaterFlying_Against_Electric_IsSuperEffective()` // 4x weakness
+
+-   `Bulbasaur_GrassPoison_Against_Fire_IsSuperEffective()` // 2x weakness
+-   `Bulbasaur_GrassPoison_Against_Water_IsNormalEffective()` // Resist + Weak = Normal
+-   `Gyarados_WaterFlying_Against_Electric_IsSuperEffective()` // 4x weakness
 
 #### DamageValidationTests.cs
-- `Pikachu_Thunderbolt_Against_Charmander_DamageRange()`
-- `SuperEffective_Move_Deals_AtLeast_2x_Damage()`
-- `NotVeryEffective_Move_Deals_AtMost_0_5x_Damage()`
-- `STAB_Move_Deals_1_5x_More_Damage()`
+
+-   `Pikachu_Thunderbolt_Against_Charmander_DamageRange()`
+-   `SuperEffective_Move_Deals_AtLeast_2x_Damage()`
+-   `NotVeryEffective_Move_Deals_AtMost_0_5x_Damage()`
+-   `STAB_Move_Deals_1_5x_More_Damage()`
 
 ### Enhanced Battle Demo Project
 
@@ -442,15 +469,18 @@ Tests/Systems/Combat/Integration/Scenarios/
 **Proposed Enhancements**:
 
 #### New Scenarios
-- `RunScenario5_TypeEffectivenessShowcase()` - Demonstrates all type effectiveness combinations
-- `RunScenario6_STABDemonstration()` - Shows STAB bonus in action
-- `RunScenario7_DualTypeMatchups()` - Shows Pokemon with dual types
-- `RunScenario8_ImmunityShowcase()` - Shows type immunities
-- `RunScenario9_CriticalHits()` - Shows critical hit mechanics
-- `RunScenario10_StatusEffects()` - Shows status effect mechanics
+
+-   `RunScenario5_TypeEffectivenessShowcase()` - Demonstrates all type effectiveness combinations
+-   `RunScenario6_STABDemonstration()` - Shows STAB bonus in action
+-   `RunScenario7_DualTypeMatchups()` - Shows Pokemon with dual types
+-   `RunScenario8_ImmunityShowcase()` - Shows type immunities
+-   `RunScenario9_CriticalHits()` - Shows critical hit mechanics
+-   `RunScenario10_StatusEffects()` - Shows status effect mechanics
 
 #### BattleScenarioLibrary.cs
+
 Create a library of pre-defined battle scenarios:
+
 ```csharp
 public static class BattleScenarioLibrary
 {
@@ -466,48 +496,47 @@ public static class BattleScenarioLibrary
 ### Battle Flow Validation Tests
 
 **Proposed Tests**:
-- `Battle_PikachuVsCharmander_CompletesInReasonableTurns()`
-- `Battle_TypeAdvantage_WinnerIsFavored()`
-- `Battle_StatusEffect_AppliesCorrectly()`
-- `Battle_StatChanges_WorkCorrectly()`
+
+-   `Battle_PikachuVsCharmander_CompletesInReasonableTurns()`
+-   `Battle_TypeAdvantage_WinnerIsFavored()`
+-   `Battle_StatusEffect_AppliesCorrectly()`
+-   `Battle_StatChanges_WorkCorrectly()`
 
 ### Known Battle Scenarios Tests
 
 **Proposed Tests**:
-- `Ash_Pikachu_Vs_Brock_Onix()` // Low level vs high level
-- `Starter_Triangle_Matchups()` // Fire vs Water vs Grass
-- `Legendary_Battle_Scenario()` // When legendaries are added
+
+-   `Ash_Pikachu_Vs_Brock_Onix()` // Low level vs high level
+-   `Starter_Triangle_Matchups()` // Fire vs Water vs Grass
+-   `Legendary_Battle_Scenario()` // When legendaries are added
 
 ### Performance Battle Tests
 
 **Proposed Tests**:
-- `Run1000Battles_CompletesWithoutErrors()`
-- `Battle_Completes_In_Reasonable_Time()`
-- `Memory_Usage_Stable_After_Many_Battles()`
+
+-   `Run1000Battles_CompletesWithoutErrors()`
+-   `Battle_Completes_In_Reasonable_Time()`
+-   `Memory_Usage_Stable_After_Many_Battles()`
 
 ### Implementation Priority
 
 **High Priority**:
+
 1. `RealBattleScenariosTests.cs` - Basic real-world cases (Pikachu vs Charmander, etc.)
 2. `MoveEffectivenessTests.cs` - Specific move effectiveness verification
 3. Expand `BattleDemo` - More visual scenarios
 
-**Medium Priority**:
-4. `TypeMatchupScenariosTests.cs` - Complete type coverage
-5. `STABScenariosTests.cs` - STAB verification
-6. `DualTypeScenariosTests.cs` - Dual-type Pokemon
+**Medium Priority**: 4. `TypeMatchupScenariosTests.cs` - Complete type coverage 5. `STABScenariosTests.cs` - STAB verification 6. `DualTypeScenariosTests.cs` - Dual-type Pokemon
 
-**Low Priority**:
-7. Performance tests
-8. Known battle scenario regression tests
+**Low Priority**: 7. Performance tests 8. Known battle scenario regression tests
 
 ### Notes
 
-- These tests focus on **real-world gameplay scenarios** rather than technical unit tests
-- Tests verify **actual Pokemon matchups** and **expected effectiveness** from player perspective
-- Each test should be **deterministic** where possible (fixed levels, moves, stats)
-- Tests should validate **gameplay correctness** (e.g., "Pikachu's Thunderbolt should be super effective against Charmander")
-- Integration with `BattleDemo` provides **visual validation** of scenarios
+-   These tests focus on **real-world gameplay scenarios** rather than technical unit tests
+-   Tests verify **actual Pokemon matchups** and **expected effectiveness** from player perspective
+-   Each test should be **deterministic** where possible (fixed levels, moves, stats)
+-   Tests should validate **gameplay correctness** (e.g., "Pikachu's Thunderbolt should be super effective against Charmander")
+-   Integration with `BattleDemo` provides **visual validation** of scenarios
 
 ---
 

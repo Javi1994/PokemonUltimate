@@ -48,14 +48,60 @@ PokemonUltimate/
 │
 ├── PokemonUltimate.Combat/        # Battle engine
 │   ├── Engine/                    # Combat engine, battle loop
-│   ├── Actions/                   # Battle actions
-│   ├── Damage/                    # Damage calculation pipeline
-│   ├── Field/                     # Battle field, slots, sides
-│   ├── Events/                    # Event system (abilities, items)
-│   ├── Helpers/                   # Helper classes
-│   ├── Providers/                 # Action providers (AI, Player)
-│   ├── Results/                   # Battle results
-│   └── View/                      # View interfaces
+│   │   ├── CombatEngine.cs       # Main battle controller
+│   │   ├── TurnEngine.cs         # Turn execution engine
+│   │   ├── BattleFlow/           # Battle lifecycle (8 steps)
+│   │   │   ├── BattleFlowContext.cs
+│   │   │   ├── BattleFlowExecutor.cs
+│   │   │   └── Steps/            # 8 battle flow steps
+│   │   └── TurnFlow/             # Turn execution (23 unique steps, 34 total)
+│   │       ├── TurnContext.cs
+│   │       ├── TurnStepExecutor.cs
+│   │       └── Steps/            # 23 turn flow steps
+│   ├── Actions/                   # Battle actions (13 types)
+│   │   ├── BattleAction.cs       # Base class
+│   │   ├── UseMoveAction.cs
+│   │   ├── DamageAction.cs
+│   │   ├── HealAction.cs
+│   │   └── ... (10 more action types)
+│   ├── Damage/                   # Damage calculation pipeline
+│   │   ├── DamagePipeline.cs    # Pipeline executor
+│   │   ├── DamageContext.cs      # Damage calculation context
+│   │   └── Steps/                # 11 damage calculation steps
+│   ├── Handlers/                 # Effect handlers (34 handlers)
+│   │   ├── Registry/            # CombatEffectHandlerRegistry
+│   │   ├── Abilities/           # 4 ability handlers
+│   │   ├── Items/               # 3 item handlers
+│   │   ├── Effects/             # 12 move effect handlers
+│   │   └── Checkers/           # 15 checker handlers
+│   ├── Field/                    # Battle field, slots, sides
+│   │   ├── BattleField.cs
+│   │   ├── BattleSide.cs
+│   │   ├── BattleSlot.cs
+│   │   └── BattleRules.cs
+│   ├── Target/                   # Target resolution system
+│   │   ├── TargetResolver.cs
+│   │   └── TargetRedirectionResolvers/
+│   ├── Utilities/                # Helper utilities
+│   │   ├── TurnOrderResolver.cs
+│   │   ├── AccuracyChecker.cs
+│   │   └── BattleSlotExtensions.cs
+│   ├── AI/                       # AI implementations (6 AIs)
+│   │   ├── RandomAI.cs
+│   │   ├── SmartAI.cs
+│   │   ├── TeamBattleAI.cs
+│   │   └── ... (3 more AIs)
+│   ├── Infrastructure/           # Supporting systems
+│   │   ├── Events/              # BattleEventManager, BattleEvents
+│   │   ├── Statistics/          # BattleStatistics, BattleStatisticsCollector
+│   │   ├── Simulation/         # BattleSimulator, MoveSimulator
+│   │   ├── ValueObjects/        # 8 value objects (StatStages, WeatherState, etc.)
+│   │   ├── Logging/             # BattleLogger, NullBattleLogger
+│   │   ├── Messages/            # BattleMessageFormatter
+│   │   ├── Factories/           # BattleFieldFactory, BattleQueueFactory
+│   │   └── Service/             # BattleQueueService, BattleArbiterService
+│   └── View/                     # View interfaces
+│       └── IBattleView.cs
 │
 ├── PokemonUltimate.Content/       # Concrete game data
 │   └── Catalogs/                  # Content catalogs (Pokemon, Moves, etc.)
@@ -97,21 +143,22 @@ PokemonUltimate/
 
 **Maps to**: `PokemonUltimate.Combat/`
 
-| Sub-Feature                      | Namespace                         | Key Folders           | Key Classes                               |
-| -------------------------------- | --------------------------------- | --------------------- | ----------------------------------------- |
-| **2.1**: Battle Foundation       | `Combat.Field`                    | `Field/`              | `BattleField`, `BattleSlot`, `BattleSide` |
-| **2.2**: Action Queue            | `Combat.Engine`                   | `Engine/`             | `BattleQueue`, `BattleAction`             |
-| **2.3**: Turn Order              | `Combat.Helpers`                  | `Helpers/`            | `TurnOrderResolver`                       |
-| **2.4**: Damage Pipeline         | `Combat.Damage`                   | `Damage/`             | `DamagePipeline`, `IDamageStep`           |
-| **2.5**: Combat Actions          | `Combat.Actions`                  | `Actions/`            | `UseMoveAction`, `DamageAction`, etc.     |
-| **2.6**: Combat Engine           | `Combat.Engine`                   | `Engine/`             | `CombatEngine`, `BattleArbiter`           |
-| **2.7**: Integration             | `Combat.Providers`, `Combat.View` | `Providers/`, `View/` | `IActionProvider`, `IBattleView`          |
-| **2.8**: End-of-Turn             | `Combat.Engine`                   | `Engine/`             | `EndOfTurnProcessor`                      |
-| **2.9**: Abilities & Items       | `Combat.Events`                   | `Events/`             | `IBattleListener`, `AbilityListener`      |
-| **2.10**: Pipeline Hooks         | `Combat.Damage`                   | `Damage/`             | `IStatModifier`                           |
-| **2.11**: Recoil & Drain         | `Combat.Actions`                  | `Actions/`            | `DamageAction` (with effects)             |
-| **2.12-2.16**: Field Systems     | `Combat.Field`, `Combat.Engine`   | `Field/`, `Engine/`   | Field condition processors                |
-| **2.17-2.19**: Advanced Features | `Combat.Events`, `Combat.Field`   | `Events/`, `Field/`   | Advanced ability/item/format support      |
+| Sub-Feature                      | Namespace                          | Key Folders                                         | Key Classes                                                                                                      |
+| -------------------------------- | ---------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **2.1**: Battle Foundation       | `Combat.Field`                     | `Field/`                                            | `BattleField`, `BattleSlot`, `BattleSide`, `BattleRules`                                                         |
+| **2.2**: Action Queue            | `Combat.Engine.Service`            | `Engine/Service/`                                   | `BattleQueueService`, `BattleAction` (13 action types)                                                           |
+| **2.3**: Turn Order              | `Combat.Utilities`                 | `Utilities/`                                        | `TurnOrderResolver`                                                                                              |
+| **2.4**: Damage Pipeline         | `Combat.Damage`                    | `Damage/`, `Damage/Steps/`                          | `DamagePipeline`, `IDamageStep` (11 steps)                                                                       |
+| **2.5**: Combat Actions          | `Combat.Actions`                   | `Actions/`                                          | `BattleAction`, `UseMoveAction`, `DamageAction`, etc. (13 action types)                                          |
+| **2.6**: Combat Engine           | `Combat.Engine`                    | `Engine/`, `Engine/BattleFlow/`, `Engine/TurnFlow/` | `CombatEngine`, `TurnEngine`, `BattleFlowExecutor`, `TurnStepExecutor` (8 battle flow steps, 23 turn flow steps) |
+| **2.7**: Integration             | `Combat.AI`, `Combat.View`         | `AI/`, `View/`                                      | `IActionProvider`, `IBattleView` (6 AI implementations)                                                          |
+| **2.8**: End-of-Turn             | `Combat.Engine.TurnFlow.Steps`     | `Engine/TurnFlow/Steps/`                            | `EndOfTurnEffectsStep`, `DurationDecrementStep`                                                                  |
+| **2.9**: Abilities & Items       | `Combat.Handlers`                  | `Handlers/`, `Handlers/Registry/`                   | `CombatEffectHandlerRegistry` (34 handlers: 4 abilities + 3 items + 12 effects + 15 checkers)                    |
+| **2.10**: Pipeline Hooks         | `Combat.Damage.Steps`              | `Damage/Steps/`                                     | `AttackerAbilityStep`, `AttackerItemStep`                                                                        |
+| **2.11**: Recoil & Drain         | `Combat.Handlers.Effects`          | `Handlers/Effects/`                                 | `RecoilEffectHandler`, `DrainEffectHandler`                                                                      |
+| **2.12-2.16**: Field Systems     | `Combat.Field`, `Combat.Handlers`  | `Field/`, `Handlers/Effects/`                       | Field condition handlers, weather/terrain/hazard handlers                                                        |
+| **2.17-2.19**: Advanced Features | `Combat.Handlers`                  | `Handlers/`                                         | Advanced ability/item handlers (extensible via registry)                                                         |
+| **2.20**: Statistics System      | `Combat.Infrastructure.Statistics` | `Infrastructure/Statistics/`                        | `BattleStatistics`, `BattleStatisticsCollector`                                                                  |
 
 **Test Location**: `Tests/Systems/Combat/`
 

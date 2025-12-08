@@ -101,75 +101,98 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 -   `BattleSlot` - Individual Pokemon slot
 -   `BattleRules` - Battle format rules
 
-### `PokemonUltimate.Combat.Events`
+### `PokemonUltimate.Combat.Infrastructure.Events`
 
 **Purpose**: Event-driven system for statistics and logging (not game logic)
 **Key Classes**:
 
--   `BattleEvent` - Structured battle event for statistics and logging
--   `IBattleEventBus` - Event bus interface for decoupled communication
--   `BattleEventBus` - Event bus implementation
--   `IBattleEventSubscriber` - Interface for event subscribers
+-   `BattleEventManager` - Centralized static event manager
+-   `BattleEvents` - Event argument classes (MoveUsed, DamageDealt, StatusApplied, etc.)
+-   Production events and debug events separation
 
-**Note**: The previous trigger-based system (`BattleTrigger`, `IBattleListener`, `AbilityListener`, `ItemListener`, `BattleTriggerProcessor`) has been replaced by phase-based processors in `PokemonUltimate.Combat.Processors.Phases`. The event bus is now used exclusively for statistics collection and logging, not for game logic.
+**Note**: The event system is used exclusively for statistics collection and logging, not for game logic. Game logic is handled by the step-based pipeline architecture.
 
 ### `PokemonUltimate.Combat.Engine`
 
-**Purpose**: Engine components
+**Purpose**: Engine components with step-based pipeline architecture
 **Key Classes**:
 
--   `CombatEngine` - Main battle controller (orchestrates battle loop and turn execution)
--   `BattleQueue` - Action queue processor (uses `LinkedList<BattleAction>` internally)
+-   `CombatEngine` - Main battle controller (orchestrates battle flow: 8 steps)
+-   `TurnEngine` - Turn execution engine (orchestrates turn flow: 23 unique steps, 34 total)
+-   `BattleQueueService` - Action queue processor (uses `LinkedList<BattleAction>` internally)
 -   `BattleArbiter` - Victory/defeat detection
--   `TurnExecutor` - Orchestrates single turn execution using phase processors
--   `ActionProcessorObserver` - Observer that detects specific action types and delegates to reactive processors
+-   `BattleFlowExecutor` - Executes battle flow steps
+-   `TurnStepExecutor` - Executes turn flow steps
 
-### `PokemonUltimate.Combat.Processors.Phases`
+### `PokemonUltimate.Combat.Engine.BattleFlow`
 
-**Purpose**: Phase-based processors for battle logic (refactored 2024-12-07)
+**Purpose**: Battle-level flow steps (8 steps)
 **Key Classes**:
 
--   `BattlePhase` - Enumeration of all battle phases/moments
--   `IBattlePhaseProcessor` - Base interface for all phase processors
--   `IActionGeneratingPhaseProcessor` - Interface for processors that generate actions
--   `IStateModifyingPhaseProcessor` - Interface for processors that modify state directly
--   `TurnStartProcessor` - Processes turn start events
--   `ActionCollectionProcessor` - Collects actions from all active slots
--   `ActionSortingProcessor` - Sorts actions by priority and speed
--   `FaintedPokemonSwitchingProcessor` - Handles automatic switching for fainted Pokemon
--   `SwitchInProcessor` - Processes entry hazards, abilities, and items on switch-in
--   `BeforeMoveProcessor` - Processes abilities and items before move execution
--   `AfterMoveProcessor` - Processes abilities and items after move execution
--   `ContactReceivedProcessor` - Processes abilities and items when contact is received
--   `DamageTakenProcessor` - Processes abilities and items when damage is taken
--   `WeatherChangeProcessor` - Processes abilities and items when weather changes
--   `EndOfTurnEffectsProcessor` - Processes end-of-turn effects (status damage, weather, terrain)
--   `TurnEndProcessor` - Processes abilities and items at turn end
--   `DurationDecrementProcessor` - Decrements durations for weather, terrain, and side conditions
--   `BattleStartProcessor` - Processes battle start events
--   `BattleEndProcessor` - Processes battle end events
+-   `IBattleFlowStep` - Base interface for battle flow steps
+-   `BattleFlowContext` - Context passed through battle flow steps
+-   `BattleFlowExecutor` - Executes battle flow steps
+-   `CreateFieldStep` - Creates BattleField with both sides
+-   `AssignActionProvidersStep` - Assigns action providers to battle sides
+-   `CreateQueueStep` - Creates BattleQueueService
+-   `ValidateInitialStateStep` - Validates initial battle state
+-   `CreateDependenciesStep` - Creates TurnEngine and dependencies
+-   `BattleStartFlowStep` - Executes battle start effects
+-   `ExecuteBattleLoopStep` - Executes main battle loop
+-   `BattleEndFlowStep` - Handles battle end
 
-### `PokemonUltimate.Combat.Helpers`
+### `PokemonUltimate.Combat.Engine.TurnFlow`
+
+**Purpose**: Turn-level flow steps (23 unique steps, 34 total)
+**Key Classes**:
+
+-   `ITurnStep` - Base interface for turn flow steps
+-   `TurnContext` - Context passed through turn flow steps
+-   `TurnStepExecutor` - Executes turn flow steps
+-   `TurnStartStep` - Initializes turn context
+-   `ActionCollectionStep` - Collects actions from providers
+-   `TargetResolutionStep` - Resolves move targets
+-   `ActionSortingStep` - Sorts actions by priority and speed
+-   `MoveValidationStep` - Validates moves
+-   `MoveProtectionCheckStep` - Checks protection effects
+-   `MoveAccuracyCheckStep` - Checks move accuracy
+-   `BeforeMoveEffectsStep` - Processes before-move effects
+-   `MoveDamageCalculationStep` - Calculates damage
+-   `MoveDamageApplicationStep` - Applies damage
+-   `MoveAnimationStep` - Executes animations
+-   `DamageTakenEffectsStep` - Processes damage-taken effects
+-   `ContactReceivedEffectsStep` - Processes contact effects
+-   `MoveEffectProcessingStep` - Processes move effects
+-   `AfterMoveEffectsStep` - Processes after-move effects
+-   `SwitchActionsStep` - Processes switch actions
+-   `SwitchInEffectsStep` - Processes entry effects
+-   `StatusActionsStep` - Processes status actions
+-   `FaintedPokemonCheckStep` - Checks for fainted Pokemon
+-   `EndOfTurnEffectsStep` - Processes end-of-turn effects
+-   `DurationDecrementStep` - Decrements durations
+-   `TurnEndStep` - Finalizes turn
+-   `ProcessGeneratedActionsStep` - Processes generated actions (appears 10 times)
+
+### `PokemonUltimate.Combat.Utilities`
 
 **Purpose**: Utility classes
 **Key Classes**:
 
--   `TurnOrderResolver` - Turn order calculation (instance-based, post-refactor, includes Tailwind speed multiplier - Sub-Feature 2.16)
--   `TargetResolver` - Target selection (instance-based, post-refactor)
--   `ITargetResolver` - Target resolver interface
--   `AccuracyChecker` - Accuracy calculation (instance-based, post-refactor, includes weather perfect accuracy - Sub-Feature 2.12)
--   `ITargetRedirectionResolver` - Target redirection resolver interface
--   `TargetRedirectionResolver` - Target redirection coordinator
--   `FollowMeResolver` - Follow Me redirection resolver
--   `LightningRodResolver` - Lightning Rod redirection resolver
+-   `TurnOrderResolver` - Turn order calculation (includes Tailwind speed multiplier - Sub-Feature 2.16)
+-   `AccuracyChecker` - Accuracy calculation (includes weather perfect accuracy - Sub-Feature 2.12)
+-   `BattleSlotExtensions` - Extension methods for BattleSlot
 
 ### `PokemonUltimate.Combat.AI`
 
-**Purpose**: AI action providers
+**Purpose**: AI action providers (6 implementations)
 **Key Classes**:
 
 -   `RandomAI` - Random action selection
--   `AlwaysAttackAI` - Always attack AI
+-   `AlwaysAttackAI` - Always uses first available move
+-   `FixedMoveAI` - Always uses specific move
+-   `NoActionAI` - Never provides action (for testing)
+-   `SmartAI` - Strategic decisions with switching
+-   `TeamBattleAI` - Team battle AI with auto-switching
 
 ### `PokemonUltimate.Combat.Providers`
 
@@ -197,29 +220,14 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 -   `BattleOutcome` - Outcome enum
 -   `BattleResult` - Detailed battle result
 
-### `PokemonUltimate.Combat.Statistics`
+### `PokemonUltimate.Combat.Infrastructure.Statistics`
 
 **Purpose**: Event-driven statistics collection system (Sub-Feature 2.20)
 **Key Classes**:
 
--   `IBattleActionObserver` - Interface for observing battle actions
--   `IStatisticsTracker` - Interface for modular statistics trackers
--   `IBattleStatisticsCollector` - Interface for statistics collection
--   `BattleStatistics` - Statistics data model
--   `BattleStatisticsCollector` - Main statistics collector implementation
-
-### `PokemonUltimate.Combat.Statistics.Trackers`
-
-**Purpose**: Modular statistics trackers (Sub-Feature 2.20)
-**Key Classes**:
-
--   `ActionTypeTracker` - Tracks action type counts
--   `MoveUsageTracker` - Tracks move usage per Pokemon
--   `DamageTracker` - Tracks damage values, critical hits, misses
--   `StatusEffectTracker` - Tracks persistent status applications
--   `FieldEffectTracker` - Tracks weather, terrain, side conditions
--   `HealingTracker` - Tracks healing amounts
--   `StatChangeTracker` - Tracks stat stage modifications
+-   `BattleStatistics` - Statistics data container
+-   `BattleStatisticsCollector` - Collects statistics by subscribing to BattleEventManager
+-   `IBattleStatisticsCollector` - Statistics collector interface
 
 ### `PokemonUltimate.Combat.Factories`
 
@@ -246,25 +254,16 @@ These effects are defined in `PokemonUltimate.Core.Effects` (see Feature 1.2: Mo
 -   `TerrainState` - Terrain condition and duration
 -   `WeatherState` - Weather condition and duration
 
-### `PokemonUltimate.Combat.Effects`
+### `PokemonUltimate.Combat.Handlers`
 
-**Purpose**: Move effect processing using Strategy Pattern (post-refactor)
+**Purpose**: Unified handler registry system for abilities, items, and move effects (34 handlers)
 **Key Classes**:
 
--   `IMoveEffectProcessor` - Move effect processor interface
--   `MoveEffectProcessorRegistry` - Registry for effect processors
--   `StatusEffectProcessor` - Processes status effects
--   `StatChangeEffectProcessor` - Processes stat change effects
--   `RecoilEffectProcessor` - Processes recoil effects
--   `DrainEffectProcessor` - Processes drain effects
--   `FlinchEffectProcessor` - Processes flinch effects
--   `ProtectEffectProcessor` - Processes protect effects
--   `CounterEffectProcessor` - Processes counter effects
--   `HealEffectProcessor` - Processes heal effects
--   `IMoveModifier` - Move modifier interface for temporary move modifications
--   `MoveModifier` - Move modifier implementation
--   `IAccumulativeEffect` - Accumulative effect interface
--   `AccumulativeEffectTracker` - Tracks accumulative effects (e.g., Badly Poisoned)
+-   `CombatEffectHandlerRegistry` - Centralized registry for all handlers
+-   **Ability Handlers** (4): `ContactAbilityHandler`, `IntimidateHandler`, `MoxieHandler`, `SpeedBoostHandler`
+-   **Item Handlers** (3): `LeftoversHandler`, `LifeOrbHandler`, `RockyHelmetHandler`
+-   **Move Effect Handlers** (12): `StatusEffectHandler`, `StatChangeEffectHandler`, `RecoilEffectHandler`, `DrainEffectHandler`, etc.
+-   **Checker Handlers** (15): `DamageApplicationHandler`, `StatusApplicationHandler`, etc.
 
 ### `PokemonUltimate.Combat.Logging`
 
@@ -327,7 +326,11 @@ PokemonUltimate.Combat/
 │
 ├── AI/
 │   ├── RandomAI.cs                     # Random AI
-│   └── AlwaysAttackAI.cs               # Always attack AI
+│   ├── AlwaysAttackAI.cs               # Always attack AI
+│   ├── FixedMoveAI.cs                  # Fixed move AI
+│   ├── NoActionAI.cs                   # No action AI (testing)
+│   ├── SmartAI.cs                      # Strategic AI
+│   └── TeamBattleAI.cs                 # Team battle AI
 │
 ├── Damage/
 │   ├── DamagePipeline.cs               # Main damage calculator
@@ -349,42 +352,79 @@ PokemonUltimate.Combat/
 │       └── BurnStep.cs                 # Burn penalty
 │
 ├── Engine/
-│   ├── CombatEngine.cs                 # Main battle controller (orchestrates battle loop)
-│   ├── TurnExecutor.cs                 # Orchestrates single turn execution
-│   ├── ActionProcessorObserver.cs      # Observer for reactive processors
-│   ├── BattleQueue.cs                  # Action queue (uses LinkedList internally)
-│   ├── BattleArbiter.cs                # Victory/defeat detection
-│   ├── Battle/
-│   │   ├── BattlePhase.cs             # Enumeration of battle phases
-│   │   ├── BattleInitializer.cs       # Battle initialization utilities
-│   │   ├── BattleLoop.cs              # Battle loop orchestration
-│   │   └── BattleUtilities.cs         # Battle utility methods
-│   └── Processors/
-│       ├── Interfaces/
-│       │   ├── IBattlePhaseProcessor.cs              # Base processor interface
-│       │   ├── IActionGeneratingPhaseProcessor.cs    # Action-generating processor interface
-│       │   └── IStateModifyingPhaseProcessor.cs      # State-modifying processor interface
-│       ├── TurnStartProcessor.cs                      # Turn start phase
-│       ├── ActionCollectionProcessor.cs              # Action collection phase
-│       ├── ActionSortingProcessor.cs                 # Action sorting phase
-│       ├── FaintedPokemonSwitchingProcessor.cs       # Fainted Pokemon switching
-│       ├── SwitchInProcessor.cs                      # Switch-in phase (entry hazards, abilities, items)
-│       ├── BeforeMoveProcessor.cs                    # Before move phase (abilities, items)
-│       ├── AfterMoveProcessor.cs                     # After move phase (abilities, items)
-│       ├── ContactReceivedProcessor.cs              # Contact received phase (abilities, items)
-│       ├── DamageTakenProcessor.cs                   # Damage taken phase (abilities, items)
-│       ├── WeatherChangeProcessor.cs                 # Weather change phase (abilities, items)
-│       ├── EndOfTurnEffectsProcessor.cs             # End-of-turn effects (status, weather, terrain)
-│       ├── TurnEndProcessor.cs                       # Turn end phase (abilities, items)
-│       ├── DurationDecrementProcessor.cs            # Duration decrement phase
-│       ├── BattleStartProcessor.cs                   # Battle start phase
-│       └── BattleEndProcessor.cs                     # Battle end phase
+│   ├── CombatEngine.cs                 # Main battle controller (orchestrates battle flow)
+│   ├── TurnEngine.cs                    # Turn execution engine (orchestrates turn flow)
+│   ├── Service/
+│   │   └── BattleQueueService.cs       # Action queue service
+│   ├── BattleFlow/
+│   │   ├── BattleFlowContext.cs         # Battle flow context
+│   │   ├── BattleFlowExecutor.cs       # Battle flow executor
+│   │   └── Steps/                      # 8 battle flow steps
+│   │       ├── CreateFieldStep.cs
+│   │       ├── AssignActionProvidersStep.cs
+│   │       ├── CreateQueueStep.cs
+│   │       ├── ValidateInitialStateStep.cs
+│   │       ├── CreateDependenciesStep.cs
+│   │       ├── BattleStartFlowStep.cs
+│   │       ├── ExecuteBattleLoopStep.cs
+│   │       └── BattleEndFlowStep.cs
+│   └── TurnFlow/
+│       ├── TurnContext.cs              # Turn flow context
+│       ├── TurnStepExecutor.cs         # Turn step executor
+│       └── Steps/                      # 23 unique turn flow steps (34 total)
+│           ├── TurnStartStep.cs
+│           ├── ActionCollectionStep.cs
+│           ├── TargetResolutionStep.cs
+│           ├── ActionSortingStep.cs
+│           ├── MoveValidationStep.cs
+│           ├── MoveProtectionCheckStep.cs
+│           ├── MoveAccuracyCheckStep.cs
+│           ├── BeforeMoveEffectsStep.cs
+│           ├── ProcessGeneratedActionsStep.cs (appears 10 times)
+│           ├── MoveDamageCalculationStep.cs
+│           ├── MoveDamageApplicationStep.cs
+│           ├── MoveAnimationStep.cs
+│           ├── DamageTakenEffectsStep.cs
+│           ├── ContactReceivedEffectsStep.cs
+│           ├── MoveEffectProcessingStep.cs
+│           ├── AfterMoveEffectsStep.cs
+│           ├── SwitchActionsStep.cs
+│           ├── SwitchInEffectsStep.cs
+│           ├── StatusActionsStep.cs
+│           ├── FaintedPokemonCheckStep.cs (appears 3 times)
+│           ├── EndOfTurnEffectsStep.cs
+│           ├── DurationDecrementStep.cs
+│           └── TurnEndStep.cs
 │
-├── Events/
-│   ├── BattleEvent.cs                  # Structured battle event for statistics/logging
-│   ├── IBattleEventBus.cs              # Event bus interface
-│   ├── BattleEventBus.cs               # Event bus implementation
-│   └── IBattleEventSubscriber.cs       # Event subscriber interface
+├── Infrastructure/
+│   ├── Events/
+│   │   ├── BattleEventManager.cs       # Centralized static event manager
+│   │   └── BattleEvents.cs             # Event argument classes
+│   ├── Statistics/
+│   │   ├── BattleStatistics.cs         # Statistics data container
+│   │   └── BattleStatisticsCollector.cs # Statistics collector
+│   ├── Simulation/
+│   │   ├── BattleSimulator.cs         # Battle simulation tool
+│   │   └── MoveSimulator.cs            # Move simulation tool
+│   ├── ValueObjects/                   # 8 value objects
+│   │   ├── StatStages.cs
+│   │   ├── WeatherState.cs
+│   │   ├── TerrainState.cs
+│   │   ├── ChargingMoveState.cs
+│   │   ├── ProtectTracker.cs
+│   │   ├── MoveStateTracker.cs
+│   │   └── DamageTakenTracker.cs
+│   ├── Logging/
+│   │   ├── IBattleLogger.cs
+│   │   ├── BattleLogger.cs
+│   │   └── NullBattleLogger.cs
+│   ├── Messages/
+│   │   ├── IBattleMessageFormatter.cs
+│   │   └── BattleMessageFormatter.cs
+│   └── Factories/
+│       ├── BattleFieldFactory.cs
+│       ├── BattleQueueFactory.cs
+│       └── DamageContextFactory.cs
 │
 ├── Field/
 │   ├── BattleField.cs                  # Main battlefield (weather tracking - Sub-Feature 2.12)
@@ -623,4 +663,4 @@ See **[Testing](testing.md)** for complete test organization.
 
 ---
 
-**Last Updated**: 2024-12-07 (Processors refactor)
+**Last Updated**: 2025-01-XX (Step-based pipeline architecture refactor)

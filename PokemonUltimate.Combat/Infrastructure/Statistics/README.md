@@ -1,230 +1,251 @@
 # Battle Statistics System
 
-Sistema completo de recolección de estadísticas de batalla. Recolecta automáticamente información detallada sobre movimientos, acciones, daño, y más.
+The statistics system collects detailed battle data by subscribing to battle events. It automatically tracks actions, damage, healing, moves, and more throughout the battle.
 
-## Características
+## Architecture
 
--   ✅ **Recolección automática**: Se suscribe a eventos automáticamente
--   ✅ **Estadísticas detalladas**: Movimientos, acciones, daño, switches, critical hits
--   ✅ **Fácil integración**: Método simple en el builder
--   ✅ **Modular**: Puede extenderse fácilmente
+The statistics system uses an **event-driven architecture**:
 
-## Estadísticas Recolectadas
+-   **BattleStatistics**: Data container for all collected statistics
+-   **BattleStatisticsCollector**: Subscribes to events and collects statistics
+-   **BattleEventManager**: Provides events that the collector listens to
 
-### Información General
+## Components
 
--   Total de turnos
--   Total de acciones ejecutadas
--   Acciones por tipo
--   Acciones por turno
--   Resultado de la batalla
+### BattleStatistics.cs
 
-### Movimientos
+Data container that holds all collected battle statistics.
 
--   Movimientos usados por el jugador
--   Movimientos usados por el enemigo
--   Movimientos usados por cada Pokemon (qué Pokemon usó qué movimiento)
--   Daño total por movimiento
--   Critical hits
+| Property                 | Type                                          | Purpose                                                   |
+| ------------------------ | --------------------------------------------- | --------------------------------------------------------- |
+| **TotalTurns**           | `int`                                         | Total number of turns in battle                           |
+| **TotalActions**         | `int`                                         | Total number of actions executed                          |
+| **ActionsByType**        | `Dictionary<string, int>`                     | Actions executed by type (DamageAction, HealAction, etc.) |
+| **ActionsByPokemon**     | `Dictionary<string, Dictionary<string, int>>` | Actions by Pokemon (Pokemon name → Action type → count)   |
+| **PlayerActionsByType**  | `Dictionary<string, int>`                     | Actions executed by player team                           |
+| **EnemyActionsByType**   | `Dictionary<string, int>`                     | Actions executed by enemy team                            |
+| **PlayerDamageDealt**    | `int`                                         | Total damage dealt by player                              |
+| **EnemyDamageDealt**     | `int`                                         | Total damage dealt by enemy                               |
+| **PlayerHealing**        | `int`                                         | Total healing by player                                   |
+| **EnemyHealing**         | `int`                                         | Total healing by enemy                                    |
+| **PlayerMoveUsage**      | `Dictionary<string, int>`                     | Moves used by player Pokemon                              |
+| **EnemyMoveUsage**       | `Dictionary<string, int>`                     | Moves used by enemy Pokemon                               |
+| **MoveUsageByPokemon**   | `Dictionary<string, Dictionary<string, int>>` | Detailed move usage (Pokemon → Move → count)              |
+| **DamageByMove**         | `Dictionary<string, int>`                     | Total damage dealt by each move                           |
+| **DamageValuesByMove**   | `Dictionary<string, List<int>>`               | Individual damage values per move (for min/max/avg)       |
+| **ActionsPerTurn**       | `Dictionary<int, int>`                        | Actions executed per turn                                 |
+| **PokemonSwitches**      | `Dictionary<string, int>`                     | Pokemon switches (Pokemon name → count)                   |
+| **CriticalHits**         | `int`                                         | Total critical hits count                                 |
+| **MissedMoves**          | `int`                                         | Total missed moves count                                  |
+| **PlayerFainted**        | `List<string>`                                | Pokemon that fainted on player side                       |
+| **EnemyFainted**         | `List<string>`                                | Pokemon that fainted on enemy side                        |
+| **StatusEffectsApplied** | `Dictionary<string, int>`                     | Status effects applied (status name → count)              |
+| **StatChanges**          | `Dictionary<string, Dictionary<string, int>>` | Stat changes (Pokemon → Stat → total change)              |
+| **WeatherChanges**       | `List<string>`                                | Weather changes that occurred                             |
+| **TerrainChanges**       | `List<string>`                                | Terrain changes that occurred                             |
+| **StepExecutionTimes**   | `Dictionary<string, List<TimeSpan>>`          | Step execution times (step name → durations)              |
+| **Outcome**              | `BattleOutcome`                               | Final battle outcome                                      |
+| **FinalField**           | `BattleField`                                 | Final battlefield state                                   |
 
-### Daño y Curación
+### BattleStatisticsCollector.cs
 
--   Daño total del jugador
--   Daño total del enemigo
--   Curación total del jugador
--   Curación total del enemigo
+Collects statistics by subscribing to battle events. Automatically tracks statistics when events are raised.
 
-### Pokemon
+**Key Methods:**
 
--   Pokemon que se desmayaron (por lado)
--   Cambios de Pokemon realizados
+-   `Subscribe()`: Subscribes to battle events
+-   `Unsubscribe()`: Unsubscribes from battle events
+-   `GetStatistics()`: Gets collected statistics
+-   `Reset()`: Resets all statistics
+-   `AutoResetOnBattleStart`: Whether to reset on battle start (default: true)
 
-### Efectos
+**Subscribed Events:**
 
--   Efectos de estado aplicados
--   Cambios de estadísticas por Pokemon
--   Cambios de clima
--   Cambios de terreno
+-   `BattleStart`: Resets statistics (if auto-reset enabled)
+-   `BattleEnd`: Records outcome and final field
+-   `TurnStart`: Tracks turn number and initializes turn action count
+-   `TurnEnd`: Records turn end
+-   `ActionExecuted`: Tracks all action types
+-   `StepExecuted`: Tracks step execution times (debug mode)
 
-### Debug (si está habilitado)
+**Tracked Action Types:**
 
--   Tiempos de ejecución de steps
+-   `DamageAction`: Damage dealt, critical hits, damage by move
+-   `HealAction`: Healing by team
+-   `UseMoveAction`: Move usage by Pokemon and team
+-   `FaintAction`: Fainted Pokemon tracking
+-   `ApplyStatusAction`: Status effects applied
+-   `StatChangeAction`: Stat changes by Pokemon
+-   `SetWeatherAction`: Weather changes
+-   `SetTerrainAction`: Terrain changes
+-   `SwitchAction`: Pokemon switches
 
-## Uso Básico
+### IBattleStatisticsCollector.cs
 
-### Con el Builder (Recomendado)
+Interface for statistics collectors.
 
 ```csharp
-using PokemonUltimate.Combat.Infrastructure.Builders;
-using PokemonUltimate.Combat.Infrastructure.Statistics;
+void Subscribe();
+void Unsubscribe();
+BattleStatistics GetStatistics();
+void Reset();
+bool AutoResetOnBattleStart { get; set; }
+```
 
-// Crear batalla con estadísticas automáticas
-var collector = BattleBuilder.Create()
-    .Singles()
-    .Random(50)
-    .WithStatistics()  // Habilita recolección automática
-    .WithRandomAI()
-    .Build();
+## Usage Example
 
+### Basic Usage
+
+```csharp
+// Create collector
+var collector = new BattleStatisticsCollector();
+
+// Subscribe to events
+collector.Subscribe();
+
+// Run battle
+var engine = new CombatEngine(...);
+engine.Initialize(...);
 await engine.RunBattle();
 
-// Acceder a las estadísticas
-var stats = collector.StatisticsCollector.GetStatistics();
+// Get statistics
+var stats = collector.GetStatistics();
+
+// Access statistics
 Console.WriteLine($"Total turns: {stats.TotalTurns}");
 Console.WriteLine($"Total actions: {stats.TotalActions}");
 Console.WriteLine($"Player damage: {stats.PlayerDamageDealt}");
-Console.WriteLine($"Critical hits: {stats.CriticalHits}");
+Console.WriteLine($"Enemy damage: {stats.EnemyDamageDealt}");
 
-// Ver movimientos usados
-foreach (var move in stats.PlayerMoveUsage)
+// Unsubscribe when done
+collector.Unsubscribe();
+```
+
+### Accumulating Statistics Across Multiple Battles
+
+```csharp
+// Disable auto-reset to accumulate statistics
+collector.AutoResetOnBattleStart = false;
+
+// Run multiple battles
+for (int i = 0; i < 100; i++)
 {
-    Console.WriteLine($"{move.Key}: {move.Value} veces");
+    var engine = new CombatEngine(...);
+    engine.Initialize(...);
+    await engine.RunBattle();
 }
 
-// Ver movimientos por Pokemon
+// Get accumulated statistics
+var stats = collector.GetStatistics();
+Console.WriteLine($"Total battles: {stats.TotalTurns / averageTurnsPerBattle}");
+
+// Reset manually when done
+collector.Reset();
+```
+
+### Accessing Detailed Statistics
+
+```csharp
+var stats = collector.GetStatistics();
+
+// Actions by type
+foreach (var kvp in stats.ActionsByType)
+{
+    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+}
+
+// Move usage by Pokemon
 foreach (var pokemon in stats.MoveUsageByPokemon)
 {
     Console.WriteLine($"{pokemon.Key}:");
     foreach (var move in pokemon.Value)
     {
-        Console.WriteLine($"  - {move.Key}: {move.Value} veces");
+        Console.WriteLine($"  {move.Key}: {move.Value} times");
     }
 }
-```
 
-### Manualmente
-
-```csharp
-using PokemonUltimate.Combat.Infrastructure.Statistics;
-
-// Crear collector
-var collector = new BattleStatisticsCollector();
-collector.Subscribe(); // Suscribirse a eventos
-
-// Crear y ejecutar batalla
-var engine = BattleBuilder.Create()
-    .Singles()
-    .Random(50)
-    .WithRandomAI()
-    .Build();
-
-await engine.RunBattle();
-
-// Obtener estadísticas
-var stats = collector.GetStatistics();
-
-// Usar estadísticas
-Console.WriteLine($"Total actions: {stats.TotalActions}");
-Console.WriteLine($"Actions by type: {string.Join(", ", stats.ActionsByType)}");
-```
-
-## Estadísticas Disponibles
-
-### `BattleStatistics` Properties
-
-```csharp
-// Información general
-int TotalTurns
-int TotalActions
-Dictionary<string, int> ActionsByType
-Dictionary<int, int> ActionsPerTurn
-BattleOutcome Outcome
-BattleField FinalField
-
-// Movimientos
-Dictionary<string, int> PlayerMoveUsage        // Movimiento -> veces usado
-Dictionary<string, int> EnemyMoveUsage         // Movimiento -> veces usado
-Dictionary<string, Dictionary<string, int>> MoveUsageByPokemon  // Pokemon -> Movimiento -> veces
-Dictionary<string, int> DamageByMove           // Movimiento -> daño total
-
-// Daño y curación
-int PlayerDamageDealt
-int EnemyDamageDealt
-int PlayerHealing
-int EnemyHealing
-
-// Pokemon
-List<string> PlayerFainted
-List<string> EnemyFainted
-Dictionary<string, int> PokemonSwitches         // Pokemon -> veces cambiado
-
-// Efectos
-Dictionary<string, int> StatusEffectsApplied   // Estado -> veces aplicado
-Dictionary<string, Dictionary<string, int>> StatChanges  // Pokemon -> Estadística -> cambio total
-List<string> WeatherChanges
-List<string> TerrainChanges
-
-// Especiales
-int CriticalHits
-int MissedMoves
-
-// Debug (solo si debug mode está habilitado)
-Dictionary<string, List<TimeSpan>> StepExecutionTimes
-```
-
-## Ejemplo Completo
-
-```csharp
-var collector = BattleBuilder.Create()
-    .Singles()
-    .FullTeam()
-    .Random(50)
-    .WithDebugMode()  // Para tiempos de ejecución de steps
-    .WithStatistics() // Habilita estadísticas
-    .WithRandomAI()
-    .Build();
-
-await engine.RunBattle();
-
-var stats = collector.StatisticsCollector.GetStatistics();
-
-// Análisis de la batalla
-Console.WriteLine("=== Battle Statistics ===");
-Console.WriteLine($"Turns: {stats.TotalTurns}");
-Console.WriteLine($"Total Actions: {stats.TotalActions}");
-Console.WriteLine($"Outcome: {stats.Outcome}");
-Console.WriteLine();
-
-Console.WriteLine("=== Damage ===");
-Console.WriteLine($"Player: {stats.PlayerDamageDealt}");
-Console.WriteLine($"Enemy: {stats.EnemyDamageDealt}");
-Console.WriteLine($"Critical Hits: {stats.CriticalHits}");
-Console.WriteLine();
-
-Console.WriteLine("=== Moves Used ===");
-foreach (var move in stats.PlayerMoveUsage.OrderByDescending(m => m.Value))
+// Damage statistics by move
+foreach (var move in stats.DamageByMove)
 {
-    var damage = stats.DamageByMove.GetValueOrDefault(move.Key, 0);
-    Console.WriteLine($"{move.Key}: {move.Value} veces, {damage} daño total");
+    var values = stats.DamageValuesByMove[move.Key];
+    var avg = values.Average();
+    var min = values.Min();
+    var max = values.Max();
+    Console.WriteLine($"{move.Key}: Total={move.Value}, Avg={avg:F1}, Min={min}, Max={max}");
 }
-Console.WriteLine();
+```
 
-Console.WriteLine("=== Moves by Pokemon ===");
-foreach (var pokemon in stats.MoveUsageByPokemon)
+## How to Add New Statistics
+
+### Step 1: Add Property to BattleStatistics
+
+Open `Infrastructure/Statistics/BattleStatistics.cs` and add your property:
+
+```csharp
+public class BattleStatistics
 {
-    Console.WriteLine($"{pokemon.Key}:");
-    foreach (var move in pokemon.Value.OrderByDescending(m => m.Value))
+    // ... existing properties ...
+
+    /// <summary>
+    /// Your new statistic.
+    /// </summary>
+    public int YourNewStatistic { get; set; }
+}
+```
+
+### Step 2: Track in BattleStatisticsCollector
+
+Open `Infrastructure/Statistics/BattleStatisticsCollector.cs` and add tracking logic:
+
+```csharp
+private void OnActionExecuted(object sender, ActionExecutedEventArgs e)
+{
+    // ... existing tracking ...
+
+    // Track your new statistic
+    if (e.Action is YourActionType yourAction)
     {
-        Console.WriteLine($"  - {move.Key}: {move.Value} veces");
+        TrackYourStatistic(yourAction, e.Field);
     }
 }
-Console.WriteLine();
 
-Console.WriteLine("=== Actions per Turn ===");
-foreach (var turn in stats.ActionsPerTurn.OrderBy(t => t.Key))
+private void TrackYourStatistic(YourActionType action, BattleField field)
 {
-    Console.WriteLine($"Turn {turn.Key}: {turn.Value} acciones");
+    // Your tracking logic here
+    _statistics.YourNewStatistic++;
 }
 ```
 
-## Resetear Estadísticas
+### Step 3: Reset in Reset Method
+
+Add reset logic to the `Reset()` method:
 
 ```csharp
-collector.Reset(); // Limpia todas las estadísticas
+public void Reset()
+{
+    // ... existing resets ...
+    _statistics.YourNewStatistic = 0;
+}
 ```
 
-## Desuscribirse
+## Design Principles
 
-```csharp
-collector.Unsubscribe(); // Deja de escuchar eventos
-```
+1. **Event-Driven**: Statistics collected automatically via events
+2. **Non-Intrusive**: Doesn't modify battle logic
+3. **Efficient**: Only tracks when subscribed, optimized lookups
+4. **Flexible**: Can accumulate across battles or reset per battle
+5. **Comprehensive**: Tracks all major battle aspects
+
+## Performance Considerations
+
+-   **Optimized Lookups**: Uses `TryGetValue` for dictionary operations
+-   **Conditional Creation**: Only creates event args if subscribers exist
+-   **Cached Checks**: Caches player/enemy slot checks
+-   **Minimal Overhead**: Statistics collection has minimal impact on battle performance
+
+## Related Documentation
+
+-   `../Events/README.md` - Event system documentation
+-   `../Events/BattleEventManager.cs` - Event manager implementation
+-   `BattleStatistics.cs` - Statistics data container
+-   `BattleStatisticsCollector.cs` - Statistics collector implementation
