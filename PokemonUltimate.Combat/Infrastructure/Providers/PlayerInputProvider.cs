@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Extensions;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Infrastructure.Helpers;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Infrastructure.Constants;
 using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
+using PokemonUltimate.Combat.Utilities;
+using PokemonUltimate.Combat.Utilities.Extensions;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Infrastructure.Providers

@@ -1,6 +1,6 @@
 
 
-using PokemonUltimate.Combat.Execution.Battle;
+using PokemonUltimate.Combat.Engine;
 
 namespace PokemonUltimate.Combat.Infrastructure.Factories.Definition
 {

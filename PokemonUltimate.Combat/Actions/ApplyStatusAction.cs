@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
-using PokemonUltimate.Content.Catalogs.Status;
-using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Actions
@@ -22,6 +21,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class ApplyStatusAction : BattleAction
     {
+        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+
         /// <summary>
         /// The slot receiving the status condition.
         /// </summary>
@@ -38,11 +39,14 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="user">The slot that initiated this status application. Can be null for system actions.</param>
         /// <param name="target">The slot receiving the status. Cannot be null.</param>
         /// <param name="status">The status condition to apply.</param>
+        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
         /// <exception cref="ArgumentNullException">If target is null.</exception>
-        public ApplyStatusAction(BattleSlot user, BattleSlot target, PersistentStatus status) : base(user)
+        public ApplyStatusAction(BattleSlot user, BattleSlot target, PersistentStatus status, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
         {
-            Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
+            ActionValidators.ValidateTargetNotNull(target, nameof(target));
+            Target = target;
             Status = status;
+            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
         }
 
         /// <summary>
@@ -52,49 +56,17 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field));
-
-            if (Target.IsEmpty)
+            if (!ActionValidators.ShouldExecute(field, Target))
                 return Enumerable.Empty<BattleAction>();
 
-            // Check if clearing status (Status.None)
-            if (Status == PersistentStatus.None)
+            // Use Status Application Checker to validate and apply status (eliminates complex validation logic)
+            var statusChecker = _behaviorRegistry.GetStatusApplicationChecker();
+            var result = statusChecker.CanApplyStatus(Target, Status, field);
+
+            if (!result.CanApply)
             {
-                Target.Pokemon.Status = Status;
+                // Status cannot be applied (already has status, immune, Safeguard, etc.)
                 return Enumerable.Empty<BattleAction>();
-            }
-
-            // Check if Pokemon already has a status
-            if (Target.Pokemon.Status != PersistentStatus.None)
-            {
-                // Pokemon already has a status, cannot apply another
-                return Enumerable.Empty<BattleAction>();
-            }
-
-            // Get status effect data to check immunities
-            var statusData = StatusCatalog.GetByStatus(Status);
-            if (statusData != null)
-            {
-                // Check type immunities (e.g., Fire types immune to Burn)
-                var pokemon = Target.Pokemon;
-                if (statusData.IsTypeImmune(pokemon.Species.PrimaryType) ||
-                    (pokemon.Species.SecondaryType.HasValue && statusData.IsTypeImmune(pokemon.Species.SecondaryType.Value)))
-                {
-                    // Pokemon is immune to this status - don't apply it
-                    return Enumerable.Empty<BattleAction>();
-                }
-            }
-
-            // Safeguard prevents status application
-            if (Target.Side.HasSideCondition(SideCondition.Safeguard))
-            {
-                var safeguardData = Target.Side.GetSideConditionData(SideCondition.Safeguard);
-                if (safeguardData != null && safeguardData.PreventsStatus)
-                {
-                    // Status is blocked by Safeguard
-                    return Enumerable.Empty<BattleAction>();
-                }
             }
 
             // Apply the status
@@ -109,10 +81,9 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
-            if (Target.IsEmpty || Status == PersistentStatus.None)
+            if (!ActionValidators.ValidateTarget(Target) || Status == PersistentStatus.None)
                 return Task.CompletedTask;
 
             string statusName = Status.ToString();

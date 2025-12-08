@@ -1,6 +1,6 @@
 using PokemonUltimate.BattleSimulator.Helpers;
-using PokemonUltimate.Combat.Infrastructure.Events;
-using PokemonUltimate.Combat.Infrastructure.Events.Definition;
+using PokemonUltimate.Combat.Events;
+using PokemonUltimate.Combat.Events.Definition;
 using PokemonUltimate.Combat.Infrastructure.Logging;
 using PokemonUltimate.Combat.Infrastructure.Logging.Definition;
 using PokemonUltimate.Localization;

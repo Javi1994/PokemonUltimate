@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Execution.Battle;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
+using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Field;
 using PokemonUltimate.Combat.Statistics;
+using PokemonUltimate.Combat.View;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Data.Blueprints;
@@ -25,9 +25,9 @@ namespace PokemonUltimate.DeveloperTools.Runners
         /// </summary>
         public class MoveTestStatistics
         {
-            private readonly Combat.Statistics.BattleStatistics _internalStats;
+            private readonly BattleStatistics _internalStats;
 
-            public MoveTestStatistics(Combat.Statistics.BattleStatistics internalStats)
+            public MoveTestStatistics(BattleStatistics internalStats)
             {
                 _internalStats = internalStats ?? throw new ArgumentNullException(nameof(internalStats));
             }

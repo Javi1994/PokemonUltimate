@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Foundation.Constants;
-using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Infrastructure.Constants;
 using PokemonUltimate.Combat.Statistics.Definition;
 using PokemonUltimate.Combat.Statistics.Trackers;
 

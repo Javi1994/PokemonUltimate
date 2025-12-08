@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
+using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Actions
@@ -21,6 +20,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class SetTerrainAction : BattleAction
     {
+        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+
         /// <summary>
         /// The terrain condition to set.
         /// </summary>
@@ -43,11 +44,13 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="terrain">The terrain to set. Use Terrain.None to clear.</param>
         /// <param name="duration">Duration in turns. 0 means infinite duration.</param>
         /// <param name="terrainData">The terrain data for this terrain condition. Can be null if not available.</param>
-        public SetTerrainAction(BattleSlot user, Terrain terrain, int duration, TerrainData terrainData = null) : base(user)
+        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
+        public SetTerrainAction(BattleSlot user, Terrain terrain, int duration, TerrainData terrainData = null, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
         {
             Terrain = terrain;
             Duration = duration;
             TerrainData = terrainData;
+            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
         }
 
         /// <summary>
@@ -55,13 +58,19 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
+            ActionValidators.ValidateField(field);
 
             // Clear terrain if None is specified
             if (Terrain == Terrain.None)
             {
                 field.ClearTerrain();
+                return Enumerable.Empty<BattleAction>();
+            }
+
+            // Use Field Condition Checker to validate terrain can be set (for consistency, even though terrains can always be overwritten)
+            var fieldChecker = _behaviorRegistry.GetFieldConditionChecker();
+            if (!fieldChecker.CanSetTerrain(field, Terrain))
+            {
                 return Enumerable.Empty<BattleAction>();
             }
 
@@ -76,8 +85,7 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
             // Terrain animation not yet implemented in IBattleView
             // For now, just return completed task

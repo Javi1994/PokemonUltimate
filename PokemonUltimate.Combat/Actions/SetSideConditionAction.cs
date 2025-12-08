@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
+using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Actions
@@ -21,6 +20,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class SetSideConditionAction : BattleAction
     {
+        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+
         /// <summary>
         /// The side to apply the condition to.
         /// </summary>
@@ -49,12 +50,15 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="condition">The condition to set. Use SideCondition.None to clear.</param>
         /// <param name="duration">Duration in turns.</param>
         /// <param name="conditionData">The side condition data for this condition. Can be null if not available.</param>
-        public SetSideConditionAction(BattleSlot user, BattleSide targetSide, SideCondition condition, int duration, SideConditionData conditionData = null) : base(user)
+        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
+        public SetSideConditionAction(BattleSlot user, BattleSide targetSide, SideCondition condition, int duration, SideConditionData conditionData = null, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
         {
-            TargetSide = targetSide ?? throw new ArgumentNullException(nameof(targetSide));
+            ActionValidators.ValidateBattleSide(targetSide, nameof(targetSide));
+            TargetSide = targetSide;
             Condition = condition;
             Duration = duration;
             ConditionData = conditionData;
+            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
         }
 
         /// <summary>
@@ -62,8 +66,7 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
+            ActionValidators.ValidateField(field);
 
             // Clear condition if None is specified
             if (Condition == SideCondition.None)
@@ -72,18 +75,12 @@ namespace PokemonUltimate.Combat.Actions
                 return Enumerable.Empty<BattleAction>();
             }
 
-            // Validate condition can be set (e.g., Aurora Veil requires Hail/Snow)
-            if (ConditionData != null)
+            // Use Field Condition Checker to validate side condition can be set (eliminates complex validation logic)
+            var fieldChecker = _behaviorRegistry.GetFieldConditionChecker();
+            if (!fieldChecker.CanSetSideCondition(field, ConditionData))
             {
-                if (ConditionData.RequiredWeather.HasValue)
-                {
-                    var currentWeather = field.Weather;
-                    if (!ConditionData.CanBeSetInWeather(currentWeather))
-                    {
-                        // Condition cannot be set in current weather
-                        return Enumerable.Empty<BattleAction>();
-                    }
-                }
+                // Condition cannot be set (e.g., Aurora Veil requires Hail/Snow)
+                return Enumerable.Empty<BattleAction>();
             }
 
             // Set the condition
@@ -100,8 +97,7 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
             // Side condition animation not yet implemented in IBattleView
             // For now, just return completed task

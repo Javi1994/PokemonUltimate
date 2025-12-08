@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
+using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Actions
@@ -22,6 +21,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class SetWeatherAction : BattleAction
     {
+        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+
         /// <summary>
         /// The weather condition to set.
         /// </summary>
@@ -44,11 +45,13 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="weather">The weather to set. Use Weather.None to clear.</param>
         /// <param name="duration">Duration in turns. 0 means infinite duration.</param>
         /// <param name="weatherData">The weather data for this weather condition. Can be null if not available.</param>
-        public SetWeatherAction(BattleSlot user, Weather weather, int duration, WeatherData weatherData = null) : base(user)
+        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
+        public SetWeatherAction(BattleSlot user, Weather weather, int duration, WeatherData weatherData = null, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
         {
             Weather = weather;
             Duration = duration;
             WeatherData = weatherData;
+            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
         }
 
         /// <summary>
@@ -57,8 +60,7 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
+            ActionValidators.ValidateField(field);
 
             // Clear weather if None is specified
             if (Weather == Weather.None)
@@ -67,15 +69,12 @@ namespace PokemonUltimate.Combat.Actions
                 return Enumerable.Empty<BattleAction>();
             }
 
-            // Check if current weather is primal and cannot be overwritten
-            if (field.WeatherData != null && !field.WeatherData.CanBeOverwritten)
+            // Use Field Condition Checker to validate weather can be set (eliminates complex validation logic)
+            var fieldChecker = _behaviorRegistry.GetFieldConditionChecker();
+            if (!fieldChecker.CanSetWeather(field, Weather, WeatherData))
             {
-                // Current weather is primal, check if new weather can overwrite it
-                if (WeatherData != null && WeatherData.CanBeOverwritten)
-                {
-                    // Trying to overwrite primal with normal weather - ignore
-                    return Enumerable.Empty<BattleAction>();
-                }
+                // Weather cannot be set (e.g., trying to overwrite primal weather)
+                return Enumerable.Empty<BattleAction>();
             }
 
             // Set the weather
@@ -92,8 +91,7 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
             // Weather animation not yet implemented in IBattleView
             // For now, just return completed task

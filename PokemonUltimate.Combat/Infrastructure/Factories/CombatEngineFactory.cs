@@ -1,12 +1,12 @@
-using PokemonUltimate.Combat.Execution.Engine;
-using PokemonUltimate.Combat.Infrastructure.Helpers;
+using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Damage.Definition;
+using PokemonUltimate.Combat.Effects.Registry;
+using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Engine.Validation;
 using PokemonUltimate.Combat.Infrastructure.Logging;
 using PokemonUltimate.Combat.Infrastructure.Providers;
 using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
-using PokemonUltimate.Combat.Infrastructure.Validation;
-using PokemonUltimate.Combat.Systems.Damage;
-using PokemonUltimate.Combat.Systems.Damage.Definition;
-using PokemonUltimate.Combat.Systems.Effects;
+using PokemonUltimate.Combat.Utilities;
 
 namespace PokemonUltimate.Combat.Infrastructure.Factories
 {

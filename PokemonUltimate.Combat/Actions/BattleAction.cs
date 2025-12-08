@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 
 namespace PokemonUltimate.Combat.Actions
 {

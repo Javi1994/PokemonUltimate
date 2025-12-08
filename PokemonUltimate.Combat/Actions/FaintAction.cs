@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
-using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -34,7 +33,8 @@ namespace PokemonUltimate.Combat.Actions
         /// <exception cref="ArgumentNullException">If target is null.</exception>
         public FaintAction(BattleSlot user, BattleSlot target) : base(user)
         {
-            Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
+            ActionValidators.ValidateTargetNotNull(target, nameof(target));
+            Target = target;
         }
 
         /// <summary>
@@ -43,10 +43,7 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field));
-
-            if (Target.IsEmpty)
+            if (!ActionValidators.ShouldExecute(field, Target))
                 return Enumerable.Empty<BattleAction>();
 
             // Pokemon should already be at 0 HP (set by DamageAction)
@@ -61,10 +58,9 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
-            if (Target.IsEmpty)
+            if (!ActionValidators.ValidateTarget(Target))
                 return Task.CompletedTask;
 
             return view.PlayFaintAnimation(Target);

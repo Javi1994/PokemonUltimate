@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Field;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Infrastructure.Factories.Definition

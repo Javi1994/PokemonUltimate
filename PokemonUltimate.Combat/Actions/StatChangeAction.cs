@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
+using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 
@@ -21,6 +22,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class StatChangeAction : BattleAction
     {
+        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+
         /// <summary>
         /// The slot whose stat is being modified.
         /// </summary>
@@ -43,17 +46,20 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="target">The slot whose stat is being modified. Cannot be null.</param>
         /// <param name="stat">The stat to modify. Cannot be HP.</param>
         /// <param name="change">The amount to change (+/-).</param>
+        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
         /// <exception cref="ArgumentNullException">If target is null.</exception>
         /// <exception cref="ArgumentException">If stat is HP.</exception>
-        public StatChangeAction(BattleSlot user, BattleSlot target, Stat stat, int change) : base(user)
+        public StatChangeAction(BattleSlot user, BattleSlot target, Stat stat, int change, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
         {
-            Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
+            ActionValidators.ValidateTargetNotNull(target, nameof(target));
 
             if (stat == Stat.HP)
                 throw new ArgumentException(ErrorMessages.CannotModifyHPStatStage, nameof(stat));
 
+            Target = target;
             Stat = stat;
             Change = change;
+            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
         }
 
         /// <summary>
@@ -63,26 +69,15 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field));
-
-            if (Target.IsEmpty || Change == 0)
+            if (!ActionValidators.ShouldExecute(field, Target) || Change == 0)
                 return Enumerable.Empty<BattleAction>();
 
-            // Mist prevents stat reductions from opponents (but allows stat increases)
-            if (Change < 0 && Target.Side.HasSideCondition(SideCondition.Mist))
+            // Use Stat Change Application Checker to validate if change can be applied (eliminates complex Mist logic)
+            var statChangeChecker = _behaviorRegistry.GetStatChangeApplicationChecker();
+            if (!statChangeChecker.CanApplyStatChange(Target, User, Change, field))
             {
-                var mistData = Target.Side.GetSideConditionData(SideCondition.Mist);
-                if (mistData != null && mistData.PreventsStatReduction)
-                {
-                    // Check if the stat reduction is from an opponent
-                    // If User is null or User.Side != Target.Side, it's from an opponent
-                    if (User == null || User.Side != Target.Side)
-                    {
-                        // Stat reduction is blocked by Mist
-                        return Enumerable.Empty<BattleAction>();
-                    }
-                }
+                // Stat change blocked (e.g., by Mist)
+                return Enumerable.Empty<BattleAction>();
             }
 
             Target.ModifyStatStage(Stat, Change);
@@ -95,10 +90,9 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
-            if (Target.IsEmpty || Change == 0)
+            if (!ActionValidators.ValidateTarget(Target) || Change == 0)
                 return Task.CompletedTask;
 
             string statName = Stat.ToString();

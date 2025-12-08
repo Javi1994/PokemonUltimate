@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Field;
 
 namespace PokemonUltimate.Combat.Infrastructure.Providers.Definition
 {

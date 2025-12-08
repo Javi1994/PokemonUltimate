@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Extensions;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
-using PokemonUltimate.Core.Data.Constants;
-using PokemonUltimate.Localization.Services;
-using PokemonUltimate.Core.Services;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Localization.Constants;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -45,7 +42,8 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="source">The source of the damage (ability/item name).</param>
         public ContactDamageAction(BattleSlot target, int damage, string source) : base(null)
         {
-            Target = target ?? throw new System.ArgumentNullException(nameof(target), ErrorMessages.SlotCannotBeNull);
+            ActionValidators.ValidateSlot(target, nameof(target));
+            Target = target;
             Damage = damage;
             Source = source ?? "contact damage";
         }
@@ -55,12 +53,11 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new System.ArgumentNullException(nameof(field));
+            ActionValidators.ValidateField(field);
 
             // Check if target is valid (not empty and not fainted)
             // Note: Target is the attacker who made contact, and they receive the contact damage
-            if (Target == null || Target.IsEmpty || Target.HasFainted)
+            if (!ActionValidators.ValidateTarget(Target) || Target.HasFainted)
                 yield break;
 
             // Apply damage directly

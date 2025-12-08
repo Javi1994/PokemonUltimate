@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
-using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Data.Constants;
-using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Core.Domain.Instances;
+using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Actions
@@ -25,6 +22,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class SwitchAction : BattleAction
     {
+        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+
         /// <summary>
         /// The slot being switched.
         /// </summary>
@@ -56,13 +55,18 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         /// <param name="slot">The slot to switch. Cannot be null.</param>
         /// <param name="newPokemon">The Pokemon to switch in. Cannot be null.</param>
+        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
         /// <exception cref="ArgumentNullException">If slot or newPokemon is null.</exception>
         public SwitchAction(
             BattleSlot slot,
-            PokemonInstance newPokemon) : base(slot)
+            PokemonInstance newPokemon,
+            BehaviorCheckerRegistry behaviorRegistry = null) : base(slot)
         {
-            Slot = slot ?? throw new ArgumentNullException(nameof(slot), ErrorMessages.PokemonCannotBeNull);
-            NewPokemon = newPokemon ?? throw new ArgumentNullException(nameof(newPokemon), ErrorMessages.PokemonCannotBeNull);
+            ActionValidators.ValidateSlot(slot, nameof(slot));
+            ActionValidators.ValidatePokemonInstance(newPokemon, nameof(newPokemon));
+            Slot = slot;
+            NewPokemon = newPokemon;
+            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
         }
 
         /// <summary>
@@ -72,18 +76,13 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field));
-
-            if (Slot.IsEmpty)
+            // Use Switch Application Checker to validate switch can be performed
+            var switchChecker = _behaviorRegistry.GetSwitchApplicationChecker();
+            if (!switchChecker.CanSwitch(Slot, NewPokemon, field))
                 return Enumerable.Empty<BattleAction>();
 
-            var side = Slot.Side;
-            if (side == null)
-                return Enumerable.Empty<BattleAction>();
-
-            // Mark Pokemon as switching out (for Pursuit detection)
-            Slot.AddVolatileStatus(VolatileStatus.SwitchingOut);
+            // Prepare switch out (marks Pokemon as switching out for Pursuit detection)
+            switchChecker.PrepareSwitchOut(Slot);
 
             // Get the current Pokemon and store it for observers/logging
             OldPokemon = Slot.Pokemon;
@@ -112,10 +111,9 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
-            if (Slot.IsEmpty)
+            if (!ActionValidators.ValidateTarget(Slot))
                 return Task.CompletedTask;
 
             // Play switch-out animation first, then switch-in

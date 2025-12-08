@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Foundation.Constants;
-using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Infrastructure.Constants;
 
 namespace PokemonUltimate.Combat.Statistics.Definition
 {

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -32,7 +32,8 @@ namespace PokemonUltimate.Combat.Actions
         /// <exception cref="ArgumentNullException">If message is null.</exception>
         public MessageAction(string message, BattleSlot user = null) : base(user)
         {
-            Message = message ?? throw new ArgumentNullException(nameof(message));
+            ActionValidators.ValidateMessage(message, nameof(message));
+            Message = message;
         }
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
+            ActionValidators.ValidateView(view);
             return view.ShowMessage(Message);
         }
     }

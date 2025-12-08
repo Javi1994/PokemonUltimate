@@ -2,16 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Extensions;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
-using PokemonUltimate.Combat.Systems.Damage;
-using PokemonUltimate.Core.Data.Constants;
-using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Localization.Constants;
-using PokemonUltimate.Localization.Extensions;
-using PokemonUltimate.Localization.Services;
+using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -27,6 +22,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class DamageAction : BattleAction
     {
+        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+
         /// <summary>
         /// The slot receiving damage.
         /// </summary>
@@ -43,11 +40,15 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="user">The slot that initiated this damage (attacker).</param>
         /// <param name="target">The slot receiving damage. Cannot be null.</param>
         /// <param name="context">The damage context with calculated damage. Cannot be null.</param>
+        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
         /// <exception cref="ArgumentNullException">If target or context is null.</exception>
-        public DamageAction(BattleSlot user, BattleSlot target, DamageContext context) : base(user)
+        public DamageAction(BattleSlot user, BattleSlot target, DamageContext context, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
         {
-            Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
-            Context = context ?? throw new ArgumentNullException(nameof(context));
+            ActionValidators.ValidateTargetNotNull(target, nameof(target));
+            ActionValidators.ValidateDamageContext(context, nameof(context));
+            Target = target;
+            Context = context;
+            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
         }
 
         /// <summary>
@@ -56,86 +57,25 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field));
-
-            if (!Target.IsActive())
+            if (!ActionValidators.ShouldExecute(field, Target, checkActive: true))
                 return Enumerable.Empty<BattleAction>();
 
-            int damage = Context.FinalDamage;
+            // Use Damage Application Checker to process all damage logic (OHKO prevention, messages, etc.)
+            var damageChecker = _behaviorRegistry.GetDamageApplicationChecker();
+            var damageResult = damageChecker.ProcessDamageApplication(Target, Context.FinalDamage, field);
 
             // No damage to apply (immune or status move)
-            if (damage == 0)
+            if (damageResult.ModifiedDamage == 0)
                 return Enumerable.Empty<BattleAction>();
 
-            var reactions = new List<BattleAction>();
-
-            // Check if damage would cause fainting BEFORE applying damage (for Focus Sash, Sturdy)
-            bool wouldFaint = Target.Pokemon.CurrentHP <= damage;
-            bool wasAtFullHP = Target.Pokemon.CurrentHP >= Target.Pokemon.MaxHP;
-
-            // Trigger OnWouldFaint BEFORE applying damage if damage would be fatal
-            // This allows items/abilities to prevent fainting (Focus Sash, Sturdy)
-            // Items/abilities can modify the damage amount by checking conditions
-            if (wouldFaint && wasAtFullHP)
-            {
-                // Check for Focus Sash or Sturdy - use catalog lookup instead of hardcoded strings
-                var focusSashItem = PokemonUltimate.Content.Catalogs.Items.ItemCatalog.GetByName("Focus Sash");
-                bool hasFocusSash = Target.Pokemon.HeldItem != null && focusSashItem != null &&
-                                    Target.Pokemon.HeldItem.Name.Equals(focusSashItem.Name, StringComparison.OrdinalIgnoreCase);
-                var sturdyAbility = PokemonUltimate.Content.Catalogs.Abilities.AbilityCatalog.GetByName("Sturdy");
-                bool hasSturdy = Target.Pokemon.Ability != null && sturdyAbility != null &&
-                                Target.Pokemon.Ability.Name.Equals(sturdyAbility.Name, StringComparison.OrdinalIgnoreCase);
-
-                if (hasFocusSash || hasSturdy)
-                {
-                    // Reduce damage to leave Pokemon at 1 HP
-                    int newDamage = Target.Pokemon.CurrentHP - 1;
-                    if (newDamage < 0)
-                        newDamage = 0;
-
-                    damage = newDamage;
-
-                    // Consume Focus Sash (Sturdy is an ability, so it doesn't get consumed)
-                    if (hasFocusSash)
-                    {
-                        Target.Pokemon.HeldItem = null; // Consume item
-                        var provider = LocalizationService.Instance;
-                        var itemName = focusSashItem?.GetDisplayName(provider) ?? "Focus Sash";
-                        reactions.Add(new MessageAction(provider.GetString(LocalizationKey.ItemActivated, Target.Pokemon.DisplayName, itemName)));
-                        reactions.Add(new MessageAction(provider.GetString(LocalizationKey.HeldOnUsingItem, Target.Pokemon.DisplayName, itemName)));
-                    }
-                    else if (hasSturdy)
-                    {
-                        var provider = LocalizationService.Instance;
-                        var abilityName = sturdyAbility?.GetDisplayName(provider) ?? "Sturdy";
-                        reactions.Add(new MessageAction(provider.GetString(LocalizationKey.AbilityActivated, Target.Pokemon.DisplayName, abilityName)));
-                        reactions.Add(new MessageAction(provider.GetString(LocalizationKey.EnduredHit, Target.Pokemon.DisplayName)));
-                    }
-                }
-            }
+            var reactions = new List<BattleAction>(damageResult.Reactions);
 
             // Apply damage (may have been modified by Focus Sash/Sturdy)
-            int actualDamage = Target.Pokemon.TakeDamage(damage);
+            int actualDamage = Target.Pokemon.TakeDamage(damageResult.ModifiedDamage);
 
-            // Record damage taken for Counter/Mirror Coat
-            // Also mark if target was hit while focusing (for Focus Punch)
-            // Note: Context.Move is never null (validated in DamageContext constructor),
-            // but we check actualDamage > 0 to avoid recording zero damage
-            if (actualDamage > 0)
-            {
-                if (Context.Move.Category == MoveCategory.Physical)
-                {
-                    Target.RecordPhysicalDamage(actualDamage);
-                }
-                else if (Context.Move.Category == MoveCategory.Special)
-                {
-                    Target.RecordSpecialDamage(actualDamage);
-                }
-
-                // Mark if target was hit while focusing
-                Target.MarkHitWhileFocusing();
-            }
+            // Record damage taken for Counter/Mirror Coat and Focus Punch (using checker)
+            // Note: Context.Move is never null (validated in DamageContext constructor)
+            damageChecker.RecordDamageTaken(Target, actualDamage, Context.Move.Category);
 
             // Note: Damage-taken and contact-received effects are processed by ActionProcessorObserver
             // This keeps actions simple and decoupled from processors
@@ -154,10 +94,9 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
-            if (!Target.IsActive() || Context.FinalDamage == 0)
+            if (!ActionValidators.ValidateActiveTarget(Target) || Context.FinalDamage == 0)
                 return Task.CompletedTask;
 
             return Task.WhenAll(

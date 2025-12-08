@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat;
-using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Field;
 using PokemonUltimate.Core.Domain.Instances;
 using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 

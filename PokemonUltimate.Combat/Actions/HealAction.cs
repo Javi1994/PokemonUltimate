@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Integration.View.Definition;
+using PokemonUltimate.Combat.Actions.Registry;
+using PokemonUltimate.Combat.Actions.Validation;
+using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Actions
@@ -20,6 +21,8 @@ namespace PokemonUltimate.Combat.Actions
     /// </remarks>
     public class HealAction : BattleAction
     {
+        private readonly BehaviorCheckerRegistry _behaviorRegistry;
+
         /// <summary>
         /// The slot receiving healing.
         /// </summary>
@@ -36,16 +39,19 @@ namespace PokemonUltimate.Combat.Actions
         /// <param name="user">The slot that initiated this healing. Can be null for system actions.</param>
         /// <param name="target">The slot receiving healing. Cannot be null.</param>
         /// <param name="amount">The amount of HP to restore. Must be non-negative.</param>
+        /// <param name="behaviorRegistry">The behavior checker registry. If null, creates a default one.</param>
         /// <exception cref="ArgumentNullException">If target is null.</exception>
         /// <exception cref="ArgumentException">If amount is negative.</exception>
-        public HealAction(BattleSlot user, BattleSlot target, int amount) : base(user)
+        public HealAction(BattleSlot user, BattleSlot target, int amount, BehaviorCheckerRegistry behaviorRegistry = null) : base(user)
         {
-            Target = target ?? throw new ArgumentNullException(nameof(target), ErrorMessages.PokemonCannotBeNull);
+            ActionValidators.ValidateTargetNotNull(target, nameof(target));
 
             if (amount < 0)
                 throw new ArgumentException(ErrorMessages.AmountCannotBeNegative, nameof(amount));
 
+            Target = target;
             Amount = amount;
+            _behaviorRegistry = behaviorRegistry ?? new BehaviorCheckerRegistry();
         }
 
         /// <summary>
@@ -54,13 +60,22 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override IEnumerable<BattleAction> ExecuteLogic(BattleField field)
         {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field));
-
-            if (Target.IsEmpty || Amount == 0)
+            if (!ActionValidators.ShouldExecute(field, Target))
                 return Enumerable.Empty<BattleAction>();
 
-            Target.Pokemon.Heal(Amount);
+            // Use Healing Application Checker to validate and calculate effective healing
+            var healingChecker = _behaviorRegistry.GetHealingApplicationChecker();
+
+            if (!healingChecker.CanHeal(Target.Pokemon, Amount))
+                return Enumerable.Empty<BattleAction>();
+
+            // Calculate effective healing (prevents overhealing)
+            int effectiveHealing = healingChecker.CalculateEffectiveHealing(Target.Pokemon, Amount);
+
+            if (effectiveHealing > 0)
+            {
+                Target.Pokemon.Heal(effectiveHealing);
+            }
 
             return Enumerable.Empty<BattleAction>();
         }
@@ -70,10 +85,15 @@ namespace PokemonUltimate.Combat.Actions
         /// </summary>
         public override Task ExecuteVisual(IBattleView view)
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
+            ActionValidators.ValidateView(view);
 
-            if (Target.IsEmpty || Amount == 0)
+            if (!ActionValidators.ValidateTarget(Target))
+                return Task.CompletedTask;
+
+            // Use Healing Application Checker to check if healing would be effective
+            var healingChecker = _behaviorRegistry.GetHealingApplicationChecker();
+
+            if (!healingChecker.CanHeal(Target.Pokemon, Amount))
                 return Task.CompletedTask;
 
             return view.UpdateHPBar(Target);
