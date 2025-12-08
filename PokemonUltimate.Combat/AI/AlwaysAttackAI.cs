@@ -19,8 +19,19 @@ namespace PokemonUltimate.Combat.AI
     /// **Sub-Feature**: 2.7: Integration
     /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
     /// </remarks>
-    public class AlwaysAttackAI : IActionProvider
+    public class AlwaysAttackAI : ActionProviderBase
     {
+        private readonly TargetResolver _targetResolver;
+
+        /// <summary>
+        /// Creates a new AlwaysAttackAI instance.
+        /// </summary>
+        /// <param name="targetResolver">The target resolver for resolving move targets. Cannot be null.</param>
+        public AlwaysAttackAI(TargetResolver targetResolver)
+        {
+            _targetResolver = targetResolver ?? throw new ArgumentNullException(nameof(targetResolver));
+        }
+
         /// <summary>
         /// Gets an action using the first available move.
         /// </summary>
@@ -28,7 +39,7 @@ namespace PokemonUltimate.Combat.AI
         /// <param name="mySlot">The slot requesting an action. Cannot be null.</param>
         /// <returns>A UseMoveAction with the first available move, or null if no moves available.</returns>
         /// <exception cref="ArgumentNullException">If field or mySlot is null.</exception>
-        public Task<BattleAction> GetAction(BattleField field, BattleSlot mySlot)
+        public override Task<BattleAction> GetAction(BattleField field, BattleSlot mySlot)
         {
             if (field == null)
                 throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
@@ -45,9 +56,8 @@ namespace PokemonUltimate.Combat.AI
             if (selectedMove == null)
                 return Task.FromResult<BattleAction>(null);
 
-            // Get valid targets for this move
-            var targetResolver = new TargetResolver();
-            var validTargets = targetResolver.GetValidTargets(mySlot, selectedMove.Move, field);
+            // Get basic valid targets (without redirections - those are applied by TargetResolutionStep)
+            var validTargets = _targetResolver.GetBasicTargets(mySlot, selectedMove.Move, field);
 
             if (validTargets.Count == 0)
             {

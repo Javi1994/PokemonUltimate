@@ -9,7 +9,6 @@ using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Effects;
 using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
 using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Localization;
@@ -18,6 +17,7 @@ using PokemonUltimate.Localization;
 using PokemonUltimate.Localization.Extensions;
 using PokemonUltimate.Localization.Providers;
 using PokemonUltimate.Localization.Providers.Definition;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
 {
@@ -28,7 +28,6 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private ComboBox comboTargetPokemon = null!;
         private NumericUpDown numericLevel = null!;
         private NumericUpDown numericTests = null!;
-        private CheckBox checkDetailedOutput = null!;
         private Button btnRun = null!;
         private TabControl tabResults = null!;
         private TabPage tabSummary = null!;
@@ -55,7 +54,6 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.comboTargetPokemon = new ComboBox();
             this.numericLevel = new NumericUpDown();
             this.numericTests = new NumericUpDown();
-            this.checkDetailedOutput = new CheckBox();
             this.btnRun = new Button();
             this.tabResults = new TabControl();
             this.tabSummary = new TabPage();
@@ -178,11 +176,6 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.numericTests.Value = 1000;
             yPos += spacing;
 
-            this.checkDetailedOutput.Text = "Detailed Output";
-            this.checkDetailedOutput.Location = new Point(leftMargin, yPos);
-            this.checkDetailedOutput.AutoSize = true;
-            yPos += 45;
-
             this.btnRun.Text = "Run Tests";
             this.btnRun.Location = new Point(leftMargin, yPos);
             this.btnRun.Width = controlWidth;
@@ -208,7 +201,6 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 lblTargetPokemon, comboTargetPokemon,
                 lblLevel, numericLevel,
                 lblTests, numericTests,
-                checkDetailedOutput,
                 btnRun,
                 progressBar,
                 lblStatus
@@ -355,14 +347,13 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                     return;
                 }
 
-                var config = new MoveRunner.MoveTestConfig
+                var config = new MoveRunner.MoveConfig
                 {
                     MoveToTest = move,
                     AttackerPokemon = attackerPokemon,
                     TargetPokemon = targetPokemon,
                     Level = (int)this.numericLevel.Value,
-                    NumberOfTests = (int)this.numericTests.Value,
-                    DetailedOutput = this.checkDetailedOutput.Checked
+                    NumberOfTests = (int)this.numericTests.Value
                 };
 
                 // Crear progress reporter
@@ -384,14 +375,20 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                     }
                 });
 
+                // Medir tiempo total de simulación
+                var totalStartTime = DateTime.Now;
+
                 // Ejecutar pruebas
                 var runner = new MoveRunner();
                 var stats = await runner.RunTestsAsync(config, progress);
 
-                // Mostrar resultados
-                DisplayResults(stats, config);
+                var totalEndTime = DateTime.Now;
+                var totalTime = (totalEndTime - totalStartTime).TotalSeconds;
 
-                this.lblStatus.Text = "Complete";
+                // Mostrar resultados
+                DisplayResults(stats, config, totalTime);
+
+                this.lblStatus.Text = $"Complete ({totalTime:F2}s)";
                 this.progressBar.Value = 100;
             }
             catch (Exception ex)
@@ -406,7 +403,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
         }
 
-        private void DisplayResults(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
+        private void DisplayResults(MoveRunner.MoveStatistics stats, MoveRunner.MoveConfig config, double totalTimeSeconds)
         {
             var provider = LocalizationService.Instance;
             var move = config.MoveToTest;
@@ -422,6 +419,8 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n");
             this.txtSummary.AppendText("Move Information\n");
             this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
+            this.txtSummary.AppendText($"Total Simulation Time: {totalTimeSeconds:F3} seconds\n");
+            this.txtSummary.AppendText($"Average Time per Test: {(totalTimeSeconds / config.NumberOfTests):F3} seconds\n\n");
             this.txtSummary.AppendText($"Move: {move.GetDisplayName(provider)}\n");
             this.txtSummary.AppendText($"  Type: {move.Type.GetDisplayName(provider)}\n");
             this.txtSummary.AppendText($"  Power: {move.Power}\n");
@@ -539,7 +538,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             UpdateActionsTable(stats, config);
         }
 
-        private void UpdateDamageTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
+        private void UpdateDamageTable(MoveRunner.MoveStatistics stats, MoveRunner.MoveConfig config)
         {
             var provider = LocalizationService.Instance;
             var dataTable = new DataTable();
@@ -575,7 +574,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.dgvDamage.DataSource = dataTable;
         }
 
-        private void UpdateStatusEffectsTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
+        private void UpdateStatusEffectsTable(MoveRunner.MoveStatistics stats, MoveRunner.MoveConfig config)
         {
             var provider = LocalizationService.Instance;
             var dataTable = new DataTable();
@@ -601,7 +600,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.dgvStatusEffects.DataSource = dataTable;
         }
 
-        private void UpdateActionsTable(MoveRunner.MoveTestStatistics stats, MoveRunner.MoveTestConfig config)
+        private void UpdateActionsTable(MoveRunner.MoveStatistics stats, MoveRunner.MoveConfig config)
         {
             var provider = LocalizationService.Instance;
             var dataTable = new DataTable();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
@@ -7,6 +8,7 @@ using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Combat.Utilities;
 using PokemonUltimate.Combat.Utilities.Extensions;
 using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.AI
 {
@@ -19,25 +21,30 @@ namespace PokemonUltimate.Combat.AI
     /// **Sub-Feature**: 2.7: Integration
     /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
     /// </remarks>
-    public class SmartAI : IActionProvider
+    public class SmartAI : ActionProviderBase
     {
         private readonly Random _random;
         private readonly double _switchThreshold; // HP percentage below which to consider switching
         private readonly double _switchChance; // Probability of switching when conditions are met
+        private readonly TargetResolver _targetResolver;
 
         /// <summary>
         /// Creates a new SmartAI instance.
         /// </summary>
+        /// <param name="targetResolver">The target resolver for resolving move targets. Cannot be null.</param>
         /// <param name="switchThreshold">HP percentage threshold (0.0-1.0) below which switching is considered. Default: 0.3 (30% HP).</param>
         /// <param name="switchChance">Probability (0.0-1.0) of switching when conditions are met. Default: 0.5 (50%).</param>
         /// <param name="seed">Optional seed for random number generator. If null, uses time-based seed.</param>
-        public SmartAI(double switchThreshold = 0.3, double switchChance = 0.5, int? seed = null)
+        public SmartAI(TargetResolver targetResolver, double switchThreshold = 0.3, double switchChance = 0.5, int? seed = null)
         {
+            if (targetResolver == null)
+                throw new ArgumentNullException(nameof(targetResolver));
             if (switchThreshold < 0.0 || switchThreshold > 1.0)
                 throw new ArgumentException(ErrorMessages.PercentMustBeBetween0And1, nameof(switchThreshold));
             if (switchChance < 0.0 || switchChance > 1.0)
                 throw new ArgumentException(ErrorMessages.PercentMustBeBetween0And1, nameof(switchChance));
 
+            _targetResolver = targetResolver;
             _switchThreshold = switchThreshold;
             _switchChance = switchChance;
             _random = seed.HasValue ? new Random(seed.Value) : new Random();
@@ -50,7 +57,7 @@ namespace PokemonUltimate.Combat.AI
         /// <param name="mySlot">The slot requesting an action. Cannot be null.</param>
         /// <returns>A BattleAction (UseMoveAction or SwitchAction), or null if no action available.</returns>
         /// <exception cref="ArgumentNullException">If field or mySlot is null.</exception>
-        public Task<BattleAction> GetAction(BattleField field, BattleSlot mySlot)
+        public override Task<BattleAction> GetAction(BattleField field, BattleSlot mySlot)
         {
             if (field == null)
                 throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
@@ -127,9 +134,8 @@ namespace PokemonUltimate.Combat.AI
             // Pick a random move
             var selectedMove = availableMoves[_random.Next(availableMoves.Count)];
 
-            // Get valid targets for this move
-            var targetResolver = new TargetResolver();
-            var validTargets = targetResolver.GetValidTargets(mySlot, selectedMove.Move, field);
+            // Get basic valid targets (without redirections - those are applied by TargetResolutionStep)
+            var validTargets = _targetResolver.GetBasicTargets(mySlot, selectedMove.Move, field);
 
             if (validTargets.Count == 0)
             {
@@ -150,6 +156,20 @@ namespace PokemonUltimate.Combat.AI
 
             // Return UseMoveAction
             return new UseMoveAction(mySlot, target, selectedMove);
+        }
+
+        /// <summary>
+        /// Selects a random Pokemon for automatic switches (when Pokemon faint).
+        /// Uses the default random selection behavior.
+        /// </summary>
+        public override Task<PokemonInstance> SelectAutoSwitch(BattleField field, BattleSlot mySlot, IReadOnlyList<PokemonInstance> availablePokemon)
+        {
+            if (availablePokemon == null || availablePokemon.Count == 0)
+                return Task.FromResult<PokemonInstance>(null);
+
+            // Select a random Pokemon from available switches
+            var selectedPokemon = availablePokemon[_random.Next(availablePokemon.Count)];
+            return Task.FromResult(selectedPokemon);
         }
     }
 }

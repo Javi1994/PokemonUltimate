@@ -127,12 +127,12 @@ public class BattleManager : MonoBehaviour
             Debug.Log("Creating CombatEngine...");
             _engine = CreateCombatEngine();
 
-            // Create action providers
+            // Create action providers using shared TargetResolver from engine
             Debug.Log($"Creating action providers... (Enemy AI: {(useRandomAIForEnemy ? "RandomAI" : "PlayerInput")})");
-            var playerProvider = new PlayerInputProvider(battleView);
+            var playerProvider = new PlayerInputProvider(battleView, _engine.TargetResolver);
             IActionProvider enemyProvider = useRandomAIForEnemy
-                ? new RandomAI()
-                : new PlayerInputProvider(battleView); // For testing
+                ? new RandomAI(_engine.TargetResolver)
+                : new PlayerInputProvider(battleView, _engine.TargetResolver); // For testing
 
             // Initialize battle
             Debug.Log("Initializing battle...");

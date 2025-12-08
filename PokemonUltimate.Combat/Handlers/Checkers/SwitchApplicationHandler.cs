@@ -1,3 +1,4 @@
+using System.Linq;
 using PokemonUltimate.Combat.Field;
 using PokemonUltimate.Combat.Handlers.Definition;
 using PokemonUltimate.Core.Data.Enums;
@@ -28,13 +29,30 @@ namespace PokemonUltimate.Combat.Handlers.Checkers
             if (slot == null || newPokemon == null || field == null)
                 return false;
 
-            // Slot must not be empty (must have a Pokemon to switch out)
-            if (slot.IsEmpty)
-                return false;
-
             // Side must exist
             if (slot.Side == null)
                 return false;
+
+            // Slot can be empty (for filling empty slots) or have a Pokemon (for switching)
+            // Empty slots are valid when filling them with a new Pokemon
+            // Non-empty slots are valid when switching Pokemon
+
+            // Additional validation: new Pokemon must not be fainted
+            if (newPokemon.IsFainted)
+                return false;
+
+            // Additional validation: new Pokemon must not already be in an active slot
+            var side = slot.Side;
+            if (side != null)
+            {
+                var activePokemon = side.Slots
+                    .Where(s => !s.IsEmpty && s.Pokemon != null)
+                    .Select(s => s.Pokemon)
+                    .ToHashSet();
+
+                if (activePokemon.Contains(newPokemon))
+                    return false; // Pokemon is already active in another slot
+            }
 
             return true;
         }

@@ -203,7 +203,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 Color color = entry.Level switch
                 {
                     UIBattleLogger.LogLevel.Debug => Color.Gray,
-                    UIBattleLogger.LogLevel.Info => Color.LightGreen,
+                    UIBattleLogger.LogLevel.Info => Color.Green, // Green for battle info and damage messages
                     UIBattleLogger.LogLevel.Warning => Color.Yellow,
                     UIBattleLogger.LogLevel.Error => Color.Red,
                     UIBattleLogger.LogLevel.BattleEvent => Color.Cyan,

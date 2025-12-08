@@ -381,10 +381,13 @@ namespace PokemonUltimate.Core.Data.Blueprints
         /// <summary>
         /// Gets a random non-hidden ability for this Pokemon.
         /// </summary>
-        /// <param name="randomProvider">Optional random provider. If null, creates a new RandomProvider.</param>
-        public AbilityData GetRandomAbility(IRandomProvider randomProvider = null)
+        /// <param name="randomProvider">Random provider for generating random values. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">If randomProvider is null.</exception>
+        public AbilityData GetRandomAbility(IRandomProvider randomProvider)
         {
-            randomProvider = randomProvider ?? new RandomProvider();
+            if (randomProvider == null)
+                throw new ArgumentNullException(nameof(randomProvider));
+
             if (Ability2 != null && randomProvider.Next(2) == 1)
                 return Ability2;
             return Ability1;

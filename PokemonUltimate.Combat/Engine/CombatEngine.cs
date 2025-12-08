@@ -1,20 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Damage;
 using PokemonUltimate.Combat.Damage.Definition;
-using PokemonUltimate.Combat.Engine.Processors;
+using PokemonUltimate.Combat.Engine.BattleFlow;
+using PokemonUltimate.Combat.Engine.BattleFlow.Definition;
+using PokemonUltimate.Combat.Engine.BattleFlow.Steps;
+using PokemonUltimate.Combat.Engine.Service;
 using PokemonUltimate.Combat.Engine.Validation;
 using PokemonUltimate.Combat.Engine.Validation.Definition;
-using PokemonUltimate.Combat.Events;
 using PokemonUltimate.Combat.Field;
 using PokemonUltimate.Combat.Handlers.Registry;
 using PokemonUltimate.Combat.Infrastructure.Constants;
-using PokemonUltimate.Combat.Infrastructure.Factories;
+using PokemonUltimate.Combat.Infrastructure.Events;
 using PokemonUltimate.Combat.Infrastructure.Factories.Definition;
 using PokemonUltimate.Combat.Infrastructure.Logging;
 using PokemonUltimate.Combat.Infrastructure.Logging.Definition;
 using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
+using PokemonUltimate.Combat.Infrastructure.Statistics;
 using PokemonUltimate.Combat.Utilities;
 using PokemonUltimate.Combat.View.Definition;
 using PokemonUltimate.Core.Data.Constants;
@@ -38,18 +42,18 @@ namespace PokemonUltimate.Combat.Engine
         private readonly IRandomProvider _randomProvider;
         private readonly IBattleStateValidator _stateValidator;
         private readonly IBattleLogger _logger;
+        private readonly IDamagePipeline _damagePipeline;
+        private readonly CombatEffectHandlerRegistry _handlerRegistry;
+        private readonly AccuracyChecker _accuracyChecker;
+        private readonly Utilities.TargetResolver _targetResolver;
 
-        // New processors and services
-        private readonly BattleInitializer _battleInitializer;
-        private readonly BattleStartProcessor _battleStartProcessor;
-        private readonly BattleEndProcessor _battleEndProcessor;
-        private BattleLoop _battleLoop;
-        private TurnExecutor _turnExecutor;
+        // Battle flow executor
+        private BattleFlowExecutor _battleFlowExecutor;
+        private BattleFlowContext _battleFlowContext;
 
-        private IBattleView _view;
-        private IActionProvider _playerProvider;
-        private IActionProvider _enemyProvider;
-        private BattleEventBus _eventBus;
+        // Tracked statistics collectors for cleanup
+        private readonly List<BattleStatisticsCollector> _statisticsCollectors = new List<BattleStatisticsCollector>();
+
 
         /// <summary>
         /// The battlefield for this battle.
@@ -59,12 +63,19 @@ namespace PokemonUltimate.Combat.Engine
         /// <summary>
         /// The action queue for processing battle actions.
         /// </summary>
-        public BattleQueue Queue { get; private set; }
+        public BattleQueueService QueueService { get; private set; }
 
         /// <summary>
         /// The current outcome of the battle.
         /// </summary>
         public BattleOutcome Outcome { get; private set; }
+
+        /// <summary>
+        /// The shared TargetResolver instance for this battle.
+        /// Available before Initialize is called, so providers can use it.
+        /// </summary>
+        public Utilities.TargetResolver TargetResolver => _targetResolver;
+
 
         /// <summary>
         /// Creates a new CombatEngine with required dependencies.
@@ -95,32 +106,21 @@ namespace PokemonUltimate.Combat.Engine
             // Create dependencies
             _stateValidator = stateValidator ?? new BattleStateValidator();
             _logger = logger ?? new BattleLogger("CombatEngine");
-            _eventBus = new BattleEventBus();
 
-            // Create processors (will be initialized with Queue/View in Initialize)
-            _battleInitializer = new BattleInitializer(_battleFieldFactory, _battleQueueFactory, _stateValidator);
-            _battleStartProcessor = new BattleStartProcessor(_eventBus);
-            _battleEndProcessor = new BattleEndProcessor(_eventBus);
+            // Store dependencies for use in Initialize
+            _damagePipeline = damagePipeline ?? new DamagePipeline(_randomProvider);
+            _handlerRegistry = handlerRegistry ?? CombatEffectHandlerRegistry.CreateDefault();
+            _accuracyChecker = accuracyChecker ?? new AccuracyChecker(_randomProvider);
+            _targetResolver = new Utilities.TargetResolver(); // Create shared instance
 
-            // Processors will be created in Initialize after Queue and View are available
-            _turnExecutor = null;
-            _battleLoop = null;
-
-            // Keep unused dependencies for compatibility (used elsewhere in the system)
-            _ = accuracyChecker ?? new AccuracyChecker(_randomProvider);
-            _ = damagePipeline ?? new DamagePipeline(_randomProvider);
-            // Handler registry is now created and initialized in UseMoveAction when needed
+            // Battle flow executor will be created in Initialize
+            _battleFlowExecutor = null;
+            _battleFlowContext = null;
         }
 
         /// <summary>
-        /// Gets the event bus for this battle.
-        /// Handles BattleEvent events for statistics/logging.
-        /// Processors handle abilities/items directly without using the event bus.
-        /// </summary>
-        public BattleEventBus EventBus => _eventBus;
-
-        /// <summary>
         /// Initializes the combat engine with parties and action providers.
+        /// Sets up the battle flow context and executor with all steps.
         /// </summary>
         /// <param name="rules">Battle configuration. Cannot be null.</param>
         /// <param name="playerParty">Player's Pokemon party. Cannot be null.</param>
@@ -128,6 +128,7 @@ namespace PokemonUltimate.Combat.Engine
         /// <param name="playerProvider">Provider for player actions. Cannot be null.</param>
         /// <param name="enemyProvider">Provider for enemy actions. Cannot be null.</param>
         /// <param name="view">Battle view for visual feedback. Cannot be null.</param>
+        /// <param name="isDebugMode">Whether to enable debug events. Defaults to false.</param>
         /// <exception cref="ArgumentNullException">If any parameter is null.</exception>
         public void Initialize(
             BattleRules rules,
@@ -135,7 +136,8 @@ namespace PokemonUltimate.Combat.Engine
             IReadOnlyList<PokemonInstance> enemyParty,
             IActionProvider playerProvider,
             IActionProvider enemyProvider,
-            IBattleView view)
+            IBattleView view,
+            bool isDebugMode = false)
         {
             if (rules == null)
                 throw new ArgumentNullException(nameof(rules));
@@ -150,83 +152,91 @@ namespace PokemonUltimate.Combat.Engine
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
 
-            _playerProvider = playerProvider;
-            _enemyProvider = enemyProvider;
-            _view = view;
+            // Create battle flow context
+            _battleFlowContext = new BattleFlowContext
+            {
+                Rules = rules,
+                PlayerParty = playerParty,
+                EnemyParty = enemyParty,
+                PlayerProvider = playerProvider,
+                EnemyProvider = enemyProvider,
+                View = view,
+                StateValidator = _stateValidator,
+                Logger = _logger,
+                Engine = this, // Provide reference to engine for features
+                TargetResolver = _targetResolver, // Share TargetResolver instance
+                IsDebugMode = isDebugMode
+            };
 
-            // Use BattleInitializer
-            (Field, Queue) = _battleInitializer.Initialize(
-                rules, playerParty, enemyParty, playerProvider, enemyProvider);
+            // Create battle flow steps
+            var steps = new List<IBattleFlowStep>
+            {
+                // === FASE 1: SETUP ===
+                new CreateFieldStep(_battleFieldFactory),
+                new AssignActionProvidersStep(),
+                new CreateQueueStep(_battleQueueFactory),
+                new ValidateInitialStateStep(),
+                new CreateDependenciesStep(_randomProvider, _damagePipeline, _handlerRegistry, _accuracyChecker),
 
-            Outcome = BattleOutcome.Ongoing;
+                // === FASE 2: EJECUCIÓN ===
+                new BattleStartFlowStep(),
+                new ExecuteBattleLoopStep(),
 
-            // Create processors that need Queue/View (now available)
-            var turnOrderResolver = new TurnOrderResolver(_randomProvider);
-            var turnStartProcessor = new TurnStartProcessor(_eventBus);
-            var actionCollectionProcessor = new ActionCollectionProcessor(_randomProvider);
-            var actionSortingProcessor = new ActionSortingProcessor(turnOrderResolver);
-            var faintedSwitchingProcessor = new FaintedPokemonSwitchingProcessor(_randomProvider, _logger);
+                // === FASE 3: CLEANUP ===
+                new BattleEndFlowStep()
+            };
 
-            var damageContextFactory = new DamageContextFactory();
-            var endOfTurnEffectsProcessor = new EndOfTurnEffectsProcessor(damageContextFactory);
-            var durationDecrementProcessor = new DurationDecrementProcessor();
-            var turnEndProcessor = new TurnEndProcessor();
-
-            // Create processors for ActionProcessorObserver
-            var damageTakenProcessor = new DamageTakenProcessor();
-            var contactReceivedProcessor = new ContactReceivedProcessor();
-            var weatherChangeProcessor = new WeatherChangeProcessor();
-            var switchInProcessor = new SwitchInProcessor(damageContextFactory);
-
-            // Create TurnExecutor
-            _turnExecutor = new TurnExecutor(
-                turnStartProcessor,
-                actionCollectionProcessor,
-                actionSortingProcessor,
-                faintedSwitchingProcessor,
-                endOfTurnEffectsProcessor,
-                durationDecrementProcessor,
-                turnEndProcessor,
-                _eventBus,
-                Queue,
-                view,
-                _stateValidator,
-                _logger,
-                turnOrderResolver,
-                damageTakenProcessor,
-                contactReceivedProcessor,
-                weatherChangeProcessor,
-                switchInProcessor);
-
-            // Create BattleLoop
-            _battleLoop = new BattleLoop(
-                _eventBus,
-                _logger,
-                async (turnNumber) => await _turnExecutor.ExecuteTurn(Field, turnNumber));
+            // Create battle flow executor
+            _battleFlowExecutor = new BattleFlowExecutor(steps, _stateValidator, _logger);
         }
 
         /// <summary>
         /// Runs the complete battle until a conclusion is reached.
+        /// Executes the unified battle flow using steps.
         /// </summary>
         /// <returns>The detailed battle result.</returns>
         public async Task<BattleResult> RunBattle()
         {
-            if (Field == null)
+            if (_battleFlowExecutor == null || _battleFlowContext == null)
                 throw new InvalidOperationException("CombatEngine must be initialized before running battle.");
 
-            // Process battle start
-            await _battleStartProcessor.ProcessAsync(Field);
+            // Execute the complete battle flow (use ConfigureAwait(false) to avoid capturing context)
+            await _battleFlowExecutor.ExecuteFlow(_battleFlowContext).ConfigureAwait(false);
 
-            // Run battle loop
-            var result = await _battleLoop.RunBattle(Field, Outcome);
+            // Update properties from context
+            Field = _battleFlowContext.Field;
+            QueueService = _battleFlowContext.QueueService;
+            Outcome = _battleFlowContext.Outcome;
 
-            // Update outcome from result
-            Outcome = result.Outcome;
+            return _battleFlowContext.Result;
+        }
 
-            // Process battle end
-            _battleEndProcessor.ProcessBattleEnd(Field, result);
+        /// <summary>
+        /// Registers a statistics collector for automatic cleanup on dispose.
+        /// </summary>
+        /// <param name="collector">The statistics collector to track.</param>
+        internal void RegisterStatisticsCollector(BattleStatisticsCollector collector)
+        {
+            if (collector == null)
+                return;
 
-            return result;
+            if (!_statisticsCollectors.Contains(collector))
+            {
+                _statisticsCollectors.Add(collector);
+            }
+        }
+
+        /// <summary>
+        /// Cleans up resources, unsubscribing all tracked statistics collectors.
+        /// </summary>
+        public void Dispose()
+        {
+            // Unsubscribe all tracked statistics collectors
+            foreach (var collector in _statisticsCollectors)
+            {
+                collector.Unsubscribe();
+            }
+            _statisticsCollectors.Clear();
         }
 
         /// <summary>
@@ -235,10 +245,10 @@ namespace PokemonUltimate.Combat.Engine
         /// <param name="turnNumber">The current turn number (for event publishing).</param>
         public async Task RunTurn(int turnNumber = 0)
         {
-            if (Field == null)
+            if (_battleFlowContext == null || _battleFlowContext.TurnEngine == null)
                 throw new InvalidOperationException("CombatEngine must be initialized before running turn.");
 
-            await _turnExecutor.ExecuteTurn(Field, turnNumber);
+            await _battleFlowContext.TurnEngine.ExecuteTurn(_battleFlowContext.Field, turnNumber);
         }
 
     }

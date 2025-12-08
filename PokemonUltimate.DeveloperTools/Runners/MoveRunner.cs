@@ -2,69 +2,73 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PokemonUltimate.Combat;
-using PokemonUltimate.Combat.Actions;
-using PokemonUltimate.Combat.Engine;
-using PokemonUltimate.Combat.Field;
-using PokemonUltimate.Combat.Statistics;
-using PokemonUltimate.Combat.View;
+using PokemonUltimate.Combat.Infrastructure.Simulation;
+using PokemonUltimate.Combat.Infrastructure.Statistics;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Domain.Instances;
 using PokemonUltimate.Core.Domain.Instances.Move;
 using PokemonUltimate.Core.Infrastructure.Factories;
-using PokemonUltimate.Core.Domain.Instances;
+using InfrastructureStats = PokemonUltimate.Combat.Infrastructure.Statistics.BattleStatistics;
 
 namespace PokemonUltimate.DeveloperTools.Runners
 {
+    /// <summary>
+    /// Move runner using the new MoveSimulator system.
+    /// Tests individual moves without full battle simulation.
+    /// </summary>
+    /// <remarks>
+    /// **Feature**: 6: Development Tools
+    /// **Sub-Feature**: 6.6: Move Debugger
+    /// **Documentation**: See `docs/features/6-development-tools/6.6-move-debugger/README.md`
+    /// </remarks>
     public class MoveRunner
     {
         /// <summary>
         /// Move test statistics wrapper for compatibility with existing UI code.
         /// Uses the new Statistics System internally.
         /// </summary>
-        public class MoveTestStatistics
+        public class MoveStatistics
         {
-            private readonly BattleStatistics _internalStats;
+            private readonly InfrastructureStats _internalStats;
+            private readonly double _totalSimulationTimeSeconds;
 
-            public MoveTestStatistics(BattleStatistics internalStats)
+            public MoveStatistics(InfrastructureStats internalStats, double totalSimulationTimeSeconds = 0)
             {
                 _internalStats = internalStats ?? throw new ArgumentNullException(nameof(internalStats));
+                _totalSimulationTimeSeconds = totalSimulationTimeSeconds;
             }
+
+            /// <summary>
+            /// Total simulation time in seconds.
+            /// </summary>
+            public double TotalSimulationTimeSeconds => _totalSimulationTimeSeconds;
 
             public List<int> DamageValues
             {
                 get
                 {
-                    // Aggregate all damage values from all Pokemon
+                    // Extract individual damage values from DamageValuesByMove dictionary
+                    // This gives us the actual damage values for each hit, not just totals
                     var allDamage = new List<int>();
-                    foreach (var damageList in _internalStats.DamageStats.Values)
+                    foreach (var moveDamageList in _internalStats.DamageValuesByMove.Values)
                     {
-                        allDamage.AddRange(damageList);
+                        allDamage.AddRange(moveDamageList);
                     }
                     return allDamage;
                 }
             }
 
             public int CriticalHits => _internalStats.CriticalHits;
-            public int Misses => _internalStats.Misses;
+            public int Misses => _internalStats.MissedMoves;
 
             public Dictionary<string, int> StatusEffectsCaused
             {
                 get
                 {
-                    // Aggregate status effects from all Pokemon
-                    var aggregated = new Dictionary<string, int>();
-                    foreach (var pokemonStats in _internalStats.StatusEffectStats.Values)
-                    {
-                        foreach (var kvp in pokemonStats)
-                        {
-                            if (!aggregated.ContainsKey(kvp.Key))
-                                aggregated[kvp.Key] = 0;
-                            aggregated[kvp.Key] += kvp.Value;
-                        }
-                    }
-                    return aggregated;
+                    // The new system tracks StatusEffectsApplied as (Effect name -> count)
+                    return new Dictionary<string, int>(_internalStats.StatusEffectsApplied);
                 }
             }
 
@@ -72,109 +76,104 @@ namespace PokemonUltimate.DeveloperTools.Runners
             {
                 get
                 {
-                    // Aggregate volatile status effects from all Pokemon
-                    var aggregated = new Dictionary<string, int>();
-                    foreach (var pokemonStats in _internalStats.VolatileStatusStats.Values)
-                    {
-                        foreach (var kvp in pokemonStats)
-                        {
-                            var key = $"Volatile_{kvp.Key}";
-                            if (!aggregated.ContainsKey(key))
-                                aggregated[key] = 0;
-                            aggregated[key] += kvp.Value;
-                        }
-                    }
-                    return aggregated;
+                    // The new system doesn't track volatile status effects separately
+                    // Return empty dictionary for now
+                    return new Dictionary<string, int>();
                 }
             }
 
-            public Dictionary<string, int> ActionsGenerated => _internalStats.ActionTypeStats;
+            public Dictionary<string, int> ActionsGenerated => _internalStats.ActionsByType;
         }
 
-        public class MoveTestConfig
+        /// <summary>
+        /// Configuration for move testing.
+        /// </summary>
+        public class MoveConfig
         {
+            /// <summary>
+            /// The move to test. Cannot be null.
+            /// </summary>
             public MoveData MoveToTest { get; set; } = null!;
+
+            /// <summary>
+            /// The Pokemon using the move. Cannot be null.
+            /// </summary>
             public PokemonSpeciesData AttackerPokemon { get; set; } = null!;
+
+            /// <summary>
+            /// The target Pokemon. Cannot be null.
+            /// </summary>
             public PokemonSpeciesData TargetPokemon { get; set; } = null!;
+
+            /// <summary>
+            /// Level for both Pokemon. Defaults to 50.
+            /// </summary>
             public int Level { get; set; } = 50;
+
+            /// <summary>
+            /// Number of move executions to test. Defaults to 100.
+            /// </summary>
             public int NumberOfTests { get; set; } = 100;
+
+            /// <summary>
+            /// Whether to show detailed output. Currently unused but kept for future use.
+            /// </summary>
             public bool DetailedOutput { get; set; } = false;
         }
 
-        public async Task<MoveTestStatistics> RunTestsAsync(MoveTestConfig config, IProgress<int>? progress = null)
+        /// <summary>
+        /// Runs move tests using MoveSimulator.
+        /// </summary>
+        /// <param name="config">Move test configuration. Cannot be null.</param>
+        /// <param name="progress">Optional progress reporter (0-100).</param>
+        /// <returns>Move statistics from all tests.</returns>
+        /// <exception cref="ArgumentNullException">If config is null.</exception>
+        public async Task<MoveStatistics> RunTestsAsync(MoveConfig config, IProgress<int>? progress = null)
         {
-            // Create statistics collector (shared across all tests)
-            var statisticsCollector = new BattleStatisticsCollector();
-            var internalStats = statisticsCollector.GetStatistics();
-            var stats = new MoveTestStatistics(internalStats);
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+            if (config.MoveToTest == null)
+                throw new ArgumentException("MoveToTest cannot be null", nameof(config));
+            if (config.AttackerPokemon == null)
+                throw new ArgumentException("AttackerPokemon cannot be null", nameof(config));
+            if (config.TargetPokemon == null)
+                throw new ArgumentException("TargetPokemon cannot be null", nameof(config));
+            if (config.NumberOfTests <= 0)
+                throw new ArgumentException("NumberOfTests must be greater than 0", nameof(config));
+            if (config.Level <= 0 || config.Level > 100)
+                throw new ArgumentException("Level must be between 1 and 100", nameof(config));
 
-            // Reset statistics at the start of the batch
-            statisticsCollector.Reset();
-
-            for (int i = 0; i < config.NumberOfTests; i++)
-            {
-                await RunSingleTestAsync(config, statisticsCollector);
-
-                // Statistics accumulate across all tests (not reset between tests)
-
-                // Actualizar progreso solo cada 1% o cada 10 tests (lo que sea menor)
-                // Esto previene stack overflow con muchas simulaciones
-                var currentPercent = (i + 1) * 100 / config.NumberOfTests;
-                var reportInterval = Math.Max(1, config.NumberOfTests / 100); // Al menos cada 1%
-                if (progress != null && ((i + 1) % reportInterval == 0 || i == config.NumberOfTests - 1))
-                {
-                    progress.Report(currentPercent);
-                }
-
-                // Permitir que la UI se actualice
-                await Task.Yield();
-            }
-
-            return stats;
-        }
-
-        private async Task RunSingleTestAsync(MoveTestConfig config, BattleStatisticsCollector statisticsCollector)
-        {
-            // Crear Pokemon
+            // Create initial Pokemon instances (MoveSimulator will create fresh ones for each test)
             var attacker = PokemonFactory.Create(config.AttackerPokemon, config.Level);
             var target = PokemonFactory.Create(config.TargetPokemon, config.Level);
-
-            // Crear campo de batalla
-            var rules = new BattleRules { PlayerSlots = 1, EnemySlots = 1 };
-            var playerParty = new[] { attacker };
-            var enemyParty = new[] { target };
-
-            var field = new BattleField();
-            field.Initialize(rules, playerParty, enemyParty);
-            var playerSlot = field.PlayerSide.Slots[0];
-            var enemySlot = field.EnemySide.Slots[0];
-
-            // Crear instancia del movimiento
             var moveInstance = new MoveInstance(config.MoveToTest);
-            if (!attacker.Moves.Contains(moveInstance))
+
+            // Configure simulation
+            var simulationConfig = new MoveSimulator.MoveSimulationConfig
             {
-                attacker.Moves.Add(moveInstance);
-            }
+                NumberOfTests = config.NumberOfTests,
+                UseRandomSeeds = true, // Each test uses different random seed
+                ResetStatisticsBetweenTests = false // Accumulate statistics across all tests
+            };
 
-            // Crear acción de usar movimiento
-            var useMoveAction = new UseMoveAction(playerSlot, enemySlot, moveInstance);
+            // Measure total simulation time
+            var simulationStartTime = DateTime.Now;
 
-            // Create a temporary queue to use the statistics system
-            var queue = new BattleQueue();
-            queue.AddObserver(statisticsCollector);
+            // Run simulation using MoveSimulator
+            var results = await MoveSimulator.SimulateAsync(
+                moveInstance,
+                attacker,
+                target,
+                simulationConfig,
+                progress);
 
-            // Note: We don't call OnBattleStart here because it resets statistics
-            // Statistics will accumulate across all tests in the batch
-            // Reset() is called once at the start of RunTestsAsync
+            var simulationEndTime = DateTime.Now;
+            var totalSimulationTime = (simulationEndTime - simulationStartTime).TotalSeconds;
 
-            // Enqueue the action
-            queue.Enqueue(useMoveAction);
+            // Wrap results in compatibility wrapper (use aggregated statistics)
+            var stats = new MoveStatistics(results.AggregatedStatistics, totalSimulationTime);
 
-            // Process queue - statistics will be tracked automatically
-            await queue.ProcessQueue(field, NullBattleView.Instance);
-
-            // Remove observer after test to clean up
-            queue.RemoveObserver(statisticsCollector);
+            return stats;
         }
     }
 }

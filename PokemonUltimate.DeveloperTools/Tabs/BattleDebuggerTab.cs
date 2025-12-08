@@ -7,11 +7,11 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
 using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Runners;
 using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
 {
@@ -21,7 +21,6 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         private ComboBox comboEnemyPokemon = null!;
         private NumericUpDown numericLevel = null!;
         private NumericUpDown numericBattles = null!;
-        private CheckBox checkDetailedOutput = null!;
         private Button btnRun = null!;
         private TabControl tabResults = null!;
         private TabPage tabSummary = null!;
@@ -46,7 +45,6 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.comboEnemyPokemon = new ComboBox();
             this.numericLevel = new NumericUpDown();
             this.numericBattles = new NumericUpDown();
-            this.checkDetailedOutput = new CheckBox();
             this.btnRun = new Button();
             this.tabResults = new TabControl();
             this.tabSummary = new TabPage();
@@ -153,11 +151,6 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.numericBattles.Value = 1000;
             yPos += spacing;
 
-            this.checkDetailedOutput.Text = "Detailed Output";
-            this.checkDetailedOutput.Location = new Point(leftMargin, yPos);
-            this.checkDetailedOutput.AutoSize = true;
-            yPos += 45;
-
             this.btnRun.Text = "Run Battles";
             this.btnRun.Location = new Point(leftMargin, yPos);
             this.btnRun.Width = controlWidth;
@@ -182,7 +175,6 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 lblEnemyPokemon, comboEnemyPokemon,
                 lblLevel, numericLevel,
                 lblBattles, numericBattles,
-                checkDetailedOutput,
                 btnRun,
                 progressBar,
                 lblStatus
@@ -294,12 +286,10 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                     PlayerPokemon = playerPokemon,
                     EnemyPokemon = enemyPokemon,
                     Level = (int)this.numericLevel.Value,
-                    NumberOfBattles = (int)this.numericBattles.Value,
-                    DetailedOutput = this.checkDetailedOutput.Checked
+                    NumberOfBattles = (int)this.numericBattles.Value
                 };
 
-                // Crear progress reporter
-                // Usar BeginInvoke para evitar bloqueos y stack overflow
+                // Crear progress reporter - solo se actualiza al final
                 var progress = new Progress<int>(percent =>
                 {
                     if (this.InvokeRequired)
@@ -307,24 +297,30 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                         this.BeginInvoke(new Action(() =>
                         {
                             this.progressBar.Value = Math.Min(100, Math.Max(0, percent));
-                            this.lblStatus.Text = $"Running battles... {percent}%";
+                            this.lblStatus.Text = percent == 100 ? "Complete" : $"Running battles... {percent}%";
                         }));
                     }
                     else
                     {
                         this.progressBar.Value = Math.Min(100, Math.Max(0, percent));
-                        this.lblStatus.Text = $"Running battles... {percent}%";
+                        this.lblStatus.Text = percent == 100 ? "Complete" : $"Running battles... {percent}%";
                     }
                 });
+
+                // Medir tiempo total de simulación
+                var totalStartTime = DateTime.Now;
 
                 // Ejecutar batallas
                 var runner = new BattleRunner();
                 var stats = await runner.RunBattlesAsync(config, progress);
 
-                // Mostrar resultados
-                DisplayResults(stats, config);
+                var totalEndTime = DateTime.Now;
+                var totalTime = (totalEndTime - totalStartTime).TotalSeconds;
 
-                this.lblStatus.Text = "Complete";
+                // Mostrar resultados
+                DisplayResults(stats, config, totalTime);
+
+                this.lblStatus.Text = $"Complete ({totalTime:F2}s)";
                 this.progressBar.Value = 100;
             }
             catch (Exception ex)
@@ -340,7 +336,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             }
         }
 
-        private void DisplayResults(BattleRunner.BattleStatistics stats, BattleRunner.BattleConfig config)
+        private void DisplayResults(BattleRunner.BattleStatistics stats, BattleRunner.BattleConfig config, double totalTimeSeconds)
         {
             // Obtener nombres traducidos de los Pokemon
             var provider = LocalizationService.Instance;
@@ -357,7 +353,11 @@ namespace PokemonUltimate.DeveloperTools.Tabs
             this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n");
             this.txtSummary.AppendText("Battle Summary\n");
             this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
-            this.txtSummary.AppendText($"Total Battles: {totalBattles}\n\n");
+            this.txtSummary.AppendText($"Total Battles: {totalBattles}\n");
+            this.txtSummary.AppendText($"Total Simulation Time: {totalTimeSeconds:F3} seconds\n");
+            this.txtSummary.AppendText($"Average Time per Battle: {(totalTimeSeconds / totalBattles):F3} seconds\n");
+            this.txtSummary.AppendText($"Total Turns: {stats.TotalTurns}\n");
+            this.txtSummary.AppendText($"Average Turns per Battle: {stats.AverageTurnsPerBattle:F2}\n\n");
             this.txtSummary.AppendText($"{playerName} Won: {stats.PlayerWins} ({stats.PlayerWins * 100.0 / totalBattles:F1}%)\n");
             this.txtSummary.AppendText($"{enemyName} Won: {stats.EnemyWins} ({stats.EnemyWins * 100.0 / totalBattles:F1}%)\n");
             if (stats.Draws > 0)
@@ -373,6 +373,10 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                 this.txtSummary.AppendText("Most Used Moves\n");
                 this.txtSummary.AppendText("═══════════════════════════════════════════════════════════════\n\n");
 
+                // Determinar qué Pokemon es del jugador y cuál del enemigo
+                var playerPokemonName = config.PlayerPokemon?.Name;
+                var enemyPokemonName = config.EnemyPokemon?.Name;
+
                 foreach (var pokemonStats in stats.MoveUsageStats.OrderByDescending(p => p.Value.Values.Sum()))
                 {
                     var pokemonName = pokemonStats.Key;
@@ -385,7 +389,29 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                         ? pokemonSpecies.GetDisplayName(LocalizationService.Instance)
                         : pokemonName;
 
-                    this.txtSummary.AppendText($"{translatedPokemonName} (Total Moves: {totalMoves}):\n");
+                    // Determinar si es del jugador o del enemigo
+                    string teamLabel;
+                    if (playerPokemonName != null && pokemonName == playerPokemonName)
+                    {
+                        teamLabel = $"[{playerName}]";
+                    }
+                    else if (enemyPokemonName != null && pokemonName == enemyPokemonName)
+                    {
+                        teamLabel = $"[{enemyName}]";
+                    }
+                    else
+                    {
+                        // Si no podemos determinar por nombre, usar PlayerMoveUsage/EnemyMoveUsage
+                        // Si algún movimiento de este Pokemon está en PlayerMoveUsage, es del jugador
+                        var pokemonMoves = pokemonStats.Value.Keys.ToList();
+                        var playerMoveCount = pokemonMoves.Count(m => stats.PlayerMoveUsage.ContainsKey(m));
+                        var enemyMoveCount = pokemonMoves.Count(m => stats.EnemyMoveUsage.ContainsKey(m));
+
+                        // Si hay más movimientos en PlayerMoveUsage, es del jugador
+                        teamLabel = playerMoveCount >= enemyMoveCount ? $"[{playerName}]" : $"[{enemyName}]";
+                    }
+
+                    this.txtSummary.AppendText($"{translatedPokemonName} {teamLabel} (Total Moves: {totalMoves}):\n");
                     foreach (var move in moves)
                     {
                         // Obtener nombre traducido del movimiento
@@ -441,6 +467,7 @@ namespace PokemonUltimate.DeveloperTools.Tabs
         {
             var provider = LocalizationService.Instance;
             var dataTable = new DataTable();
+            dataTable.Columns.Add("Team", typeof(string));
             dataTable.Columns.Add("Pokemon", typeof(string));
             dataTable.Columns.Add("Move", typeof(string));
             dataTable.Columns.Add("Uses", typeof(int));
@@ -467,7 +494,12 @@ namespace PokemonUltimate.DeveloperTools.Tabs
                         : move.Key;
 
                     var percentage = (move.Value * 100.0) / totalMoves;
-                    dataTable.Rows.Add(translatedPokemonName, translatedMoveName, move.Value, $"{percentage:F1}%");
+                    // Determinar equipo usando PlayerMoveUsage/EnemyMoveUsage
+                    var pokemonMoves = pokemonStats.Value.Keys.ToList();
+                    var playerMoveCount = pokemonMoves.Count(m => stats.PlayerMoveUsage.ContainsKey(m));
+                    var enemyMoveCount = pokemonMoves.Count(m => stats.EnemyMoveUsage.ContainsKey(m));
+                    var team = playerMoveCount >= enemyMoveCount ? "Player" : "Enemy";
+                    dataTable.Rows.Add(team, translatedPokemonName, translatedMoveName, move.Value, $"{percentage:F1}%");
                 }
             }
 

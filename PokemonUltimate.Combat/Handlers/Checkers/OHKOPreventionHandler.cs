@@ -14,7 +14,7 @@ namespace PokemonUltimate.Combat.Handlers.Checkers
 {
     /// <summary>
     /// Handler unificado para prevención de OHKO (Focus Sash, Sturdy).
-    /// Puede verificar comportamientos (usado en Actions) y procesar efectos (usado en Processors).
+    /// Puede verificar comportamientos (usado en Actions) y procesar efectos (usado en Steps).
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System

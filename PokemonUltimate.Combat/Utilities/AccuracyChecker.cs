@@ -32,20 +32,6 @@ namespace PokemonUltimate.Combat.Utilities
         }
 
         /// <summary>
-        /// Checks if a move hits its target.
-        /// </summary>
-        /// <param name="user">The slot using the move.</param>
-        /// <param name="target">The target slot.</param>
-        /// <param name="move">The move being used.</param>
-        /// <param name="fixedRandomValue">Fixed random value for testing (0.0 to 1.0).</param>
-        /// <returns>True if the move hits, false if it misses.</returns>
-        /// <exception cref="ArgumentNullException">If user, target, or move is null.</exception>
-        public bool CheckHit(BattleSlot user, BattleSlot target, MoveData move, float? fixedRandomValue = null)
-        {
-            return CheckHit(user, target, move, field: null, fixedRandomValue);
-        }
-
-        /// <summary>
         /// Checks if a move hits its target, considering weather accuracy modifiers.
         /// </summary>
         /// <param name="user">The slot using the move.</param>

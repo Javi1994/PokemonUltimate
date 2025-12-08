@@ -23,6 +23,6 @@ namespace PokemonUltimate.Combat.Infrastructure.Constants
         /// <summary>
         /// Number of consecutive turns without HP changes before battle is considered stuck (infinite loop).
         /// </summary>
-        public const int MaxTurnsWithoutHPChange = 20;
+        public const int MaxTurnsWithoutHPChange = 10;
     }
 }

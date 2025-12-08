@@ -78,8 +78,8 @@ namespace PokemonUltimate.Combat.Actions
             // Note: Context.Move is never null (validated in DamageContext constructor)
             damageHandler.RecordDamageTaken(Target, actualDamage, Context.Move.Category);
 
-            // Note: Damage-taken and contact-received effects are processed by ActionProcessorObserver
-            // This keeps actions simple and decoupled from processors
+            // Note: Damage-taken and contact-received effects are processed by DamageTakenEffectsStep and ContactReceivedEffectsStep
+            // This keeps actions simple and decoupled from reactive effect processing
 
             // Check if Pokemon fainted (after OnWouldFaint triggers may have prevented it)
             if (Target.Pokemon.IsFainted)

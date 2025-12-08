@@ -9,7 +9,7 @@ namespace PokemonUltimate.Combat.Handlers.Definition
 {
     /// <summary>
     /// Interface unificada para handlers que procesan efectos de habilidades.
-    /// Puede verificar comportamientos (usado en Actions) y procesar efectos (usado en Processors).
+    /// Puede verificar comportamientos (usado en Actions) y procesar efectos (usado en Steps).
     /// </summary>
     /// <remarks>
     /// **Feature**: 2: Combat System
@@ -38,7 +38,7 @@ namespace PokemonUltimate.Combat.Handlers.Definition
 
         /// <summary>
         /// Procesa el efecto de la habilidad y genera acciones.
-        /// Usado por Processors cuando se activa el trigger.
+        /// Usado por Steps cuando se activa el trigger.
         /// </summary>
         /// <param name="ability">La habilidad data. No puede ser null.</param>
         /// <param name="slot">El slot del Pokemon con esta habilidad. No puede ser null.</param>

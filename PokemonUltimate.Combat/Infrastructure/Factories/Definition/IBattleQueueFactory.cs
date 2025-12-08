@@ -1,6 +1,7 @@
 
 
 using PokemonUltimate.Combat.Engine;
+using PokemonUltimate.Combat.Engine.Service;
 
 namespace PokemonUltimate.Combat.Infrastructure.Factories.Definition
 {
@@ -19,6 +20,6 @@ namespace PokemonUltimate.Combat.Infrastructure.Factories.Definition
         /// Creates a new BattleQueue instance.
         /// </summary>
         /// <returns>A new BattleQueue.</returns>
-        BattleQueue Create();
+        BattleQueueService Create();
     }
 }

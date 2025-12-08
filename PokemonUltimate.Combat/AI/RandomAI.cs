@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
@@ -7,6 +8,7 @@ using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Combat.Utilities;
 using PokemonUltimate.Combat.Utilities.Extensions;
 using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.AI
 {
@@ -19,16 +21,19 @@ namespace PokemonUltimate.Combat.AI
     /// **Sub-Feature**: 2.7: Integration
     /// **Documentation**: See `docs/features/2-combat-system/2.7-integration/architecture.md`
     /// </remarks>
-    public class RandomAI : IActionProvider
+    public class RandomAI : ActionProviderBase
     {
         private readonly Random _random;
+        private readonly TargetResolver _targetResolver; // Reuse resolver to avoid allocation overhead
 
         /// <summary>
         /// Creates a new RandomAI instance.
         /// </summary>
+        /// <param name="targetResolver">The target resolver for resolving move targets. Cannot be null.</param>
         /// <param name="seed">Optional seed for random number generator. If null, uses time-based seed.</param>
-        public RandomAI(int? seed = null)
+        public RandomAI(TargetResolver targetResolver, int? seed = null)
         {
+            _targetResolver = targetResolver ?? throw new ArgumentNullException(nameof(targetResolver));
             _random = seed.HasValue ? new Random(seed.Value) : new Random();
         }
 
@@ -39,7 +44,7 @@ namespace PokemonUltimate.Combat.AI
         /// <param name="mySlot">The slot requesting an action. Cannot be null.</param>
         /// <returns>A UseMoveAction with a random valid move, or null if no moves available.</returns>
         /// <exception cref="ArgumentNullException">If field or mySlot is null.</exception>
-        public Task<BattleAction> GetAction(BattleField field, BattleSlot mySlot)
+        public override Task<BattleAction> GetAction(BattleField field, BattleSlot mySlot)
         {
             if (field == null)
                 throw new ArgumentNullException(nameof(field), ErrorMessages.FieldCannotBeNull);
@@ -61,9 +66,8 @@ namespace PokemonUltimate.Combat.AI
             // Pick a random move
             var selectedMove = availableMoves[_random.Next(availableMoves.Count)];
 
-            // Get valid targets for this move
-            var targetResolver = new TargetResolver();
-            var validTargets = targetResolver.GetValidTargets(mySlot, selectedMove.Move, field);
+            // Get basic valid targets (without redirections - those are applied by TargetResolutionStep)
+            var validTargets = _targetResolver.GetBasicTargets(mySlot, selectedMove.Move, field);
 
             if (validTargets.Count == 0)
             {
@@ -86,6 +90,20 @@ namespace PokemonUltimate.Combat.AI
 
             // Return UseMoveAction
             return Task.FromResult<BattleAction>(new UseMoveAction(mySlot, target, selectedMove));
+        }
+
+        /// <summary>
+        /// Selects a random Pokemon for automatic switches (when Pokemon faint).
+        /// Uses the default random selection behavior.
+        /// </summary>
+        public override Task<PokemonInstance> SelectAutoSwitch(BattleField field, BattleSlot mySlot, IReadOnlyList<PokemonInstance> availablePokemon)
+        {
+            if (availablePokemon == null || availablePokemon.Count == 0)
+                return Task.FromResult<PokemonInstance>(null);
+
+            // Select a random Pokemon from available switches
+            var selectedPokemon = availablePokemon[_random.Next(availablePokemon.Count)];
+            return Task.FromResult(selectedPokemon);
         }
     }
 }

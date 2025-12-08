@@ -126,7 +126,7 @@ namespace PokemonUltimate.Combat.Handlers.Registry
 
         /// <summary>
         /// Procesa una habilidad cuando se activa un trigger específico.
-        /// Usado por Processors para generar acciones.
+        /// Usado por Steps para generar acciones.
         /// </summary>
         /// <param name="ability">La habilidad a procesar. No puede ser null.</param>
         /// <param name="slot">El slot del Pokemon con esta habilidad. No puede ser null.</param>
@@ -140,7 +140,7 @@ namespace PokemonUltimate.Combat.Handlers.Registry
 
         /// <summary>
         /// Procesa una habilidad cuando se activa un trigger específico, con contexto adicional.
-        /// Usado por Processors para generar acciones cuando se necesita información adicional (como el attacker en contact effects).
+        /// Usado por Steps para generar acciones cuando se necesita información adicional (como el attacker en contact effects).
         /// </summary>
         /// <param name="ability">La habilidad a procesar. No puede ser null.</param>
         /// <param name="slot">El slot del Pokemon con esta habilidad. No puede ser null.</param>
@@ -200,7 +200,7 @@ namespace PokemonUltimate.Combat.Handlers.Registry
 
         /// <summary>
         /// Procesa un item cuando se activa un trigger específico.
-        /// Usado por Processors para generar acciones.
+        /// Usado por Steps para generar acciones.
         /// </summary>
         /// <param name="item">El item a procesar. No puede ser null.</param>
         /// <param name="slot">El slot del Pokemon con este item. No puede ser null.</param>
@@ -214,7 +214,7 @@ namespace PokemonUltimate.Combat.Handlers.Registry
 
         /// <summary>
         /// Procesa un item cuando se activa un trigger específico, con contexto adicional.
-        /// Usado por Processors para generar acciones cuando se necesita información adicional (como el attacker en contact effects).
+        /// Usado por Steps para generar acciones cuando se necesita información adicional (como el attacker en contact effects).
         /// </summary>
         /// <param name="item">El item a procesar. No puede ser null.</param>
         /// <param name="slot">El slot del Pokemon con este item. No puede ser null.</param>

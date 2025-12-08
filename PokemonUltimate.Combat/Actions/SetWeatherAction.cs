@@ -80,8 +80,8 @@ namespace PokemonUltimate.Combat.Actions
             // Set the weather
             field.SetWeather(Weather, Duration, WeatherData);
 
-            // Note: Weather-change effects are processed by ActionProcessorObserver
-            // This keeps actions simple and decoupled from processors
+            // Note: Weather-change effects are processed by handlers when weather changes
+            // This keeps actions simple and decoupled from reactive effect processing
 
             return Enumerable.Empty<BattleAction>();
         }

@@ -268,13 +268,16 @@ namespace PokemonUltimate.Core.Data.Blueprints
         /// <summary>
         /// Gets a random duration for this status.
         /// </summary>
-        /// <param name="randomProvider">Optional random provider. If null, creates a new RandomProvider.</param>
-        public int GetRandomDuration(IRandomProvider randomProvider = null)
+        /// <param name="randomProvider">Random provider for generating random values. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">If randomProvider is null.</exception>
+        public int GetRandomDuration(IRandomProvider randomProvider)
         {
+            if (randomProvider == null)
+                throw new ArgumentNullException(nameof(randomProvider));
+
             if (IsIndefinite) return 0;
             if (MinTurns == MaxTurns) return MinTurns;
 
-            randomProvider = randomProvider ?? new RandomProvider();
             return randomProvider.Next(MinTurns, MaxTurns + 1);
         }
 

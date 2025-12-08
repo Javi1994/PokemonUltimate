@@ -24,15 +24,18 @@ namespace PokemonUltimate.Combat.Infrastructure.Providers
     public class PlayerInputProvider : IActionProvider
     {
         private readonly IBattleView _view;
+        private readonly TargetResolver _targetResolver;
 
         /// <summary>
         /// Creates a new player input provider.
         /// </summary>
         /// <param name="view">The battle view for collecting player input. Cannot be null.</param>
-        /// <exception cref="ArgumentNullException">If view is null.</exception>
-        public PlayerInputProvider(IBattleView view)
+        /// <param name="targetResolver">The target resolver for resolving move targets. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">If view or targetResolver is null.</exception>
+        public PlayerInputProvider(IBattleView view, TargetResolver targetResolver)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view), ErrorMessages.ViewCannotBeNull);
+            _targetResolver = targetResolver ?? throw new ArgumentNullException(nameof(targetResolver));
         }
 
         /// <summary>
@@ -94,9 +97,8 @@ namespace PokemonUltimate.Combat.Infrastructure.Providers
             if (moveInstance == null)
                 return null; // Player cancelled
 
-            // 3. Get valid targets
-            var targetResolver = new TargetResolver();
-            var validTargets = targetResolver.GetValidTargets(mySlot, moveInstance.Move, field);
+            // 3. Get basic valid targets (without redirections - those are applied by TargetResolutionStep)
+            var validTargets = _targetResolver.GetBasicTargets(mySlot, moveInstance.Move, field);
             if (validTargets.Count == 0)
                 return null; // No valid targets
 

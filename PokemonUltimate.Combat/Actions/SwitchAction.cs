@@ -100,8 +100,8 @@ namespace PokemonUltimate.Combat.Actions
 
             // Battle state is reset automatically by SetPokemon -> ResetBattleState
 
-            // Note: Switch-in effects (entry hazards + abilities + items) are processed by ActionProcessorObserver
-            // This keeps actions simple and decoupled from processors
+            // Note: Switch-in effects (entry hazards + abilities + items) are processed by SwitchInEffectsStep
+            // This keeps actions simple and decoupled from reactive effect processing
 
             return Enumerable.Empty<BattleAction>();
         }

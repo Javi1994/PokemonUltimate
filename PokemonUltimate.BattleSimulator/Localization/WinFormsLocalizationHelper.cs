@@ -32,7 +32,7 @@ namespace PokemonUltimate.BattleSimulator.Localization
         /// <param name="comboBox">The ComboBox to populate.</param>
         /// <param name="includeNone">Whether to include a "(None)" option at the start.</param>
         /// <param name="filter">Optional filter function to exclude certain enum values.</param>
-        public static void PopulateEnumComboBox<TEnum>(ComboBox comboBox, bool includeNone = false, Func<TEnum, bool> filter = null) where TEnum : struct, Enum
+        public static void PopulateEnumComboBox<TEnum>(ComboBox comboBox, bool includeNone = false, Func<TEnum, bool>? filter = null) where TEnum : struct, Enum
         {
             if (comboBox == null)
                 throw new ArgumentNullException(nameof(comboBox));

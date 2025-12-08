@@ -4,7 +4,6 @@ using System.Linq;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Damage;
-using PokemonUltimate.Combat.Engine.Processors;
 using PokemonUltimate.Combat.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
 using PokemonUltimate.Combat.Infrastructure.Messages;
@@ -387,19 +386,11 @@ namespace PokemonUltimate.DeveloperTools.Runners
 
                 if (target != null && moveInstance != null)
                 {
-                    var randomProvider = new RandomProvider();
+                    // UseMoveAction is now a simple data holder - execution is handled by turn steps
                     var action = new UseMoveAction(
                         slot,
                         target,
-                        moveInstance,
-                        randomProvider,
-                        new AccuracyChecker(randomProvider),
-                        new DamagePipeline(randomProvider),
-                        messageFormatter: new BattleMessageFormatter(),
-                        beforeMoveProcessor: null, // Will be created automatically
-                        afterMoveProcessor: null, // Will be created automatically
-                        targetResolver: new TargetResolver(),
-                        handlerRegistry: null // Will be created and initialized automatically
+                        moveInstance
                     );
 
                     actions.Add(action);

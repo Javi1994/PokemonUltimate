@@ -12,13 +12,16 @@ using PokemonUltimate.BattleSimulator.Logging;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.AI;
 using PokemonUltimate.Combat.Damage;
+using PokemonUltimate.Combat.Damage.Definition;
 using PokemonUltimate.Combat.Engine;
 using PokemonUltimate.Combat.Engine.Validation;
 using PokemonUltimate.Combat.Field;
+using PokemonUltimate.Combat.Handlers.Registry;
+using PokemonUltimate.Combat.Infrastructure.Builders;
 using PokemonUltimate.Combat.Infrastructure.Constants;
 using PokemonUltimate.Combat.Infrastructure.Factories;
 using PokemonUltimate.Combat.Infrastructure.Providers;
-using PokemonUltimate.Combat.Statistics;
+using PokemonUltimate.Combat.Infrastructure.Statistics;
 using PokemonUltimate.Combat.Utilities;
 using PokemonUltimate.Combat.View;
 using PokemonUltimate.Content.Catalogs.Pokemon;
@@ -50,7 +53,6 @@ namespace PokemonUltimate.BattleSimulator.Forms
         private TabPage tabBattleMode = null!;
         private TabPage tabPokemon = null!;
         private TabPage tabLogs = null!;
-        private TabPage tabResults = null!;
 
         // Logs Tab controls
         private RichTextBox txtLogs = null!;
@@ -72,8 +74,6 @@ namespace PokemonUltimate.BattleSimulator.Forms
         private CheckBox checkRandomPlayerTeam = null!;
         private CheckBox checkRandomEnemyTeam = null!;
         private NumericUpDown numericRandomTeamLevel = null!;
-        private NumericUpDown numericBatchSimulations = null!;
-        private CheckBox checkExportLogs = null!;
 
         // Helper class to hold controls for each Pokemon slot
         private class PokemonSlotControls
@@ -89,8 +89,10 @@ namespace PokemonUltimate.BattleSimulator.Forms
         private Button btnStartBattle = null!;
         private Button btnStopBattle = null!;
         private Label lblStatus = null!;
+        private Label lblBattleTime = null!;
 
         private UIBattleLogger? _logger;
+        private BattleDamageLogger? _damageLogger;
         private CombatEngine? _engine;
         private Task? _battleTask;
         private bool _isBattleRunning = false;
@@ -272,50 +274,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 Value = 50
             };
 
-            // Batch Simulation GroupBox
-            var groupBatchSimulation = new GroupBox
-            {
-                Text = "Batch Simulation",
-                Location = new Point(15, 130),
-                Size = new Size(470, 140),
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left
-            };
-
-            var lblBatchSimulations = new Label
-            {
-                Text = "Number of Battles:",
-                Location = new Point(20, 30),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9)
-            };
-
-            this.numericBatchSimulations = new NumericUpDown
-            {
-                Location = new Point(20, 55),
-                Size = new Size(150, 25),
-                Minimum = 1,
-                Maximum = 10000,
-                Value = 1
-            };
-
-            this.checkExportLogs = new CheckBox
-            {
-                Text = "Export Logs to File",
-                Location = new Point(20, 90),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9),
-                Checked = false
-            };
-
-            groupBatchSimulation.Controls.AddRange(new Control[]
-            {
-                lblBatchSimulations, numericBatchSimulations, checkExportLogs
-            });
-
             groupRandomTeams.Controls.AddRange(new Control[]
             {
-                checkRandomPlayerTeam, checkRandomEnemyTeam, lblRandomLevel, numericRandomTeamLevel, groupBatchSimulation
+                checkRandomPlayerTeam, checkRandomEnemyTeam, lblRandomLevel, numericRandomTeamLevel
             });
 
             this.tabBattleMode.Controls.AddRange(new Control[]
@@ -672,14 +633,23 @@ namespace PokemonUltimate.BattleSimulator.Forms
             this.lblStatus = new Label
             {
                 Text = "Ready",
-                Location = new Point(400, 20),
+                Location = new Point(270, 20),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9)
             };
 
+            this.lblBattleTime = new Label
+            {
+                Text = "",
+                Location = new Point(270, 20), // Same Y position as lblStatus
+                AutoSize = true,
+                Font = new Font("Segoe UI", 8),
+                ForeColor = Color.Gray
+            };
+
             buttonPanel.Controls.AddRange(new Control[]
             {
-                btnStartBattle, btnStopBattle, lblStatus
+                btnStartBattle, btnStopBattle, lblStatus, lblBattleTime
             });
 
             mainPanel.Controls.AddRange(new Control[]
@@ -1079,13 +1049,23 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 return;
             }
 
-            int numberOfBattles = (int)numericBatchSimulations.Value;
+            // Clean up previous logger subscription to prevent memory leaks
+            if (_logger != null)
+            {
+                _logger.LogAdded -= Logger_LogAdded;
+            }
 
-            // Note: Automatic log saving happens in SaveLogsToFile() for each battle
-            // checkExportLogs is for optional consolidated export (handled automatically in RunBatchBattlesAsync)
+            // Clean up previous damage logger to prevent memory leaks
+            if (_damageLogger != null)
+            {
+                _damageLogger.Unsubscribe();
+            }
 
             // Create logger
             _logger = new UIBattleLogger();
+
+            // Create damage logger to listen to battle events and generate damage messages
+            _damageLogger = new BattleDamageLogger(_logger);
 
             // Subscribe to log events for the logs tab
             _logger.LogAdded += Logger_LogAdded;
@@ -1103,18 +1083,12 @@ namespace PokemonUltimate.BattleSimulator.Forms
             // Update UI
             this.btnStartBattle.Enabled = false;
             this.btnStopBattle.Enabled = true;
-            this.lblStatus.Text = numberOfBattles > 1 ? $"Running {numberOfBattles} battles..." : "Battle running...";
+            this.lblStatus.Text = "Battle running...";
+            this.lblBattleTime.Text = ""; // Clear previous time
             _isBattleRunning = true;
 
-            // Start battle(s) in background thread to avoid blocking UI
-            if (numberOfBattles > 1)
-            {
-                _battleTask = Task.Run(async () => await RunBatchBattlesAsync(numberOfBattles));
-            }
-            else
-            {
-                _battleTask = Task.Run(async () => await RunBattleAsync());
-            }
+            // Start battle in background thread to avoid blocking UI
+            _battleTask = Task.Run(async () => await RunBattleAsync());
         }
 
         private void BtnClearLogs_Click(object? sender, EventArgs e)
@@ -1163,22 +1137,29 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
         private void Logger_LogAdded(object? sender, UIBattleLogger.LogEntry e)
         {
-            // Always invoke on UI thread to avoid cross-thread issues
-            if (this.InvokeRequired)
+            // During battle, suspend UI updates for performance
+            // Logs will be displayed in batch at the end
+            if (!_isBattleRunning)
             {
-                try
+                // Battle finished, update UI immediately
+                if (this.InvokeRequired)
                 {
-                    this.BeginInvoke(new Action(() => AddLogToUI(e)));
+                    try
+                    {
+                        this.BeginInvoke(new Action(() => AddLogToUI(e)));
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Form is closing, ignore
+                    }
                 }
-                catch (ObjectDisposedException)
+                else
                 {
-                    // Form is closing, ignore
+                    AddLogToUI(e);
                 }
             }
-            else
-            {
-                AddLogToUI(e);
-            }
+            // During battle, logs are collected but not displayed in real-time
+            // They will be shown when RefreshLogDisplay() is called after battle ends
         }
 
         private void AddLogToUI(UIBattleLogger.LogEntry entry)
@@ -1200,11 +1181,14 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     if (filter == "Battle Events" && entry.Level != UIBattleLogger.LogLevel.BattleEvent) return;
                 }
 
+                // Suspend layout for better performance when adding many logs
+                this.txtLogs.SuspendLayout();
+
                 // Set color based on level
                 Color color = entry.Level switch
                 {
                     UIBattleLogger.LogLevel.Debug => Color.Gray,
-                    UIBattleLogger.LogLevel.Info => Color.LightGreen,
+                    UIBattleLogger.LogLevel.Info => Color.Green, // Green for battle info and damage messages
                     UIBattleLogger.LogLevel.Warning => Color.Yellow,
                     UIBattleLogger.LogLevel.Error => Color.Red,
                     UIBattleLogger.LogLevel.BattleEvent => Color.Cyan,
@@ -1217,8 +1201,11 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 this.txtLogs.AppendText(entry.ToString() + Environment.NewLine);
                 this.txtLogs.SelectionColor = this.txtLogs.ForeColor;
 
-                // Auto-scroll if enabled
-                if (this.checkAutoScroll.Checked)
+                // Resume layout
+                this.txtLogs.ResumeLayout();
+
+                // Auto-scroll only at the end (not during battle for performance)
+                if (this.checkAutoScroll.Checked && !_isBattleRunning)
                 {
                     this.txtLogs.ScrollToCaret();
                 }
@@ -1240,6 +1227,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 if (_logger == null || this.IsDisposed || this.txtLogs.IsDisposed)
                     return;
 
+                // Suspend layout for better performance when adding many logs
+                this.txtLogs.SuspendLayout();
+
                 this.txtLogs.Clear();
                 var filter = this.comboLogFilter.SelectedItem?.ToString() ?? "All";
 
@@ -1257,7 +1247,30 @@ namespace PokemonUltimate.BattleSimulator.Forms
                         if (filter == "Battle Events" && entry.Level != UIBattleLogger.LogLevel.BattleEvent) continue;
                     }
 
-                    AddLogToUI(entry);
+                    // Set color based on level
+                    Color color = entry.Level switch
+                    {
+                        UIBattleLogger.LogLevel.Debug => Color.Gray,
+                        UIBattleLogger.LogLevel.Info => Color.Green,
+                        UIBattleLogger.LogLevel.Warning => Color.Yellow,
+                        UIBattleLogger.LogLevel.Error => Color.Red,
+                        UIBattleLogger.LogLevel.BattleEvent => Color.Cyan,
+                        _ => Color.White
+                    };
+
+                    this.txtLogs.SelectionStart = this.txtLogs.TextLength;
+                    this.txtLogs.SelectionLength = 0;
+                    this.txtLogs.SelectionColor = color;
+                    this.txtLogs.AppendText(entry.ToString() + Environment.NewLine);
+                    this.txtLogs.SelectionColor = this.txtLogs.ForeColor;
+                }
+
+                // Resume layout and scroll to end
+                this.txtLogs.ResumeLayout();
+
+                if (this.checkAutoScroll.Checked)
+                {
+                    this.txtLogs.ScrollToCaret();
                 }
             }
             catch (ObjectDisposedException)
@@ -1279,6 +1292,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
             this.btnStartBattle.Enabled = true;
             this.btnStopBattle.Enabled = false;
             this.lblStatus.Text = "Battle stopped";
+            this.lblBattleTime.Text = ""; // Clear time when stopped
 
             if (_logger != null)
             {
@@ -1291,156 +1305,161 @@ namespace PokemonUltimate.BattleSimulator.Forms
         }
 
 
-        private async Task<BattleResult> RunSingleBattleAsync(bool updateUI = true)
+        /// <summary>
+        /// Creates a BattleBuilder with the current UI configuration.
+        /// This helper method centralizes the builder creation logic.
+        /// </summary>
+        private BattleBuilder CreateBattleBuilder(UIBattleLogger logger, BattleStatisticsCollector? statisticsCollector = null)
+        {
+            // Create player party from slot controls
+            var playerParty = new PokemonParty();
+            foreach (var slot in playerSlotControls)
+            {
+                var pokemonName = slot.ComboPokemon.SelectedItem?.ToString();
+                if (string.IsNullOrEmpty(pokemonName))
+                    continue;
+
+                var pokemonData = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
+                if (pokemonData == null)
+                    continue;
+
+                var level = (int)slot.NumericLevel.Value;
+                var builder = PokemonInstanceBuilder.Create(pokemonData, level);
+
+                var nature = GetSelectedNature(slot.ComboNature);
+                if (nature.HasValue)
+                    builder = builder.WithNature(nature.Value);
+
+                if (slot.CheckPerfectIVs.Checked)
+                    builder = builder.WithIVs(new IVSet(31, 31, 31, 31, 31, 31));
+
+                var pokemon = builder.Build();
+                if (!playerParty.TryAdd(pokemon))
+                {
+                    logger?.LogWarning($"Player party is full, skipping {pokemonName}");
+                }
+            }
+
+            // Create enemy party from slot controls
+            var enemyParty = new PokemonParty();
+            foreach (var slot in enemySlotControls)
+            {
+                var pokemonName = slot.ComboPokemon.SelectedItem?.ToString();
+                if (string.IsNullOrEmpty(pokemonName))
+                    continue;
+
+                var pokemonData = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
+                if (pokemonData == null)
+                    continue;
+
+                var level = (int)slot.NumericLevel.Value;
+                var builder = PokemonInstanceBuilder.Create(pokemonData, level);
+
+                var nature = GetSelectedNature(slot.ComboNature);
+                if (nature.HasValue)
+                    builder = builder.WithNature(nature.Value);
+
+                if (slot.CheckPerfectIVs.Checked)
+                    builder = builder.WithIVs(new IVSet(31, 31, 31, 31, 31, 31));
+
+                var pokemon = builder.Build();
+                if (!enemyParty.TryAdd(pokemon))
+                {
+                    logger?.LogWarning($"Enemy party is full, skipping {pokemonName}");
+                }
+            }
+
+            if (playerParty.Count == 0 || enemyParty.Count == 0)
+            {
+                throw new InvalidOperationException("Both teams must have at least one Pokemon.");
+            }
+
+            // Validate parties are valid for battle
+            if (!playerParty.IsValidForBattle())
+            {
+                throw new InvalidOperationException("Player party must have at least one active Pokemon.");
+            }
+            if (!enemyParty.IsValidForBattle())
+            {
+                throw new InvalidOperationException("Enemy party must have at least one active Pokemon.");
+            }
+
+            // Create engine with custom logger first (needed for TargetResolver)
+            var randomProvider = new RandomProvider();
+            var battleFieldFactory = new BattleFieldFactory();
+            var battleQueueFactory = new BattleQueueFactory();
+            var accuracyChecker = new AccuracyChecker(randomProvider);
+            var damagePipeline = new DamagePipeline(randomProvider);
+            var stateValidator = new BattleStateValidator();
+
+            var customEngine = new CombatEngine(
+                battleFieldFactory,
+                battleQueueFactory,
+                randomProvider,
+                accuracyChecker,
+                damagePipeline,
+                handlerRegistry: null, // Will be created automatically when needed
+                stateValidator,
+                logger);
+
+            // Create AI for team battles (handles auto-switch when Pokemon faint)
+            // Use RandomAI for simulations to avoid unnecessary strategic switches that slow down battles
+            // RandomAI only switches when Pokemon faint (automatic switches), not strategically
+            // Use shared TargetResolver from engine
+            var playerAI = new RandomAI(customEngine.TargetResolver);
+            var enemyAI = new RandomAI(customEngine.TargetResolver);
+
+            // Configure battle rules
+            var rules = new BattleRules
+            {
+                PlayerSlots = (int)this.numericPlayerSlots.Value,
+                EnemySlots = (int)this.numericEnemySlots.Value
+            };
+
+            // Create BattleBuilder with all configuration
+            var battleBuilder = BattleBuilder.Create()
+                .WithEngine(customEngine)
+                .WithRules(rules)
+                .WithPlayerParty(playerParty)
+                .WithEnemyParty(enemyParty)
+                .WithPlayerAI(playerAI)
+                .WithEnemyAI(enemyAI)
+                .WithView(NullBattleView.Instance);
+
+            // Register statistics collector if provided
+            if (statisticsCollector != null)
+            {
+                battleBuilder.WithStatistics(statisticsCollector);
+            }
+
+            return battleBuilder;
+        }
+
+        private async Task<BattleResult> RunSingleBattleAsync()
         {
             try
             {
-                // Create player party from slot controls using PokemonParty
-                var playerParty = new PokemonParty();
-                foreach (var slot in playerSlotControls)
-                {
-                    var pokemonName = slot.ComboPokemon.SelectedItem?.ToString();
-                    if (string.IsNullOrEmpty(pokemonName))
-                        continue;
-
-                    var pokemonData = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
-                    if (pokemonData == null)
-                        continue;
-
-                    var level = (int)slot.NumericLevel.Value;
-                    var builder = PokemonInstanceBuilder.Create(pokemonData, level);
-
-                    var nature = GetSelectedNature(slot.ComboNature);
-                    if (nature.HasValue)
-                        builder = builder.WithNature(nature.Value);
-
-                    if (slot.CheckPerfectIVs.Checked)
-                        builder = builder.WithIVs(new IVSet(31, 31, 31, 31, 31, 31));
-
-                    var pokemon = builder.Build();
-                    if (!playerParty.TryAdd(pokemon))
-                    {
-                        // Party is full (shouldn't happen with current UI, but handle gracefully)
-                        if (_logger != null)
-                            _logger.LogWarning($"Player party is full, skipping {pokemonName}");
-                    }
-                }
-
-                // Create enemy party from slot controls using PokemonParty
-                var enemyParty = new PokemonParty();
-                foreach (var slot in enemySlotControls)
-                {
-                    var pokemonName = slot.ComboPokemon.SelectedItem?.ToString();
-                    if (string.IsNullOrEmpty(pokemonName))
-                        continue;
-
-                    var pokemonData = PokemonCatalog.All.FirstOrDefault(p => p.Name == pokemonName);
-                    if (pokemonData == null)
-                        continue;
-
-                    var level = (int)slot.NumericLevel.Value;
-                    var builder = PokemonInstanceBuilder.Create(pokemonData, level);
-
-                    var nature = GetSelectedNature(slot.ComboNature);
-                    if (nature.HasValue)
-                        builder = builder.WithNature(nature.Value);
-
-                    if (slot.CheckPerfectIVs.Checked)
-                        builder = builder.WithIVs(new IVSet(31, 31, 31, 31, 31, 31));
-
-                    var pokemon = builder.Build();
-                    if (!enemyParty.TryAdd(pokemon))
-                    {
-                        // Party is full (shouldn't happen with current UI, but handle gracefully)
-                        if (_logger != null)
-                            _logger.LogWarning($"Enemy party is full, skipping {pokemonName}");
-                    }
-                }
-
-                if (playerParty.Count == 0 || enemyParty.Count == 0)
-                {
-                    throw new InvalidOperationException("Both teams must have at least one Pokemon.");
-                }
-
-                // Validate parties are valid for battle
-                if (!playerParty.IsValidForBattle())
-                {
-                    throw new InvalidOperationException("Player party must have at least one active Pokemon.");
-                }
-                if (!enemyParty.IsValidForBattle())
-                {
-                    throw new InvalidOperationException("Enemy party must have at least one active Pokemon.");
-                }
-
-                // Create AI for team battles (handles auto-switch when Pokemon faint)
-                // Note: Event publisher will be set after engine initialization
-                var playerAI = new TeamBattleAI(switchThreshold: 0.3, switchChance: 0.6, logger: _logger);
-                var enemyAI = new TeamBattleAI(switchThreshold: 0.25, switchChance: 0.7, logger: _logger);
-
-                // Create view (null view for simulation)
-                var view = NullBattleView.Instance;
-
-                // Create logger and inject into engine
-                // Create engine manually to use custom logger
-                var randomProvider = new RandomProvider();
-                var battleFieldFactory = new BattleFieldFactory();
-                var battleQueueFactory = new BattleQueueFactory();
-                var accuracyChecker = new AccuracyChecker(randomProvider);
-                var damagePipeline = new DamagePipeline(randomProvider);
-                var stateValidator = new BattleStateValidator();
-
-                _engine = new CombatEngine(
-                    battleFieldFactory,
-                    battleQueueFactory,
-                    randomProvider,
-                    accuracyChecker,
-                    damagePipeline,
-                    handlerRegistry: null, // Will be created automatically when needed
-                    stateValidator,
-                    _logger);
-
-                // Initialize with configured battle mode
-                var rules = new BattleRules
-                {
-                    PlayerSlots = (int)this.numericPlayerSlots.Value,
-                    EnemySlots = (int)this.numericEnemySlots.Value
-                };
-                _engine.Initialize(rules, playerParty, enemyParty, playerAI, enemyAI, view);
-
-                // Set event publisher for AIs after engine initialization
-                var eventBus = _engine.EventBus;
-                if (eventBus != null)
-                {
-                    playerAI.SetEventPublisher(eventBus);
-                    enemyAI.SetEventPublisher(eventBus);
-                }
-
-                // Register detailed logger observer that publishes events
-                // This observer acts as a bridge: it observes actions and publishes events
-                if (_logger != null && eventBus != null)
-                {
-                    var detailedLogger = new DetailedBattleLoggerObserver(_logger, eventBus);
-                    _engine.Queue.AddObserver(detailedLogger);
-                }
-
                 // Register statistics collector
-                // For batch mode, collector is created outside and Reset() is called once
                 // For single battle, create new collector
                 if (_statisticsCollector == null)
                 {
                     _statisticsCollector = new BattleStatisticsCollector();
-                    _statisticsCollector.OnBattleStart(_engine.Field);
                 }
                 else
                 {
-                    // For single battle mode, always reset kill history to show only current battle
-                    // (other stats may accumulate if needed, but kill history should be per-battle)
+                    // For single battle mode, clear fainted lists to show only current battle
                     var stats = _statisticsCollector.GetStatistics();
-                    stats.KillHistory.Clear();
+                    stats.PlayerFainted.Clear();
+                    stats.EnemyFainted.Clear();
                 }
-                // Note: For batch mode, OnBattleStart (which calls Reset) is NOT called here
-                // to allow statistics to accumulate across battles
-                _engine.Queue.AddObserver(_statisticsCollector);
+
+                // Create BattleBuilder with current configuration
+                if (_logger == null)
+                    throw new InvalidOperationException("Logger must be initialized before creating battle builder.");
+                var battleBuilder = CreateBattleBuilder(_logger, _statisticsCollector);
+
+                // Build the engine (this initializes it)
+                _engine = battleBuilder.Build();
 
                 // Create Pokemon name mapping for logs and statistics
                 _pokemonNameMapping = PokemonNameMapper.CreateNameMapping(_engine.Field);
@@ -1451,67 +1470,96 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     uiLogger.SetPokemonNameMapping(_pokemonNameMapping);
                 }
 
+                // Update damage logger with name mapping
+                if (_damageLogger != null)
+                {
+                    _damageLogger.SetPokemonNameMapping(_pokemonNameMapping);
+                }
+
                 // Subscribe event-based logger to events (converts events to logs)
                 // This is the single source of truth for logging - no hardcoded logs
-                if (_logger != null && eventBus != null)
-                {
-                    var eventLogger = new Logging.EventBasedBattleLogger(_logger);
-                    eventBus.Subscribe(eventLogger);
-                }
+
+                // Measure battle execution time
+                var battleStartTime = DateTime.Now;
 
                 // Run battle (configure await to continue on background thread)
                 var result = await _engine.RunBattle().ConfigureAwait(false);
 
-                // Battle end logging and team statistics handled by EventBasedBattleLogger via events
+                // Calculate battle duration
+                var battleEndTime = DateTime.Now;
+                var battleDuration = (battleEndTime - battleStartTime).TotalSeconds;
 
-                // Notify statistics collector that battle ended
-                if (_statisticsCollector != null && _engine.Field != null)
+                // Battle end logging and statistics are handled automatically by BattleStatisticsCollector
+                // via IBattleFeature interface (OnBattleEnd is called automatically by CombatEngine)
+
+                // Save logs automatically to Logs folder
+                if (_logger != null)
                 {
-                    _statisticsCollector.OnBattleEnd(result.Outcome, _engine.Field);
+                    SaveLogsToFile(_logger, result, battleDuration);
                 }
 
-                // Save logs automatically to Logs folder (always for single battles)
-                // Note: For batch battles, SaveLogsToFile is called in RunBatchBattlesAsync for each battle
-                if (_logger != null && updateUI) // Single battle mode
+                // Update UI
+                if (this.InvokeRequired)
                 {
-                    SaveLogsToFile(_logger, result.Outcome);
-                }
-
-                // Update UI only if requested (not during batch)
-                if (updateUI)
-                {
-                    if (this.InvokeRequired)
+                    try
                     {
-                        try
+                        this.Invoke(new Action(() =>
                         {
-                            this.Invoke(new Action(() =>
+                            if (!_isBattleRunning) return; // Battle was stopped
+                            this.btnStartBattle.Enabled = true;
+                            this.btnStopBattle.Enabled = false;
+                            this.lblStatus.Text = $"Battle ended: {result.Outcome} ({result.TurnsTaken} turns)";
+                            // Update battle time label position to be right after status text
+                            UpdateBattleTimeLabelPosition();
+                            this.lblBattleTime.Text = $"Total Time: {battleDuration:F3} seconds";
+                            _isBattleRunning = false;
+
+                            // Refresh log display in batch (much faster than real-time updates)
+                            RefreshLogDisplay();
+
+                            // IMPORTANT: Update statistics BEFORE disposing engine (engine.Field is needed)
+                            UpdateStatisticsDisplay();
+
+                            // IMPORTANT: Dispose engine AFTER updating statistics to clean up event subscriptions and prevent memory leaks
+                            if (_engine != null)
                             {
-                                if (!_isBattleRunning) return; // Battle was stopped
-                                this.btnStartBattle.Enabled = true;
-                                this.btnStopBattle.Enabled = false;
-                                this.lblStatus.Text = $"Battle ended: {result.Outcome}";
-                                _isBattleRunning = false;
-                                UpdateStatisticsDisplay();
-                                // Switch to player results tab after battle
-                                this.tabControl.SelectedTab = tabPlayerResults;
-                            }));
-                        }
-                        catch (ObjectDisposedException)
-                        {
-                            // Form is closing, ignore
-                        }
+                                _engine.Dispose();
+                                _engine = null;
+                            }
+
+                            // Don't switch tabs automatically - let user stay on current tab
+                        }));
                     }
-                    else
+                    catch (ObjectDisposedException)
                     {
-                        if (!_isBattleRunning) return result; // Battle was stopped
-                        this.btnStartBattle.Enabled = true;
-                        this.btnStopBattle.Enabled = false;
-                        this.lblStatus.Text = result.Outcome.ToString();
-                        _isBattleRunning = false;
-                        UpdateStatisticsDisplay();
-                        // Switch to player results tab after battle
-                        this.tabControl.SelectedTab = tabPlayerResults;
+                        // Form is closing, ignore
                     }
+                }
+                else
+                {
+                    if (!_isBattleRunning) return result; // Battle was stopped
+                    this.btnStartBattle.Enabled = true;
+                    this.btnStopBattle.Enabled = false;
+                    this.lblStatus.Text = $"Battle ended: {result.Outcome} ({result.TurnsTaken} turns)";
+                    // Update battle time label position to be right after status text
+                    UpdateBattleTimeLabelPosition();
+                    this.lblBattleTime.Text = $"Total Time: {battleDuration:F3} seconds";
+                    _isBattleRunning = false;
+
+                    // Refresh log display in batch (much faster than real-time updates)
+                    RefreshLogDisplay();
+
+                    // IMPORTANT: Update statistics BEFORE disposing engine (engine.Field is needed)
+                    UpdateStatisticsDisplay();
+
+                    // IMPORTANT: Dispose engine AFTER updating statistics to clean up event subscriptions and prevent memory leaks
+                    if (_engine != null)
+                    {
+                        _engine.Dispose();
+                        _engine = null;
+                    }
+
+                    // Don't switch tabs automatically - let user stay on current tab
                 }
 
                 return result;
@@ -1523,7 +1571,7 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     _logger.LogError($"Battle error: {ex.Message}");
                 }
 
-                if (updateUI && this.InvokeRequired)
+                if (this.InvokeRequired)
                 {
                     this.Invoke(new Action(() =>
                     {
@@ -1534,240 +1582,20 @@ namespace PokemonUltimate.BattleSimulator.Forms
                         this.btnStartBattle.Enabled = true;
                         this.btnStopBattle.Enabled = false;
                         this.lblStatus.Text = "Error occurred";
+                        this.lblBattleTime.Text = ""; // Clear time on error
                         _isBattleRunning = false;
                     }));
                 }
 
-                throw; // Re-throw for batch handling
+                throw;
             }
         }
 
         private async Task RunBattleAsync()
         {
-            await RunSingleBattleAsync(updateUI: true);
+            await RunSingleBattleAsync();
         }
 
-        private async Task RunBatchBattlesAsync(int numberOfBattles)
-        {
-            try
-            {
-                var allBattleLogs = new List<string>();
-                var summaryStats = new Dictionary<BattleOutcome, int>();
-                int completedBattles = 0;
-
-                // Create shared statistics collector for batch and reset once
-                _statisticsCollector = new BattleStatisticsCollector();
-                _statisticsCollector.Reset(); // Reset once at the start of batch
-
-                for (int i = 0; i < numberOfBattles; i++)
-                {
-                    if (!_isBattleRunning) break; // User stopped
-
-                    // Update status
-                    if (this.InvokeRequired)
-                    {
-                        this.Invoke(new Action(() =>
-                        {
-                            this.lblStatus.Text = $"Running battle {i + 1} of {numberOfBattles}...";
-                        }));
-                    }
-
-                    // Create new logger for each battle
-                    var battleLogger = new UIBattleLogger();
-                    battleLogger.LogAdded += Logger_LogAdded;
-                    _logger = battleLogger;
-
-                    // Clean up previous engine observers if exists
-                    if (_engine != null)
-                    {
-                        // Remove observers from previous battle
-                        _engine.Queue.RemoveObserver(_statisticsCollector);
-                        // Note: DetailedLoggerObserver and EventLogger are recreated each battle
-                    }
-
-                    // Clear previous engine reference
-                    _engine = null;
-
-                    // Reset kill history before each battle in batch mode (but keep other accumulated stats)
-                    // This ensures each battle shows only its own kill history
-                    if (_statisticsCollector != null)
-                    {
-                        var stats = _statisticsCollector.GetStatistics();
-                        stats.KillHistory.Clear();
-                    }
-
-                    // Run single battle without UI updates
-                    var result = await RunSingleBattleAsync(updateUI: false);
-
-                    // Clean up observers after battle
-                    if (_engine != null && _statisticsCollector != null)
-                    {
-                        _engine.Queue.RemoveObserver(_statisticsCollector);
-                    }
-
-                    // Unsubscribe logger for cleanup
-                    battleLogger.LogAdded -= Logger_LogAdded;
-
-                    // Track outcome
-                    if (!summaryStats.ContainsKey(result.Outcome))
-                    {
-                        summaryStats[result.Outcome] = 0;
-                    }
-                    summaryStats[result.Outcome]++;
-
-                    // Save logs automatically to Logs folder for each battle
-                    if (_logger != null)
-                    {
-                        SaveLogsToFile(_logger, result.Outcome, battleNumber: i + 1, totalBattles: numberOfBattles);
-                    }
-
-                    // Collect logs for this battle (for batch export if enabled)
-                    if (_logger != null && checkExportLogs.Checked)
-                    {
-                        var battleLog = new StringBuilder();
-                        battleLog.AppendLine($"═══════════════════════════════════════════════════════════════");
-                        battleLog.AppendLine($"BATTLE #{i + 1} of {numberOfBattles}");
-                        battleLog.AppendLine($"═══════════════════════════════════════════════════════════════");
-                        battleLog.AppendLine($"Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-                        battleLog.AppendLine($"Outcome: {result.Outcome}");
-                        battleLog.AppendLine();
-
-                        foreach (var logEntry in _logger.Logs)
-                        {
-                            battleLog.AppendLine(logEntry.ToString());
-                        }
-
-                        battleLog.AppendLine();
-                        battleLog.AppendLine($"═══════════════════════════════════════════════════════════════");
-                        battleLog.AppendLine($"END OF BATTLE #{i + 1} - Outcome: {result.Outcome}");
-                        battleLog.AppendLine($"═══════════════════════════════════════════════════════════════");
-                        battleLog.AppendLine();
-                        battleLog.AppendLine();
-
-                        allBattleLogs.Add(battleLog.ToString());
-                    }
-
-                    // Clear logger for next battle
-                    _logger?.Clear();
-                    _logger = null;
-
-                    completedBattles++;
-
-                    // Small delay to allow UI updates
-                    await Task.Delay(10);
-                }
-
-                // Export consolidated logs if requested (automatic, no dialog)
-                if (checkExportLogs.Checked && allBattleLogs.Count > 0)
-                {
-                    try
-                    {
-                        // Generate automatic path in Logs folder (project directory)
-                        var projectDir = GetProjectDirectory();
-                        var logsFolder = Path.Combine(projectDir, "Logs");
-                        if (!Directory.Exists(logsFolder))
-                        {
-                            Directory.CreateDirectory(logsFolder);
-                        }
-
-                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                        var consolidatedFileName = $"battle_logs_batch_{timestamp}_{numberOfBattles}battles.txt";
-                        var consolidatedPath = Path.Combine(logsFolder, consolidatedFileName);
-
-                        var fullLog = new StringBuilder();
-                        fullLog.AppendLine($"BATCH BATTLE SIMULATION REPORT");
-                        fullLog.AppendLine($"═══════════════════════════════════════════════════════════════");
-                        fullLog.AppendLine($"Total Battles: {completedBattles}");
-                        fullLog.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-                        fullLog.AppendLine();
-
-                        // Add summary statistics
-                        if (summaryStats.Count > 0)
-                        {
-                            fullLog.AppendLine("SUMMARY:");
-                            foreach (var stat in summaryStats.OrderByDescending(s => s.Value))
-                            {
-                                var percentage = (stat.Value * 100.0) / completedBattles;
-                                fullLog.AppendLine($"  {stat.Key}: {stat.Value} ({percentage.ToString("F1", CultureInfo.InvariantCulture)}%)");
-                            }
-                            fullLog.AppendLine();
-                            fullLog.AppendLine();
-                        }
-
-                        foreach (var battleLog in allBattleLogs)
-                        {
-                            fullLog.Append(battleLog);
-                        }
-
-                        File.WriteAllText(consolidatedPath, fullLog.ToString(), Encoding.UTF8);
-
-                        if (this.InvokeRequired)
-                        {
-                            this.Invoke(new Action(() =>
-                            {
-                                MessageBox.Show(
-                                    $"Successfully exported consolidated log with {completedBattles} battles to:\n{consolidatedPath}",
-                                    "Export Complete",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Information);
-                            }));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (this.InvokeRequired)
-                        {
-                            this.Invoke(new Action(() =>
-                            {
-                                MessageBox.Show(
-                                    $"Error exporting consolidated logs: {ex.Message}",
-                                    "Export Error",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
-                            }));
-                        }
-                    }
-                }
-
-                // Update UI on UI thread
-                if (this.InvokeRequired)
-                {
-                    this.Invoke(new Action(() =>
-                    {
-                        if (!_isBattleRunning) return; // Battle was stopped
-                        this.btnStartBattle.Enabled = true;
-                        this.btnStopBattle.Enabled = false;
-                        this.lblStatus.Text = $"Completed {completedBattles} battles";
-                        _isBattleRunning = false;
-                        UpdateStatisticsDisplay();
-                        // Switch to player results tab after batch
-                        this.tabControl.SelectedTab = tabPlayerResults;
-                    }));
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_logger != null)
-                {
-                    _logger.LogError($"Batch battle error: {ex.Message}");
-                }
-
-                if (this.InvokeRequired)
-                {
-                    this.Invoke(new Action(() =>
-                    {
-                        MessageBox.Show(
-                            $"Batch battle error: {ex.Message}",
-                            "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        this.btnStartBattle.Enabled = true;
-                        this.btnStopBattle.Enabled = false;
-                        this.lblStatus.Text = "Error occurred";
-                        _isBattleRunning = false;
-                    }));
-                }
-            }
-        }
 
         private void BtnRefreshPlayerResults_Click(object? sender, EventArgs e)
         {
@@ -1890,15 +1718,11 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     }
                 }
 
-                // Get kill history separated by team
-                var playerKillHistory = stats.KillHistory.Where(k => k.KillerIsPlayer).ToList();
-                var enemyKillHistory = stats.KillHistory.Where(k => !k.KillerIsPlayer).ToList();
-
-                // Calculate kills based on kill history (excludes self-inflicted deaths from status effects)
-                int playerKills = playerKillHistory.Count;
-                int enemyKills = enemyKillHistory.Count;
-
-                const int boxWidth = 60;
+                // Calculate kills based on fainted Pokemon lists
+                // Note: In the new system, we track fainted Pokemon but not who killed them
+                // We approximate kills as the number of fainted Pokemon on the opposite team
+                int playerKills = stats.EnemyFainted.Count;
+                int enemyKills = stats.PlayerFainted.Count;
 
                 // ===== EQUIPO JUGADOR - Player Results Tab =====
                 var playerSb = new StringBuilder();
@@ -1933,12 +1757,12 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     playerSb.AppendLine();
                 }
 
-                // Historial de Kills
-                if (playerKillHistory.Count > 0)
+                // Historial de Kills (Pokemon enemigos derrotados)
+                if (stats.EnemyFainted.Count > 0)
                 {
-                    playerSb.AppendLine("Historial de Kills:");
-                    foreach (var kill in playerKillHistory)
-                        playerSb.AppendLine($"  {kill.Killer} -> {kill.Victim}");
+                    playerSb.AppendLine("Pokemon Enemigos Derrotados:");
+                    foreach (var fainted in stats.EnemyFainted)
+                        playerSb.AppendLine($"  ✗ {fainted}");
                     playerSb.AppendLine();
                 }
 
@@ -1980,12 +1804,12 @@ namespace PokemonUltimate.BattleSimulator.Forms
                     enemySb.AppendLine();
                 }
 
-                // Historial de Kills
-                if (enemyKillHistory.Count > 0)
+                // Historial de Kills (Pokemon jugador derrotados)
+                if (stats.PlayerFainted.Count > 0)
                 {
-                    enemySb.AppendLine("Historial de Kills:");
-                    foreach (var kill in enemyKillHistory)
-                        enemySb.AppendLine($"  {kill.Killer} -> {kill.Victim}");
+                    enemySb.AppendLine("Pokemon Jugador Derrotados:");
+                    foreach (var fainted in stats.PlayerFainted)
+                        enemySb.AppendLine($"  ✗ {fainted}");
                     enemySb.AppendLine();
                 }
 
@@ -2060,10 +1884,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
         /// Saves battle logs automatically to the Logs folder.
         /// </summary>
         /// <param name="logger">The logger containing the battle logs.</param>
-        /// <param name="outcome">The battle outcome.</param>
-        /// <param name="battleNumber">Optional battle number for batch simulations.</param>
-        /// <param name="totalBattles">Optional total battles count for batch simulations.</param>
-        private void SaveLogsToFile(UIBattleLogger logger, BattleOutcome outcome, int? battleNumber = null, int? totalBattles = null)
+        /// <param name="result">The battle result containing outcome and turns taken.</param>
+        /// <param name="battleDurationSeconds">The battle execution time in seconds.</param>
+        private void SaveLogsToFile(UIBattleLogger logger, BattleResult result, double battleDurationSeconds)
         {
             try
             {
@@ -2079,33 +1902,54 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
                 // Generate filename with timestamp
                 var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                string fileName;
-                if (battleNumber.HasValue && totalBattles.HasValue)
-                {
-                    fileName = $"battle_logs_{timestamp}_battle{battleNumber.Value}of{totalBattles.Value}.txt";
-                }
-                else
-                {
-                    fileName = $"battle_logs_{timestamp}.txt";
-                }
+                string fileName = $"battle_logs_{timestamp}.txt";
 
                 var filePath = Path.Combine(logsFolder, fileName);
 
                 // Build log content
                 var logContent = new StringBuilder();
                 logContent.AppendLine("═══════════════════════════════════════════════════════════════");
-                if (battleNumber.HasValue && totalBattles.HasValue)
-                {
-                    logContent.AppendLine($"BATTLE #{battleNumber.Value} of {totalBattles.Value}");
-                }
-                else
-                {
-                    logContent.AppendLine("BATTLE LOG");
-                }
+                logContent.AppendLine("BATTLE LOG");
                 logContent.AppendLine("═══════════════════════════════════════════════════════════════");
                 logContent.AppendLine($"Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-                logContent.AppendLine($"Outcome: {outcome}");
+                logContent.AppendLine($"Outcome: {result.Outcome}");
+                logContent.AppendLine($"Turns Taken: {result.TurnsTaken}");
+                logContent.AppendLine($"Execution Time: {battleDurationSeconds:F3} seconds");
                 logContent.AppendLine();
+
+                // Add battle participants information if available
+                if (_engine?.Field != null)
+                {
+                    var field = _engine.Field;
+                    var rules = field.Rules;
+
+                    // Determine battle mode name
+                    string battleMode = "Custom";
+                    if (rules.PlayerSlots == 1 && rules.EnemySlots == 1)
+                        battleMode = "Singles";
+                    else if (rules.PlayerSlots == 2 && rules.EnemySlots == 2)
+                        battleMode = "Doubles";
+                    else if (rules.PlayerSlots == 3 && rules.EnemySlots == 3)
+                        battleMode = "Triples";
+                    else if (rules.PlayerSlots == 6 && rules.EnemySlots == 6)
+                        battleMode = "Full Team";
+
+                    // Get team sizes
+                    int playerTeamSize = field.PlayerSide?.Party?.Count ?? 0;
+                    int enemyTeamSize = field.EnemySide?.Party?.Count ?? 0;
+
+                    // Get initial active Pokemon count (at battle start, before any faints)
+                    int playerActive = rules.PlayerSlots;
+                    int enemyActive = rules.EnemySlots;
+
+                    // Format participants section similar to old log format
+                    var battleStartTime = DateTime.Now.ToString("HH:mm:ss.fff");
+                    logContent.AppendLine($"[{battleStartTime}] INFO Battle started - Mode: {battleMode}");
+                    logContent.AppendLine($"[{battleStartTime}] INFO   Battle Slots: Player={rules.PlayerSlots}, Enemy={rules.EnemySlots}");
+                    logContent.AppendLine($"[{battleStartTime}] INFO   Team Size: Player={playerTeamSize} Pokemon, Enemy={enemyTeamSize} Pokemon");
+                    logContent.AppendLine($"[{battleStartTime}] INFO   Initial Active: Player={playerActive} Pokemon, Enemy={enemyActive} Pokemon");
+                    logContent.AppendLine();
+                }
 
                 // Add all log entries
                 foreach (var logEntry in logger.Logs)
@@ -2115,7 +1959,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
 
                 logContent.AppendLine();
                 logContent.AppendLine("═══════════════════════════════════════════════════════════════");
-                logContent.AppendLine($"END OF BATTLE - Outcome: {outcome}");
+                logContent.AppendLine($"END OF BATTLE - Outcome: {result.Outcome}");
+                logContent.AppendLine($"Turns Taken: {result.TurnsTaken}");
+                logContent.AppendLine($"Total Execution Time: {battleDurationSeconds:F3} seconds");
                 logContent.AppendLine("═══════════════════════════════════════════════════════════════");
 
                 // Write to file
@@ -2139,6 +1985,9 @@ namespace PokemonUltimate.BattleSimulator.Forms
             }
         }
 
+        /// <summary>
+        /// Cleans up resources when the form is closing to prevent memory leaks.
+        /// </summary>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (_isBattleRunning)
@@ -2158,7 +2007,31 @@ namespace PokemonUltimate.BattleSimulator.Forms
                 _logger.LogAdded -= Logger_LogAdded;
             }
 
+            // Unsubscribe damage logger
+            _damageLogger?.Unsubscribe();
+            _damageLogger = null;
+
+            // Dispose engine to clean up event subscriptions
+            if (_engine != null)
+            {
+                _engine.Dispose();
+                _engine = null;
+            }
+
             base.OnFormClosing(e);
+        }
+
+        /// <summary>
+        /// Updates the battle time label position to be right after the status text.
+        /// </summary>
+        private void UpdateBattleTimeLabelPosition()
+        {
+            if (this.lblStatus != null && this.lblBattleTime != null)
+            {
+                // Calculate position: right edge of status label + small gap
+                int statusRightEdge = this.lblStatus.Left + this.lblStatus.Width;
+                this.lblBattleTime.Location = new Point(statusRightEdge + 15, this.lblStatus.Top);
+            }
         }
     }
 }
