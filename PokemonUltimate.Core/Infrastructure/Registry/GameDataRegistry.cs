@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Data.Blueprints.Definition;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Infrastructure.Registry.Definition;
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using PokemonUltimate.Core.Data.Effects;
+using PokemonUltimate.Core.Strategies.Effect.Definition;
 
 namespace PokemonUltimate.Core.Strategies.Effect
 {

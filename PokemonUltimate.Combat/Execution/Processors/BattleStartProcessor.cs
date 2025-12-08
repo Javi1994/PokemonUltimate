@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Execution.Battle;
-using PokemonUltimate.Combat.Execution.Processors.Interfaces;
+using PokemonUltimate.Combat.Execution.Processors.Definition;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Events;
+using PokemonUltimate.Combat.Infrastructure.Events.Definition;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Execution.Processors

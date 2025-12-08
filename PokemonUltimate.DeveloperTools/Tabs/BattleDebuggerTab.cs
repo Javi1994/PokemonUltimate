@@ -7,10 +7,11 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Moves;
 using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
 using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.DeveloperTools.Runners;
+using PokemonUltimate.Localization.Extensions;
 
 namespace PokemonUltimate.DeveloperTools.Tabs
 {

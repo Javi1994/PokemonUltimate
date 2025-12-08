@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Foundation.Constants;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Events;
+using PokemonUltimate.Combat.Infrastructure.Events.Definition;
 using PokemonUltimate.Combat.Infrastructure.Logging;
-using PokemonUltimate.Combat.Results;
+using PokemonUltimate.Combat.Infrastructure.Logging.Definition;
 
 namespace PokemonUltimate.Combat.Execution.Battle
 {

@@ -1,3 +1,4 @@
+using PokemonUltimate.Combat.Systems.Damage.Definition;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Systems.Damage.Steps

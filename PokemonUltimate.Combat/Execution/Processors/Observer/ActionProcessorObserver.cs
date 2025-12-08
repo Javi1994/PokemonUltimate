@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Execution.Battle;
 using PokemonUltimate.Combat.Extensions;
+using PokemonUltimate.Combat.Foundation.Constants;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
-using PokemonUltimate.Combat.Results;
 using PokemonUltimate.Combat.Statistics;
+using PokemonUltimate.Combat.Statistics.Definition;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Execution.Processors.Observer

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
+using PokemonUltimate.Combat.Systems.Damage.Definition;
 using PokemonUltimate.Combat.Systems.Damage.Steps;
 using PokemonUltimate.Core.Data.Blueprints;
 

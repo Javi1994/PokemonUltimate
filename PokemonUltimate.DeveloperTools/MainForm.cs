@@ -2,9 +2,10 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Providers;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
 using PokemonUltimate.DeveloperTools.Tabs;
+using PokemonUltimate.Localization.Providers;
 
 namespace PokemonUltimate.DeveloperTools
 {

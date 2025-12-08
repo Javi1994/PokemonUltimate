@@ -5,9 +5,10 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Items;
 using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -172,7 +173,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             {
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvItems,
-                    item.GetLocalizedName(provider),
+                    item.GetDisplayName(provider),
                     item.Category.ToString(),
                     item.Id);
 
@@ -200,12 +201,12 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(item.GetLocalizedName(provider));
+            details.AppendLine(item.GetDisplayName(provider));
             details.AppendLine();
             details.AppendLine($"ID: {item.Id}");
             details.AppendLine($"Category: {item.Category}");
 
-            var description = item.GetLocalizedDescription(provider);
+            var description = item.GetDescription(provider);
             if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();

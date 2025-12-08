@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Execution.Battle;
-using PokemonUltimate.Combat.Execution.Processors.Interfaces;
+using PokemonUltimate.Combat.Execution.Processors.Definition;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
@@ -13,7 +13,9 @@ using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Constants;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.Combat.Execution.Processors
 {
@@ -364,7 +366,7 @@ namespace PokemonUltimate.Combat.Execution.Processors
                 if (pokemon.CurrentHP < pokemon.MaxHP && healing > 0)
                 {
                     var provider = LocalizationService.Instance;
-                    var terrainName = terrainData.GetLocalizedName(provider);
+                    var terrainName = terrainData.GetDisplayName(provider);
                     actions.Add(new MessageAction(provider.GetString(LocalizationKey.TerrainHealing, pokemon.DisplayName, terrainName)));
                     actions.Add(new HealAction(null, slot, healing)); // null user = system action
                 }

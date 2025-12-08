@@ -1,9 +1,10 @@
 using System.Drawing;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Providers;
-using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Services;
 using PokemonUltimate.DataViewer.Tabs;
+using PokemonUltimate.Localization.Providers;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DataViewer
 {

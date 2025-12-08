@@ -4,13 +4,17 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Events;
+using PokemonUltimate.Combat.Infrastructure.Events.Definition;
 using PokemonUltimate.Combat.Infrastructure.Helpers;
 using PokemonUltimate.Combat.Infrastructure.Logging;
+using PokemonUltimate.Combat.Infrastructure.Logging.Definition;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Localization.Extensions;
 
 namespace PokemonUltimate.Combat.Integration.AI
 {

@@ -1,5 +1,6 @@
 using System;
 using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Systems.Damage.Definition;
 using PokemonUltimate.Core.Data.Effects;
 using PokemonUltimate.Core.Data.Enums;
 

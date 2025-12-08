@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Core.Data.Blueprints;
+using PokemonUltimate.Core.Strategies.Move.Definition;
 
 namespace PokemonUltimate.Core.Strategies.Move
 {

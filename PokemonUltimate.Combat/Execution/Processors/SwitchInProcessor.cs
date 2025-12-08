@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Execution.Battle;
-using PokemonUltimate.Combat.Execution.Processors.Interfaces;
+using PokemonUltimate.Combat.Execution.Processors.Definition;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
@@ -14,9 +14,10 @@ using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
-using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Localization.Constants;
+using PokemonUltimate.Localization.Extensions;
 
 namespace PokemonUltimate.Combat.Execution.Processors
 {
@@ -138,7 +139,7 @@ namespace PokemonUltimate.Combat.Execution.Processors
             if (damage > 0)
             {
                 var provider = LocalizationService.Instance;
-                var hazardName = hazardData.GetLocalizedName(provider);
+                var hazardName = hazardData.GetDisplayName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardSpikesDamage, pokemon.DisplayName, hazardName)));
                 actions.Add(CreateHazardDamageAction(slot, field, damage));
             }
@@ -170,7 +171,7 @@ namespace PokemonUltimate.Combat.Execution.Processors
             if (damage > 0)
             {
                 var provider = LocalizationService.Instance;
-                var hazardName = hazardData.GetLocalizedName(provider);
+                var hazardName = hazardData.GetDisplayName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardStealthRockDamage, pokemon.DisplayName, hazardName)));
                 actions.Add(CreateHazardDamageAction(slot, field, damage));
             }
@@ -193,7 +194,7 @@ namespace PokemonUltimate.Combat.Execution.Processors
             {
                 side.RemoveHazard(HazardType.ToxicSpikes);
                 var provider = LocalizationService.Instance;
-                var hazardName = hazardData.GetLocalizedName(provider);
+                var hazardName = hazardData.GetDisplayName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardToxicSpikesAbsorbed, pokemon.DisplayName, hazardName)));
                 return;
             }
@@ -208,7 +209,7 @@ namespace PokemonUltimate.Combat.Execution.Processors
             if (status != PersistentStatus.None)
             {
                 var provider = LocalizationService.Instance;
-                var hazardName = hazardData.GetLocalizedName(provider);
+                var hazardName = hazardData.GetDisplayName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardToxicSpikesStatus, pokemon.DisplayName, hazardName)));
                 actions.Add(new ApplyStatusAction(null, slot, status));
             }
@@ -243,7 +244,7 @@ namespace PokemonUltimate.Combat.Execution.Processors
                 }
 
                 var provider = LocalizationService.Instance;
-                var hazardName = hazardData.GetLocalizedName(provider);
+                var hazardName = hazardData.GetDisplayName(provider);
                 actions.Add(new MessageAction(provider.GetString(LocalizationKey.HazardStickyWebSpeed, pokemon.DisplayName, hazardName)));
                 actions.Add(new StatChangeAction(null, slot, hazardData.StatToLower.Value, stages));
             }

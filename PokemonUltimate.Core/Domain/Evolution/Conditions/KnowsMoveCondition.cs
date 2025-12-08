@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
+using PokemonUltimate.Core.Domain.Evolution.Definition;
 using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.Core.Domain.Evolution.Conditions

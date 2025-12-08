@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
@@ -10,14 +10,18 @@
     <ItemGroup>
       <ProjectReference Include="..\PokemonUltimate.Content\PokemonUltimate.Content.csproj" />
       <ProjectReference Include="..\PokemonUltimate.Core\PokemonUltimate.Core.csproj" />
+      <ProjectReference Include="..\PokemonUltimate.Localization\PokemonUltimate.Localization.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Engine\Processors\Interfaces\" />
       <Folder Include="Foundation\" />
       <Folder Include="Infrastructure\" />
       <Folder Include="Integration\" />
       <Folder Include="Systems\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="PROPUESTA_REORGANIZACION.md" />
     </ItemGroup>
 
 </Project>

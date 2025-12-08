@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PokemonUltimate.Core.Data.Blueprints.Definition;
 using PokemonUltimate.Core.Data.Effects.Definition;
 using PokemonUltimate.Core.Data.Enums;
 

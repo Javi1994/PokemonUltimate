@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using PokemonUltimate.Combat.Infrastructure.Logging.Definition;
 
 namespace PokemonUltimate.Combat.Infrastructure.Logging
 {

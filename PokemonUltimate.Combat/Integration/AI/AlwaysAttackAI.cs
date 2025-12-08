@@ -6,6 +6,7 @@ using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Helpers;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Integration.AI

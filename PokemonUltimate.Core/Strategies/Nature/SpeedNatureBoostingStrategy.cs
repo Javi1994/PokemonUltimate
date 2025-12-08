@@ -1,3 +1,5 @@
+using PokemonUltimate.Core.Strategies.Nature.Definition;
+
 namespace PokemonUltimate.Core.Strategies.Nature
 {
     /// <summary>

@@ -2,8 +2,10 @@ using PokemonUltimate.Combat.Execution.Engine;
 using PokemonUltimate.Combat.Infrastructure.Helpers;
 using PokemonUltimate.Combat.Infrastructure.Logging;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Combat.Infrastructure.Validation;
 using PokemonUltimate.Combat.Systems.Damage;
+using PokemonUltimate.Combat.Systems.Damage.Definition;
 using PokemonUltimate.Combat.Systems.Effects;
 
 namespace PokemonUltimate.Combat.Infrastructure.Factories

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
@@ -14,6 +14,7 @@
       <Folder Include="Strategies\" />
       <Folder Include="Utilities\" />
     </ItemGroup>
+
 
     <ItemGroup>
       <None Remove="ORGANIZACION_ANALISIS.md" />

@@ -5,8 +5,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Terrain;
 using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Extensions;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -173,7 +174,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvTerrain,
-                    terrain.GetLocalizedName(provider),
+                    terrain.GetDisplayName(provider),
                     typeStr,
                     durationStr);
 
@@ -200,7 +201,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(terrain.GetLocalizedName(provider));
+            details.AppendLine(terrain.GetDisplayName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {terrain.Terrain}");
             details.AppendLine($"Duration: {terrain.DefaultDuration} turns");
@@ -208,7 +209,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (terrain.BoostedType.HasValue)
                 details.AppendLine($"Boosts: {terrain.BoostedType} moves ({terrain.BoostMultiplier}x)");
 
-            var description = terrain.GetLocalizedDescription(provider);
+            var description = terrain.GetDescription(provider);
             if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();

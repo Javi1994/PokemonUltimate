@@ -1,6 +1,6 @@
 using System;
+using PokemonUltimate.Combat.Foundation.Constants;
 using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Combat.Results;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Execution.Battle

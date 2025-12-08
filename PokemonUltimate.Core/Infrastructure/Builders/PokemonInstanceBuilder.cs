@@ -11,6 +11,7 @@ using PokemonUltimate.Core.Domain.Instances.Stats;
 using PokemonUltimate.Core.Infrastructure.Providers.Definition;
 using PokemonUltimate.Core.Services;
 using PokemonUltimate.Core.Strategies.Move;
+using PokemonUltimate.Core.Strategies.Move.Definition;
 using PokemonUltimate.Core.Strategies.Nature;
 using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 

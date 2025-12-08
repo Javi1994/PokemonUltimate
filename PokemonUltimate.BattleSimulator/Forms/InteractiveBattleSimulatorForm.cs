@@ -11,6 +11,7 @@ using PokemonUltimate.BattleSimulator.Helpers;
 using PokemonUltimate.BattleSimulator.Logging;
 using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Execution.Engine;
+using PokemonUltimate.Combat.Foundation.Constants;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
 using PokemonUltimate.Combat.Infrastructure.Helpers;
@@ -18,7 +19,6 @@ using PokemonUltimate.Combat.Infrastructure.Providers;
 using PokemonUltimate.Combat.Infrastructure.Validation;
 using PokemonUltimate.Combat.Integration.AI;
 using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Combat.Results;
 using PokemonUltimate.Combat.Statistics;
 using PokemonUltimate.Combat.Systems.Damage;
 using PokemonUltimate.Combat.Systems.Effects;
@@ -26,12 +26,13 @@ using PokemonUltimate.Content.Catalogs.Pokemon;
 using PokemonUltimate.Content.Providers;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Instances;
 using PokemonUltimate.Core.Domain.Instances.Party;
 using PokemonUltimate.Core.Domain.Instances.Stats;
 using PokemonUltimate.Core.Infrastructure.Builders;
-using PokemonUltimate.Core.Domain.Instances;
-using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Providers;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.BattleSimulator.Forms
 {

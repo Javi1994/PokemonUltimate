@@ -5,8 +5,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Weather;
 using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Extensions;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -173,7 +174,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvWeather,
-                    weather.GetLocalizedName(provider),
+                    weather.GetDisplayName(provider),
                     typeStr,
                     durationStr);
 
@@ -200,7 +201,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(weather.GetLocalizedName(provider));
+            details.AppendLine(weather.GetDisplayName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {weather.Weather}");
 
@@ -212,7 +213,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (weather.IsPrimal)
                 details.AppendLine("Primal: Yes (cannot be overwritten)");
 
-            var description = weather.GetLocalizedDescription(provider);
+            var description = weather.GetDescription(provider);
             if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();

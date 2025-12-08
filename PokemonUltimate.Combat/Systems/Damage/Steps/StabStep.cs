@@ -1,3 +1,5 @@
+using PokemonUltimate.Combat.Systems.Damage.Definition;
+
 namespace PokemonUltimate.Combat.Systems.Damage.Steps
 {
     /// <summary>

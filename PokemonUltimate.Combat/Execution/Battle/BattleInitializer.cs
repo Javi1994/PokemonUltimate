@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
+using PokemonUltimate.Combat.Infrastructure.Factories.Definition;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Combat.Infrastructure.Validation;
+using PokemonUltimate.Combat.Infrastructure.Validation.Definition;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
 

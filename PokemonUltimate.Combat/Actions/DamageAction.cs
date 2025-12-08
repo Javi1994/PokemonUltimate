@@ -5,16 +5,13 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Integration.View;
+using PokemonUltimate.Combat.Integration.View.Definition;
 using PokemonUltimate.Combat.Systems.Damage;
-using PokemonUltimate.Content.Catalogs.Abilities;
-using PokemonUltimate.Content.Catalogs.Items;
-using PokemonUltimate.Content.Extensions;
-using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Core.Utilities.Extensions;
-using PokemonUltimate.Core.Infrastructure.Localization;
-using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Constants;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.Combat.Actions
 {
@@ -104,7 +101,7 @@ namespace PokemonUltimate.Combat.Actions
                     {
                         Target.Pokemon.HeldItem = null; // Consume item
                         var provider = LocalizationService.Instance;
-                        var itemName = focusSashItem?.GetLocalizedName(provider) ?? "Focus Sash";
+                        var itemName = focusSashItem?.GetDisplayName(provider) ?? "Focus Sash";
                         reactions.Add(new MessageAction(provider.GetString(LocalizationKey.ItemActivated, Target.Pokemon.DisplayName, itemName)));
                         reactions.Add(new MessageAction(provider.GetString(LocalizationKey.HeldOnUsingItem, Target.Pokemon.DisplayName, itemName)));
                     }

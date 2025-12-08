@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Infrastructure.Logging;
+using PokemonUltimate.Combat.Infrastructure.Logging.Definition;
 
 namespace PokemonUltimate.BattleSimulator.Logging
 {

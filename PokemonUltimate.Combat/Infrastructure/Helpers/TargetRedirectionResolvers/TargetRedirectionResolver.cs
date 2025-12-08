@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Infrastructure.Helpers.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
 
 namespace PokemonUltimate.Combat.Infrastructure.Helpers.TargetRedirectionResolvers

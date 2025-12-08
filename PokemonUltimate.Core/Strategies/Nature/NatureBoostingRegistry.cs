@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Strategies.Nature.Definition;
 
 namespace PokemonUltimate.Core.Strategies.Nature
 {

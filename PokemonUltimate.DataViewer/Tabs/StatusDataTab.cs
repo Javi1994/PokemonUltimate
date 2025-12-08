@@ -6,8 +6,9 @@ using PokemonUltimate.Content.Catalogs.Status;
 using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Utilities.Extensions;
-using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -176,7 +177,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvStatus,
-                    status.GetLocalizedName(provider),
+                    status.GetDisplayName(provider),
                     typeStr,
                     categoryStr);
 
@@ -203,12 +204,12 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(status.GetLocalizedName(provider));
+            details.AppendLine(status.GetDisplayName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {(status.IsPersistent ? status.PersistentStatus.GetDisplayName(provider) : status.VolatileStatus.GetDisplayName(provider))}");
             details.AppendLine($"Category: {(status.IsPersistent ? "Persistent" : "Volatile")}");
 
-            var description = status.GetLocalizedDescription(provider);
+            var description = status.GetDescription(provider);
             if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();

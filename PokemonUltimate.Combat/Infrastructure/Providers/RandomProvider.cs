@@ -1,4 +1,5 @@
 using System;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Infrastructure.Providers

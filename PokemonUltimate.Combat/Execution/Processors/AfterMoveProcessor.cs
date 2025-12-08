@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Execution.Battle;
-using PokemonUltimate.Combat.Execution.Processors.Interfaces;
+using PokemonUltimate.Combat.Execution.Processors.Definition;
 using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Core.Infrastructure.Localization;
-using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Localization.Services;
+using PokemonUltimate.Localization.Constants;
+using PokemonUltimate.Localization.Extensions;
 
 namespace PokemonUltimate.Combat.Execution.Processors
 {
@@ -169,7 +169,7 @@ namespace PokemonUltimate.Combat.Execution.Processors
 
             // Message for item activation
             var provider = LocalizationService.Instance;
-            var itemName = item.GetLocalizedName(provider);
+            var itemName = item.GetDisplayName(provider);
             actions.Add(new MessageAction(
                 provider.GetString(LocalizationKey.ItemActivated, slot.Pokemon.DisplayName, itemName)));
 

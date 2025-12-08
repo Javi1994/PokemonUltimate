@@ -4,6 +4,8 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
+using PokemonUltimate.Combat.Systems.Effects.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Effects;
 using PokemonUltimate.Core.Data.Effects.Definition;

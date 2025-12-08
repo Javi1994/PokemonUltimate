@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokemonUltimate.Core.Data.Blueprints.Definition;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 using PokemonUltimate.Core.Infrastructure.Providers;

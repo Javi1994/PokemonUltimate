@@ -4,9 +4,10 @@ using System.Linq;
 using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Abilities;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Utilities.Extensions;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {

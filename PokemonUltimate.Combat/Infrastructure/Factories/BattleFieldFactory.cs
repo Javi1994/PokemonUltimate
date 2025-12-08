@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Infrastructure.Factories.Definition;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
 

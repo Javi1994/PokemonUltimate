@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Foundation.Field;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Combat.Statistics.Definition;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Constants;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.Combat.Statistics.Trackers
 {

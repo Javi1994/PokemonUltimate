@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using PokemonUltimate.Combat.Results;
+using PokemonUltimate.Combat.Foundation.Constants;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
 
 namespace PokemonUltimate.Combat.Infrastructure.Events

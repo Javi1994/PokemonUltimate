@@ -6,7 +6,9 @@ using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Foundation.Constants;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Integration.View;
+using PokemonUltimate.Combat.Integration.View.Definition;
 using PokemonUltimate.Combat.Statistics;
+using PokemonUltimate.Combat.Statistics.Definition;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Execution.Battle

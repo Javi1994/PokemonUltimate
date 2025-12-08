@@ -1,5 +1,7 @@
 using System;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
+using PokemonUltimate.Combat.Systems.Damage.Definition;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Systems.Damage.Steps

@@ -1,18 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using PokemonUltimate.BattleSimulator.Helpers;
-using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Actions;
+using PokemonUltimate.Combat.Foundation.Constants;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Events;
-using PokemonUltimate.Combat.Results;
+using PokemonUltimate.Combat.Infrastructure.Events.Definition;
 using PokemonUltimate.Combat.Statistics;
+using PokemonUltimate.Combat.Statistics.Definition;
 using PokemonUltimate.Core.Data.Enums;
-using PokemonUltimate.Core.Infrastructure.Localization;
-using PokemonUltimate.Core.Domain.Instances;
-using PokemonUltimate.Core.Services;
 using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Localization;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Providers;
+using PokemonUltimate.Localization.Providers.Definition;
+using PokemonUltimate.Localization.Services;
 using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.BattleSimulator.Logging

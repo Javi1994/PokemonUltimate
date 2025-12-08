@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PokemonUltimate.Combat.Systems.Effects.Definition;
 using PokemonUltimate.Core.Data.Enums;
 
 namespace PokemonUltimate.Combat.Systems.Effects

@@ -5,8 +5,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Field;
 using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -173,7 +174,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvHazard,
-                    hazard.GetLocalizedName(provider),
+                    hazard.GetDisplayName(provider),
                     typeStr,
                     layersStr);
 
@@ -200,7 +201,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(hazard.GetLocalizedName(provider));
+            details.AppendLine(hazard.GetDisplayName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {hazard.Type}");
             details.AppendLine($"Max Layers: {hazard.MaxLayers}");
@@ -210,7 +211,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             else
                 details.AppendLine("Affects Flying: No (grounded only)");
 
-            var description = hazard.GetLocalizedDescription(provider);
+            var description = hazard.GetDescription(provider);
             if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();

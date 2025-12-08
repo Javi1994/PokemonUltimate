@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Statistics.Definition;
 
 namespace PokemonUltimate.Combat.Statistics.Trackers
 {
@@ -22,7 +23,7 @@ namespace PokemonUltimate.Combat.Statistics.Trackers
             var actionTypeName = action.GetType().Name;
             if (!stats.ActionTypeStats.ContainsKey(actionTypeName))
                 stats.ActionTypeStats[actionTypeName] = 0;
-            
+
             stats.ActionTypeStats[actionTypeName]++;
         }
     }

@@ -1,7 +1,11 @@
 using System;
 using System.Windows.Forms;
-using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization;
+using PokemonUltimate.Localization.Helpers;
+using PokemonUltimate.Localization.Providers;
+using PokemonUltimate.Localization.Providers.Definition;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DeveloperTools.Localization
 {

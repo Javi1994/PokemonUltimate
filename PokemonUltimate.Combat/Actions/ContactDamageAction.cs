@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Integration.View;
+using PokemonUltimate.Combat.Integration.View.Definition;
 using PokemonUltimate.Core.Data.Constants;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Constants;
 
 namespace PokemonUltimate.Combat.Actions
 {

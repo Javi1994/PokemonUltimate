@@ -1,5 +1,7 @@
 
 
+using PokemonUltimate.Core.Strategies.Effect.Definition;
+
 namespace PokemonUltimate.Core.Strategies.Effect
 {
     public class EmbargoDescriptionStrategy : IMoveRestrictionDescriptionStrategy

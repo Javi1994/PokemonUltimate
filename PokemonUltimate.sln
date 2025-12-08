@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 #
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.Core", "PokemonUltimate.Core\PokemonUltimate.Core.csproj", "{7C4824C3-DB54-4BED-B131-FE54110E098C}"
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.DataViewer", "PokemonUltimate.DataViewer\PokemonUltimate.DataViewer.csproj", "{8DE0F40E-50FF-4880-A720-EBFB1FA4C639}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.BattleSimulator", "PokemonUltimate.BattleSimulator\PokemonUltimate.BattleSimulator.csproj", "{C212B17E-C373-4481-A20A-B49A11626BE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonUltimate.Localization", "PokemonUltimate.Localization\PokemonUltimate.Localization.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,5 +45,9 @@ Global
 		{C212B17E-C373-4481-A20A-B49A11626BE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C212B17E-C373-4481-A20A-B49A11626BE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C212B17E-C373-4481-A20A-B49A11626BE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

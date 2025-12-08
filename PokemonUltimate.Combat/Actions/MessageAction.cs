@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Integration.View;
+using PokemonUltimate.Combat.Integration.View.Definition;
 
 namespace PokemonUltimate.Combat.Actions
 {

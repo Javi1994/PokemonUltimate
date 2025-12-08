@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using PokemonUltimate.Core.Data.Enums;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
+using PokemonUltimate.Core.Strategies.Stats.Definition;
 
 namespace PokemonUltimate.Core.Strategies.Stats
 {

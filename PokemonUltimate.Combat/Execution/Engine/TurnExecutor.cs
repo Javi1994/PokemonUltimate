@@ -7,12 +7,17 @@ using PokemonUltimate.Combat.Execution.Processors;
 using PokemonUltimate.Combat.Execution.Processors.Observer;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Events;
+using PokemonUltimate.Combat.Infrastructure.Events.Definition;
 using PokemonUltimate.Combat.Infrastructure.Helpers;
 using PokemonUltimate.Combat.Infrastructure.Logging;
+using PokemonUltimate.Combat.Infrastructure.Logging.Definition;
 using PokemonUltimate.Combat.Infrastructure.Validation;
+using PokemonUltimate.Combat.Infrastructure.Validation.Definition;
 using PokemonUltimate.Combat.Integration.View;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Combat.Integration.View.Definition;
 using PokemonUltimate.Core.Utilities.Extensions;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.Combat.Execution.Engine
 {

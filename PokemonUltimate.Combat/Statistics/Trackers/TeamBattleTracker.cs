@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Statistics.Definition;
 
 namespace PokemonUltimate.Combat.Statistics.Trackers
 {

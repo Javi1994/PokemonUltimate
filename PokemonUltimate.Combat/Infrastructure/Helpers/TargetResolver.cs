@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonUltimate.Combat.Extensions;
 using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Infrastructure.Helpers.Definition;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;

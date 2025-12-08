@@ -5,6 +5,7 @@ using PokemonUltimate.Combat;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Providers;
 using PokemonUltimate.Combat.Systems.Damage;
+using PokemonUltimate.Combat.Systems.Damage.Definition;
 using PokemonUltimate.Combat.Systems.Damage.Steps;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Infrastructure.Factories;

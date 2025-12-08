@@ -1,3 +1,5 @@
+using PokemonUltimate.Combat.Infrastructure.Logging.Definition;
+
 namespace PokemonUltimate.Combat.Infrastructure.Logging
 {
     /// <summary>

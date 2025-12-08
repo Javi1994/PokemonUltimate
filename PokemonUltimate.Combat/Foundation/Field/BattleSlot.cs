@@ -1,6 +1,7 @@
 using System;
 using PokemonUltimate.Combat.Foundation.ValueObjects;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Core.Data.Constants;
 using PokemonUltimate.Core.Data.Enums;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;

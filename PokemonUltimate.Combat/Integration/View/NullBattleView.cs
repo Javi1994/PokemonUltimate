@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokemonUltimate.Combat.Actions;
 using PokemonUltimate.Combat.Foundation.Field;
+using PokemonUltimate.Combat.Integration.View.Definition;
 using PokemonUltimate.Core.Domain.Instances.Move;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
 

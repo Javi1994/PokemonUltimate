@@ -8,10 +8,15 @@ using PokemonUltimate.Combat.Foundation.Constants;
 using PokemonUltimate.Combat.Foundation.Field;
 using PokemonUltimate.Combat.Infrastructure.Factories;
 using PokemonUltimate.Combat.Infrastructure.Helpers;
+using PokemonUltimate.Combat.Infrastructure.Helpers.Definition;
 using PokemonUltimate.Combat.Infrastructure.Messages;
+using PokemonUltimate.Combat.Infrastructure.Messages.Definition;
 using PokemonUltimate.Combat.Infrastructure.Providers;
+using PokemonUltimate.Combat.Infrastructure.Providers.Definition;
 using PokemonUltimate.Combat.Integration.View;
+using PokemonUltimate.Combat.Integration.View.Definition;
 using PokemonUltimate.Combat.Systems.Damage;
+using PokemonUltimate.Combat.Systems.Damage.Definition;
 using PokemonUltimate.Combat.Systems.Effects;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Constants;
@@ -19,9 +24,10 @@ using PokemonUltimate.Core.Data.Effects;
 using PokemonUltimate.Core.Data.Enums;
 using PokemonUltimate.Core.Domain.Instances;
 using PokemonUltimate.Core.Domain.Instances.Move;
-using PokemonUltimate.Core.Infrastructure.Localization;
+using PokemonUltimate.Localization.Services;
 using PokemonUltimate.Core.Services;
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
+using PokemonUltimate.Localization.Constants;
 
 namespace PokemonUltimate.Combat.Actions
 {

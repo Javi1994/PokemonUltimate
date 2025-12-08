@@ -1,4 +1,5 @@
 using PokemonUltimate.Core.Data.Enums;
+using PokemonUltimate.Core.Domain.Evolution.Definition;
 using PokemonInstance = PokemonUltimate.Core.Domain.Instances.Pokemon.PokemonInstance;
 
 namespace PokemonUltimate.Core.Domain.Evolution.Conditions

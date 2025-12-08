@@ -1,4 +1,5 @@
 using System;
+using PokemonUltimate.Combat.Systems.Damage.Definition;
 using PokemonUltimate.Core.Data.Constants;
 
 namespace PokemonUltimate.Combat.Systems.Damage.Steps

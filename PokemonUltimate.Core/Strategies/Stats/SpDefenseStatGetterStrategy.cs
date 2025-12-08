@@ -1,4 +1,5 @@
 using PokemonUltimate.Core.Domain.Instances.Pokemon;
+using PokemonUltimate.Core.Strategies.Stats.Definition;
 
 namespace PokemonUltimate.Core.Strategies.Stats
 {

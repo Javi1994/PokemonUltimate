@@ -5,8 +5,9 @@ using System.Windows.Forms;
 using PokemonUltimate.Content.Catalogs.Field;
 using PokemonUltimate.Content.Extensions;
 using PokemonUltimate.Core.Data.Blueprints;
-using PokemonUltimate.Core.Infrastructure.Localization;
 using PokemonUltimate.Core.Services;
+using PokemonUltimate.Localization.Extensions;
+using PokemonUltimate.Localization.Services;
 
 namespace PokemonUltimate.DataViewer.Tabs
 {
@@ -173,7 +174,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
                 var row = new DataGridViewRow();
                 row.CreateCells(this.dgvFieldEffect,
-                    fieldEffect.GetLocalizedName(provider),
+                    fieldEffect.GetDisplayName(provider),
                     typeStr,
                     durationStr);
 
@@ -200,7 +201,7 @@ namespace PokemonUltimate.DataViewer.Tabs
 
             var provider = LocalizationService.Instance;
             var details = new System.Text.StringBuilder();
-            details.AppendLine(fieldEffect.GetLocalizedName(provider));
+            details.AppendLine(fieldEffect.GetDisplayName(provider));
             details.AppendLine();
             details.AppendLine($"Type: {fieldEffect.Type}");
 
@@ -221,7 +222,7 @@ namespace PokemonUltimate.DataViewer.Tabs
             if (fieldEffect.SwapsDefenses)
                 details.AppendLine("Effect: Swaps Defense and Sp. Defense");
 
-            var description = fieldEffect.GetLocalizedDescription(provider);
+            var description = fieldEffect.GetDescription(provider);
             if (!string.IsNullOrEmpty(description))
             {
                 details.AppendLine();

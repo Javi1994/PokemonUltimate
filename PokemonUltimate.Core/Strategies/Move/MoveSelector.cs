@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using PokemonUltimate.Core.Data.Blueprints;
 using PokemonUltimate.Core.Data.Enums;
 using PokemonUltimate.Core.Infrastructure.Providers.Definition;
+using PokemonUltimate.Core.Strategies.Move.Definition;
 
 namespace PokemonUltimate.Core.Strategies.Move
 {
